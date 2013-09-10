@@ -1,0 +1,27 @@
+# TODO
+
+## ROADMAP für Umstellung
+
+- Kopieren der Dateien von
+  - SystemControl/Roboter/src/utils
+  - SystemControl/Roboter/src/plattform
+  - common/util
+
+- Neuordnung in zusammenhängende Module
+
+- alten Code zum Compilieren bringen
+  
+- Umstellung des Namspace auf Tina oder tina
+
+- Aufräumen
+
+## notwendig Änderungen
+
+- ScopedLock wieder als Standard nehmen (LockGuard bringt keinen Vorteil)
+- Namespace für ScopedLock
+- mehrere Eventqueues ermöglichen
+- Action: aus statische Funktionen als Zustände Methoden verwenden
+
+## BUGS
+
+
