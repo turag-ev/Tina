@@ -21,6 +21,19 @@
 - Namespace für ScopedLock
 - mehrere Eventqueues ermöglichen
 - Action: aus statische Funktionen als Zustände Methoden verwenden
+- Units: wenn Value-Typ Ganzzahltyp, wird beim Erstellung einer Variable nicht gerundet
+- init.h und final.h auflösen
+- pycrc für crc benutzen: https://github.com/tpircher/pycrc
+- EventNamespace aus types.h in statemachine Module überführen
+- types.h C kompatible machen
+- normialize ergänzen um cross-c-c++ Makros:
+    - constexpr in C ersetzen
+    - _always_inline für c anpassen
+    
+    -> C/C++ kompatiblen Header erstellen für:
+       - plattform/utils/time.h
+       - math.h
+- Quelle für REQUIRES angeben
 
 ## BUGS
 
