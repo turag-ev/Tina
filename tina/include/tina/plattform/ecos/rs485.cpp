@@ -1,0 +1,111 @@
+#define LOG_SOURCE "H"
+
+#include <util/ecoshelpers.h>
+#include <plattform/hardware.h>
+#include <comm/rs485bus-SystemControl.h>
+#include <cyg/io/io.h>
+#include <util/types.h>
+#include <utils/time.h>
+#include <utils/debug.h>
+
+
+
+bool Hardware::initRS485() {
+	info("initRS485\n");
+
+	// usart pins are driven by peripheral
+	HAL_ARM_AT91_PIO_CFG(AT91_USART_RXD1);
+	HAL_ARM_AT91_PIO_CFG(AT91_USART_TXD1);
+	HAL_ARM_AT91_PIO_CFG(AT91_USART_RTS1);
+
+	int __attribute__((unused)) status_reg;
+
+	HAL_READ_UINT32(AT91_USART1 + AT91_US_CSR, status_reg);
+	HAL_WRITE_UINT32(AT91_USART1 + AT91_US_CR, AT91_US_CR_TxRESET | AT91_US_CR_RxRESET | AT91_US_CR_TxDISAB | AT91_US_CR_RxDISAB);
+	HAL_WRITE_UINT32(AT91_USART1 + AT91_US_BRG, AT91_US_BAUD(RS485_BAUD_RATE));
+	HAL_WRITE_UINT32(AT91_USART1 + AT91_US_MR, 0 | AT91_US_MR_CLOCK_MCK | AT91_US_MR_LENGTH_8 | AT91_US_MR_STOP_1 | AT91_US_MR_PARITY_NONE | AT91_US_MR_MODE_NORMAL | (1<<0)); // <- RS485-Mode aktiv
+	HAL_WRITE_UINT32(AT91_USART1 + AT91_US_CR, AT91_US_CR_TxENAB | AT91_US_CR_RxENAB);
+
+	// disable interrupts
+	HAL_WRITE_UINT32(AT91_USART1 + AT91_US_IDR, -1);
+
+	return true;
+}
+
+
+bool Hardware::transceiveRS485(uint8_t* input, int input_length, uint8_t* output, int output_length, int timeout) {
+	if (!input || input_length == 0) return false;
+
+	// SENDE-TEIL
+	int i = 0;
+	cyg_uint32 temp = 0;
+
+	while (i < input_length) {
+		// write data bytes to transmit-register
+	  	HAL_WRITE_UINT32(AT91_USART1 + AT91_US_THR, (cyg_uint8)input[i]);
+
+		// wait for raising TXRDY-flag -> character transmitted
+		do {
+			HAL_READ_UINT32(AT91_USART1 + AT91_US_CSR,temp);
+			temp &= AT91_US_CSR_TxRDY;
+		} while (temp == 0);
+		
+		i++;
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////
+	// EMPFANGS-TEIL
+
+	if (!output || output_length == 0) return true;
+
+	for (i = 0; i < output_length; ++i) output[i] = 0;
+
+	i = 0;
+	bool leave_loop = false;
+
+	// load initial timeout into TO-Register
+	int timeout_symbols = ticks_to_ms(timeout) * (RS485_BAUD_RATE / 1000);
+	if (timeout_symbols > 0xffff) timeout_symbols = 0xffff;
+
+    // disable DMA (driver doesn't work otherwise)
+    HAL_WRITE_UINT32(AT91_USART1 + AT91_US_CR, AT91_US_CR_RxRESET);
+    HAL_WRITE_UINT32(AT91_USART1 + AT91_US_PTCR, AT91_US_PTCR_RXTDIS);
+    HAL_WRITE_UINT32(AT91_USART1 + AT91_US_CR, AT91_US_CR_RSTATUS);
+    HAL_WRITE_UINT32(AT91_USART1 + AT91_US_CR, AT91_US_CR_RxENAB);
+
+	HAL_WRITE_UINT16(AT91_USART1 + AT91_US_RTO, timeout_symbols);
+	HAL_WRITE_UINT32(AT91_USART1 + AT91_US_CR, AT91_US_CR_RETTO);
+
+	while (!leave_loop) {
+		// wait for raising RXRDY-flag or timeout
+		do {
+			HAL_READ_UINT32(AT91_USART1 + AT91_US_CSR, temp);
+		} while ( ! (temp  & (AT91_US_CSR_RxRDY | AT91_US_CSR_TIMEOUT | AT91_US_CSR_RXBRK | AT91_US_CSR_OVRE | AT91_US_CSR_OVRE)));
+
+		// only leave loop on timeout or error
+		if (temp & (AT91_US_CSR_TIMEOUT | AT91_US_CSR_RXBRK | AT91_US_CSR_OVRE | AT91_US_CSR_OVRE)) {
+			leave_loop = true;
+		}
+		if (temp & AT91_US_CSR_RxRDY) {
+			HAL_READ_UINT32(AT91_USART1 + AT91_US_RHR, temp);
+
+			// fill buffer up to the top
+			if (i < output_length) {
+				output[i] = temp;
+			}
+
+			++i;
+
+			// reduce timeout after first received byte
+			if (i==1) HAL_WRITE_UINT16(AT91_USART1 + AT91_US_RTO, 15);
+		}
+	}
+
+	if (i == output_length) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
