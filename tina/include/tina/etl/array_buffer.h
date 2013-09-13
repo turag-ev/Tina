@@ -186,7 +186,7 @@ public:
   template<class... Args> _always_inline
   void emplace_back(Args&&... args) {
     if (!is_full()) {
-      bytes_.emplace(length_, args...);
+      bytes_.emplace(length_, std::forward<Args>(args)...);
       length_++;
     }
   }
@@ -202,7 +202,7 @@ public:
   void emplace_front(Args&&... args) {
     if (prepare_for_insert(begin())) {
       length_++;
-      bytes_.emplace(0, args...);
+      bytes_.emplace(0, std::forward<Args>(args)...);
     }
   }
 
@@ -221,7 +221,7 @@ public:
   void emplace(iterator position, Args&&... args) {
     if (prepare_for_insert(position)) {
       length_++;
-      bytes_.emplace(position, args...);
+      bytes_.emplace(position, std::forward<Args>(args)...);
     }
   }
 

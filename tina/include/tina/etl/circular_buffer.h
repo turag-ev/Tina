@@ -292,7 +292,7 @@ public:
     }
 #endif
 
-    bytes_.emplace(last_.n_, args...);
+    bytes_.emplace(last_.n_, std::forward<Args>(args)...);
   }
 
   void push_front(const T& x) {
@@ -310,7 +310,7 @@ public:
 
   template< class... Args >
   void emplace_front(Args&&... args) {
-    bytes_.emplace(first_.n_, args...);
+    bytes_.emplace(first_.n_, std::forward<Args>(args)...);
     --first_;
 
 #ifndef NDEBUG
