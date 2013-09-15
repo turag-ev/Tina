@@ -11,7 +11,7 @@
 
 #include "normalize.h"
 
-namespace extra {
+namespace TURAG {
 
 ////////////////////////////////////////////////////////////////////////////////
 // std extention
@@ -61,6 +61,6 @@ typename ReverseIterator::iterator_type make_forward(ReverseIterator rit) {
   return rit.base() - 1;
 }
 
-} // namespace extra
+} // namespace TURAG
 
 #endif // ALGORITHM_H

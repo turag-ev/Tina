@@ -10,7 +10,7 @@
 #ifndef UTILS_DEBUG_H
 #define UTILS_DEBUG_H
 
-#include <utils/debugprint.h>
+#include <tina/debugprint.h>
 
 // Debug prefixes
 #define ERROR_PREFIX    "!"
@@ -76,6 +76,9 @@
 
 #define menu_printf(format, args...) CMenu_Printf("^" CMENU_PREFIX format "\r\n", ##args)
 #define menu_print(msg) CMenu_Printf("^" CMENU_PREFIX msg "\r\n")
+
+#define bool_string(b) ((b)?"true":"false")
+#define bool_string_de(b) ((b)?"ja":"nein")
 
 #endif // UTILS_DEBUG_H
 

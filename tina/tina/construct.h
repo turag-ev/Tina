@@ -5,9 +5,9 @@
 #include <iterator>
 
 #include "normalize.h"
-#include "macro-helper.h"
+#include "macros.h"
 
-namespace extra {
+namespace TURAG {
 
 template<typename T>
 #if GCC_VERSION < 40800
@@ -45,6 +45,6 @@ void destruct(ForwardIterator first, ForwardIterator last) {
   }
 }
 
-} // namespace extra
+} // namespace TURAG
 
 #endif // CONSTRUCT_H

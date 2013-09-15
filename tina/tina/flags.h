@@ -4,7 +4,7 @@
 #include <limits.h>
 #include "normalize.h"
 
-namespace SystemControl {
+namespace TURAG {
 
 template<typename Enum>
 class Flags {
@@ -233,6 +233,6 @@ private:
 template<typename Enum>
 const Flags<Enum> Flags<Enum>::NOTHING;
 
-} // namespace SystemControl
+} // namespace TURAG
 
 #endif // FLAGS_H

@@ -8,13 +8,13 @@
 #define LOG_SOURCE "E"
 //#define DEBUG_LEVEL 3
 
-#include "debug.h"
+#include "../debug.h"
 
 #include <algorithm>
-#include <utils/thread.h>
-#include "extra/array_buffer.h"
-#include "extra/circular_buffer.h"
-#include "extra/algorithm.h"
+#include <tina/thread.h>
+#include "../array_buffer.h"
+#include "../circular_buffer.h"
+#include "../algorithm.h"
 #include "eventqueue.h"
 #include "state.h"
 
@@ -22,7 +22,7 @@
 # undef EVENTQUEUE_USAGE_MEASUREMENT
 #endif
 
-namespace SystemControl {
+namespace TURAG {
 
 struct EventQueuePrivate {
   // Circular buffer for events
@@ -179,7 +179,7 @@ EventQueue::pushTimedelayed(SystemTime ticks, EventId id, pointer params,
     iter++;
   }
   /*if (iter == p.timequeue.rend())*/ iter--;
-  p.timequeue.emplace(extra::make_forward(iter), Event(id, params, method), t);
+  p.timequeue.emplace(make_forward(iter), Event(id, params, method), t);
 
 #ifdef EVENTQUEUE_USAGE_MEASUREMENT
   if (p.timequeue.size() > p.max_timed_events) {
@@ -205,7 +205,7 @@ struct is_id {
 void
 EventQueue::removeTimedelayed(EventId id) {
   Mutex::Lock lock(p.timemutex);
-  extra::remove_if(p.timequeue, is_id(id));
+  remove_if(p.timequeue, is_id(id));
 }
 
 void
@@ -241,7 +241,7 @@ EventQueue::removeCallback(EventMethod method) {
 
   {
     Mutex::Lock lock(p.timemutex);
-    extra::remove_if(p.timequeue, is_callback(method));
+    remove_if(p.timequeue, is_callback(method));
   }
 }
 
@@ -329,4 +329,4 @@ void sc_eventqueue_push_timedelayed(SystemTicks ticks, EventId id, pointer param
   EventQueue::pushTimedelayed(SystemTime{ticks}, id, params, method);
 }
 
-} // namespace SystemControl
+} // namespace TURAG

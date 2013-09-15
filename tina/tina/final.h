@@ -1,8 +1,10 @@
 #ifndef FINAL_H
 #define FINAL_H
 
-#include "macro-helper.h"
+#include "macros.h"
 #include "normalize.h"
+
+namespace TURAG {
 
 ////////////////////////////////////////////////////////////////////////////////
 // finalizer (exit code)
@@ -27,5 +29,7 @@ private:
 
 /// macro for call a function initialization
 #define FINAL_CALL(v) static finalizer_call CONCAT(_finalizer_,__COUNTER__) (v)
+
+} // namespace TURAG
 
 #endif // FINAL_H

@@ -1,7 +1,7 @@
 #ifndef TINA_UNITS_CONFIG_H
 #define TINA_UNITS_CONFIG_H
 
-namespace Tina {
+namespace TURAG {
 namespace Units {
 
 /// Typ für Gleitkommazahlen
@@ -20,7 +20,7 @@ constexpr UnitFactor FROM_SI_CONVERT_FACTOR_ANGLE  =    1.f; // rad
 constexpr UnitFactor FROM_SI_CONVERT_FACTOR_TIME   =    1.f; // s
 
 } // namespace Units
-} // namespace Tina
+} // namespace TURAG
 
 #endif // TINA_UNITS_CONFIG_H
 

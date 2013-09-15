@@ -5,9 +5,11 @@
 #include <iterator>
 
 #include "normalize.h"
-#include "../debug.h"
-#include "macro-helper.h"
+#include "debug.h"
+#include "macros.h"
 #include "array_storage.h"
+
+namespace TURAG {
 
 /// circular buffer implementation
 ///   -empty-     -2 elements-   -3 elements-
@@ -395,7 +397,9 @@ private:
   intern_iterator last_;
 
   // bytes needed to work a round the value ctor at construction
-  extra::array_storage<T, N> bytes_;
+  array_storage<T, N> bytes_;
 };
+
+} // namespace TURAG
 
 #endif // CIRCULAR_BUFFER_H

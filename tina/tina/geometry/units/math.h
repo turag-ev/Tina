@@ -5,7 +5,7 @@
 
 #include "units.h"
 
-namespace Tina {
+namespace TURAG {
 
 namespace Units {
 
@@ -25,7 +25,7 @@ template<typename Dim> constexpr
 Units::Quantity< typename Units::dim_root<Dim, 2>::type >
 sqrt(Units::Quantity<Dim> arg) {
   return Units::Quantity< typename Units::dim_root<Dim, 2>::type >
-      (sqrt(arg.value));
+      (std::sqrt(arg.value));
 }
 
 template<typename Dim> constexpr
@@ -54,7 +54,7 @@ Units::Length hypot(Units::Length x, Units::Length y) {
   return Units::Length(__builtin_hypotf(x.value, y.value));
 }
 
-} // namespace Tina
+} // namespace TURAG
 
 #endif // TINA_UNITS_MATH_H
 

@@ -2,9 +2,8 @@
 #define PACKED_H
 
 #include <type_traits>
-#include "../types.h"
 
-namespace extra {
+namespace TURAG {
 
 ////////////////////////////////////////////////////////////////////////////////
 // Pointer casts
@@ -41,6 +40,6 @@ inline const Unpacked& reinterpret_reference(const Packed& src) {
   return *reinterpret_cast<const Unpacked*>(&src);
 }
 
-} // namespace extra
+} // namespace TURAG
 
 #endif // PACKED_H

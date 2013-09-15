@@ -24,6 +24,9 @@
 // nullptr
 
 #if (GCC_VERSION < 40600) && defined(__cplusplus)
+
+namespace TURAG {
+
 // from http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2431.pdf
 const                        // this is a const object...
 class nullptr_t {
@@ -40,6 +43,9 @@ private:
   void operator&() const;    // whose address can't be taken
 
 } nullptr = {};              // and whose name is nullptr
+
+} // namespace TURAG
+
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////

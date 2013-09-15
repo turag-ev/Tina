@@ -4,6 +4,8 @@
 #include "macros.h"
 #include "normalize.h"
 
+namespace TURAG {
+
 ////////////////////////////////////////////////////////////////////////////////
 // LockGuard
 
@@ -74,5 +76,7 @@ private:
   Mutex& m_;
   bool locked_;
 };
+
+} // namespace TURAG
 
 #endif // SCOPED_LOCK_H

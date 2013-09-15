@@ -1,12 +1,14 @@
-#ifndef ARRAY_H
-#define ARRAY_H
+#ifndef TINA_ARRAY_H
+#define TINA_ARRAY_H
 
 #include <cstddef>
 #include <iterator>
 
 #include "normalize.h"
-#include "../debug.h"
+#include "debug.h"
 #include "array_storage.h"
+
+namespace TURAG {
 
 template<typename ArrayBufferType>
 struct _ArrayBufferHelper {
@@ -233,7 +235,7 @@ private:
   std::size_t length_;
 
   // bytes for array
-  extra::array_storage<T, N> bytes_;
+  array_storage<T, N> bytes_;
 
   bool prepare_for_insert(iterator position) {
 #ifdef NDEBUG
@@ -313,4 +315,6 @@ bool _ArrayBufferHelper<ArrayBufferType>::is_full(const_iterator end, const_iter
 }
 #endif
 
-#endif // ARRAY_H
+} // namespace TURAG
+
+#endif // TINA_ARRAY_H

@@ -2,9 +2,9 @@
 #define MATH_H
 
 #include <cmath>
-#include "extra/normalize.h"
+#include "../normalize.h"
 
-namespace Tina {
+namespace TURAG {
 
 template<typename T>
 constexpr _always_inline
@@ -41,6 +41,6 @@ unsigned int gcd(int a, int b) {
   return (a % b == 0) ? b : gcd(a, a % b);
 }
 
-}
+} // namespace TURAG
 
 #endif // MATH_H

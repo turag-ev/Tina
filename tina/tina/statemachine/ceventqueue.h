@@ -1,7 +1,7 @@
 #ifndef CEVENTQUEUE_H
 #define CEVENTQUEUE_H
 
-#include <utils/timetype.h>
+#include <tina/timetype.h>
 
 #ifdef __cplusplus
 extern "C" {

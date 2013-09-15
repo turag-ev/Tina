@@ -2,12 +2,12 @@
 #define GEOMETRY_H
 
 #include <array>
-
-#include "extra/normalize.h"
 #include <cmath>
-#include "extra/units.h"
 
-namespace SystemControl {
+#include "../normalize.h"
+#include "units.h"
+
+namespace TURAG {
 
 typedef Units::Angle Angle;
 typedef Units::Length Length;
@@ -268,6 +268,6 @@ struct Circle {
 
 bool interselect(Circle one, Circle two, std::array<Point, 2>& results);
 
-} // namespace SystemControl
+} // namespace TURAG
 
 #endif // GEOMETRY_H

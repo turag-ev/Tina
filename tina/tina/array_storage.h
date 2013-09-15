@@ -7,7 +7,7 @@
 #include "normalize.h"
 #include "construct.h"
 
-namespace extra {
+namespace TURAG {
 
 template<typename T>
 struct storage {
@@ -91,6 +91,6 @@ private:
   typename storage<T>::type data_[N];
 };
 
-}
+} // namespace TURAG
 
 #endif // ARRAY_STORAGE_H

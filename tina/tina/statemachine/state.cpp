@@ -8,14 +8,14 @@
  */
 
 #define LOG_SOURCE "A"
-#include "utils/debug.h"
+#include "../debug.h"
 
 #include "state.h"
-#include "debug.h"
+#include "../debug.h"
 #include "eventqueue.h"
-#include "extra/packed.h"
+#include "../packed.h"
 
-namespace SystemControl {
+namespace TURAG {
 
 // Mögliche Zustände für Aktionen:
 //                     | currentstate_ | parent_  | child_   | about_to_close_
@@ -48,7 +48,7 @@ bool Action::exit(EventId eid) {
       if (parent_->about_to_close_) {
         parent_->cancel();
       } else {
-        parent_->func(Action::event_return, extra::pack<pointer>(eid));
+        parent_->func(Action::event_return, pack<pointer>(eid));
       }
     }
     return true;
@@ -199,4 +199,4 @@ void Action::killChildActions() {
   }
 }
 
-} // namespace SystemControl
+} // namespace TURAG

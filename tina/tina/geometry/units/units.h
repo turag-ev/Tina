@@ -4,7 +4,7 @@
 #include "config.h"
 #include "unit.h"
 
-namespace Tina {
+namespace TURAG {
 namespace Units {
 
 constexpr Unit<LengthDimension> mm(FROM_SI_CONVERT_FACTOR_LENGTH / 1000.f);
@@ -20,6 +20,6 @@ constexpr Unit<TimeDimension>  s(FROM_SI_CONVERT_FACTOR_TIME);
 constexpr Unit<TimeDimension> ms(FROM_SI_CONVERT_FACTOR_TIME / 1000.f);
 
 } // namespace Units
-} // namespace Tina
+} // namespace TURAG
 
 #endif // TINA_UNITS_UNITS_H

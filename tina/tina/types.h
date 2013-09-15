@@ -10,14 +10,15 @@
 #ifndef TYPES_H_
 #define TYPES_H_
 
-#include "extra/normalize.h"
 #include <limits>
+#include <stddef.h>
+#include <util/types.h>
+#include "normalize.h"
+
+namespace TURAG {
 
 ////////////////////////////////////////////////////////////////////////////////
 // integral types
-
-#include <stddef.h>
-#include <util/types.h>
 
 /// unsigned integer type
 typedef unsigned int  uint;
@@ -30,8 +31,6 @@ typedef void* pointer;
 
 ////////////////////////////////////////////////////////////////////////////////
 // intern types
-
-namespace SystemControl {
 
 /// type for event ids
 typedef uint32_t EventId;
@@ -57,6 +56,6 @@ static const float NaNf = __builtin_nanf("");
 
 typedef uint Points;
 
-} // namespace SystemControl
+} // namespace TURAG
 
 #endif /* TYPES_H_ */

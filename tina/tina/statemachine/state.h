@@ -10,13 +10,13 @@
 #ifndef UTILS_STATE_H_
 #define UTILS_STATE_H_
 
-#include "types.h"
-#include "extra/normalize.h"
-#include "extra/macro-helper.h"
+#include "../types.h"
+#include "../normalize.h"
+#include "../macros.h"
 
 IGNORE_WARNING("-Wunused-parameter");
 
-namespace SystemControl {
+namespace TURAG {
 
 ////////////////////////////////////////////////////////////////////////////////
 //     Action State Model
@@ -432,6 +432,6 @@ A StaticAction<A>::instance;
 
 // intern macros
 
-}
+} // namespace TURAG
 
 #endif /* UTILS_STATE_H_ */

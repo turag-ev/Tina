@@ -11,12 +11,12 @@
 #define EVENTQUEUE_H_
 
 #include <type_traits>
-#include <utils/time.h>
-#include "types.h"
-#include "extra/packed.h"
-#include "extra/macro-helper.h"
+#include <tina/time.h>
+#include "../types.h"
+#include "../packed.h"
+#include "../macros.h"
 
-namespace SystemControl {
+namespace TURAG {
 
 class Action;
 
@@ -100,7 +100,7 @@ public:
 
   template<typename T, REQUIRES(!std::is_pointer<T>)> _always_inline
   static void push(EventId id, T param, EventMethod method = nullptr) {
-    push(id, extra::pack<void*>(param), method);
+    push(id, pack<void*>(param), method);
   }
 
   /// Push an new event to the event processing loop
@@ -117,9 +117,9 @@ public:
   /** Paramters the same as in push */
   static void pushToFront(EventId id, pointer params, EventMethod method = nullptr);
 
-  template<typename T> _always_inline
+  template<typename T, REQUIRES(!std::is_pointer<T>)> _always_inline
   static void pushToFront(EventId id, T param, EventMethod method = nullptr) {
-    pushToFront(id, extra::pack<void*>(param), method);
+    pushToFront(id, pack<void*>(param), method);
   }
 
   /// Push an new event to the front of the event processing loop
@@ -139,9 +139,9 @@ public:
    */
   static void pushTimedelayed(SystemTime ticks, EventId id, pointer param, EventMethod method = nullptr);
 
-  template<typename T> _always_inline
+  template<typename T, REQUIRES(!std::is_pointer<T>)> _always_inline
   static void pushTimedelayed(SystemTime ticks, EventId id, T param, EventMethod method = nullptr) {
-    pushTimedelayed(ticks, id, extra::pack<void*>(param), method);
+    pushTimedelayed(ticks, id, pack<void*>(param), method);
   }
 
   /// Process event in a number of kernel ticks
@@ -205,7 +205,8 @@ public:
   static const EventId event_quit = -1;
 };
 
-} // namespace SystemControl
+} // namespace TURAG
+
 #endif /* EVENTQUEUE_H_ */
 
 

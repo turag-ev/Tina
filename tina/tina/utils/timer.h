@@ -1,7 +1,9 @@
 #ifndef TIME_H
 #define TIME_H
 
-#include <utils/time.h>
+#include <tina/time.h>
+
+namespace TURAG {
 
 ////////////////////////////////////////////////////////////////////////////////
 // timer (to stop times)
@@ -19,5 +21,7 @@ public:
 private:
   SystemTime start_time_;
 };
+
+} // namespace TURAG
 
 #endif // TIME_H

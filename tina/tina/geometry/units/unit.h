@@ -2,12 +2,14 @@
 #define TINA_UNITS_UNIT_H
 
 #include <cstddef>
+#include <type_traits>
+#include <cmath>
 
 #include "config.h"
 #include <tina/macros.h>
 #include <tina/normalize.h>
 
-namespace Tina {
+namespace TURAG {
 namespace Units {
 
 namespace detail {
@@ -442,6 +444,6 @@ typedef Quantity< typename dim_div<LengthDimension, TimeDimension>::type > Veloc
 typedef Quantity< typename dim_div<AngleDimension, TimeDimension>::type > AngularVelocity;
 
 } // namespace Units
-} // namespace Tina
+} // namespace TURAG
 
 #endif // TINA_UNITS_UNIT_H

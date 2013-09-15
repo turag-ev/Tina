@@ -1,8 +1,10 @@
 #ifndef INIT_H
 #define INIT_H
 
-#include "macro-helper.h"
+#include "macros.h"
 #include "normalize.h"
+
+namespace TURAG {
 
 ////////////////////////////////////////////////////////////////////////////////
 // initializer (startup code)
@@ -36,5 +38,7 @@ public:
 
 /// macro for call a function initialization
 #define INIT_CALL(v) static initializer_call CONCAT(_initializer_,__COUNTER__) (v)
+
+} // namespace TURAG
 
 #endif // INIT_H

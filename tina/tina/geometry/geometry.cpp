@@ -1,8 +1,8 @@
 #include "geometry.h"
 
-using namespace Units;
+namespace TURAG {
 
-namespace SystemControl {
+using namespace Units;
 
 bool interselect(Circle one, Circle two, std::array<Point, 2>& results) {
   // dx and dy are the vertical and horizontal distances between
@@ -93,4 +93,4 @@ Pose& Pose::translate(const Pose& other) {
   return *this;
 }
 
-} // namespace SystemControl
+} // namespace TURAG

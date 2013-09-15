@@ -10,7 +10,9 @@
 #ifndef UTILS_BITS_H
 #define UTILS_BITS_H
 
-#include "types.h"
+#include "../types.h"
+
+namespace TURAG {
 
 ///////////////////////////////////////////////////////////////////////////////
 //   Bit operations
@@ -179,5 +181,6 @@ test_bit(T t, size_t n) {
   return (t & (1 << n));
 }
 
+} // namespace TURAG
 
 #endif // UTILS_BITS_H
