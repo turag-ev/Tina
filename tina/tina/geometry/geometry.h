@@ -199,53 +199,14 @@ Angle angle_between(const T1& a, const T2& b) {
 }
 
 // round
-//constexpr
-//int round(float x) {
-//  return lround(x);
-//}
-
 constexpr _always_inline
 int round(float x) {
+#ifndef ECOS
+  return lround(x);
+#else
   return (x > 0.f) ? (x + 0.5f) : (x - 0.5f);
+#endif
 }
-
-////////////////////////////////////////////////////////////////////////////////
-// Straight
-
-class Straight {
-public:
-  template<typename T, typename U>
-  constexpr explicit
-  Straight(const T& t, const U& u) :
-    m(static_cast<float>(u.y - t.y)/(u.x - t.x)),
-    n(t.y - m * t.x)
-  { }
-
-  constexpr explicit
-  Straight(float n, float m) :
-    m(m),
-    n(n)
-  { }
-
-  constexpr explicit
-  Straight() :
-    m(0.f),
-    n(0.f)
-  { }
-
-  constexpr
-  Length getY(Length x) const {
-    return Length(m * x.value + n);
-  }
-
-  constexpr
-  Length getX(Length y) const {
-    return Length((y.value - n) / m);
-  }
-
-  float m;
-  float n;
-};
 
 ////////////////////////////////////////////////////////////////////////////////
 // Circle

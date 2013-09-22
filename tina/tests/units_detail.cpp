@@ -3,8 +3,8 @@
 
 #include <tina/geometry/units.h>
 
-using namespace Tina::Units;
-using namespace Tina::Units::detail;
+using namespace TURAG::Units;
+using namespace TURAG::Units::detail;
 
 BOOST_AUTO_TEST_CASE( gcd_func ) {
   BOOST_CHECK_EQUAL(gcd(15, 18), 3);

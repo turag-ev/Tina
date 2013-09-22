@@ -36,22 +36,22 @@ abs(Units::Quantity<Dim> arg) {
 
 constexpr
 Units::Real sin(Units::Angle arg) {
-  return Units::Dimensionless(__builtin_sinf(arg.to(Units::rad)));
+  return std::sin(arg.to(Units::rad));
 }
 
 constexpr
 Units::Real cos(Units::Angle arg) {
-  return Units::Dimensionless(__builtin_cosf(arg.to(Units::rad)));
+  return std::cos(arg.to(Units::rad));
 }
 
 constexpr
 Units::Angle atan2(Units::Length y, Units::Length x) {
-  return __builtin_atan2f(y.value, x.value) * Units::rad;
+  return std::atan2(y.value, x.value) * Units::rad;
 }
 
 constexpr
 Units::Length hypot(Units::Length x, Units::Length y) {
-  return Units::Length(__builtin_hypotf(x.value, y.value));
+  return Units::Length(std::hypot(x.value, y.value));
 }
 
 } // namespace TURAG

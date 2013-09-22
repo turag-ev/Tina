@@ -217,7 +217,7 @@ public:
 
   constexpr
   size_type capacity() const {
-    return N;
+    return N - 1;
   }
 
   constexpr

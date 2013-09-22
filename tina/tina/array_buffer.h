@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <iterator>
+#include <cassert>
 
 #include "normalize.h"
 #include "debug.h"
@@ -194,10 +195,7 @@ public:
   }
 
   void push_front(const value_type& val) {
-    if (prepare_for_insert(begin())) {
-      length_++;
-      bytes_.emplace(0, val);
-    }
+    insert(begin(), val);
   }
 
   template<class... Args> _always_inline
@@ -213,9 +211,10 @@ public:
   }
 
   void insert(iterator position, const value_type& val) {
+    value_type copy = val;
     if (prepare_for_insert(position)) {
       length_++;
-      *position = val;
+      bytes_.emplace(position, std::move(copy));
     }
   }
 
@@ -258,7 +257,7 @@ private:
 
 template<typename T, std::size_t N>
 void ArrayBuffer<T, N>::erase(iterator position) {
-  if (position != end) {
+  if (position != end()) {
     length_--;
     bytes_.erase(position - &bytes_[0]);
     for (iterator i = position; i < end(); ++i) {
@@ -269,6 +268,8 @@ void ArrayBuffer<T, N>::erase(iterator position) {
 
 template<typename T, std::size_t N>
 void ArrayBuffer<T, N>::erase(iterator first, iterator last) {
+  assert(last >= first);
+
   size_t diff = last - first;
   // TODO bytes_.erase for diff elements
   length_ -= diff;

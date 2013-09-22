@@ -216,7 +216,7 @@ struct Quantity {
   { }
 
   constexpr
-  Value to(Unit<Dim> u) const {
+  Real to(Unit<Dim> u) const {
     return value / u.factor;
   }
 
@@ -260,7 +260,7 @@ struct Quantity<DimensionlessDimension> {
   { }
 
   constexpr
-  Value to(Unit<DimensionlessDimension> u) const {
+  Real to(Unit<DimensionlessDimension> u) const {
     return value / u.factor;
   }
 
