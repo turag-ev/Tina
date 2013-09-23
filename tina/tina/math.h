@@ -41,6 +41,9 @@ unsigned int gcd(int a, int b) {
   return (a % b == 0) ? b : gcd(a, a % b);
 }
 
+/// silent not-a-number of float type
+constexpr float NaNf = __builtin_nanf("");
+
 } // namespace TURAG
 
 #endif // TINA_MATH_H

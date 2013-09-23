@@ -11,7 +11,7 @@
 #include "cansc.h"
 #include <cstdio>
 
-namespace SystemControl {
+namespace TURAG {
 
 ////////////////////////////////////////////////////////////////////////////////
 // CAN
@@ -66,4 +66,5 @@ ErrorCode can_read_blackboard(const Blackboard* object, pointer dest) {
 
 } /* namespace CAN */
 
-} /* namespace SystemControl */
+} // namespace TURAG
+

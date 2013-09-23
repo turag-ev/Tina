@@ -13,6 +13,7 @@
 #include "../types.h"
 #include "../normalize.h"
 #include "../macros.h"
+#include "types.h"
 
 IGNORE_WARNING("-Wunused-parameter");
 

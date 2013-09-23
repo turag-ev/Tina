@@ -6,8 +6,7 @@
 #include <cmath>
 
 #include "config.h"
-#include <tina/macros.h>
-#include <tina/normalize.h>
+#include <tina/tina.h>
 
 namespace TURAG {
 namespace Units {
@@ -164,7 +163,7 @@ constexpr struct null_t {
 namespace detail {
   template<typename T, REQUIRES(std::is_floating_point<T>)> constexpr
   int roundToInt(T value) {
-#if GCC_VERSION < 40700
+#if GCC_VERSION < 40700 || defined(ECOS)
     return (value < 0.0) ? ceil(value - 0.5) : floor(value + 0.5);
 #else
     return std::lround(value);
@@ -188,7 +187,7 @@ namespace detail {
   template<typename T, REQUIRES2(std::is_floating_point<T>::value && !std::is_floating_point<Value>::value)>
   constexpr
   Value toValue(T value) {
-#if GCC_VERSION < 40700
+#if GCC_VERSION < 40700 || defined(ECOS)
     return (value < 0.0) ? ceil(value - 0.5) : floor(value + 0.5);
 #else
     return std::lround(value);

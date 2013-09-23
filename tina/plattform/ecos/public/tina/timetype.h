@@ -6,6 +6,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // time type
 
-typedef cyg_tick_count_t SystemTime;
+typedef cyg_tick_count_t SystemTicks;
 
 #endif // ECOS_TIMETYPE_H

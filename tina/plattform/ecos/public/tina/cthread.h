@@ -4,8 +4,7 @@
 #include <cyg/kernel/kapi.h>
 #include <util/types.h>
 
-#include "utils/extra/macro-helper.h"
-#include "utils/extra/normalize.h"
+#include <tina/tina.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -65,7 +64,7 @@ typedef cyg_mutex_t CMutex;
 #define mutex_unlock   cyg_mutex_unlock
 
 #ifdef __cplusplus
-}
+} // extern "C"
 #endif
 
 #endif // ECOS_CTHREAD_H

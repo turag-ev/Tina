@@ -15,6 +15,7 @@
 #include "../types.h"
 #include "../packed.h"
 #include "../macros.h"
+#include "types.h"
 
 namespace TURAG {
 

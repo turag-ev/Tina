@@ -12,13 +12,12 @@
 
 #include <cyg/kernel/kapi.h>
 
-#include "utils/types.h"
-#include "utils/time.h"
-#include "utils/extra/macro-helper.h"
-#include "utils/extra/normalize.h"
-#include "utils/extra/scoped_lock.h"
+#include <tina/tina.h>
+#include <tina/scoped_lock.h>
 
-namespace SystemControl {
+#include "time.h"
+
+namespace TURAG {
 
 ////////////////////////////////////////////////////////////////////////////////
 // Thread
@@ -56,8 +55,8 @@ public:
   }
 
   /// lets the current thread sleeps for a time of ecos ticks
-  static _always_inline void delay(cyg_tick_count_t ticks) {
-    cyg_thread_delay(ticks);
+  static _always_inline void delay(SystemTime ticks) {
+    cyg_thread_delay(ticks.value);
   }
 
   static _always_inline void setName(const char *) { }
@@ -69,8 +68,8 @@ private:
 };
 
 /// lets the current thread sleeps for a time of ecos ticks
-_always_inline void Thread_delay(cyg_tick_count_t ticks) {
-  cyg_thread_delay(ticks);
+_always_inline void Thread_delay(SystemTime ticks) {
+  cyg_thread_delay(ticks.value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -134,8 +133,8 @@ public:
     return cyg_cond_wait(&cond_);
   }
 
-  _always_inline bool waitWithTimeout(Time timeout) {
-    return cyg_cond_timed_wait(&cond_, get_current_tick() + timeout);
+  _always_inline bool waitWithTimeout(SystemTime timeout) {
+    return cyg_cond_timed_wait(&cond_, cyg_current_time() + timeout.value);
   }
 
   _always_inline void signal() {
@@ -150,6 +149,6 @@ private:
   cyg_cond_t cond_;
 };
 
-} // namespace SystemControl
+} // namespace TURAG
 
 #endif // ECOS_THREAD_H_

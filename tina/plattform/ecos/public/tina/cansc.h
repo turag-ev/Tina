@@ -9,10 +9,9 @@
 #define CAN_H_
 
 #include <turag/casa.h>
-#include "utils/types.h"
-#include "utils/extra/macro-helper.h"
+#include <tina/tina.h>
 
-namespace SystemControl {
+namespace TURAG {
 
 ////////////////////////////////////////////////////////////////////////////////
 // CAN
@@ -68,6 +67,6 @@ ErrorCode read_blackboard(const Blackboard* object, pointer dest);
 
 } /* namespace CAN */
 
-} /* namespace SystemControl */
+} // namespace TURAG
 
 #endif /* CAN_H_ */
