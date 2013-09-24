@@ -21,6 +21,7 @@ static PWMConfig pwmcfg = {
         {PWM_OUTPUT_ACTIVE_LOW, NULL},
 #endif
     },
+    0,
     0
 };
 

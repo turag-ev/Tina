@@ -6,8 +6,8 @@
 
 #include "utils/types.h"
 #include "utils/time.h"
-#include "utils/extra/macro-helper.h"
-#include "utils/extra/normalize.h"
+#include <tina/macros.h>
+#include <tina/normalize.h>
 #include <utils/extra/scoped_lock.h>
 
 /// when definied, than getStackUsage will give real values. But thread creating time will increase.

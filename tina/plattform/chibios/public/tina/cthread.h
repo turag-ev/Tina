@@ -4,8 +4,8 @@
 #include <ch.h>
 #include <stddef.h>
 
-#include "utils/extra/macro-helper.h"
-#include "utils/extra/normalize.h"
+#include <tina/macros.h>
+#include <tina/normalize.h>
 
 #ifdef __cplusplus
 extern "C" {

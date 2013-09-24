@@ -3,8 +3,8 @@
 
 #include <ch.h>
 
-#include <utils/types.h>
-#include <utils/extra/normalize.h>
+#include <tina/types.h>
+#include <tina/normalize.h>
 #include "timetype.h"
 
 struct SystemTime {
