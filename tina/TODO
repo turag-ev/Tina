@@ -10,7 +10,7 @@
 - Neuordnung in zusammenhängende Module
 
 - alten Code zum Compilieren bringen
-  
+
 - Umstellung des Namspace auf Tina oder tina
 
 - Aufräumen
@@ -29,7 +29,7 @@
 - normialize ergänzen um cross-c-c++ Makros:
     - constexpr in C ersetzen
     - _always_inline für c anpassen
-    
+
     -> C/C++ kompatiblen Header erstellen für:
        - plattform/utils/time.h
        - math.h
