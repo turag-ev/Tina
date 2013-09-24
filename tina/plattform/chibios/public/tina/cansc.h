@@ -13,10 +13,10 @@ extern "C" {
 #include <casa/blackboard.h>
 #include <casa/rpc.h>
 }
-#include "utils/types.h"
-#include "utils/extra/macro-helper.h"
+#include <tina/types.h>
+#include <tina/macros.h>
 
-namespace SystemControl {
+namespace TURAG {
 
 ////////////////////////////////////////////////////////////////////////////////
 // CAN
@@ -77,6 +77,6 @@ ErrorCode read_blackboard(const Blackboard* object, pointer dest);
 
 } /* namespace CAN */
 
-} /* namespace SystemControl */
+} /* namespace TURAG */
 
 #endif /* CAN_H_ */

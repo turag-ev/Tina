@@ -13,7 +13,7 @@
 /// when definied, than getStackUsage will give real values. But thread creating time will increase.
 #define THREADS_STACK_MEASUREMENT
 
-namespace SystemControl {
+namespace TURAG {
 
 ////////////////////////////////////////////////////////////////////////////////
 // Thread

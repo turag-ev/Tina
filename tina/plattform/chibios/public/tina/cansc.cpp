@@ -1,16 +1,16 @@
 #include <cstdio>
 #define LOG_SOURCE "C"
-#include "utils/debug.h"
+#include <tina/debug.h>
 
 extern "C" {
 #include <casa/casa.h>
 #include <casa/blackboard.h>
 #include <casa/rpc.h>
 }
-#include "utils/cansc.h"
+#include "cansc.h"
 #include "xserial.h"
 
-namespace SystemControl {
+namespace TURAG {
 
 ////////////////////////////////////////////////////////////////////////////////
 // CAN
@@ -73,4 +73,4 @@ ErrorCode can_read_blackboard(const Blackboard* object, pointer dest) {
 
 } /* namespace CAN */
 
-} /* namespace SystemControl */
+} /* namespace TURAG */

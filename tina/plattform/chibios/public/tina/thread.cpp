@@ -1,14 +1,14 @@
 #include "thread.h"
 #include "cthread.h"
-#include <utils/debug.h>
+#include <tina/debug.h>
 #include <cstdint>
 
-#include <utils/debug.h>
+#include <tina/debug.h>
 #include <stackusage.h>
 
 typedef Thread ChThread;
 
-namespace SystemControl {
+namespace TURAG {
 
 namespace detail {
 
@@ -39,4 +39,4 @@ size_t thread_get_stack_usage(const CThread* thread) {
 
 } // namespace detail
 
-} /* namespace SystemControl */
+} /* namespace TURAG */

@@ -54,7 +54,7 @@ Units::Length hypot(Units::Length x, Units::Length y) {
 #ifdef ECOS
   return Units::Length(std::sqrt(x.value*x.value + y.value*y.value));
 #else
-  return Units::Length(std::hypot(x.value, y.value));
+  return Units::Length(::hypot(x.value, y.value));
 #endif
 }
 

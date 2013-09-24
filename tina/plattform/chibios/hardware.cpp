@@ -1,5 +1,5 @@
 #define LOG_SOURCE "H"
-#include "utils/debug.h"
+#include <tina/debug.h>
 
 #include "plattform/hardware.h"
 #include "backplane2013.h"
@@ -11,6 +11,8 @@
 #include <debug/cooldebug.h>
 #include <comm/rs485bus-SystemControl.h>
 
+namespace TURAG
+{
 
 extern "C"
 void Hardware_Init()
@@ -400,7 +402,7 @@ bool Hardware::writeUART(uint8_t *output, int output_length, SystemTime timeout,
 
 /** Extension Board - Analog Inputs (IOBoard 0) */
 
-#include "utils/time.h"
+#include <tina/time.h>
 static int buffered_value = 0;
 static SystemTime last_read;
 
@@ -551,3 +553,6 @@ bool Hardware::ioBoard0Available(void) {
 bool Hardware::ioBoard1Available(void) {
     return RobotIO::IOBoards[1].isAvailable();
 }
+
+} // namespace TURAG
+

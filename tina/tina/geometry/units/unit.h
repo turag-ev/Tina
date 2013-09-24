@@ -166,7 +166,7 @@ namespace detail {
 #if GCC_VERSION < 40700 || defined(ECOS)
     return (value < 0.0) ? ceil(value - 0.5) : floor(value + 0.5);
 #else
-    return std::lround(value);
+    return ::lround(value);
 #endif
   }
   
@@ -190,7 +190,7 @@ namespace detail {
 #if GCC_VERSION < 40700 || defined(ECOS)
     return (value < 0.0) ? ceil(value - 0.5) : floor(value + 0.5);
 #else
-    return std::lround(value);
+    return ::lround(value);
 #endif
   }
 }
