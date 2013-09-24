@@ -6,6 +6,8 @@
 using namespace Tina::Units;
 using namespace Tina::Units::detail;
 
+BOOST_AUTO_TEST_SUITE(Units_detail)
+
 BOOST_AUTO_TEST_CASE( gcd_func ) {
   BOOST_CHECK_EQUAL(gcd(15, 18), 3);
   BOOST_CHECK_EQUAL(gcd(9, 18), 9);
@@ -90,5 +92,7 @@ BOOST_AUTO_TEST_CASE( rational_sub_func ) {
   BOOST_CHECK_EQUAL(Test3::z(), 0);
   BOOST_CHECK_EQUAL(Test3::n(), 1); 
 }
+
+BOOST_AUTO_TEST_SUITE_END()
 
 //____________________________________________________________________________//
