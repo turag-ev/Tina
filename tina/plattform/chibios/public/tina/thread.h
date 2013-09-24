@@ -4,11 +4,11 @@
 #include <ch.h>
 #include <cstddef>
 
-#include "utils/types.h"
-#include "utils/time.h"
+#include <tina/types.h>
+#include <tina/time.h>
 #include <tina/macros.h>
 #include <tina/normalize.h>
-#include <utils/extra/scoped_lock.h>
+#include <tina/scoped_lock.h>
 
 /// when definied, than getStackUsage will give real values. But thread creating time will increase.
 #define THREADS_STACK_MEASUREMENT
