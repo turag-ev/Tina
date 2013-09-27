@@ -35,7 +35,7 @@ class Action {
 public:
   enum {
     /// Event id when state is started
-    event_start = SCnamespace('A', 'c', 't') + 0,
+    event_start = EventNamespace('A', 'c', 't') + 0,
 
     /// Event id when action is about to be closed from outside of the action
     /// with the \a Action::cancel function.
@@ -45,7 +45,7 @@ public:
     event_cancel,
 
     /// Event id when child action exited. exit code is passed in data pointer
-    event_return = SCnamespace('A', 'c', 't') + 100,
+    event_return = EventNamespace('A', 'c', 't') + 100,
     /// Exit code for successfully executed action
     event_success,
     /// Exit code for failure in executed action

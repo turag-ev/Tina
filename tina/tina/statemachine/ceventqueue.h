@@ -16,8 +16,8 @@ typedef void (*SCEventMethod)(SCEventId id, void* data);
 /// create a unsigned integer with the first three bytes filled with characters
 /// to build a namespace. The last byte can be used for any value >= 0 and < 256.
 /// example:
-/// \code enum { event_x = SCnamespace('X', 'X', 'X') + 100 }; \endcode
-#define SC_NAMESPACE(a,b,c) (((a) << 24) | ((b) << 16) | ((c) << 8))
+/// \code enum { event_x = EVENT_NAMESPACE('X', 'X', 'X') + 100 }; \endcode
+#define EVENT_NAMESPACE(a,b,c) (((a) << 24) | ((b) << 16) | ((c) << 8))
 
 /// Event
 typedef struct {
