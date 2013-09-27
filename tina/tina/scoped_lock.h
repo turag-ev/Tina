@@ -7,28 +7,6 @@
 namespace TURAG {
 
 ////////////////////////////////////////////////////////////////////////////////
-// LockGuard
-
-template<class Mutex>
-class LockGuard {
-  NOT_COPYABLE(LockGuard);
-
-public:
-  _always_inline explicit LockGuard(Mutex& m) :
-    m_(m)
-  {
-    m_.lock();
-  }
-
-  _always_inline ~LockGuard() {
-    m_.unlock();
-  }
-
-private:
-  Mutex& m_;
-};
-
-////////////////////////////////////////////////////////////////////////////////
 // ScopedLock
 
 template<class Mutex>

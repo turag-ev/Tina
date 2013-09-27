@@ -1,31 +1,13 @@
 # TODO
 
-## ROADMAP für Umstellung
-
-- Kopieren der Dateien von
-  - SystemControl/Roboter/src/utils
-  - SystemControl/Roboter/src/plattform
-  - common/util
-
-- Neuordnung in zusammenhängende Module
-
-- alten Code zum Compilieren bringen
-
-- Umstellung des Namspace auf Tina oder tina
-
-- Aufräumen
-
 ## notwendig Änderungen
 
 - ScopedLock wieder als Standard nehmen (LockGuard bringt keinen Vorteil)
-- Namespace für ScopedLock
 - mehrere Eventqueues ermöglichen
 - Action: aus statische Funktionen als Zustände Methoden verwenden
 - Units: wenn Value-Typ Ganzzahltyp, wird beim Erstellung einer Variable nicht gerundet
 - init.h und final.h auflösen
 - pycrc für crc benutzen: https://github.com/tpircher/pycrc
-- EventNamespace aus types.h in statemachine Module überführen
-- types.h C kompatible machen
 - normialize ergänzen um cross-c-c++ Makros:
     - constexpr in C ersetzen
     - _always_inline für c anpassen

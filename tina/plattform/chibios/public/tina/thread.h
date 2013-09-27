@@ -93,7 +93,7 @@ class mutex_detail {
   NOT_COPYABLE(mutex_detail);
 
 public:
-  typedef LockGuard<mutex_detail> Lock;
+  typedef ScopedLock<mutex_detail> Lock;
 
   constexpr _always_inline
   mutex_detail() :
@@ -104,8 +104,7 @@ public:
   NativeHandle getNativeHandle() {return &mut_;}
   
 protected:
-  // not for end-user use Mutex::Lock or ScopedLock<Mutex>!
-  friend class LockGuard<mutex_detail>;
+  // not for end-user use ScopedLock<Mutex> or Mutex::Lock!
   friend class ScopedLock<mutex_detail>;
 
   _always_inline void lock() {

@@ -92,7 +92,14 @@ public:
   _always_inline ~Mutex() {
     cyg_mutex_destroy(&mut_);
   }
+  
+  typedef cyg_mutex_t* NativeHandle;
+  NativeHandle getNativeHandle() {return &mut_;}
 
+protected:
+  // not for end-user use ScopedLock<Mutex> or Mutex::Lock!
+  friend class ScopedLock<Mutex>;
+  
   _always_inline void lock() {
     cyg_mutex_lock(&mut_);
   }
@@ -105,9 +112,6 @@ public:
     cyg_mutex_unlock(&mut_);
   }
 
-  typedef cyg_mutex_t* NativeHandle;
-  NativeHandle getNativeHandle() {return &mut_;}
-
 private:
   cyg_mutex_t mut_;
 };
@@ -119,8 +123,6 @@ class ConditionVariable {
   NOT_COPYABLE(ConditionVariable);
 
 public:
-  typedef ScopedLock<Mutex> Lock;
-
   _always_inline ConditionVariable(Mutex* mutex) {
     cyg_cond_init(&cond_, mutex->getNativeHandle());
   }
