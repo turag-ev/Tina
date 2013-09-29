@@ -14,6 +14,32 @@
 namespace TURAG {
 
 ////////////////////////////////////////////////////////////////////////////////
+// predicates for std algorithm e.x. std::find, ...
+
+template<typename T>
+struct is_equal_predicate {
+  typedef T type;
+
+  template<typename U>
+  constexpr explicit
+  is_equal_predicate(U&& t) :
+    value(t)
+  { }
+
+  constexpr
+  bool operator() (T& t) {
+    return t == value;
+  }
+
+  T value;
+};
+
+template<typename T> constexpr
+is_equal_predicate<typename std::remove_reference<T>::type> is_equal(T&& t) {
+  return is_equal_predicate<typename std::remove_reference<T>::type>(std::forward<T>(t));
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // std extention
 
 template<typename Container, typename T>
