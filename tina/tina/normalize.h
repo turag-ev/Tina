@@ -18,8 +18,17 @@
 // constexpr
 
 #if GCC_VERSION < 40600 && defined(__cplusplus)
-# define constexpr __attribute__((const))
+# define constexpr
 #endif
+
+// constexpr for functions from math.h?
+#ifdef __cplusplus
+# if GCC_VERSION < 40700
+#  define math_constexpr inline
+# else // GCC_VERSION < 40700
+#  define math_constexpr constexpr
+# endif // GCC_VERSION < 40700
+#endif // __cplusplus
 
 ////////////////////////////////////////////////////////////////////////////////
 // nullptr

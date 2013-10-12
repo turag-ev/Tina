@@ -21,7 +21,7 @@ sqr(Units::Quantity<Dim> arg) {
       (arg.value * arg.value);
 }
 
-template<typename Dim> constexpr
+template<typename Dim> math_constexpr
 Units::Quantity< typename Units::dim_root<Dim, 2>::type >
 sqrt(Units::Quantity<Dim> arg) {
   return Units::Quantity< typename Units::dim_root<Dim, 2>::type >
@@ -34,22 +34,22 @@ abs(Units::Quantity<Dim> arg) {
   return Units::Quantity<Dim>(std::abs(arg.value));
 }
 
-constexpr
+math_constexpr
 Units::Real sin(Units::Angle arg) {
   return std::sin(arg.to(Units::rad));
 }
 
-constexpr
+math_constexpr
 Units::Real cos(Units::Angle arg) {
   return std::cos(arg.to(Units::rad));
 }
 
-constexpr
+math_constexpr
 Units::Angle atan2(Units::Length y, Units::Length x) {
   return std::atan2(y.value, x.value) * Units::rad;
 }
 
-constexpr
+math_constexpr
 Units::Length hypot(Units::Length x, Units::Length y) {
 #ifdef ECOS
   return Units::Length(std::sqrt(x.value*x.value + y.value*y.value));
