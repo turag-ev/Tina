@@ -112,6 +112,13 @@
 #endif
 
 /**
+ * @brief   Enables the DCMI subsystem.
+ */
+#if !defined(HAL_USE_DCMI) || defined(__DOXYGEN__)
+#define HAL_USE_DCMI                 FALSE
+#endif
+
+/**
  * @brief   Enables the RTC subsystem.
  */
 #if !defined(HAL_USE_RTC) || defined(__DOXYGEN__)
