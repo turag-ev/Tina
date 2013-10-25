@@ -23,11 +23,11 @@ struct is_equal_predicate {
   template<typename U>
   constexpr explicit
   is_equal_predicate(U&& t) :
-    value(t)
+    value(std::move(t))
   { }
 
   constexpr
-  bool operator() (T& t) {
+  bool operator() (const T& t) {
     return t == value;
   }
 

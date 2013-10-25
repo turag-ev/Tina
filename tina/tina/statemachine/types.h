@@ -17,11 +17,6 @@ constexpr
 int32_t EventNamespace(char a, char b, char c) {
   return (a << 24) | (b << 16) | (c << 8);
 }
-// nur für Kompatibilität:
-constexpr
-int32_t SCnamespace(char a, char b, char c) {
-  return EventNamespace(a, b, c);
-}
 
 } // namespace TURAG
 

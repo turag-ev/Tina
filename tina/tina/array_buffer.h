@@ -11,10 +11,22 @@
 
 namespace TURAG {
 
-template<typename ArrayBufferType>
+template<typename T>
 struct _ArrayBufferHelper {
-  typedef typename ArrayBufferType::iterator iterator;
-  typedef typename ArrayBufferType::const_iterator const_iterator;
+  // types
+  typedef T value_type;
+  typedef T& reference;
+  typedef const T& const_reference;
+  typedef T* pointer;
+  typedef const T* const_pointer;
+  typedef std::size_t size_type;
+  typedef std::ptrdiff_t difference_type;
+
+  // iterator
+  typedef pointer iterator;
+  typedef const_pointer const_iterator;
+  typedef std::reverse_iterator<iterator> reverse_iterator;
+  typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
 #ifdef NDEBUG
   static bool prepare_for_insert(iterator position, iterator end);
@@ -210,11 +222,10 @@ public:
     length_ = 0;
   }
 
-  void insert(iterator position, const value_type& val) {
-    value_type copy = val;
+  void insert(iterator position, value_type val) {
     if (prepare_for_insert(position)) {
       length_++;
-      bytes_.emplace(position, std::move(copy));
+      bytes_.emplace(position, std::move(val));
     }
   }
 
@@ -238,9 +249,9 @@ private:
 
   bool prepare_for_insert(iterator position) {
 #ifdef NDEBUG
-    return _ArrayBufferHelper<self_type>::prepare_for_insert(position, end());
+    return _ArrayBufferHelper<T>::prepare_for_insert(position, end());
 #else
-    return _ArrayBufferHelper<self_type>::prepare_for_insert(position, end(), const_iterator(&bytes_[N]));
+    return _ArrayBufferHelper<T>::prepare_for_insert(position, end(), const_iterator(&bytes_[N]));
 #endif
   }
 
@@ -248,11 +259,11 @@ private:
 #ifdef NDEBUG
     return false;
 #else
-    return _ArrayBufferHelper<self_type>::is_full(cend(), const_iterator(&bytes_[N]));
+    return _ArrayBufferHelper<T>::is_full(cend(), const_iterator(&bytes_[N]));
 #endif
   }
 
-  friend struct _ArrayBufferHelper<self_type>;
+  friend struct _ArrayBufferHelper<T>;
 };
 
 template<typename T, std::size_t N>
@@ -283,16 +294,16 @@ void ArrayBuffer<T, N>::erase(iterator first, iterator last) {
 }
 
 #ifdef NDEBUG
-template<typename ArrayBufferType>
-bool _ArrayBufferHelper<ArrayBufferType>::prepare_for_insert(iterator position, iterator end) {
+template<typename T>
+bool _ArrayBufferHelper<T>::prepare_for_insert(iterator position, iterator end) {
   for (iterator i = end; i > position; --i) {
     *i = *(i-1);
   }
   return true;
 }
 #else
-template<typename ArrayBufferType>
-bool _ArrayBufferHelper<ArrayBufferType>::prepare_for_insert(iterator position, iterator end, const_iterator max_end) {
+template<typename T>
+bool _ArrayBufferHelper<T>::prepare_for_insert(iterator position, iterator end, const_iterator max_end) {
   if (end == max_end) {
     error("ArrayBuffer overflow!");
     return false;
@@ -306,8 +317,8 @@ bool _ArrayBufferHelper<ArrayBufferType>::prepare_for_insert(iterator position, 
 #endif
 
 #ifndef NDEBUG
-template<typename ArrayBufferType>
-bool _ArrayBufferHelper<ArrayBufferType>::is_full(const_iterator end, const_iterator max_end) {
+template<typename T>
+bool _ArrayBufferHelper<T>::is_full(const_iterator end, const_iterator max_end) {
   if (end == max_end) {
     error("ArrayBuffer overflow!");
     return true;
