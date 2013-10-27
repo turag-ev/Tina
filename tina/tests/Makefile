@@ -4,7 +4,7 @@ CXX = g++
 RM = rm
 
 # Compiler flags
-CFLAGS = -O2 -s -Wall -I.. -I.
+CFLAGS = -Wall -I.. -I.
 CXXFLAGS = $(CFLAGS) -std=c++0x
 LDFLAGS = -Wall
 

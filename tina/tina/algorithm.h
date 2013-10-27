@@ -69,7 +69,7 @@ bool any_of_value(const Container& t, const T& val) {
 /// get length of container
 template <typename Container>
 std::size_t length(const Container& c) {
-  return c.length();
+  return c.size();
 }
 
 /// same as array_size

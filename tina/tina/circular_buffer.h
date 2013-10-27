@@ -116,6 +116,7 @@ class CircularBuffer {
   static_assert(!(N & (N-1)), "CircularBuffer size must be a power of 2");
 
 public:
+  // FIXME: create own copy und move constructors for not trivial desctructable types
   COPYABLE(CircularBuffer);
   MOVABLE(CircularBuffer);
 

@@ -34,7 +34,7 @@ void destruct(T* ptr) {
 
 /// destroy a range of type instances
 template<typename ForwardIterator, REQUIRES(is_trivially_destructible<typename std::iterator_traits<ForwardIterator>::value_type>)> _always_inline
-void destruct(ForwardIterator first, ForwardIterator last) { }
+void destruct(ForwardIterator, ForwardIterator) { }
 
 template<typename ForwardIterator, REQUIRES(!is_trivially_destructible<typename std::iterator_traits<ForwardIterator>::value_type>)>
 void destruct(ForwardIterator first, ForwardIterator last) {
