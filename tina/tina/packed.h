@@ -27,7 +27,7 @@ inline Unpacked unpack(Packed src) {
   return helper.dest;
 }
 
-/// like reinterpret_cast, but returns Reference und is more powerfull
+/// like reinterpret_cast, but returns reference and is more powerfull
 template<typename Unpacked, typename Packed>
 inline Unpacked& reinterpret_reference(Packed& src) {
   return *reinterpret_cast<Unpacked*>(&src);

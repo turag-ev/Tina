@@ -64,11 +64,11 @@ public:
   constexpr explicit ArrayBuffer() :
     length_(0), bytes_()
   { }
-  
+
   ~ArrayBuffer() {
   	bytes_.erase(begin(), end());
   }
- 
+
   // FIXME: create own copy und move constructors for not trivial desctructable types
   COPYABLE(ArrayBuffer);
   MOVABLE(ArrayBuffer);
@@ -278,7 +278,7 @@ void ArrayBuffer<T, N>::erase(iterator position) {
     length_--;
     bytes_.erase(position - &bytes_[0]);
     for (iterator i = position; i < end(); ++i) {
-      *i = *(i+1);
+      *i = std::move(*(i+1));
     }
   }
 }
@@ -288,12 +288,12 @@ void ArrayBuffer<T, N>::erase(iterator first, iterator last) {
   assert(last >= first);
 
   bytes_.erase(first, last);
-  
+
   size_t diff = last - first;
   length_ -= diff;
   if (!empty()) {
     for (iterator i = first; i < end(); ++i) {
-      *i = *(i + diff);
+      *i = std::move(*(i + diff));
     }
   } else {
     length_ = 0;
@@ -317,7 +317,7 @@ bool _ArrayBufferHelper<T>::prepare_for_insert(iterator position, iterator end, 
   }
 
   for (iterator i = end; i > position; --i) {
-    *i = *(i-1);
+    *i = std::move(*(i-1));
   }
   return true;
 }

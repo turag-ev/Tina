@@ -14,11 +14,74 @@
 
 namespace TURAG {
 
-///////////////////////////////////////////////////////////////////////////////
-//   Bit operations
+template<std::size_t Bytes>
+struct unsigned_integer { }
 
-/// Create a Bitmask
-/// \param bits Number of Bits
+template<> struct unsigned_integer<1> { typedef  uint8_t type; }
+template<> struct unsigned_integer<2> { typedef uint16_t type; }
+template<> struct unsigned_integer<4> { typedef uint32_t type; }
+template<> struct unsigned_integer<8> { typedef uint64_t type; }
+
+///////////////////////////////////////////////////////////////////////////////
+//   bit access and register manipulations
+
+template<std::size_t Bytes>
+class BitMask {
+private:
+  unsigned_integer<Bytes>::type mask_;
+};
+
+template<std::size_t Bytes>
+class BitRange {
+public:
+  BitRange(std::size_t start_bit, std::size_t end_bit) :
+    mask_(start_bit, end_bit), shift_(end_bit)
+  { }
+
+private:
+  BitMask<Bytes> mask_;
+  std::size_t shift_;
+};
+
+template<std::size_t Bytes>
+class BitRegister {
+  
+  getBitRange(std::size_t start, std::size_t end) {
+    return BitRangeProxy<Bytes>(this, start, end);
+  }
+  
+  getBit
+  BitRangeProxy<Bytes> getPin(std::size_t n) {
+    return BitRangeProxy<Bytes>(this, n, n);
+  }
+  
+private:
+  violate Register* register_;
+}
+
+template<std::size_t Bytes>
+class BitRangeProxy {
+  BitProxy<Bytes>& operator= (unsigned_integer<Bytes>::type lhs) {
+    mask_    
+    return *this
+  }
+
+private:
+  BitRange range_;
+  BitRegister register_;
+  
+  constexpr BitProxy(BitMask<Bytes> range, BitRegister<Bytes> reg) :
+    range_(range), register_(reg)
+  { }
+  
+  friend class BitRegister;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//   bit operations
+
+/// create a bitmask
+/// \param bits number of bits
 /// \example create_bitmask(4) gives 00001111b = 0Fh
 constexpr
 inline unsigned create_bitmask(size_t bits) {
@@ -29,7 +92,7 @@ inline unsigned create_bitmask(size_t bits) {
 // read_bitfield(T b, size_t pos, size_t n)
 // write_bitfield(T b, U value, size_t pos, size_t n)
 
-/// Set bits in the bitmask in value to true
+/// set bits in the bitmask in value to true
 /// \param t any integer value
 /// \param mask bitmask
 /// \returns new value

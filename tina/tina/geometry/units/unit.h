@@ -13,7 +13,7 @@ namespace Units {
 
 namespace detail {
 
-// größer gemeinsamer Teiler
+// größter gemeinsamer Teiler
 constexpr
 unsigned gcd(unsigned n, unsigned m) {
   return (m == 0) ? n : gcd(m, n % m);

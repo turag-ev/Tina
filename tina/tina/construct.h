@@ -38,8 +38,6 @@ void destruct(ForwardIterator, ForwardIterator) { }
 
 template<typename ForwardIterator, REQUIRES(!is_trivially_destructible<typename std::iterator_traits<ForwardIterator>::value_type>)>
 void destruct(ForwardIterator first, ForwardIterator last) {
-  typedef typename std::iterator_traits<ForwardIterator>::value_type value_type;
-
   for (; first != last; ++first) {
     destruct(std::addressof(*first));
   }

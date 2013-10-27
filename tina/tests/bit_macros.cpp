@@ -3,7 +3,7 @@
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
 
-BOOST_AUTO_TEST_SUITE(BitMacros)
+BOOST_AUTO_TEST_SUITE(BitMacrosTests)
 
 BOOST_AUTO_TEST_CASE(test_BIT) {
   BOOST_CHECK_EQUAL(BIT(3), 0x8);
