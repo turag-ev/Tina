@@ -7,7 +7,7 @@ extern "C" {
 #include <casa/blackboard.h>
 #include <casa/rpc.h>
 }
-#include "cansc.h"
+#include "public/tina/cansc.h"
 #include "xserial.h"
 
 namespace TURAG {

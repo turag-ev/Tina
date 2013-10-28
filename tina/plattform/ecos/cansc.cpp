@@ -8,7 +8,7 @@
 #define LOG_SOURCE "C"
 #include <tina/debug.h>
 
-#include "cansc.h"
+#include "public/tina/cansc.h"
 #include <cstdio>
 
 namespace TURAG {

@@ -1,5 +1,5 @@
-#include "thread.h"
-#include "cthread.h"
+#include "public/tina/thread.h"
+#include "public/tina/cthread.h"
 #include <tina/debug.h>
 #include <cstdint>
 
