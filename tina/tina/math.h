@@ -2,7 +2,7 @@
 #define TINA_MATH_H
 
 #ifndef ECOS
-//# include <cmath>
+# include <cmath>
 
 #else
 # include <math.h>
