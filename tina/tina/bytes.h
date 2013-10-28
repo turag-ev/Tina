@@ -4,15 +4,15 @@
 #include <tina/types.h>
 #include <tina/tina.h>
 
-_always_inline uint8_t highbyte(uint16_t halfword) {
+static _always_inline uint8_t highbyte(uint16_t halfword) {
 	return (halfword >> 8) & 0xFF;
 }
 
-_always_inline uint8_t lowbyte(uint16_t halfword) {
+static _always_inline uint8_t lowbyte(uint16_t halfword) {
 	return halfword & 0xFF;
 }
 
-_always_inline uint16_t halfword(uint8_t highbyte, uint8_t lowbyte) {
+static _always_inline uint16_t halfword(uint8_t highbyte, uint8_t lowbyte) {
 	return ((uint16_t)highbyte << 8) + lowbyte;
 }
 
