@@ -2,7 +2,7 @@
 #define ECOS_CTHREAD_H
 
 #include <cyg/kernel/kapi.h>
-#include <util/types.h>
+#include <tina/types.h>
 
 #include <tina/tina.h>
 

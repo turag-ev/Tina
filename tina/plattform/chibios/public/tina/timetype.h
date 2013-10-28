@@ -6,6 +6,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // time type
 
-typedef systime_t SystemTicks;
+typedef systime_t TuragSystemTicks;
 
 #endif // CHIBIOS_TIMETYPE_H

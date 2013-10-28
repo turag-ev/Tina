@@ -11,25 +11,8 @@
 #define TYPES_H_
 
 #include <stddef.h>
+#include <stdint.h>
 
-#if !defined(ECOS) || defined(SYSTEM_CONTROL_ECOS)
-	#include <stdint.h>
-
-#else
-# include <cyg/infra/cyg_type.h>
-
-	typedef cyg_uint8  uint8_t;
-	typedef cyg_int8   int8_t;
-
-	typedef cyg_uint16 uint16_t;
-	typedef cyg_int16  int16_t;
-
-	typedef cyg_uint32 uint32_t;
-	typedef cyg_int32  int32_t;
-
-	typedef cyg_uint64 uint64_t;
-	typedef cyg_int64  int64_t;
-#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // integral types

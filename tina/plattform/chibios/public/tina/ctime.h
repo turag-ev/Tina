@@ -10,7 +10,7 @@ extern "C" {
 #endif
 
 typedef struct {
-  TuragSytemTicks value;
+  TuragSystemTicks value;
 } TuragSystemTime;
 
 // only for intern use!!!
@@ -55,7 +55,7 @@ unsigned turag_ticks_to_us(TuragSystemTime time) {
  * \return sys ticks
  */
 _always_inline
-SystemTicks turag_get_current_tick(void) { // [tick]
+TuragSystemTime turag_get_current_tick(void) { // [tick]
   return _turag_ticks_to_time(chTimeNow());
 }
 
