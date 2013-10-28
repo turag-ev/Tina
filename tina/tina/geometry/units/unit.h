@@ -3,8 +3,8 @@
 
 #include <cstddef>
 #include <type_traits>
-#include <cmath>
 
+#include "../../math.h"
 #include "config.h"
 #include <tina/tina.h>
 

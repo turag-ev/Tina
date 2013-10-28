@@ -1,7 +1,20 @@
 #ifndef TINA_MATH_H
 #define TINA_MATH_H
 
-#include <cmath>
+#ifndef ECOS
+//# include <cmath>
+
+#else
+# include <math.h>
+namespace std {
+using ::sin;
+using ::cos;
+using ::sqrt;
+using ::atan2;
+using ::fabs;
+}
+#endif
+
 #include "normalize.h"
 
 namespace TURAG {

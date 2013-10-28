@@ -2,8 +2,8 @@
 #define GEOMETRY_H
 
 #include <array>
-#include <cmath>
 
+#include "../math.h"
 #include "../normalize.h"
 #include "units.h"
 

@@ -325,8 +325,8 @@ void sc_eventqueue_push_to_front(EventId id, pointer params, EventMethod method)
 }
 
 extern "C"
-void sc_eventqueue_push_timedelayed(SystemTicks ticks, EventId id, pointer params, EventMethod method) {
-  EventQueue::pushTimedelayed(SystemTime{ticks}, id, params, method);
+void sc_eventqueue_push_timedelayed(TuragSystemTime ticks, EventId id, pointer params, EventMethod method) {
+  EventQueue::pushTimedelayed(SystemTime{ticks.value}, id, params, method);
 }
 
 } // namespace TURAG

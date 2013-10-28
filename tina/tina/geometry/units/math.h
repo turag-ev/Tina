@@ -1,8 +1,7 @@
 #ifndef TINA_UNITS_MATH_H
 #define TINA_UNITS_MATH_H
 
-#include <cmath>
-
+#include "../../math.h"
 #include "units.h"
 
 namespace TURAG {
@@ -31,7 +30,7 @@ sqrt(Units::Quantity<Dim> arg) {
 template<typename Dim> constexpr
 Units::Quantity<Dim>
 abs(Units::Quantity<Dim> arg) {
-  return Units::Quantity<Dim>(std::abs(arg.value));
+  return Units::Quantity<Dim>(std::fabs(arg.value));
 }
 
 math_constexpr

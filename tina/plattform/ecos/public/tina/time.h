@@ -3,11 +3,14 @@
 
 #include <cyg/kernel/kapi.h>
 
-#include <tina/types.h>
-#include <tina/normalize.h>
+#include <tina/tina.h>
 #include "timetype.h"
+#include "ctime.h"
 
 namespace TURAG {
+
+// use type from c interface
+typedef TuragSystemTicks SystemTicks; 
 
 struct SystemTime {
   SystemTicks value;
@@ -17,10 +20,9 @@ struct SystemTime {
     value(ticks)
   { }
   
-  constexpr _always_inline
-  SystemTime(int t, SystemTicks ticks) :
-    value((t == 0) ? 1 : ((t < 0) ? -1 : ticks))
-  { }
+  constexpr operator TuragSystemTime() const {
+    return TuragSystemTime{value};
+  }  
 };
 
 constexpr SystemTime operator - (SystemTime arg) { return SystemTime{-arg.value}; }

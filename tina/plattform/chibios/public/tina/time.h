@@ -3,9 +3,11 @@
 
 #include <ch.h>
 
-#include <tina/types.h>
-#include <tina/normalize.h>
-#include "timetype.h"
+#include <tina/tina.h>
+#include "ctime.h"
+
+// use type from c interface
+typedef TuragSystemTicks SystemTicks; 
 
 struct SystemTime {
   SystemTicks value;
@@ -19,6 +21,10 @@ struct SystemTime {
   SystemTime(int t, SystemTicks ticks) :
     value((t == 0) ? TIME_IMMEDIATE : ((t < 0) ? TIME_INFINITE : ticks))
   { }
+  
+  constexpr operator TuragSystemTime() const {
+    return TuragSystemTime{value};
+  }  
 };
 
 constexpr SystemTime operator - (SystemTime arg) { return SystemTime{-arg.value}; }

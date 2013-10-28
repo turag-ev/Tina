@@ -1,7 +1,7 @@
 #ifndef CEVENTQUEUE_H
 #define CEVENTQUEUE_H
 
-#include <tina/timetype.h>
+#include <tina/ctime.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,7 +29,7 @@ typedef struct {
 /// Event with time information for timedelayed events
 typedef struct {
   SCEvent    event;     ///< event to process
-  SystemTicks time;      ///< time when event is due
+  TuragSystemTime time;      ///< time when event is due
 } SCTimeEvent;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -57,7 +57,7 @@ void sc_eventqueue_push_to_front(SCEventId id, void* params, SCEventMethod metho
  * \param method function for processing event or nullptr. When nullptr is passed,
  *               event is given to the main action event function.
  */
-void sc_eventqueue_push_timedelayed(SystemTicks ticks, SCEventId id, void* params, SCEventMethod method);
+void sc_eventqueue_push_timedelayed(TuragSystemTime ticks, SCEventId id, void* params, SCEventMethod method);
 
 enum {
   sc_eventqueue_event_quit = -1,

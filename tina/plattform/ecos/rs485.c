@@ -36,7 +36,7 @@ bool turag_rs485_init(uint32_t baud_rate) {
 }
 
 
-bool turag_rs485_transceive(uint8_t* input, int input_length, uint8_t* output, int output_length, int timeout) {
+bool turag_rs485_transceive(uint8_t* input, int input_length, uint8_t* output, int output_length, TuragSystemTime timeout) {
 	if (!input || input_length == 0) return false;
 
 	// SENDE-TEIL

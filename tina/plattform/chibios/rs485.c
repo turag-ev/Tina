@@ -46,7 +46,7 @@ bool turag_rs485_init(uint32_t baud_rate) {
 /**
  * this functions wants a timeout in system ticks!
  */
-bool turag_rs485_transceive(uint8_t *input, int input_length, uint8_t *output, int output_length, SystemTicks timeout) {
+bool turag_rs485_transceive(uint8_t *input, int input_length, uint8_t *output, int output_length, TuragSystemTime timeout) {
     bool ok = true;
 
     chBSemWait(&_RS485_Sem);
@@ -60,7 +60,7 @@ bool turag_rs485_transceive(uint8_t *input, int input_length, uint8_t *output, i
 
     if (output && output_length > 0) {
         // read answer
-        ok = sdReadTimeout(&SD3, output, output_length, timeout);
+        ok = sdReadTimeout(&SD3, output, output_length, timeout.value);
     }
 
     chBSemSignal(&_RS485_Sem);

@@ -9,6 +9,7 @@
 #define TURAG_CHIBI_RS485_H_
 
 #include <tina/types.h>
+#include <tina/ctime.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -16,7 +17,7 @@ extern "C" {
 
 
 bool turag_rs485_init(uint32_t baud_rate);
-bool turag_rs485_transceive(uint8_t* input, int input_length, uint8_t* output, int output_length, int timeout);
+bool turag_rs485_transceive(uint8_t* input, int input_length, uint8_t* output, int output_length, TuragSystemTime timeout);
 
 
 #ifdef __cplusplus
