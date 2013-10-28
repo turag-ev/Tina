@@ -5,27 +5,21 @@
 #include <casa/casa.h>
 #include <robotio/robotio.h>
 #include <debug/cooldebug.h>
-#include "backplane2013.h"
 
-extern "C" {
 #include "usbshell.h"
 #include "xserial.h"
 #include "xcan.h"
 #include "xadc.h"
 #include "pwmled.h"
-}
 
 #ifdef USE_CRASHRECOVERY
 #include "crashrecovery.h"
 #endif
 
-#include "plattform/hardware.h"
-#include "systemcontrol.h"
 
-extern void user_code_start();
+extern void user_code_start(void);
 
-extern "C"
-int main() {
+int main(void) {
     /* initialize system */
     halInit();
     chSysInit();

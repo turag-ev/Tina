@@ -1,17 +1,20 @@
 #define LOG_SOURCE "H"
 
-#include <util/ecoshelpers.h>
-#include <plattform/hardware.h>
-#include <comm/rs485bus-SystemControl.h>
 #include <cyg/io/io.h>
-#include <util/types.h>
-#include <utils/time.h>
-#include <utils/debug.h>
+#include <cyg/hal/hal_io.h>
+
+#include <tina/ctime.h>
+#include <tina/types.h>
+#include <tina/debug.h>
+
+static uint32_t rs485_baud_rate;
 
 
 
-bool Hardware::initRS485() {
+bool turag_rs485_init(uint32_t baud_rate) {
 	info("initRS485\n");
+	
+	rs485_baud_rate = baud_rate;
 
 	// usart pins are driven by peripheral
 	HAL_ARM_AT91_PIO_CFG(AT91_USART_RXD1);
@@ -22,7 +25,7 @@ bool Hardware::initRS485() {
 
 	HAL_READ_UINT32(AT91_USART1 + AT91_US_CSR, status_reg);
 	HAL_WRITE_UINT32(AT91_USART1 + AT91_US_CR, AT91_US_CR_TxRESET | AT91_US_CR_RxRESET | AT91_US_CR_TxDISAB | AT91_US_CR_RxDISAB);
-	HAL_WRITE_UINT32(AT91_USART1 + AT91_US_BRG, AT91_US_BAUD(RS485_BAUD_RATE));
+	HAL_WRITE_UINT32(AT91_USART1 + AT91_US_BRG, AT91_US_BAUD(rs485_baud_rate));
 	HAL_WRITE_UINT32(AT91_USART1 + AT91_US_MR, 0 | AT91_US_MR_CLOCK_MCK | AT91_US_MR_LENGTH_8 | AT91_US_MR_STOP_1 | AT91_US_MR_PARITY_NONE | AT91_US_MR_MODE_NORMAL | (1<<0)); // <- RS485-Mode aktiv
 	HAL_WRITE_UINT32(AT91_USART1 + AT91_US_CR, AT91_US_CR_TxENAB | AT91_US_CR_RxENAB);
 
@@ -33,7 +36,7 @@ bool Hardware::initRS485() {
 }
 
 
-bool Hardware::transceiveRS485(uint8_t* input, int input_length, uint8_t* output, int output_length, int timeout) {
+bool turag_rs485_transceive(uint8_t* input, int input_length, uint8_t* output, int output_length, int timeout) {
 	if (!input || input_length == 0) return false;
 
 	// SENDE-TEIL
@@ -65,7 +68,7 @@ bool Hardware::transceiveRS485(uint8_t* input, int input_length, uint8_t* output
 	bool leave_loop = false;
 
 	// load initial timeout into TO-Register
-	int timeout_symbols = ticks_to_ms(timeout) * (RS485_BAUD_RATE / 1000);
+	int timeout_symbols = turag_ticks_to_ms(timeout) * (rs485_baud_rate / 1000);
 	if (timeout_symbols > 0xffff) timeout_symbols = 0xffff;
 
     // disable DMA (driver doesn't work otherwise)

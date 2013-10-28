@@ -6,7 +6,7 @@
  */
 
 #define LOG_SOURCE "C"
-#include "utils/debug.h"
+#include <tina/debug.h>
 
 #include "cansc.h"
 #include <cstdio>
