@@ -12,6 +12,7 @@
 
 #include <algorithm>
 #include <tina/thread.h>
+#include <tina/ctime.h>
 #include "../array_buffer.h"
 #include "../circular_buffer.h"
 #include "../algorithm.h"

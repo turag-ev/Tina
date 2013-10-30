@@ -115,7 +115,7 @@ struct Pose {
   { }
 
   explicit constexpr
-  Pose(const Point& p, Angle a = 0) :
+  Pose(const Point& p, Angle a = Units::null) :
     x(p.x), y(p.y), phi(a)
   { }
 
