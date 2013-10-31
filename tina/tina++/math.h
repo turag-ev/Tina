@@ -1,5 +1,5 @@
-#ifndef TINA_MATH_H
-#define TINA_MATH_H
+#ifndef TINAPP_MATH_H
+#define TINAPP_MATH_H
 
 #ifndef ECOS
 # include <cmath>
@@ -59,4 +59,4 @@ constexpr float NaNf = __builtin_nanf("");
 
 } // namespace TURAG
 
-#endif // TINA_MATH_H
+#endif // TINAPP_MATH_H
