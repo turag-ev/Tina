@@ -1,85 +1,75 @@
-#ifndef ECOS_TIME_H
-#define ECOS_TIME_H
+#ifndef TURAG_ECOS_CTIME_H
+#define TURAG_ECOS_CTIME_H
 
-#include <cyg/kernel/kapi.h>
-
-#include <tina/tina.h>
+#include <pkgconf/kernel.h>
 #include "timetype.h"
-#include "ctime.h"
+#include <tina/tina.h>
 
-namespace TURAG {
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-// use type from c interface
-typedef TuragSystemTicks SystemTicks; 
+// old-style eCos time Macros
 
-struct SystemTime {
-  SystemTicks value;
+#define S_TO_TICK(s)    ((cyg_uint64)(s)  * (cyg_uint64)1000000000 * (cyg_uint64)CYGNUM_HAL_RTC_DENOMINATOR / (cyg_uint64)CYGNUM_HAL_RTC_NUMERATOR)
+#define MS_TO_TICK(ms)	((cyg_uint64)(ms) * (cyg_uint64)1000000 * (cyg_uint64)CYGNUM_HAL_RTC_DENOMINATOR / (cyg_uint64)CYGNUM_HAL_RTC_NUMERATOR)
+#define US_TO_TICK(us) 	((cyg_uint64)(us) * (cyg_uint64)1000 * (cyg_uint64)CYGNUM_HAL_RTC_DENOMINATOR / (cyg_uint64)CYGNUM_HAL_RTC_NUMERATOR)
 
-  constexpr explicit _always_inline
-  SystemTime(SystemTicks ticks = 0) :
-    value(ticks)
-  { }
-  
-  constexpr operator TuragSystemTime() const {
-    return TuragSystemTime{value};
-  }  
-};
+#define TICK_TO_S(ticks)	(((cyg_uint64)(ticks) * (cyg_uint64)CYGNUM_HAL_RTC_NUMERATOR) / ((cyg_uint64)1000000000 * (cyg_uint64)CYGNUM_HAL_RTC_DENOMINATOR))
+#define TICK_TO_MS(ticks) 	(((cyg_uint64)(ticks) * (cyg_uint64)CYGNUM_HAL_RTC_NUMERATOR) / ((cyg_uint64)1000000 * (cyg_uint64)CYGNUM_HAL_RTC_DENOMINATOR))
+#define TICK_TO_US(ticks)	(((cyg_uint64)(ticks) * (cyg_uint64)CYGNUM_HAL_RTC_NUMERATOR) / ((cyg_uint64)1000 * (cyg_uint64)CYGNUM_HAL_RTC_DENOMINATOR))
 
-constexpr SystemTime operator - (SystemTime arg) { return SystemTime{-arg.value}; }
-constexpr SystemTime operator + (SystemTime arg) { return arg; }
-constexpr SystemTime operator + (SystemTime lhs, SystemTime rhs) { return SystemTime{lhs.value + rhs.value}; }
-constexpr SystemTime operator - (SystemTime lhs, SystemTime rhs) { return SystemTime{lhs.value - rhs.value}; }
-constexpr bool operator <= (SystemTime lhs, SystemTime rhs) { return lhs.value <= rhs.value; }
-constexpr bool operator >= (SystemTime lhs, SystemTime rhs) { return lhs.value >= rhs.value; }
-constexpr bool operator == (SystemTime lhs, SystemTime rhs) { return lhs.value == rhs.value; }
-constexpr bool operator != (SystemTime lhs, SystemTime rhs) { return lhs.value != rhs.value; }
-constexpr bool operator <  (SystemTime lhs, SystemTime rhs) { return lhs.value < rhs.value;  }
-constexpr bool operator >  (SystemTime lhs, SystemTime rhs) { return lhs.value > rhs.value;  }
+// tina-style time fucntions
 
-constexpr SystemTime operator * (SystemTime lhs, unsigned rhs) { return SystemTime{lhs.value * rhs}; }
-constexpr SystemTime operator * (unsigned lhs, SystemTime rhs) { return SystemTime{lhs * rhs.value}; }
+typedef struct {
+  TuragSystemTicks value;
+} TuragSystemTime;
 
-////////////////////////////////////////////////////////////////////////////////
-// time functions
-
-constexpr _always_inline SystemTime s_to_ticks(int s) {
-  return SystemTime((s * 1000000000ULL * static_cast<uint64_t>(CYGNUM_HAL_RTC_DENOMINATOR)
-              / static_cast<uint64_t>(CYGNUM_HAL_RTC_NUMERATOR)));
+// only for intern use!!!
+static _always_inline
+TuragSystemTime _turag_ticks_to_time(TuragSystemTicks ticks) {
+  TuragSystemTime result = {ticks};
+  return result;
 }
 
-constexpr _always_inline SystemTime ms_to_ticks(int ms) {
-  return SystemTime((ms * 1000000ULL * static_cast<uint64_t>(CYGNUM_HAL_RTC_DENOMINATOR)
-               / static_cast<uint64_t>(CYGNUM_HAL_RTC_NUMERATOR)));
+static _always_inline
+TuragSystemTime turag_s_to_ticks(int s) {
+  return _turag_ticks_to_time(S_TO_TICK(s));
 }
 
-constexpr _always_inline SystemTime us_to_ticks(int us) {
-  return SystemTime((us * 1000ULL * static_cast<uint64_t>(CYGNUM_HAL_RTC_DENOMINATOR)
-               / static_cast<uint64_t>(CYGNUM_HAL_RTC_NUMERATOR)));
+static _always_inline
+TuragSystemTime turag_ms_to_ticks(int ms) {
+  return _turag_ticks_to_time(MS_TO_TICK(ms));
 }
 
-constexpr _always_inline unsigned ticks_to_s(SystemTime ticks) {
-  return (ticks.value * static_cast<uint64_t>(CYGNUM_HAL_RTC_NUMERATOR))
-      / (1000000000ULL * static_cast<uint64_t>(CYGNUM_HAL_RTC_DENOMINATOR));
+static _always_inline 
+TuragSystemTime turag_us_to_ticks(int us)	{
+  return _turag_ticks_to_time(US_TO_TICK(us));
 }
 
-constexpr _always_inline unsigned ticks_to_ms(SystemTime ticks) {
-  return (ticks.value * static_cast<uint64_t>(CYGNUM_HAL_RTC_NUMERATOR))
-      / (1000000ULL * static_cast<uint64_t>(CYGNUM_HAL_RTC_DENOMINATOR));
+static _always_inline
+unsigned turag_ticks_to_s(TuragSystemTime time)	{
+  return TICK_TO_S(time.value);
 }
 
-constexpr _always_inline unsigned ticks_to_us(SystemTime ticks) {
-  return (ticks.value * static_cast<uint64_t>(CYGNUM_HAL_RTC_NUMERATOR))
-      / (1000ULL * static_cast<uint64_t>(CYGNUM_HAL_RTC_DENOMINATOR));
+static _always_inline
+unsigned turag_ticks_to_ms(TuragSystemTime time) {
+  return TICK_TO_MS(time.value);
 }
 
-/// Get number of ecos ticks since system start
-/**
- * \return ecos ticks
- */
-_always_inline SystemTime get_current_tick() { // [tick]
-  return SystemTime(cyg_current_time());
+static _always_inline
+unsigned turag_ticks_to_us(TuragSystemTime time) {
+  return TICK_TO_US(time.value);
 }
 
-} // namespace TURAG
+static _always_inline
+TuragSystemTime turag_get_current_tick(void) {
+  return _turag_ticks_to_time(cyg_current_time());
+}
 
-#endif // ECOS_TIME_H
+#ifdef __cplusplus
+} // extern "C"
+#endif
+
+#endif // TURAG_ECOS_CTIME_H
+

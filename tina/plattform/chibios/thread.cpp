@@ -1,5 +1,5 @@
+#include "public/tina++/thread.h"
 #include "public/tina/thread.h"
-#include "public/tina/cthread.h"
 #include <tina/debug.h>
 #include <cstdint>
 
@@ -18,7 +18,7 @@ msg_t thread_entry(void* data) {
 }
 
 extern "C"
-msg_t cthread_entry(void* data) {
+msg_t _turag_thread_entry(void* data) {
   ((void (*)(uint32_t))data)(0);
   return 0;
 }
@@ -30,7 +30,7 @@ std::size_t thread_get_stack_usage(const char* stack, std::size_t stack_size) {
 }
 
 extern "C"
-size_t thread_get_stack_usage(const CThread* thread) {
+size_t turag_thread_get_stack_usage(const TuragThread* thread) {
   return su_get_stack_usage(static_cast<const char*>(thread->stack),
                                 thread->stack_size);
 }

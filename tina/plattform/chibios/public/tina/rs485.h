@@ -8,8 +8,8 @@
 #ifndef TURAG_CHIBI_RS485_H_
 #define TURAG_CHIBI_RS485_H_
 
-#include <tina/types.h>
-#include <tina/ctime.h>
+#include <tina/tina.h>
+#include <tina/time.h>
 
 #ifdef __cplusplus
 extern "C" {

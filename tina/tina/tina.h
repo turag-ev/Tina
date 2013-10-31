@@ -2,8 +2,8 @@
 #define TINA_H
 
 // kleine Abkürzung
-#include "normalize.h"
-#include "types.h"
-#include "macros.h"
+#include "helper/normalize.h"
+#include "helper/types.h"
+#include "helper/macros.h"
 
 #endif // TINA_H

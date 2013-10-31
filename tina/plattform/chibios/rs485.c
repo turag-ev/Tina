@@ -1,8 +1,8 @@
 #define LOG_SOURCE "H"
 
 #include <tina/debug.h>
-#include <tina/types.h>
-#include <tina/ctime.h>
+#include <tina/tina.h>
+#include <tina/time.h>
 // #include <ch.h>
 // #include <hal.h>
 // #include <steuerungm.h>

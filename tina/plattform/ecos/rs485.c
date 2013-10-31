@@ -3,8 +3,8 @@
 #include <cyg/io/io.h>
 #include <cyg/hal/hal_io.h>
 
-#include <tina/ctime.h>
-#include <tina/types.h>
+#include <tina/time.h>
+#include <tina/tina.h>
 #include <tina/debug.h>
 
 static uint32_t rs485_baud_rate;

@@ -1,7 +1,6 @@
 #ifndef TURAG_BYTES_H
 #define TURAG_BYTES_H
 
-#include <tina/types.h>
 #include <tina/tina.h>
 
 static _always_inline uint8_t turag_highbyte(uint16_t halfword) {
