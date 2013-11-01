@@ -17,15 +17,18 @@ static SerialConfig serial_cfg_rs485 = {
     0
 };
 
+static TuragSystemTime rs485_timeout;
 static BinarySemaphore _RS485_Sem;
 
-bool turag_rs485_init(uint32_t baud_rate) {
+
+bool turag_rs485_init(uint32_t baud_rate, TuragSystemTime timeout) {
     uint8_t buf[1] = { 0 };
 
     chBSemInit(&_RS485_Sem, TRUE);
 
     serial_cfg_rs485.speed = baud_rate;
     sdStart(&SD3, &serial_cfg_rs485);
+    rs485_timeout = timeout;
 
     // setup RTS output
     palSetPadMode(GPIOD, BPD_SC_RTS, PAL_MODE_OUTPUT_PUSHPULL);
@@ -43,10 +46,7 @@ bool turag_rs485_init(uint32_t baud_rate) {
     return true;
 }
 
-/**
- * this functions wants a timeout in system ticks!
- */
-bool turag_rs485_transceive(uint8_t *input, int input_length, uint8_t *output, int output_length, TuragSystemTime timeout) {
+bool turag_rs485_transceive(uint8_t *input, int input_length, uint8_t *output, int output_length) {
     bool ok = true;
 
     chBSemWait(&_RS485_Sem);
@@ -59,8 +59,8 @@ bool turag_rs485_transceive(uint8_t *input, int input_length, uint8_t *output, i
     }
 
     if (output && output_length > 0) {
-        // read answer
-        ok = sdReadTimeout(&SD3, output, output_length, timeout.value);
+        // read answer, timeout in systemticks!
+        ok = sdReadTimeout(&SD3, output, output_length, rs485_timeout.value);
     }
 
     chBSemSignal(&_RS485_Sem);

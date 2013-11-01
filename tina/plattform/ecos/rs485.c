@@ -8,13 +8,17 @@
 #include <tina/debug.h>
 
 static uint32_t rs485_baud_rate;
+static int timeout_symbols;
 
 
 
-bool turag_rs485_init(uint32_t baud_rate) {
+bool turag_rs485_init(uint32_t baud_rate, TuragSystemTime timeout) {
 	info("initRS485\n");
 	
 	rs485_baud_rate = baud_rate;
+
+	timeout_symbols = turag_ticks_to_ms(timeout) * (rs485_baud_rate / 1000);
+	if (timeout_symbols > 0xffff) timeout_symbols = 0xffff;
 
 	// usart pins are driven by peripheral
 	HAL_ARM_AT91_PIO_CFG(AT91_USART_RXD1);
@@ -36,7 +40,7 @@ bool turag_rs485_init(uint32_t baud_rate) {
 }
 
 
-bool turag_rs485_transceive(uint8_t* input, int input_length, uint8_t* output, int output_length, TuragSystemTime timeout) {
+bool turag_rs485_transceive(uint8_t* input, int input_length, uint8_t* output, int output_length) {
 	if (!input || input_length == 0) return false;
 
 	// SENDE-TEIL
@@ -67,16 +71,13 @@ bool turag_rs485_transceive(uint8_t* input, int input_length, uint8_t* output, i
 	i = 0;
 	bool leave_loop = false;
 
-	// load initial timeout into TO-Register
-	int timeout_symbols = turag_ticks_to_ms(timeout) * (rs485_baud_rate / 1000);
-	if (timeout_symbols > 0xffff) timeout_symbols = 0xffff;
-
     // disable DMA (driver doesn't work otherwise)
     HAL_WRITE_UINT32(AT91_USART1 + AT91_US_CR, AT91_US_CR_RxRESET);
     HAL_WRITE_UINT32(AT91_USART1 + AT91_US_PTCR, AT91_US_PTCR_RXTDIS);
     HAL_WRITE_UINT32(AT91_USART1 + AT91_US_CR, AT91_US_CR_RSTATUS);
     HAL_WRITE_UINT32(AT91_USART1 + AT91_US_CR, AT91_US_CR_RxENAB);
 
+	// load initial timeout into TO-Register
 	HAL_WRITE_UINT16(AT91_USART1 + AT91_US_RTO, timeout_symbols);
 	HAL_WRITE_UINT32(AT91_USART1 + AT91_US_CR, AT91_US_CR_RETTO);
 
