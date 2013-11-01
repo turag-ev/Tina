@@ -1,5 +1,5 @@
-#ifndef ALGORITHM_H
-#define ALGORITHM_H
+#ifndef TINAPP_ALGORITHM_H
+#define TINAPP_ALGORITHM_H
 
 #include <algorithm>
 
@@ -83,4 +83,4 @@ typename ReverseIterator::iterator_type make_forward(ReverseIterator rit) {
 
 } // namespace TURAG
 
-#endif // ALGORITHM_H
+#endif // TINAPP_ALGORITHM_H

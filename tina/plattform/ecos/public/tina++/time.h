@@ -3,7 +3,6 @@
 
 #include <cyg/kernel/kapi.h>
 
-#include <tina/timetype.h>
 #include <tina/time.h>
 #include <tina++/tina.h>
 

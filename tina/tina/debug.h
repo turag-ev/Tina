@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef UTILS_DEBUG_H
-#define UTILS_DEBUG_H
+#ifndef TINA_DEBUG_H
+#define TINA_DEBUG_H
 
 #include <tina/debugprint.h>
 
@@ -80,5 +80,5 @@
 #define bool_string(b) ((b)?"true":"false")
 #define bool_string_de(b) ((b)?"ja":"nein")
 
-#endif // UTILS_DEBUG_H
+#endif // TINA_DEBUG_H
 

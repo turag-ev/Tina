@@ -1,5 +1,5 @@
-#ifndef FLAGS_H
-#define FLAGS_H
+#ifndef TINAPP_FLAGS_H
+#define TINAPP_FLAGS_H
 
 #include <limits.h>
 #include "normalize.h"
@@ -235,4 +235,4 @@ const Flags<Enum> Flags<Enum>::NOTHING;
 
 } // namespace TURAG
 
-#endif // FLAGS_H
+#endif // TINAPP_FLAGS_H
