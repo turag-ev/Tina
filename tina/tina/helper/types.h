@@ -13,6 +13,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#ifndef ECOS
+# include <stdbool.h>
+#endif
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // integral types
