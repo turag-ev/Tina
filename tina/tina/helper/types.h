@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef TYPES_H_
-#define TYPES_H_
+#ifndef TINA_HELPER_TYPES_H
+#define TINA_HELPER_TYPES_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -17,6 +17,9 @@
 # include <stdbool.h>
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // integral types
@@ -30,4 +33,8 @@ typedef unsigned char uchar;
 /// void pointer type
 typedef void* pointer;
 
-#endif /* TYPES_H_ */
+#ifdef __cplusplus
+} // extern "C"
+#endif
+
+#endif // TINA_HELPER_TYPES_H

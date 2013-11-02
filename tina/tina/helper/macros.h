@@ -1,5 +1,5 @@
-#ifndef MACROHELPER_H
-#define MACROHELPER_H
+#ifndef TINA_HELPER_MACROS_H
+#define TINA_HELPER_MACROS_H
 
 #include "normalize.h"
 
@@ -84,4 +84,4 @@
 #define REQUIRES(...) typename std::enable_if<__VA_ARGS__::value, bool>::type = false
 #define REQUIRES2(...) typename std::enable_if<__VA_ARGS__, bool>::type = false
 
-#endif // MACROHELPER_H
+#endif // TINA_HELPER_MACROS_H

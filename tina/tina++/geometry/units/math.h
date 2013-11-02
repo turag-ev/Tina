@@ -1,5 +1,5 @@
-#ifndef TINA_UNITS_MATH_H
-#define TINA_UNITS_MATH_H
+#ifndef TINAPP_UNITS_MATH_H
+#define TINAPP_UNITS_MATH_H
 
 #include "../../math.h"
 #include "units.h"
@@ -59,5 +59,5 @@ Units::Length hypot(Units::Length x, Units::Length y) {
 
 } // namespace TURAG
 
-#endif // TINA_UNITS_MATH_H
+#endif // TINAPP_UNITS_MATH_H
 

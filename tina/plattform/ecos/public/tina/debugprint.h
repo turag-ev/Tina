@@ -1,5 +1,5 @@
-#ifndef DEBUGPRINT_H_
-#define DEBUGPRINT_H_
+#ifndef TINA_ECOS_DEBUGPRINT_H
+#define TINA_ECOS_DEBUGPRINT_H
 
 #include <stdio.h>
 
@@ -19,4 +19,4 @@ void debug_puts(const char* s);
 } // extern "C"
 #endif
 
-#endif
+#endif // TINA_ECOS_DEBUGPRINT_H

@@ -1,10 +1,12 @@
-#ifndef CHIBIOS_TIME_H
-#define CHIBIOS_TIME_H
+#ifndef TINAPP_CHIBIOS_TIME_H
+#define TINAPP_CHIBIOS_TIME_H
 
 #include <ch.h>
 
 #include <tina++/tina.h>
 #include <tina/time.h>
+
+namespace TURAG {
 
 // use type from c interface
 typedef TuragSystemTicks SystemTicks; 
@@ -73,4 +75,6 @@ _always_inline SystemTime get_current_tick() { // [tick]
   return SystemTime{chTimeNow()};
 }
 
-#endif // CHIBIOS_TIME_H
+} // namespace TURAG
+
+#endif // TINAPP_CHIBIOS_TIME_H

@@ -1,6 +1,5 @@
-
-#ifndef BIT_MACROS_H
-#define BIT_MACROS_H
+#ifndef TINA_UTILS_BIT_MACROS_H
+#define TINA_UTILS_BIT_MACROS_H
 
 /// get bit
 /// example: \code BIT(3) = 1 << 3 = 1000b = 0x8 \endcode
@@ -60,6 +59,6 @@
 /// \param n number of bit to clear
 #define BIT_CLEAR(x, n)              (x &= ~BIT(n))
 
-#endif // BIT_MACROS_H
+#endif // TINA_UTILS_BIT_MACROS_H
 
 

@@ -1,5 +1,5 @@
-#ifndef ECOS_TIME_H
-#define ECOS_TIME_H
+#ifndef TINAPP_ECOS_TIME_H
+#define TINAPP_ECOS_TIME_H
 
 #include <cyg/kernel/kapi.h>
 
@@ -81,4 +81,4 @@ _always_inline SystemTime get_current_tick() { // [tick]
 
 } // namespace TURAG
 
-#endif // ECOS_TIME_H
+#endif // TINAPP_ECOS_TIME_H

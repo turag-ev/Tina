@@ -1,5 +1,5 @@
-#ifndef TINAPP_INTEGER_H
-#define TINAPP_INTEGER_H
+#ifndef TINAPP_HELPER_INTEGER_H
+#define TINAPP_HELPER_INTEGER_H
 
 #include <tina/tina.h>
 
@@ -28,4 +28,4 @@ struct unsigned_integer {
 
 } // namespace TURAG
 
-#endif // TINA_INTEGER_H
+#endif // TINAPP_HELPER_INTEGER_H

@@ -1,5 +1,5 @@
-#ifndef TIME_H
-#define TIME_H
+#ifndef TINAPP_UTILS_TIMER_H
+#define TINAPP_UTILS_TIMER_H
 
 #include <tina++/time.h>
 
@@ -24,4 +24,4 @@ private:
 
 } // namespace TURAG
 
-#endif // TIME_H
+#endif // TINAPP_UTILS_TIMER_H

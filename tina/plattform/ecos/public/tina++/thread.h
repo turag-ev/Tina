@@ -1,5 +1,5 @@
-#ifndef ECOS_THREAD_H_
-#define ECOS_THREAD_H_
+#ifndef TINAPP_ECOS_THREAD_H
+#define TINAPP_ECOS_THREAD_H
 
 #include <cyg/kernel/kapi.h>
 
@@ -144,4 +144,4 @@ private:
 
 } // namespace TURAG
 
-#endif // ECOS_THREAD_H_
+#endif // TINAPP_ECOS_THREAD_H

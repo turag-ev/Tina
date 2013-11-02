@@ -1,5 +1,5 @@
-#ifndef DEBUGPRINT_H_
-#define DEBUGPRINT_H_
+#ifndef TINA_CHIBIOS_DEBUGPRINT_H
+#define TINA_CHIBIOS_DEBUGPRINT_H
 
 #include <debug/cooldebug.h>
 
@@ -11,7 +11,7 @@ extern "C" {
 #define debug_printf    SC_DEBUG
 
 #ifdef __cplusplus
-}
+} // extern "C"
 #endif
 
-#endif
+#endif // TINA_CHIBIOS_DEBUGPRINT_H

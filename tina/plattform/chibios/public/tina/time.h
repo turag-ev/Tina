@@ -1,5 +1,5 @@
-#ifndef TURAG_CHIBI_CTIME_H
-#define TURAG_CHIBI_CTIME_H
+#ifndef TINA_CHIBIOS_TIME_H
+#define TINA_CHIBIOS_TIME_H
 
 #include <ch.h>
 
@@ -64,5 +64,5 @@ TuragSystemTime turag_get_current_tick(void) { // [tick]
 } // extern "C"
 #endif
 
-#endif // TURAG_CHIBI_CTIME_H
+#endif // TINA_CHIBIOS_TIME_H
 

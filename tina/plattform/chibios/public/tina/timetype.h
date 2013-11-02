@@ -1,5 +1,5 @@
-#ifndef CHIBIOS_TIMETYPE_H
-#define CHIBIOS_TIMETYPE_H
+#ifndef TINA_CHIBIOS_TIMETYPE_H
+#define TINA_CHIBIOS_TIMETYPE_H
 
 #include <ch.h>
 
@@ -8,4 +8,4 @@
 
 typedef systime_t TuragSystemTicks;
 
-#endif // CHIBIOS_TIMETYPE_H
+#endif // TINA_CHIBIOS_TIMETYPE_H

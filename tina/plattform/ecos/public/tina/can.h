@@ -1,5 +1,5 @@
-#ifndef CCAN_H
-#define CCAN_H
+#ifndef TINA_ECOS_CAN_H
+#define TINA_ECOS_CAN_H
 
 #include <turag/casa.h>
 
@@ -20,4 +20,4 @@ TuragCanErrorCode turag_can_read_blackboard(const TuragCanBlackboard* object, vo
 } // extern "C"
 #endif
 
-#endif // CCAN_H
+#endif // TINA_ECOS_CAN_H

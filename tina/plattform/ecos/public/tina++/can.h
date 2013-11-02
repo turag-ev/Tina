@@ -1,13 +1,10 @@
-#ifndef CAN_H_
-#define CAN_H_
+#ifndef TINAPP_ECOS_CAN_H
+#define TINAPP_ECOS_CAN_H
 
 #include <turag/casa.h>
 #include <tina++/tina.h>
 
 namespace TURAG {
-
-////////////////////////////////////////////////////////////////////////////////
-// CAN
 
 namespace CAN {
 
@@ -58,8 +55,8 @@ uint64_t call(Id remote_id, FuncId func_id, uint64_t param, ErrorCode* error_res
 /// \param dest   destination of blackboard value
 ErrorCode read_blackboard(const Blackboard* object, pointer dest);
 
-} /* namespace CAN */
+} // namespace CAN
 
 } // namespace TURAG
 
-#endif /* CAN_H_ */
+#endif // TINAPP_ECOS_CAN_H

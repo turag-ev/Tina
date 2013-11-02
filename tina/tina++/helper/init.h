@@ -1,5 +1,5 @@
-#ifndef INIT_H
-#define INIT_H
+#ifndef TINAPP_HELPER_INIT_H
+#define TINAPP_HELPER_INIT_H
 
 #include "macros.h"
 #include "normalize.h"
@@ -41,4 +41,4 @@ public:
 
 } // namespace TURAG
 
-#endif // INIT_H
+#endif // TINAPP_HELPER_INIT_H

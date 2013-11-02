@@ -1,5 +1,5 @@
-#ifndef FLAGS_H
-#define FLAGS_H
+#ifndef TINAPP_UTILS_FLAGS_H
+#define TINAPP_UTILS_FLAGS_H
 
 #include <limits>
 #include "../tina.h"
@@ -238,4 +238,4 @@ constexpr Flags<Enum, Bits> Flags<Enum, Bits>::NOTHING;
 
 } // namespace TURAG
 
-#endif // FLAGS_H
+#endif // TINAPP_UTILS_FLAGS_H

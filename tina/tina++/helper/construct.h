@@ -1,5 +1,5 @@
-#ifndef CONSTRUCT_H
-#define CONSTRUCT_H
+#ifndef TINAPP_HELPER_CONSTRUCT_H
+#define TINAPP_HELPER_CONSTRUCT_H
 
 #include <type_traits>
 #include <iterator>
@@ -45,4 +45,4 @@ void destruct(ForwardIterator first, ForwardIterator last) {
 
 } // namespace TURAG
 
-#endif // CONSTRUCT_H
+#endif // TINAPP_HELPER_CONSTRUCT_H

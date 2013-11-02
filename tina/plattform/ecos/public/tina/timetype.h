@@ -1,5 +1,5 @@
-#ifndef ECOS_TIMETYPE_H
-#define ECOS_TIMETYPE_H
+#ifndef TINA_ECOS_TIMETYPE_H
+#define TINA_ECOS_TIMETYPE_H
 
 #include <cyg/kernel/kapi.h>
 
@@ -8,4 +8,4 @@
 
 typedef cyg_tick_count_t TuragSystemTicks;
 
-#endif // ECOS_TIMETYPE_H
+#endif // TINA_ECOS_TIMETYPE_H

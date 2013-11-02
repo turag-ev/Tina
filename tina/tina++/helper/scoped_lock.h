@@ -1,5 +1,5 @@
-#ifndef SCOPED_LOCK_H
-#define SCOPED_LOCK_H
+#ifndef TINAPP_HELPER_SCOPED_LOCK_H
+#define TINAPP_HELPER_SCOPED_LOCK_H
 
 #include "macros.h"
 #include "normalize.h"
@@ -57,4 +57,4 @@ private:
 
 } // namespace TURAG
 
-#endif // SCOPED_LOCK_H
+#endif // TINAPP_HELPER_SCOPED_LOCK_H

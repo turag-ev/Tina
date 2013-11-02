@@ -7,10 +7,10 @@
  *
  */
 
-#ifndef UTILS_BITS_H
-#define UTILS_BITS_H
+#ifndef TINAPP_UTILS_BITS_H
+#define TINAPP_UTILS_BITS_H
 
-#include "../types.h"
+#include "../tina.h"
 
 namespace TURAG {
 
@@ -238,4 +238,4 @@ test_bit(T t, size_t n) {
 
 } // namespace TURAG
 
-#endif // UTILS_BITS_H
+#endif // TINAPP_UTILS_BITS_H

@@ -1,5 +1,5 @@
-#ifndef TINA_UNITS_UNITS_H
-#define TINA_UNITS_UNITS_H
+#ifndef TINAPP_GEOMETRY_UNITS_UNITS_H
+#define TINAPP_GEOMETRY_UNITS_UNITS_H
 
 #include "config.h"
 #include "unit.h"
@@ -40,4 +40,4 @@ constexpr Angle operator"" _deg(long long unsigned x) { return x * deg; }
 } // namespace Units
 } // namespace TURAG
 
-#endif // TINA_UNITS_UNITS_H
+#endif // TINAPP_GEOMETRY_UNITS_UNITS_H

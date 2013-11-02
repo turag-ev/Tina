@@ -1,5 +1,5 @@
-#ifndef TINA_UNITS_UNIT_H
-#define TINA_UNITS_UNIT_H
+#ifndef TINAPP_UNITS_UNIT_H
+#define TINAPP_UNITS_UNIT_H
 
 #include <cstddef>
 #include <type_traits>
@@ -445,4 +445,4 @@ typedef Quantity< typename dim_div<AngleDimension, TimeDimension>::type > Angula
 } // namespace Units
 } // namespace TURAG
 
-#endif // TINA_UNITS_UNIT_H
+#endif // TINAPP_UNITS_UNIT_H

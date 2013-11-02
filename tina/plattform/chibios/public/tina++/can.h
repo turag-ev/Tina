@@ -1,25 +1,13 @@
-/*
- * cansc.h
- *
- *  Created on: 18.07.2012
- *      Author: richard
- */
+#ifndef TINAPP_CHIBIOS_CAN_H
+#define TINAPP_CHIBIOS_CAN_H
 
-#ifndef CAN_H_
-#define CAN_H_
-
-extern "C" {
 #include <casa/casa.h>
 #include <casa/blackboard.h>
 #include <casa/rpc.h>
-}
 
 #include <tina++/tina.h>
 
 namespace TURAG {
-
-////////////////////////////////////////////////////////////////////////////////
-// CAN
 
 namespace CAN {
 
@@ -75,8 +63,8 @@ uint64_t call(Id remote_id, FuncId func_id, uint64_t param, ErrorCode* error_res
 /// \param dest   destination of blackboard value
 ErrorCode read_blackboard(const Blackboard* object, pointer dest);
 
-} /* namespace CAN */
+} // namespace CAN
 
-} /* namespace TURAG */
+} // namespace TURAG
 
-#endif /* CAN_H_ */
+#endif // TINAPP_CHIBIOS_CAN_H

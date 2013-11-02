@@ -1,5 +1,5 @@
-#ifndef TINA_UNITS_CONFIG_H
-#define TINA_UNITS_CONFIG_H
+#ifndef TINAPP_UNITS_CONFIG_H
+#define TINAPP_UNITS_CONFIG_H
 
 namespace TURAG {
 namespace Units {
@@ -22,5 +22,5 @@ constexpr UnitFactor FROM_SI_CONVERT_FACTOR_TIME   =    1.f; // s
 } // namespace Units
 } // namespace TURAG
 
-#endif // TINA_UNITS_CONFIG_H
+#endif // TINAPP_UNITS_CONFIG_H
 

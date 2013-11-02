@@ -1,5 +1,5 @@
-#ifndef TINAPP_NORMALIZE_H
-#define TINAPP_NORMALIZE_H
+#ifndef TINAPP_HELPER_NORMALIZE_H
+#define TINAPP_HELPER_NORMALIZE_H
 
 #include <tina/helper/normalize.h>
 
@@ -53,4 +53,4 @@ private:
 
 #endif
 
-#endif // NORMALIZE_H
+#endif // TINAPP_HELPER_NORMALIZE_H

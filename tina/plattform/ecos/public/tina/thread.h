@@ -1,5 +1,5 @@
-#ifndef ECOS_CTHREAD_H
-#define ECOS_CTHREAD_H
+#ifndef TINA_ECOS_THREAD_H
+#define TINA_ECOS_THREAD_H
 
 #include <cyg/kernel/kapi.h>
 
@@ -64,4 +64,4 @@ typedef cyg_mutex_t TuragMutex;
 } // extern "C"
 #endif
 
-#endif // ECOS_CTHREAD_H
+#endif // TINA_ECOS_THREAD_H

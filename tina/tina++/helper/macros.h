@@ -1,5 +1,5 @@
-#ifndef TINAPP_MACROS_H
-#define TINAPP_MACROS_H
+#ifndef TINAPP_HELPER_MACROS_H
+#define TINAPP_HELPER_MACROS_H
 
 #include "normalize.h"
 #include <tina/helper/macros.h>
@@ -31,4 +31,4 @@
 #define REQUIRES(...) typename std::enable_if<__VA_ARGS__::value, bool>::type = false
 #define REQUIRES2(...) typename std::enable_if<__VA_ARGS__, bool>::type = false
 
-#endif // TINAPP_MACROS_H
+#endif // TINAPP_HELPER_MACROS_H

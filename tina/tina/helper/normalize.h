@@ -1,5 +1,5 @@
-#ifndef NORMALIZE_H
-#define NORMALIZE_H
+#ifndef TINA_HELPER_NORMALIZE_H
+#define TINA_HELPER_NORMALIZE_H
 
 /// get GCC version in useable format
 #define GCC_VERSION (__GNUC__ * 10000 \
@@ -81,13 +81,6 @@
 #define _alias(name) __attribute__((weak, alias (name)))
 
 /// place variable in a specific  section
-#define _section(s) __attribute__ ((section("." s)))
+#define _section(s) __attribute__((section("." s)))
 
-/// ccm memory for stm
-#ifdef CHIBIOS
-# define _ccm_memory _section("ccm")
-#else
-# define _ccm_memory
-#endif
-
-#endif // NORMALIZE_H
+#endif // TINA_HELPER_NORMALIZE_H

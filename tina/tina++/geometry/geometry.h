@@ -1,5 +1,5 @@
-#ifndef GEOMETRY_H
-#define GEOMETRY_H
+#ifndef TINAPP_GEOMETRY_GEOMETRY_H
+#define TINAPP_GEOMETRY_GEOMETRY_H
 
 #include <array>
 
@@ -231,4 +231,4 @@ bool interselect(Circle one, Circle two, std::array<Point, 2>& results);
 
 } // namespace TURAG
 
-#endif // GEOMETRY_H
+#endif // TINAPP_GEOMETRY_GEOMETRY_H

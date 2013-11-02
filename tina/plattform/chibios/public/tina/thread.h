@@ -1,5 +1,5 @@
-#ifndef CHIBIOS_CTHREAD_H
-#define CHIBIOS_CTHREAD_H
+#ifndef TINA_CHIBIOS_THREAD_H
+#define TINA_CHIBIOS_THREAD_H
 
 #include <ch.h>
 #include <stddef.h>
@@ -65,4 +65,4 @@ typedef Mutex TuragMutex;
 } // extern "C"
 #endif
 
-#endif // CHIBIOS_CTHREAD_H
+#endif // TINA_CHIBIOS_THREAD_H

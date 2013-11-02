@@ -5,14 +5,10 @@
  *  @author		Martin Oemus <martin@oemus.net>
  * 
  */
-#ifndef TINA_PLATFORM_TESTMENU_H_
-#define TINA_PLATFORM_TESTMENU_H_
-
+#ifndef TINA_CHIBIOS_TESTMENU_H
+#define TINA_CHIBIOS_TESTMENU_H
 
 # include <cmenu/console_menu.h>
 # include "testmenu-cmenu-board.h"
 
-
-
-
-#endif /* TINA_PLATFORM_TESTMENU_H_ */
+#endif // TINA_CHIBIOS_TESTMENU_H

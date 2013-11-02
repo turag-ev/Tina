@@ -1,5 +1,5 @@
-#ifndef CCAN_H
-#define CCAN_H
+#ifndef TINA_CHIBIOS_CAN_H
+#define TINA_CHIBIOS_CAN_H
 
 #include <casa/casa.h>
 #include <casa/blackboard.h>
@@ -19,7 +19,7 @@ typedef Casa_BBObject_t TuragCanBlackboard;
 TuragCanErrorCode turag_can_read_blackboard(const TuragCanBlackboard* object, void* dest);
 
 #ifdef __cplusplus
-}
+} // extern "C"
 #endif
 
-#endif // CCAN_H
+#endif // TINA_CHIBIOS_CAN_H

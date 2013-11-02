@@ -1,5 +1,5 @@
-#ifndef PACKED_H
-#define PACKED_H
+#ifndef TINAPP_HELPER_PACKED_H
+#define TINAPP_HELPER_PACKED_H
 
 namespace TURAG {
 
@@ -40,4 +40,4 @@ inline const Unpacked& reinterpret_reference(const Packed& src) {
 
 } // namespace TURAG
 
-#endif // PACKED_H
+#endif // TINAPP_HELPER_PACKED_H

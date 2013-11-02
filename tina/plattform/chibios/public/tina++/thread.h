@@ -1,5 +1,5 @@
-#ifndef CHIBIOS_THREAD_H_
-#define CHIBIOS_THREAD_H_
+#ifndef TINAPP_CHIBIOS_THREAD_H
+#define TINAPP_CHIBIOS_THREAD_H
 
 #include <ch.h>
 #include <cstddef>
@@ -164,6 +164,6 @@ private:
 // and WORKING_AREA have problems with this.
 template<size_t size = 0> class Thread : public detail::thread_detail<size> { };
 
-} // namespace SystemControl
+} // namespace TURAG
 
-#endif // CHIBIOS_THREAD_H_
+#endif // TINAPP_CHIBIOS_THREAD_H

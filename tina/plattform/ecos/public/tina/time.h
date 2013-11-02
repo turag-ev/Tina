@@ -1,5 +1,5 @@
-#ifndef TURAG_ECOS_CTIME_H
-#define TURAG_ECOS_CTIME_H
+#ifndef TINA_ECOS_TIME_H
+#define TINA_ECOS_TIME_H
 
 #include <pkgconf/kernel.h>
 #include "timetype.h"
@@ -71,5 +71,5 @@ TuragSystemTime turag_get_current_tick(void) {
 } // extern "C"
 #endif
 
-#endif // TURAG_ECOS_CTIME_H
+#endif // TINA_ECOS_TIME_H
 

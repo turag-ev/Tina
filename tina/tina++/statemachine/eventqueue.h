@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef TINAPP_EVENTQUEUE_H_
-#define TINAPP_EVENTQUEUE_H_
+#ifndef TINAPP_STATEMACHINE_EVENTQUEUE_H
+#define TINAPP_STATEMACHINE_EVENTQUEUE_H
 
 #include <type_traits>
 
@@ -207,6 +207,6 @@ public:
 
 } // namespace TURAG
 
-#endif /* TINAPP_EVENTQUEUE_H_ */
+#endif // TINAPP_STATEMACHINE_EVENTQUEUE_H
 
 
