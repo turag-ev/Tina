@@ -12,7 +12,7 @@ namespace TURAG {
 template<class Mutex>
 class ScopedLock {
   NOT_COPYABLE(ScopedLock);
-  MOVABLE(ScopedLock);
+  NOT_MOVABLE(ScopedLock);
 
 public:
   _always_inline explicit ScopedLock(Mutex& m) :
