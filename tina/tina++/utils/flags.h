@@ -13,7 +13,7 @@ public:
   typedef Enum enum_type;
   static constexpr std::size_t bits = Bits;
 
-  static constexpr Flags NOTHING = Flags();
+  static const Flags NOTHING;
 
   static constexpr _always_inline int bit(Enum b) {
     return 1 << static_cast<int>(b);
@@ -234,7 +234,7 @@ private:
   }
 
 template<typename Enum, std::size_t Bits>
-constexpr Flags<Enum, Bits> Flags<Enum, Bits>::NOTHING;
+const Flags<Enum, Bits> Flags<Enum, Bits>::NOTHING;
 
 } // namespace TURAG
 
