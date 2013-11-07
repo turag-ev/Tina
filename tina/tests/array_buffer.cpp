@@ -1,8 +1,8 @@
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
 
-#include <tina/array_buffer.h>
-#include <tina/algorithm.h>
+#include <tina++/container/array_buffer.h>
+#include <tina++/algorithm.h>
 
 #include <ostream>
 #include <deque>

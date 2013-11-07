@@ -1,7 +1,7 @@
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
 
-#include <tina/geometry/units.h>
+#include <tina++/geometry/units.h>
 
 using namespace TURAG::Units;
 using namespace TURAG::Units::detail;

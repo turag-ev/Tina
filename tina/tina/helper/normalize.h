@@ -83,4 +83,8 @@
 /// place variable in a specific  section
 #define _section(s) __attribute__((section("." s)))
 
+
+#define _packed __attribute__ ((packed))
+#define _unsed __attribute__ ((unused))
+
 #endif // TINA_HELPER_NORMALIZE_H

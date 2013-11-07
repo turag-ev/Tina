@@ -30,7 +30,7 @@
 
 #if GCC_VERSION < 40600
 
-namespace TURAG {
+namespace std {
 
 // from http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2431.pdf
 const                        // this is a const object...
