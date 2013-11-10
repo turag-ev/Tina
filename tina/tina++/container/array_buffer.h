@@ -303,9 +303,7 @@ void ArrayBuffer<T, N>::erase(iterator first, iterator last) {
 #ifdef NDEBUG
 template<typename T>
 bool _ArrayBufferHelper<T>::prepare_for_insert(iterator position, iterator end) {
-  for (iterator i = end; i > position; --i) {
-    *i = *(i-1);
-  }
+  std::move_backward(position, end, end + 1);
   return true;
 }
 #else
@@ -316,9 +314,7 @@ bool _ArrayBufferHelper<T>::prepare_for_insert(iterator position, iterator end, 
     return false;
   }
 
-  for (iterator i = end; i > position; --i) {
-    *i = std::move(*(i-1));
-  }
+  std::move_backward(position, end, end + 1);
   return true;
 }
 #endif

@@ -63,14 +63,14 @@ static EventQueuePrivate p;
 _hot
 void print_debug_info(const Event &e) {
   if (e.id >> 24 != 0) {
-    infof("Event: %c%c%c%u 0x%x",
+    infof("Event: %c%c%c%u 0x%zx",
           static_cast<char>(e.id >> 24),
           static_cast<char>(e.id >> 16),
           static_cast<char>(e.id >> 8),
           static_cast<unsigned>(e.id & 0xFF),
           reinterpret_cast<ptrdiff_t>(e.method));
   } else {
-    infof("Event: %u 0x%x",
+    infof("Event: %u 0x%zx",
           static_cast<unsigned>(e.id & 0xFF),
           reinterpret_cast<ptrdiff_t>(e.method));
   }
@@ -304,13 +304,13 @@ EventQueue::printDebugInfo() {
   printQueue();
 
   info ("Stack:\n");
-  infof("  size of EventQueue: %u bytes\n", static_cast<unsigned>(sizeof(EventQueuePrivate)));
-  infof("  number of queue elements: %u\n", static_cast<unsigned>(size));
-  infof("  number of timed queue elements: %u\n", static_cast<unsigned>(timequeue_size));
+  infof("  size of EventQueue: %zu bytes\n", sizeof(EventQueuePrivate));
+  infof("  number of queue elements: %zu\n", size);
+  infof("  number of timed queue elements: %zu\n", timequeue_size);
 #ifdef EVENTQUEUE_USAGE_MEASUREMENT
   info ("Usage:\n");
-  infof("  max. number of queue elements: %u\n", static_cast<unsigned>(p.max_events));
-  infof("  max. number of timed queue elements: %u\n", static_cast<unsigned>(p.max_timed_events));
+  infof("  max. number of queue elements: %zu\n", p.max_events);
+  infof("  max. number of timed queue elements: %zu\n", p.max_timed_events);
 #endif
 }
 

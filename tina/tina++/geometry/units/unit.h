@@ -164,7 +164,7 @@ namespace detail {
   template<typename T, REQUIRES(std::is_floating_point<T>)> constexpr
   int roundToInt(T value) {
 #if GCC_VERSION < 40700 || defined(ECOS)
-    return (value < 0.0) ? ceil(value - 0.5) : floor(value + 0.5);
+    return (value < 0.0f) ? ceil(value - 0.5f) : floor(value + 0.5f);
 #else
     return ::lround(value);
 #endif

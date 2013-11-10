@@ -1,10 +1,14 @@
 
 #include <math.h>
 
-// fuck this eCos, we have our own
+// fuck eCos, we make our own float math functions from eCos double functions
 
 float sinf(float x) {
   return sin(x);
+}
+
+float asinf(float x) {
+  return asin(x);
 }
 
 float cosf(float x) {
@@ -16,5 +20,5 @@ float atan2f(float y, float x) {
 }
 
 float sqrtf(float x) {
-  return sqrtf(x);
+  return sqrt(x);
 }

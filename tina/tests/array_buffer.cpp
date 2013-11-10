@@ -348,7 +348,7 @@ BOOST_AUTO_TEST_CASE( test_ArrayBuffer_pop_back ) {
   Dummy::instances = 4;
 }
 
-/*
+
 BOOST_AUTO_TEST_CASE( test_ArrayBuffer_copy ) {
   {
     CONTAINER test1;
@@ -371,7 +371,7 @@ BOOST_AUTO_TEST_CASE( test_ArrayBuffer_copy ) {
   }
   BOOST_CHECK_EQUAL(Dummy::instances, 0);
   Dummy::instances = 0;
-}*/
+}
 
 BOOST_AUTO_TEST_SUITE_END()
 

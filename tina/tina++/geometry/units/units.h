@@ -14,7 +14,7 @@ constexpr Unit<LengthDimension>  m(FROM_SI_CONVERT_FACTOR_LENGTH);
 
 constexpr Unit<AngleDimension> mrad(FROM_SI_CONVERT_FACTOR_ANGLE / 1000.f);
 constexpr Unit<AngleDimension>  rad(FROM_SI_CONVERT_FACTOR_ANGLE);
-constexpr Unit<AngleDimension>  deg(FROM_SI_CONVERT_FACTOR_ANGLE * M_PI/180.f);
+constexpr Unit<AngleDimension>  deg(FROM_SI_CONVERT_FACTOR_ANGLE * float(M_PI)/180.f);
 
 constexpr Unit<TimeDimension>  s(FROM_SI_CONVERT_FACTOR_TIME);
 constexpr Unit<TimeDimension> ms(FROM_SI_CONVERT_FACTOR_TIME / 1000.f);

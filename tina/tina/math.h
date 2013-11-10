@@ -84,5 +84,8 @@
 
 
 
+// float constants
+
+#define M_PIf ((float)M_PI)
 
 #endif // TINA_MATH_H
