@@ -140,18 +140,18 @@ void crashrecovery_dump()
     int i;
     SCPLT_ERROR("-----\r\n");
     SCPLT_ERROR("last_instance_crashed = %d\r\n", last_instance_crashed);
-    SCPLT_ERROR("crashrecovery_valid = 0x%.8x\r\n", crashrecovery_valid);
+    SCPLT_ERROR("crashrecovery_valid = 0x%.8x\r\n", (ptrdiff_t)crashrecovery_valid);
 
     for (i = 0; i < 2; i++) {
-        SCPLT_ERROR("&crashrecovery_info[%d] = 0x%.8x\r\n", i, &crashrecovery_info[i]);
-        SCPLT_ERROR(" - t_startup = %d\r\n", crashrecovery_info[i].t_startup);
-        SCPLT_ERROR(" - t_lastalive = %d\r\n", crashrecovery_info[i].t_lastalive);
-        SCPLT_ERROR(" - t_matchstart = %d\r\n", crashrecovery_info[i].t_matchstart);
-        SCPLT_ERROR(" - match_started = %d\r\n", crashrecovery_info[i].match_started);
-        SCPLT_ERROR(" > crashed = %d\r\n", crashrecovery_info[i].crashed);
-        SCPLT_ERROR(" > crash_reason = 0x%x\r\n", crashrecovery_info[i].crash_reason);
-        SCPLT_ERROR(" > write_in_progress = %d\r\n", crashrecovery_info[i].write_in_progress);
-        SCPLT_ERROR(" > checksum = 0x%.8x (valid: %d)\r\n", crashrecovery_info[i].checksum, valid_checksum(&crashrecovery_info[i]));
+        SCPLT_ERROR("&crashrecovery_info[%d] = 0x%.8x\r\n", i, (ptrdiff_t)&crashrecovery_info[i]);
+        SCPLT_ERROR(" - t_startup = %u\r\n", (unsigned)crashrecovery_info[i].t_startup);
+        SCPLT_ERROR(" - t_lastalive = %u\r\n", (unsigned)crashrecovery_info[i].t_lastalive);
+        SCPLT_ERROR(" - t_matchstart = %u\r\n", (unsigned)crashrecovery_info[i].t_matchstart);
+        SCPLT_ERROR(" - match_started = %u\r\n", (unsigned)crashrecovery_info[i].match_started);
+        SCPLT_ERROR(" > crashed = %u\r\n", crashrecovery_info[i].crashed);
+        SCPLT_ERROR(" > crash_reason = 0x%lx\r\n", crashrecovery_info[i].crash_reason);
+        SCPLT_ERROR(" > write_in_progress = %u\r\n", crashrecovery_info[i].write_in_progress);
+        SCPLT_ERROR(" > checksum = 0x%.8lx (valid: %d)\r\n", crashrecovery_info[i].checksum, valid_checksum(&crashrecovery_info[i]));
     }
 }
 
