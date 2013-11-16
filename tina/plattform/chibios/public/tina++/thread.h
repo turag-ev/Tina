@@ -24,7 +24,10 @@ namespace TURAG {
  */
 namespace detail {
 
-msg_t thread_entry(void* data);
+extern "C" {
+extern void _turag_thread_entry(void* data) TURAG_THREAD_ENTRY;
+}
+
 std::size_t thread_get_stack_usage(const char* stack, std::size_t stack_size);
 
 template<size_t size>
@@ -37,10 +40,10 @@ public:
   { }
 
   _always_inline
-  void start(tprio_t priority, void (*entry) (uint32_t)) {
+  void start(tprio_t priority, void (*entry) ()) {
     thread_ = chThdCreateStatic(working_area_, sizeof(working_area_),
                                 NORMALPRIO + priority,
-                                thread_entry,
+                                (tfunc_t)_turag_thread_entry,
                                 (void*)entry);
   }
 

@@ -21,13 +21,13 @@ typedef struct {
   static WORKING_AREA(CONCAT(name, _stack_), stack_size); \
   TuragThread name = {0, &CONCAT(name, _stack_), sizeof(CONCAT(name, _stack_))}
   
-TURAG_THREAD_ENTRY msg_t _turag_thread_entry(void* data);
+extern void _turag_thread_entry(void* data) TURAG_THREAD_ENTRY;
 
 static _always_inline
-void turag_thread_start(TuragThread* thread, tprio_t priority, void (*entry) (uint32_t)) {
+void turag_thread_start(TuragThread* thread, tprio_t priority, void (*entry) (void)) {
   thread->thread = chThdCreateStatic(thread->stack, thread->stack_size,
                                      NORMALPRIO + priority,
-                                     _turag_thread_entry,
+                                     (tfunc_t)_turag_thread_entry,
                                      (void*)entry);
 }
 

@@ -13,6 +13,11 @@ namespace TURAG {
 ////////////////////////////////////////////////////////////////////////////////
 // Thread
 
+
+extern "C" {
+extern void _turag_thread_entry(cyg_addrword_t data) TURAG_THREAD_ENTRY;
+}
+
 /**
  * \class Thread
  * \brief Plattform independent thread
@@ -31,8 +36,9 @@ public:
    * \param priority priority of the thread
    * \param entry    function called in newly created thread
    */
-  void start(cyg_addrword_t priority, void (*entry) (uint32_t)) {
-    cyg_thread_create(31-priority, (cyg_thread_entry_t*) entry, 0, nullptr, (void *)stack_, sizeof(stack_), &thread_handle_, &thread_);
+  void start(cyg_addrword_t priority, void (*entry) ()) {
+    cyg_thread_create(31-priority, _turag_thread_entry, (cyg_addrword_t)entry, nullptr,
+      (void *)stack_, sizeof(stack_), &thread_handle_, &thread_);
     cyg_thread_resume(thread_handle_);
   }
 

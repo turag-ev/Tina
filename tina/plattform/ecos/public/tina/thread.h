@@ -22,10 +22,13 @@ typedef struct {
   static cyg_thread CONCAT(name, _thread_); \
   TuragThread name = {(char*)&CONCAT(name, _stack_), stack_size, &CONCAT(name, _thread_), 0};
   
+  
+extern void _turag_thread_entry(cyg_addrword_t data) TURAG_THREAD_ENTRY;
+  
 static _always_inline
-void turag_thread_start(TuragThread* thread, cyg_addrword_t priority, void (*entry)(uint32_t)) {
-  cyg_thread_create(31-priority, (void (*)(cyg_addrword_t))entry,
-                    0, NULL, (void *)thread->stack,
+void turag_thread_start(TuragThread* thread, cyg_addrword_t priority, void (*entry)(void)) {
+  cyg_thread_create(31-priority, _turag_thread_entry,
+                    (cyg_addrword_t)entry, NULL, (void *)thread->stack,
                     thread->stack_size, &(thread->thread_handle), thread->thread);
   cyg_thread_resume(thread->thread_handle);
 }
