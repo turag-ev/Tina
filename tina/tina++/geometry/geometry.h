@@ -169,13 +169,13 @@ bool operator==(const Point& l, const Point& r) {
 // algorithm
 
 template<typename T1, typename T2>
-constexpr
+constexpr _always_inline
 Units::Area distance_sqr(const T1& a, const T2& b) {
   return sqr(a.x - b.x)  + sqr(a.y - b.y);
 }
 
 template<typename T1, typename T2>
-constexpr
+constexpr _always_inline
 Length distance(const T1& a, const T2& b) {
   return sqrt(distance_sqr(a, b));
 }

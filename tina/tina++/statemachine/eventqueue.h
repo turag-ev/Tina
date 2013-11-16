@@ -12,6 +12,7 @@
 
 #include <type_traits>
 
+#include <tina++/tina.h>
 #include <tina++/time.h>
 #include <tina++/helper/packed.h>
 #include "types.h"
@@ -77,12 +78,10 @@ public:
    *             passed as function parameters.
    */
 #ifdef TURAG_STATEMACHINE_FOREVER
-#define _TURAG_STATEMACHINE_MAIN_ATTR  _noreturn
+  static void main(Action& mainaction, EventMethod tick, EventMethod idle) _noreturn;
 #else
-#define _TURAG_STATEMACHINE_MAIN_ATTR
+  static void main(Action& mainaction, EventMethod tick, EventMethod idle);
 #endif
-  static void main(Action& mainaction, EventMethod tick, EventMethod idle) _TURAG_STATEMACHINE_MAIN_ATTR;
-#undef _TURAG_STATEMACHINE_MAIN_ATTR
 
   static bool processEvent(EventId id, pointer params, EventMethod callback);
 

@@ -22,3 +22,7 @@ float atan2f(float y, float x) {
 float sqrtf(float x) {
   return sqrt(x);
 }
+
+long int lroundf(float x) {
+  return (x < 0.0f) ? ceil(x - 0.5f) : floor(x + 0.5f);
+}

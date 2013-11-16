@@ -161,12 +161,12 @@ constexpr struct null_t {
 
 // roundToInt
 namespace detail {
-  template<typename T, REQUIRES(std::is_floating_point<T>)> constexpr
+  template<typename T, REQUIRES(std::is_floating_point<T>)> constexpr _always_inline
   int roundToInt(T value) {
-#if GCC_VERSION < 40700 || defined(ECOS)
+#if GCC_VERSION < 40700
     return (value < 0.0f) ? ceil(value - 0.5f) : floor(value + 0.5f);
 #else
-    return ::lround(value);
+    return lroundf(value);
 #endif
   }
   
