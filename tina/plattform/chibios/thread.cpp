@@ -12,15 +12,18 @@ namespace TURAG {
 
 namespace detail {
 
+TURAG_THREAD_ENTRY
 msg_t thread_entry(void* data) {
-  reinterpret_cast<void (*)(uint32_t)>(data)(0);
-  return 0;
+  TURAG_THREAD_ENTRY void (*entry)(uint32_t) =
+    reinterpret_cast<void (*)(uint32_t)>(data);
+    
+  entry(0);
 }
 
-extern "C"
+extern "C" TURAG_THREAD_ENTRY
 msg_t _turag_thread_entry(void* data) {
-  ((void (*)(uint32_t))data)(0);
-  return 0;
+  TURAG_THREAD_ENTRY void (*entry)(uint32_t) = (void (*)(uint32_t))data;
+  entry(0);
 }
 
 #ifdef CH_DBG_FILL_THREADS

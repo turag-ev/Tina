@@ -21,7 +21,7 @@ typedef struct {
   static char CONCAT(name, _stack_) [stack_size] __attribute__((aligned(4))); \
   static cyg_thread CONCAT(name, _thread_); \
   TuragThread name = {(char*)&CONCAT(name, _stack_), stack_size, &CONCAT(name, _thread_), 0};
-
+  
 static _always_inline
 void turag_thread_start(TuragThread* thread, cyg_addrword_t priority, void (*entry)(uint32_t)) {
   cyg_thread_create(31-priority, (void (*)(cyg_addrword_t))entry,

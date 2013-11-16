@@ -76,7 +76,13 @@ public:
    *             EventQueue::event_null as id and nullptr as data parameter is
    *             passed as function parameters.
    */
-  static void main(Action& mainaction, EventMethod tick, EventMethod idle);
+#ifdef TURAG_STATEMACHINE_FOREVER
+#define _TURAG_STATEMACHINE_MAIN_ATTR  _noreturn
+#else
+#define _TURAG_STATEMACHINE_MAIN_ATTR
+#endif
+  static void main(Action& mainaction, EventMethod tick, EventMethod idle) _TURAG_STATEMACHINE_MAIN_ATTR;
+#undef _TURAG_STATEMACHINE_MAIN_ATTR
 
   static bool processEvent(EventId id, pointer params, EventMethod callback);
 

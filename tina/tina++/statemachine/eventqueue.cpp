@@ -109,8 +109,10 @@ eq_pop_timedelayed(Event* event) {
   return false;
 }
 
-void
-EventQueue::main(Action& mainaction, EventMethod tick, EventMethod idle) {
+#ifdef TURAG_STATEMACHINE_FOREVER
+_noreturn
+#endif
+void EventQueue::main(Action& mainaction, EventMethod tick, EventMethod idle) {
   Event event(event_null, nullptr, nullptr);
 
   p.main_action = &mainaction;
@@ -128,8 +130,10 @@ EventQueue::main(Action& mainaction, EventMethod tick, EventMethod idle) {
       continue;
     }
 
+#ifndef TURAG_STATEMACHINE_FOREVER
     if (event.id == event_quit)
       break;
+#endif
 
     print_debug_info(event);
 
