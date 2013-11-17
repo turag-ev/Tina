@@ -14,6 +14,7 @@
 #include <tina++/thread.h>
 #include <tina++/time.h>
 #include <tina/time.h>
+#include <tina/statemachine/eventqueue.h>
 #include "../container/array_buffer.h"
 #include "../container/circular_buffer.h"
 #include "../algorithm.h"
@@ -26,261 +27,211 @@
 
 namespace TURAG {
 
-struct EventQueuePrivate {
-  // Circular buffer for events
-  CircularBuffer<Event, EventQueue::size> queue;
+EventQueue::EventQueue() :
+  mutex_(),
+  var_(&mutex_),
 
-  // Mutex of the event queue
-  Mutex mutex;
+  queue_(),
+  handler_(nullptr)
+{ }
 
-  // array buffer implementation for time event queue
-  ArrayBuffer<TimeEvent, EventQueue::timequeue_size> timequeue;
+const EventClass EventNull("kein Event", EventQueue::event_null);
 
-  // Mutex of the time events
-  Mutex timemutex;
+static _hot
+void print_debug_info(const Event& e) {
+  EventId id = e.event_class->id;
+  const char* name = (e.event_class->name) ? e.event_class->name : "";
 
-  // Zeiger auf Hauptaktion
-  Action* main_action;
-
-#ifdef EVENTQUEUE_USAGE_MEASUREMENT
-  size_t max_events;
-  size_t max_timed_events;
-#endif
-
-  EventQueuePrivate() :
-    mutex(),
-    timequeue(), timemutex(),
-    main_action(nullptr)
-#ifdef EVENTQUEUE_USAGE_MEASUREMENT
-    ,max_events(0),
-    max_timed_events(0)
-#endif
-  { }
-};
-
-static EventQueuePrivate p;
+  if ((id >> 8) != 0) {
+    infof("Event: %s (id: %c%c%c%u param: %d method: 0x%zx)",
+          name,
+          static_cast<char>(id >> 24),
+          static_cast<char>(id >> 16),
+          static_cast<char>(id >> 8),
+          static_cast<unsigned>(id & 0xFF),
+          e.param,
+          reinterpret_cast<ptrdiff_t>(e.method));
+  } else {
+    infof("Event: %s (id: %u param: %d method: 0x%zx)",
+          name,
+          static_cast<unsigned>(id),
+          e.param,
+          reinterpret_cast<ptrdiff_t>(e.method));
+  }
+}
 
 _hot
-void print_debug_info(const Event &e) {
-  if (e.id >> 24 != 0) {
-    infof("Event: %c%c%c%u 0x%zx",
-          static_cast<char>(e.id >> 24),
-          static_cast<char>(e.id >> 16),
-          static_cast<char>(e.id >> 8),
-          static_cast<unsigned>(e.id & 0xFF),
-          reinterpret_cast<ptrdiff_t>(e.method));
-  } else {
-    infof("Event: %u 0x%zx",
-          static_cast<unsigned>(e.id & 0xFF),
-          reinterpret_cast<ptrdiff_t>(e.method));
-  }
-}
-
-static _hot bool
-eq_pop(Event* event) {
-  Mutex::Lock lock(p.mutex);
-
-  if (!p.queue.empty()) {
-    *event = p.queue.front();
-    p.queue.pop_front();
-    return true;
-  } else {
-    return false;
-  }
-}
-
-static _hot bool
-eq_pop_timedelayed(Event* event) {
-  Mutex::Lock lock(p.timemutex);
-
-  if (p.timequeue.empty())
-    return false;
-
-  SystemTime t = get_current_tick();
-  TimeEvent& first = p.timequeue.back();
-  if (first.time <= t) {
-    p.timequeue.pop_back();
-    if (first.event.id != EventQueue::event_null) {
-      *event = first.event;
-      return true;
+bool EventQueue::loadEvent(Event* event) {
+  if (!timequeue_.empty()) {
+    puts("time event!");
+    SystemTime t = get_current_tick();
+    const TimeEvent& first = timequeue_.back();
+    if (first.time <= t) {
+      if (first.event.event_class->id != EventQueue::event_null) {
+        *event = first.event;
+        timequeue_.pop_back();
+        return true;
+      }
+      timequeue_.pop_back();
     }
+  }
+
+  if (!queue_.empty()) {
+    // lade nächstes Event
+    *event = queue_.front();
+    queue_.pop_front();
+    return true;
   }
 
   return false;
 }
 
+SystemTime EventQueue::getTimeToNextEvent() const {
+  if (!timequeue_.empty()) {
+    const TimeEvent& first = timequeue_.back();
+    int diff = first.time.value - get_current_tick().value;
+    if (diff <= 0) {
+      return ms_to_ticks(1);
+    } else {
+      return SystemTime(diff);
+    }
+  }
+
+  return s_to_ticks(50);
+}
+
 #ifdef TURAG_STATEMACHINE_FOREVER
 _noreturn
 #endif
-void EventQueue::main(Action& mainaction, EventMethod tick, EventMethod idle) {
-  Event event(event_null, nullptr, nullptr);
+void EventQueue::main(EventHandler handler) {
+  Event event(&EventNull, 0, nullptr);
 
-  p.main_action = &mainaction;
-  mainaction.start(nullptr);
+  handler_ = handler;
 
   while (true) {
-    // load next event
-    if (!eq_pop_timedelayed(&event) && !eq_pop(&event)) {
-      event.id = EventQueue::event_null;
+    Mutex::Lock lock(mutex_);
+
+    while (!loadEvent(&event)) {
+      // warte auf Event
+      var_.waitFor(getTimeToNextEvent());
     }
 
-    tick(event.id, event.params);
-    if (event.id == event_null) {
-      idle(event_null, nullptr);
-      continue;
-    }
+    lock.unlock();
 
 #ifndef TURAG_STATEMACHINE_FOREVER
-    if (event.id == event_quit)
+    if (event.event_class->id == event_quit)
       break;
 #endif
 
     print_debug_info(event);
 
     if (event.method != nullptr) {
-      (*event.method)(event.id, event.params);
+      (*event.method)(event.event_class->id, event.param);
     } else {
-      mainaction.func(event.id, event.params);
+      handler_(event.event_class->id, event.param);
     }
   }
 }
 
-bool
-EventQueue::processEvent(EventId id, pointer params, EventMethod callback) {
-  if (p.main_action != nullptr) {
+bool EventQueue::processEvent(EventId id, int param, EventMethod callback) {
+  if (handler_ != nullptr) {
     if (callback != nullptr) {
-      (*callback)(id, params);
+      (*callback)(id, param);
       return false;
 
     } else {
-      return p.main_action->func(id, params);
+      return handler_(id, param);
     }
   }
 
   return false;
 }
 
-void
-EventQueue::push(EventId id, pointer params, EventMethod method) {
-  Mutex::Lock lock(p.mutex);
-  p.queue.emplace_back(id, params, method);
+void EventQueue::push(const EventClass* event_class, int param, EventMethod method) {
+  Mutex::Lock lock(mutex_);
+  queue_.emplace_back(event_class, param, method);
+  var_.signal();
 }
 
-void
-EventQueue::pushToFront(EventId id, pointer params, EventMethod method) {
-  Mutex::Lock lock(p.mutex);
-  p.queue.emplace_front(id, params, method);
+void EventQueue::pushToFront(const EventClass* event_class, int param, EventMethod method) {
+  Mutex::Lock lock(mutex_);
+  queue_.emplace_front(event_class, param, method);
+  var_.signal();
 }
 
-void
-EventQueue::pushTimedelayed(SystemTime ticks, EventId id, pointer params,
-                            EventMethod method)
+void EventQueue::pushTimedelayed(SystemTime ticks, const EventClass* event_class,
+                                  int param, EventMethod method)
 {
-  Mutex::Lock lock(p.timemutex);
-
   SystemTime t = get_current_tick() + ticks;
+  Mutex::Lock lock(mutex_);
+
   // search for item to insert after
-  auto iter = p.timequeue.rbegin();
-  while (iter != p.timequeue.rend() && t > iter->time) {
+  auto iter = timequeue_.rbegin();
+  while (iter != timequeue_.rend() && t > iter->time) {
     iter++;
   }
   /*if (iter == p.timequeue.rend())*/ iter--;
-  p.timequeue.emplace(make_forward(iter), Event(id, params, method), t);
+  timequeue_.emplace(make_forward(iter), Event(event_class, param, method), t);
 
 #ifdef EVENTQUEUE_USAGE_MEASUREMENT
-  if (p.timequeue.size() > p.max_timed_events) {
-    p.max_timed_events = p.timequeue.size();
+  if (timequeue_.size() > p.max_timed_events) {
+    p.max_timed_events = timequeue_.size();
   }
 #endif
 }
 
-struct is_id {
-  constexpr explicit
-  is_id(EventId id) :
-    value(id)
-  { }
-
-  constexpr
-  bool operator() (TimeEvent& event) const {
-    return event.event.id == value;
-  }
-
-  EventId value;
-};
-
-void
-EventQueue::removeTimedelayed(EventId id) {
-  Mutex::Lock lock(p.timemutex);
-  remove_if(p.timequeue, is_id(id));
-}
-
-void
-EventQueue::removeEvent(EventId id) {
-  Mutex::Lock lock(p.mutex);
-
-  for (auto& event : p.queue) {
-    if (event.id == id) event.id = event_null;
-  }
-}
-
-struct is_callback {
-  constexpr explicit
-  is_callback(EventMethod method) :
-    value(method)
-  { }
-
-  constexpr
-  bool operator() (TimeEvent& event) const {
-    return event.event.method == value;
-  }
-
-  EventMethod value;
-};
-
-void
-EventQueue::removeCallback(EventMethod method) {
-//  { TODO
-//    scoped_lock lock(self.mutex_);
-//
-//
-//  }
-
-  {
-    Mutex::Lock lock(p.timemutex);
-    remove_if(p.timequeue, is_callback(method));
-  }
-}
-
-void
-EventQueue::clear() {
-  Mutex::Lock lock1(p.mutex);
-  Mutex::Lock lock2(p.timemutex);
-
-  p.queue.clear();
-  p.timequeue.clear();
+void EventQueue::clear() {
+  Mutex::Lock lock(mutex_);
+  queue_.clear();
 }
 
 void EventQueue::discardEvents() {
-  Mutex::Lock lock(p.mutex);
-  p.queue.clear();
+  Mutex::Lock lock(mutex_);
+  queue_.clear();
 }
 
+void EventQueue::removeTimedelayed(EventId id) {
+  Mutex::Lock lock(mutex_);
 
-void
-EventQueue::printTimeQueue() {
-  Mutex::Lock lock(p.timemutex);
+  remove_if(timequeue_, [&](const TimeEvent& tevent) { return tevent.event.event_class->id == id;});
+}
+
+void EventQueue::removeEvent(EventId id) {
+  Mutex::Lock lock(mutex_);
+
+  for (auto& event : queue_) {
+    if (event.event_class->id == id) event.event_class = &EventNull;
+  }
+
+  remove_if(timequeue_, [&](const TimeEvent& tevent) { return tevent.event.event_class->id == id;});
+}
+
+void EventQueue::removeCallback(EventMethod method) {
+  Mutex::Lock lock(mutex_);
+
+  for (auto& event : queue_) {
+    if (event.method == method) event.event_class = &EventNull;
+  }
+
+  remove_if(timequeue_, [&](const TimeEvent& tevent) { return tevent.event.method == method;});
+}
+
+void EventQueue::printTimeQueue() {
+  Mutex::Lock lock(mutex_);
 
   infof("Timed Events:\n");
   infof("  current time: %u ms\n", ticks_to_ms(get_current_tick()));
-  if (!p.timequeue.empty()) {
-    for (auto i = p.timequeue.begin(); i != p.timequeue.end(); i++) {
-      infof("  @%u ms %c%c%c%u %p\n",
-            ticks_to_ms(i->time),
-            static_cast<char>(i->event.id >> 24),
-            static_cast<char>(i->event.id >> 16),
-            static_cast<char>(i->event.id >> 8),
-            static_cast<unsigned>(i->event.id & 0xFF),
-            i->event.method);
+  if (!timequeue_.empty()) {
+    for (const auto& tevent : timequeue_) {
+      EventId id = tevent.event.event_class->id;
+
+      infof("  @%u ms %c%c%c%u %zx\n",
+            ticks_to_ms(tevent.time),
+            static_cast<char>(id >> 24),
+            static_cast<char>(id >> 16),
+            static_cast<char>(id >> 8),
+            static_cast<unsigned>(id & 0xFF),
+            reinterpret_cast<ptrdiff_t>(tevent.event.method));
     }
   } else {
     info("  timed event queue is empty\n");
@@ -289,13 +240,13 @@ EventQueue::printTimeQueue() {
 
 void
 EventQueue::printQueue() {
-  Mutex::Lock lock(p.mutex);
+  Mutex::Lock lock(mutex_);
 
   info("EventQueue Debug Information:");
   info(" - Events:");
-  if (!p.queue.empty()) {
-    for (auto i = p.queue.begin(); i != p.queue.end(); i++) {
-      print_debug_info(*i);
+  if (!queue_.empty()) {
+    for (const auto& event : queue_) {
+      print_debug_info(event);
     }
   } else {
     info("  event queue is empty");
@@ -308,31 +259,41 @@ EventQueue::printDebugInfo() {
   printQueue();
 
   info ("Stack:\n");
-  infof("  size of EventQueue: %zu bytes\n", sizeof(EventQueuePrivate));
+  infof("  size of EventQueue: %zu bytes\n", sizeof(EventQueue));
   infof("  number of queue elements: %zu\n", size);
   infof("  number of timed queue elements: %zu\n", timequeue_size);
-#ifdef EVENTQUEUE_USAGE_MEASUREMENT
-  info ("Usage:\n");
-  infof("  max. number of queue elements: %zu\n", p.max_events);
-  infof("  max. number of timed queue elements: %zu\n", p.max_timed_events);
-#endif
 }
 
 // C Schnittstelle
 
 extern "C"
-void turag_eventqueue_push(EventId id, pointer params, EventMethod method) {
-  EventQueue::push(id, params, method);
+void turag_eventqueue_push(TuragEventQueue* queue,
+                           const TuragEventClass* event_class, int param,
+                           TuragEventMethod method)
+{
+  auto q = reinterpret_cast<EventQueue*>(queue);
+  q->push(reinterpret_cast<const EventClass*>(event_class), param, method);
 }
 
 extern "C"
-void turag_eventqueue_push_to_front(EventId id, pointer params, EventMethod method) {
-  EventQueue::pushToFront(id, params, method);
+void turag_eventqueue_push_to_front(TuragEventQueue* queue,
+                                    const TuragEventClass* event_class,
+                                    int param, TuragEventMethod method)
+{
+  auto q = reinterpret_cast<EventQueue*>(queue);
+  q->pushToFront(reinterpret_cast<const EventClass*>(event_class), param,
+                 method);
 }
 
 extern "C"
-void turag_eventqueue_push_timedelayed(TuragSystemTime ticks, EventId id, pointer params, EventMethod method) {
-  EventQueue::pushTimedelayed(SystemTime{ticks.value}, id, params, method);
+void turag_eventqueue_push_timedelayed(TuragEventQueue* queue,
+                                       TuragSystemTime ticks,
+                                       const TuragEventClass* event_class,
+                                       int param, TuragEventMethod method)
+{
+  auto q = reinterpret_cast<EventQueue*>(queue);
+  q->pushTimedelayed(ticks, reinterpret_cast<const EventClass*>(event_class),
+                     param, method);
 }
 
 } // namespace TURAG

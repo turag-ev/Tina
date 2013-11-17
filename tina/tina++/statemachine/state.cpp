@@ -47,7 +47,7 @@ bool Action::exit(EventId eid) {
       if (parent_->about_to_close_) {
         parent_->cancel();
       } else {
-        parent_->func(Action::event_return, pack<pointer>(eid));
+        parent_->func(Action::event_return, pack<int>(eid));
       }
     }
     return true;
@@ -81,7 +81,7 @@ bool Action::cancel() {
     }
     // ab jetzt alle Kinderaktionen beendet
 
-    bool delayed_close = currentstate_(Action::event_cancel, nullptr);
+    bool delayed_close = currentstate_(Action::event_cancel, 0);
     if (!delayed_close) {
       // Aktion wird sofort geschlossen
       currentstate_ = nullptr;
@@ -109,7 +109,7 @@ bool Action::cancel() {
   }
 }
 
-void Action::nextState(State next, pointer data) {
+void Action::nextState(State next, int data) {
   if (isActive() && !about_to_close_) {
     if (child_) {
       if (!child_->cancel()) {
@@ -131,7 +131,7 @@ void Action::nextState(State next, pointer data) {
   }
 }
 
-void Action::start(Action *parent, pointer data) {
+void Action::start(Action *parent, int data) {
   if (!isActive() && !about_to_close_) {
     infof("#####-##### START %s #####-#####", name_);
     parent_ = parent;
@@ -146,7 +146,7 @@ void Action::start(Action *parent, pointer data) {
 }
 
 _hot
-bool Action::func(EventId id, pointer data) {
+bool Action::func(EventId id, int data) {
   if (isActive()) {
     if (child_) {
       State state_by_event = currentstate_;
@@ -167,7 +167,7 @@ bool Action::func(EventId id, pointer data) {
   }
 }
 
-void Action::setChildAction(Action* child, pointer data) {
+void Action::setChildAction(Action* child, int data) {
   if (isActive() && !about_to_close_) {
     if (child_ == nullptr) {
       child_ = child;

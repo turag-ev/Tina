@@ -137,7 +137,7 @@ class ConditionVariable {
 
 public:
   constexpr _always_inline
-  ConditionVariable() :
+  ConditionVariable(Mutex*) :
     cond_(_CONDVAR_DATA(cond_))
   { }
 
@@ -146,8 +146,12 @@ public:
   }
 
 #ifdef CH_USE_CONDVARS_TIMEOUT
-  _always_inline bool waitWithTimeout(SystemTime timeout) {
+  _always_inline bool waitFor(SystemTime timeout) {
     return chCondWaitTimeout(&cond_, timeout.value) != RDY_TIMEOUT;
+  }
+  
+  _always_inline bool waitUntil(SystemTime timeout) {
+    return chCondWaitTimeout(&cond_, timeout.value - chTimeNow()) != RDY_TIMEOUT;
   }
 #endif
 

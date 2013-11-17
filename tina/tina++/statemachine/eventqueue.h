@@ -12,16 +12,26 @@
 
 #include <type_traits>
 
-#include <tina++/tina.h>
-#include <tina++/time.h>
+#include <tina++/thread.h>
 #include <tina++/helper/packed.h>
-#include "types.h"
+#include <tina++/container/circular_buffer.h>
+#include <tina++/container/array_buffer.h>
+#include <tina++/statemachine/types.h>
 
 namespace TURAG {
 
-class Action;
+struct EventClass {
+  MOVABLE(EventClass);
+  COPYABLE(EventClass);
 
-//#define EVENTQUEUE_USAGE_MEASUREMENT
+  constexpr
+  EventClass(const char* name, EventId id) :
+    name(name), id(id)
+  { }
+
+  const char* name;
+  EventId id;
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 //     Event
@@ -29,23 +39,26 @@ class Action;
 
 /// Event
 struct Event {
-  EventId      id;        ///< event id
-  pointer      params;    ///< parameters
-  EventMethod  method;    ///< event method for async method calls or \a nullptr
+  MOVABLE(Event);
+  COPYABLE(Event);
+
+  const EventClass* event_class; ///< event id
+  int               param;       ///< parameters
+  EventMethod       method;      ///< event method for async method calls or \a nullptr
 
   constexpr
-  Event(EventId id, pointer params, EventMethod method) :
-    id(id), params(params), method(method)
+  Event(const EventClass* event_class, int param, EventMethod method) :
+    event_class(event_class), param(param), method(method)
   { }
 };
 
-/// Print debug information for given event
-void print_debug_info(const Event& e);
-
 /// Event with time information for timedelayed events
 struct TimeEvent {
-  Event      event;     ///< event to process
-  SystemTime time;      ///< time when event is due
+  MOVABLE(TimeEvent);
+  COPYABLE(TimeEvent);
+
+  Event     event;     ///< event to process
+  SystemTime time;     ///< time when event is due
 
   constexpr
   TimeEvent(const Event& event, SystemTime time) :
@@ -53,10 +66,18 @@ struct TimeEvent {
   { }
 
   constexpr
-  TimeEvent(EventId id, pointer params, EventMethod method, SystemTime time) :
-    event(id, params, method), time(time)
+  TimeEvent(const EventClass* event_class, int param, EventMethod method, SystemTime time) :
+    event(event_class, param, method), time(time)
   { }
 };
+
+template<EventId id>
+struct UnnamedEventClass {
+static const EventClass event_class;
+};
+
+template<EventId id>
+const EventClass UnnamedEventClass<id>::event_class("Unbekannt", id);
 
 ////////////////////////////////////////////////////////////////////////////////
 //     EventQueue
@@ -64,6 +85,10 @@ struct TimeEvent {
 /// Event processing queue
 class EventQueue {
 public:
+  typedef bool (*EventHandler)(EventId id, int data);
+
+  EventQueue();
+
   /// Start the event processing loop
   /**
    * \param mainaction Main action that is started, when event queue starts.
@@ -78,20 +103,20 @@ public:
    *             passed as function parameters.
    */
 #ifdef TURAG_STATEMACHINE_FOREVER
-  static void main(Action& mainaction, EventMethod tick, EventMethod idle) _noreturn;
+  void main(EventHandler handler) _noreturn;
 #else
-  static void main(Action& mainaction, EventMethod tick, EventMethod idle);
+  void main(EventHandler handler);
 #endif
 
-  static bool processEvent(EventId id, pointer params, EventMethod callback);
+  bool processEvent(EventId id, int param, EventMethod callback);
 
   /// Push quit event (\a EventQueue::event_quit) to front of event queue.
   /**
    * When event_quit is processed, EventQueue::main will return.
    * Only useful outside of embedded system.
    */
-  static _always_inline void quit() {
-    pushToFront(event_quit);
+  _always_inline void quit() {
+    pushToFront<event_quit>(0);
   }
 
   /// Push an new event to the event processing loop
@@ -101,36 +126,40 @@ public:
    * \param method function for processing event or nullptr. When nullptr is passed,
    *               event is given to the main action event function.
    */
-  static void push(EventId id, pointer params, EventMethod method = nullptr);
+  void push(const EventClass* event_class, int params = 0, EventMethod method = nullptr);
 
-  template<typename T, REQUIRES(!std::is_pointer<T>)> _always_inline
-  static void push(EventId id, T param, EventMethod method = nullptr) {
-    push(id, pack<void*>(param), method);
+  template<typename T, REQUIRES(!std::is_integral<T>)> _always_inline
+  void push(const EventClass* event_class, T param, EventMethod method = nullptr) {
+    push(event_class, pack<int>(param), method);
   }
 
-  /// Push an new event to the event processing loop
-  /**
-   * \param id     event id SHOULD NOT be event_null otherwise event will be ignored
-   * \param method function for processing event or nullptr. When nullptr is passed,
-   *               event is given to the main action event function.
-   */
-  static _always_inline void push(EventId id, EventMethod method = nullptr) {
-    push(id, nullptr, method);
+  template<EventId id>
+  void push(int param = 0, EventMethod method = nullptr) {
+    push(&UnnamedEventClass<id>::event_class, param, method);
   }
 
-  /// Push an new event to the front of the event processing loop
-  /** Paramters the same as in push */
-  static void pushToFront(EventId id, pointer params, EventMethod method = nullptr);
-
-  template<typename T, REQUIRES(!std::is_pointer<T>)> _always_inline
-  static void pushToFront(EventId id, T param, EventMethod method = nullptr) {
-    pushToFront(id, pack<void*>(param), method);
+  template<EventId id, typename T, REQUIRES(!std::is_integral<T>)> _always_inline
+  void push(T param, EventMethod method = nullptr) {
+    push(&UnnamedEventClass<id>::event_class, pack<int>(param), method);
   }
 
   /// Push an new event to the front of the event processing loop
   /** Paramters the same as in push */
-  static _always_inline void pushToFront(EventId id, EventMethod method = nullptr) {
-    pushToFront(id, nullptr, method);
+  void pushToFront(const EventClass* event_class, int param = 0, EventMethod method = nullptr);
+
+  template<typename T, REQUIRES(!std::is_integral<T>)> _always_inline
+  void pushToFront(const EventClass* event_class, T param, EventMethod method = nullptr) {
+    pushToFront(event_class, pack<int>(param), method);
+  }
+
+  template<EventId id>
+  void pushToFront(int param = 0, EventMethod method = nullptr) {
+    pushToFront(&UnnamedEventClass<id>::event_class, param, method);
+  }
+
+  template<EventId id, typename T, REQUIRES(!std::is_integral<T>)> _always_inline
+  void pushToFront(T param, EventMethod method = nullptr) {
+    pushToFront(&UnnamedEventClass<id>::event_class, pack<int>(param), method);
   }
 
   /// Process event in a number of kernel ticks
@@ -142,62 +171,57 @@ public:
    * \param method function for processing event or nullptr. When nullptr is passed,
    *               event is given to the main action event function.
    */
-  static void pushTimedelayed(SystemTime ticks, EventId id, pointer param, EventMethod method = nullptr);
+  void pushTimedelayed(SystemTime ticks, const EventClass* event_class, int param = 0, EventMethod method = nullptr);
 
-  template<typename T, REQUIRES(!std::is_pointer<T>)> _always_inline
-  static void pushTimedelayed(SystemTime ticks, EventId id, T param, EventMethod method = nullptr) {
-    pushTimedelayed(ticks, id, pack<void*>(param), method);
+  template<typename T, REQUIRES(!std::is_integral<T>)> _always_inline
+  void pushTimedelayed(SystemTime ticks, const EventClass* event_class, T param, EventMethod method = nullptr) {
+    pushTimedelayed(ticks, event_class, pack<int>(param), method);
   }
 
-  /// Process event in a number of kernel ticks
-  /**
-   * NOTE: timedelayed events are more privileged as normal events.
-   * \param ticks  time from now in ecos ticks to process event
-   * \param id     event id SHOULD NOT be event_null otherwise event will be ignored
-   * \param method function for processing event or nullptr. When nullptr is passed,
-   *               event is given to the main action event function.
-   */
-  static _always_inline void pushTimedelayed(SystemTime ticks, EventId id, EventMethod method = nullptr) {
-    pushTimedelayed(ticks, id, nullptr, method);
+  template<EventId id>
+  void pushTimedelayed(SystemTime ticks, int param = 0, EventMethod method = nullptr) {
+    pushTimedelayed(ticks, &UnnamedEventClass<id>::event_class, param, method);
+  }
+
+  template<EventId id, typename T, REQUIRES(!std::is_integral<T>)> _always_inline
+  void pushTimedelayed(SystemTime ticks, T param, EventMethod method = nullptr) {
+    pushTimedelayed(ticks, &UnnamedEventClass<id>::event_class, pack<int>(param), method);
   }
 
   /// Remove all events from timedelayed event queue with that id.
   /**
    * \param id event id that is searched
    */
-  static void removeTimedelayed(EventId id);
+  void removeTimedelayed(EventId id);
 
   /// Remove all events from event queue with that id.
   /**
    * \param id event id that is searched
    */
-  static void removeEvent(EventId id);
+  void removeEvent(EventId id);
 
   /// Remove all events with specific callback.
   /**
    * \param method event function that is searched
    */
-  static void removeCallback(EventMethod method);
+  void removeCallback(EventMethod method);
 
   /// Clear event queue.
-  static void clear();
+  void clear();
 
   /// Clear event queue for normal events (not timedelayed events).
-  static void discardEvents();
+  void discardEvents();
 
 #ifndef NDEBUG
   /// Print debug information for the event queue.
-  static void printTimeQueue();
-  static void printQueue();
-  static void printDebugInfo();
+  void printTimeQueue();
+  void printQueue();
+  void printDebugInfo();
 #endif
 
   /// Number of the maximum events + 1 (must be a power of two)
   static const size_t size = 1 << 5; // 32
   static_assert(!(size & (size-1)), "EventQueue::size must be a power of 2");
-
-  /// Number of the maximum time events
-  static const size_t timequeue_size = 16;
 
   enum {
     event_null = 0, ///< \a EventId for do nothing
@@ -208,6 +232,23 @@ public:
 
   /// \a EventId for quit the event processing loop
   static const EventId event_quit = -1;
+
+  /// Number of the maximum time events
+  static const size_t timequeue_size = 16;
+
+private:
+  mutable Mutex mutex_;
+  ConditionVariable var_;
+
+  // Circular buffer for events
+  CircularBuffer<Event, EventQueue::size> queue_;
+
+  ArrayBuffer<TimeEvent, EventQueue::timequeue_size> timequeue_;
+
+  EventHandler handler_;
+
+  bool loadEvent(Event* event);
+  SystemTime getTimeToNextEvent() const;
 };
 
 } // namespace TURAG

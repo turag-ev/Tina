@@ -7,7 +7,7 @@ namespace TURAG {
 typedef uint32_t EventId;
 
 /// function for event processing
-typedef void (*EventMethod)(EventId id, pointer data);
+typedef void (*EventMethod)(EventId id, int data);
 
 /// create a unsigned integer with the first three bytes filled with characters
 /// to build a namespace. The last byte can be used for any value >= 0 and < 256.

@@ -132,8 +132,12 @@ public:
     return cyg_cond_wait(&cond_);
   }
 
-  _always_inline bool waitWithTimeout(SystemTime timeout) {
+  _always_inline bool waitFor(SystemTime timeout) {
     return cyg_cond_timed_wait(&cond_, cyg_current_time() + timeout.value);
+  }
+  
+  _always_inline bool waitUntil(SystemTime timeout) {
+    return cyg_cond_timed_wait(&cond_, timeout.value);
   }
 
   _always_inline void signal() {

@@ -24,6 +24,11 @@ struct SystemTime {
     value((t == 0) ? TIME_IMMEDIATE : ((t < 0) ? TIME_INFINITE : ticks))
   { }
   
+  constexpr
+  SystemTime(TuragSystemTime time) :
+    value(time.value)
+  { }
+  
   constexpr operator TuragSystemTime() const {
     return TuragSystemTime{value};
   }  

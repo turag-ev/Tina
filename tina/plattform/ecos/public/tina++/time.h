@@ -19,6 +19,11 @@ struct SystemTime {
     value(ticks)
   { }
   
+  constexpr
+  SystemTime(TuragSystemTime time) :
+    value(time.value)
+  { }
+  
   constexpr operator TuragSystemTime() const {
     return TuragSystemTime{value};
   }  
