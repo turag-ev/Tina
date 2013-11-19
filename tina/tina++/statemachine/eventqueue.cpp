@@ -221,6 +221,7 @@ void EventQueue::printTimeQueue() {
 
   infof("Timed Events:\n");
   infof("  current time: %u ms\n", ticks_to_ms(get_current_tick()));
+
   if (!timequeue_.empty()) {
     for (const auto& tevent : timequeue_) {
       EventId id = tevent.event.event_class->id;

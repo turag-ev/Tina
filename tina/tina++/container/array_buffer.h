@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <iterator>
 #include <cassert>
+#include <algorithm>
 
 #include "../tina.h"
 #include "../debug.h"
@@ -243,8 +244,17 @@ public:
     }
   }
 
-  void erase(iterator position);
-  void erase(iterator first, iterator last);
+  void erase(iterator position) {
+    std::move(position + 1, end(), position);
+    length_--;
+    bytes_.erase(end());
+  }
+
+  void erase(iterator first, iterator last) {
+    iterator new_end = std::move(last, end(), first);
+    bytes_.erase(new_end, end());
+    length_ = new_end - begin();
+  }
 
 private:
   // number of elements in array
@@ -271,34 +281,6 @@ private:
 
   friend struct _ArrayBufferHelper<T>;
 };
-
-template<typename T, std::size_t N>
-void ArrayBuffer<T, N>::erase(iterator position) {
-  if (position != end()) {
-    length_--;
-    bytes_.erase(position - &bytes_[0]);
-    for (iterator i = position; i < end(); ++i) {
-      *i = std::move(*(i+1));
-    }
-  }
-}
-
-template<typename T, std::size_t N>
-void ArrayBuffer<T, N>::erase(iterator first, iterator last) {
-  assert(last >= first);
-
-  bytes_.erase(first, last);
-
-  size_t diff = last - first;
-  length_ -= diff;
-  if (!empty()) {
-    for (iterator i = first; i < end(); ++i) {
-      *i = std::move(*(i + diff));
-    }
-  } else {
-    length_ = 0;
-  }
-}
 
 #ifdef NDEBUG
 template<typename T>
