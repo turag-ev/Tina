@@ -1,13 +1,17 @@
 #ifndef TINAPP_STATEMACHINE_TYPES_H
 #define TINAPP_STATEMACHINE_TYPES_H
 
+#include <tina/statemachine/eventqueue.h>
+
 namespace TURAG {
 
 /// type for event ids
-typedef uint32_t EventId;
+typedef TuragEventId EventId;
 
 /// function for event processing
-typedef void (*EventMethod)(EventId id, int data);
+typedef TuragEventMethod EventMethod;
+
+typedef TuragEventArg EventArg;
 
 /// create a unsigned integer with the first three bytes filled with characters
 /// to build a namespace. The last byte can be used for any value >= 0 and < 256.

@@ -43,11 +43,11 @@ struct Event {
   COPYABLE(Event);
 
   const EventClass* event_class; ///< event id
-  int               param;       ///< parameters
+  EventArg          param;       ///< parameters
   EventMethod       method;      ///< event method for async method calls or \a nullptr
 
   constexpr
-  Event(const EventClass* event_class, int param, EventMethod method) :
+  Event(const EventClass* event_class, EventArg param, EventMethod method) :
     event_class(event_class), param(param), method(method)
   { }
 };
@@ -66,7 +66,7 @@ struct TimeEvent {
   { }
 
   constexpr
-  TimeEvent(const EventClass* event_class, int param, EventMethod method, SystemTime time) :
+  TimeEvent(const EventClass* event_class, EventArg param, EventMethod method, SystemTime time) :
     event(event_class, param, method), time(time)
   { }
 };
@@ -85,7 +85,7 @@ const EventClass UnnamedEventClass<id>::event_class("Unbekannt", id);
 /// Event processing queue
 class EventQueue {
 public:
-  typedef bool (*EventHandler)(EventId id, int data);
+  typedef bool (*EventHandler)(EventId id, EventArg data);
 
   EventQueue();
 
@@ -108,7 +108,7 @@ public:
   void main(EventHandler handler);
 #endif
 
-  bool processEvent(EventId id, int param, EventMethod callback);
+  bool processEvent(EventId id, EventArg param, EventMethod callback);
 
   /// Push quit event (\a EventQueue::event_quit) to front of event queue.
   /**
@@ -126,40 +126,40 @@ public:
    * \param method function for processing event or nullptr. When nullptr is passed,
    *               event is given to the main action event function.
    */
-  void push(const EventClass* event_class, int params = 0, EventMethod method = nullptr);
+  void push(const EventClass* event_class, EventArg params = 0, EventMethod method = nullptr);
 
   template<typename T, REQUIRES(!std::is_integral<T>)> _always_inline
   void push(const EventClass* event_class, T param, EventMethod method = nullptr) {
-    push(event_class, pack<int>(param), method);
+    push(event_class, pack<EventArg>(param), method);
   }
 
   template<EventId id>
-  void push(int param = 0, EventMethod method = nullptr) {
+  void push(EventArg param = 0, EventMethod method = nullptr) {
     push(&UnnamedEventClass<id>::event_class, param, method);
   }
 
   template<EventId id, typename T, REQUIRES(!std::is_integral<T>)> _always_inline
   void push(T param, EventMethod method = nullptr) {
-    push(&UnnamedEventClass<id>::event_class, pack<int>(param), method);
+    push(&UnnamedEventClass<id>::event_class, pack<EventArg>(param), method);
   }
 
   /// Push an new event to the front of the event processing loop
   /** Paramters the same as in push */
-  void pushToFront(const EventClass* event_class, int param = 0, EventMethod method = nullptr);
+  void pushToFront(const EventClass* event_class, EventArg param = 0, EventMethod method = nullptr);
 
   template<typename T, REQUIRES(!std::is_integral<T>)> _always_inline
   void pushToFront(const EventClass* event_class, T param, EventMethod method = nullptr) {
-    pushToFront(event_class, pack<int>(param), method);
+    pushToFront(event_class, pack<EventArg>(param), method);
   }
 
   template<EventId id>
-  void pushToFront(int param = 0, EventMethod method = nullptr) {
+  void pushToFront(EventArg param = 0, EventMethod method = nullptr) {
     pushToFront(&UnnamedEventClass<id>::event_class, param, method);
   }
 
   template<EventId id, typename T, REQUIRES(!std::is_integral<T>)> _always_inline
   void pushToFront(T param, EventMethod method = nullptr) {
-    pushToFront(&UnnamedEventClass<id>::event_class, pack<int>(param), method);
+    pushToFront(&UnnamedEventClass<id>::event_class, pack<EventArg>(param), method);
   }
 
   /// Process event in a number of kernel ticks
@@ -167,25 +167,25 @@ public:
    * NOTE: timedelayed events are more privileged as normal events.
    * \param ticks  time from now in ecos ticks to process event
    * \param id     event id SHOULD NOT be event_null otherwise event will be ignored
-   * \param param  pointer to data for extra information and/or further processing
+   * \param param  parameter for data for extra information and/or further processing
    * \param method function for processing event or nullptr. When nullptr is passed,
    *               event is given to the main action event function.
    */
-  void pushTimedelayed(SystemTime ticks, const EventClass* event_class, int param = 0, EventMethod method = nullptr);
+  void pushTimedelayed(SystemTime ticks, const EventClass* event_class, EventArg param = 0, EventMethod method = nullptr);
 
   template<typename T, REQUIRES(!std::is_integral<T>)> _always_inline
   void pushTimedelayed(SystemTime ticks, const EventClass* event_class, T param, EventMethod method = nullptr) {
-    pushTimedelayed(ticks, event_class, pack<int>(param), method);
+    pushTimedelayed(ticks, event_class, pack<EventArg>(param), method);
   }
 
   template<EventId id>
-  void pushTimedelayed(SystemTime ticks, int param = 0, EventMethod method = nullptr) {
+  void pushTimedelayed(SystemTime ticks, EventArg param = 0, EventMethod method = nullptr) {
     pushTimedelayed(ticks, &UnnamedEventClass<id>::event_class, param, method);
   }
 
   template<EventId id, typename T, REQUIRES(!std::is_integral<T>)> _always_inline
   void pushTimedelayed(SystemTime ticks, T param, EventMethod method = nullptr) {
-    pushTimedelayed(ticks, &UnnamedEventClass<id>::event_class, pack<int>(param), method);
+    pushTimedelayed(ticks, &UnnamedEventClass<id>::event_class, pack<EventArg>(param), method);
   }
 
   /// Remove all events from timedelayed event queue with that id.

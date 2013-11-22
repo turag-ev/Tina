@@ -7,6 +7,7 @@
 
 #define LOG_SOURCE "E"
 //#define DEBUG_LEVEL 3
+#define __STDC_FORMAT_MACROS
 
 #include "../debug.h"
 
@@ -14,6 +15,7 @@
 #include <tina++/thread.h>
 #include <tina++/time.h>
 #include <tina/time.h>
+#include <inttypes.h>
 #include <tina/statemachine/eventqueue.h>
 #include "../container/array_buffer.h"
 #include "../container/circular_buffer.h"
@@ -43,7 +45,7 @@ void print_debug_info(const Event& e) {
   const char* name = (e.event_class->name) ? e.event_class->name : "";
 
   if ((id >> 8) != 0) {
-    infof("Event: %s (id: %c%c%c%u param: %d method: 0x%zx)",
+    infof("Event: %s (id: %c%c%c%u param: %" PRIu32 " method: 0x%zx)",
           name,
           static_cast<char>(id >> 24),
           static_cast<char>(id >> 16),
@@ -52,7 +54,7 @@ void print_debug_info(const Event& e) {
           e.param,
           reinterpret_cast<ptrdiff_t>(e.method));
   } else {
-    infof("Event: %s (id: %u param: %d method: 0x%zx)",
+    infof("Event: %s (id: %u param: %" PRIu32 " method: 0x%zx)",
           name,
           static_cast<unsigned>(id),
           e.param,
@@ -63,7 +65,6 @@ void print_debug_info(const Event& e) {
 _hot
 bool EventQueue::loadEvent(Event* event) {
   if (!timequeue_.empty()) {
-    puts("time event!");
     SystemTime t = get_current_tick();
     const TimeEvent& first = timequeue_.back();
     if (first.time <= t) {
@@ -133,7 +134,7 @@ void EventQueue::main(EventHandler handler) {
   }
 }
 
-bool EventQueue::processEvent(EventId id, int param, EventMethod callback) {
+bool EventQueue::processEvent(EventId id, EventArg param, EventMethod callback) {
   if (handler_ != nullptr) {
     if (callback != nullptr) {
       (*callback)(id, param);
@@ -147,20 +148,20 @@ bool EventQueue::processEvent(EventId id, int param, EventMethod callback) {
   return false;
 }
 
-void EventQueue::push(const EventClass* event_class, int param, EventMethod method) {
+void EventQueue::push(const EventClass* event_class, EventArg param, EventMethod method) {
   Mutex::Lock lock(mutex_);
   queue_.emplace_back(event_class, param, method);
   var_.signal();
 }
 
-void EventQueue::pushToFront(const EventClass* event_class, int param, EventMethod method) {
+void EventQueue::pushToFront(const EventClass* event_class, EventArg param, EventMethod method) {
   Mutex::Lock lock(mutex_);
   queue_.emplace_front(event_class, param, method);
   var_.signal();
 }
 
 void EventQueue::pushTimedelayed(SystemTime ticks, const EventClass* event_class,
-                                  int param, EventMethod method)
+                                  EventArg param, EventMethod method)
 {
   SystemTime t = get_current_tick() + ticks;
   Mutex::Lock lock(mutex_);
@@ -269,7 +270,7 @@ EventQueue::printDebugInfo() {
 
 extern "C"
 void turag_eventqueue_push(TuragEventQueue* queue,
-                           const TuragEventClass* event_class, int param,
+                           const TuragEventClass* event_class, TuragEventArg param,
                            TuragEventMethod method)
 {
   auto q = reinterpret_cast<EventQueue*>(queue);
@@ -279,7 +280,7 @@ void turag_eventqueue_push(TuragEventQueue* queue,
 extern "C"
 void turag_eventqueue_push_to_front(TuragEventQueue* queue,
                                     const TuragEventClass* event_class,
-                                    int param, TuragEventMethod method)
+                                    TuragEventArg param, TuragEventMethod method)
 {
   auto q = reinterpret_cast<EventQueue*>(queue);
   q->pushToFront(reinterpret_cast<const EventClass*>(event_class), param,
@@ -290,7 +291,7 @@ extern "C"
 void turag_eventqueue_push_timedelayed(TuragEventQueue* queue,
                                        TuragSystemTime ticks,
                                        const TuragEventClass* event_class,
-                                       int param, TuragEventMethod method)
+                                       TuragEventArg param, TuragEventMethod method)
 {
   auto q = reinterpret_cast<EventQueue*>(queue);
   q->pushTimedelayed(ticks, reinterpret_cast<const EventClass*>(event_class),

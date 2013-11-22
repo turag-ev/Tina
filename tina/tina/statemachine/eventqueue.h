@@ -8,16 +8,18 @@ extern "C" {
 #endif
 
 /// type for event ids
-typedef uint32_t TuragEventId;
+typedef int32_t TuragEventId;
+
+typedef int32_t TuragEventArg;
 
 /// function for event processing
-typedef void (*TuragEventMethod)(TuragEventId id, int data);
+typedef void (*TuragEventMethod)(TuragEventId id, TuragEventArg data);
 
 /// create a unsigned integer with the first three bytes filled with characters
 /// to build a namespace. The last byte can be used for any value >= 0 and < 256.
 /// example:
-/// \code enum { event_x = EVENT_NAMESPACE('X', 'X', 'X') + 100 }; \endcode
-#define EVENT_NAMESPACE(a,b,c) (((a) << 24) | ((b) << 16) | ((c) << 8))
+/// \code enum { event_x = TURAG_EVENT_NAMESPACE('X', 'X', 'X') + 100 }; \endcode
+#define TURAG_EVENT_NAMESPACE(a,b,c) (((a) << 24) | ((b) << 16) | ((c) << 8))
 
 typedef struct {
   const char* name;
@@ -27,7 +29,7 @@ typedef struct {
 /// Event
 typedef struct {
   TuragEventId      id;        ///< event id
-  void*      params;    ///< parameters
+  TuragEventArg     params;    ///< parameters
   TuragEventMethod  method;    ///< event method for async method calls or \a nullptr
 } TuragEvent;
 
@@ -51,14 +53,14 @@ typedef struct _TuragEventQueue TuragEventQueue;
  *               event is given to the main action event function.
  */
 void turag_eventqueue_push(TuragEventQueue* queue,
-                           const TuragEventClass* event_class, int params,
+                           const TuragEventClass* event_class, TuragEventArg params,
                            TuragEventMethod method);
 
 /// Push an new event to the front of the event processing loop
 /** Paramters the same as in push */
 void turag_eventqueue_push_to_front(TuragEventQueue* queue,
                                     const TuragEventClass* event_class,
-                                    int params, TuragEventMethod method);
+                                    TuragEventArg params, TuragEventMethod method);
 
 /// Process event in a number of kernel ticks
 /**
@@ -72,7 +74,7 @@ void turag_eventqueue_push_to_front(TuragEventQueue* queue,
 void turag_eventqueue_push_timedelayed(TuragEventQueue* queue,
                                        TuragSystemTime ticks,
                                        const TuragEventClass* event_class,
-                                       int param, TuragEventMethod method);
+                                       TuragEventArg param, TuragEventMethod method);
 
 enum {
   turag_eventqueue_event_quit = -1,

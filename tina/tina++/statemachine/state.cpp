@@ -47,7 +47,7 @@ bool Action::exit(EventId eid) {
       if (parent_->about_to_close_) {
         parent_->cancel();
       } else {
-        parent_->func(Action::event_return, pack<int>(eid));
+        parent_->func(Action::event_return, reinterpret_reference<EventArg>(eid));
       }
     }
     return true;
@@ -109,7 +109,7 @@ bool Action::cancel() {
   }
 }
 
-void Action::nextState(State next, int data) {
+void Action::nextState(State next, EventArg data) {
   if (isActive() && !about_to_close_) {
     if (child_) {
       if (!child_->cancel()) {
@@ -131,7 +131,7 @@ void Action::nextState(State next, int data) {
   }
 }
 
-void Action::start(Action *parent, int data) {
+void Action::start(Action *parent, EventArg data) {
   if (!isActive() && !about_to_close_) {
     infof("#####-##### START %s #####-#####", name_);
     parent_ = parent;
@@ -146,7 +146,7 @@ void Action::start(Action *parent, int data) {
 }
 
 _hot
-bool Action::func(EventId id, int data) {
+bool Action::func(EventId id, EventArg data) {
   if (isActive()) {
     if (child_) {
       State state_by_event = currentstate_;
@@ -167,7 +167,7 @@ bool Action::func(EventId id, int data) {
   }
 }
 
-void Action::setChildAction(Action* child, int data) {
+void Action::setChildAction(Action* child, EventArg data) {
   if (isActive() && !about_to_close_) {
     if (child_ == nullptr) {
       child_ = child;
