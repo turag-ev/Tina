@@ -15,6 +15,8 @@
 
 #ifndef ECOS
 # include <stdbool.h>
+#else
+# include <cyg/infra/cyg_type.h>
 #endif
 
 #ifdef __cplusplus

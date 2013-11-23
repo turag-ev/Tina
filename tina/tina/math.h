@@ -82,7 +82,49 @@
 #define sign(x)         (((float)(x))==0.0f ? 0.0f : (((float)(x)) > 0.0f ? 1.0f : -1.0f))
 #define DOT(v1,v2) 		(((float)((v1).x)*(float)((v2).x)) + ((float)((v1).y)*(float)((v2).y)))
 
+// extra math functions
 
+static inline float fmaxf(float value1, float value2){
+  if(value1 > value2)
+    return value1;
+  else
+    return value2;
+}
+
+static inline double fmax(double value1, double value2){
+  if(value1 > value2)
+    return value1;
+  else
+    return value2;
+}
+
+static inline long double fmaxl(long double value1, long double value2){
+  if(value1 > value2)
+    return value1;
+  else
+    return value2;
+}
+
+static inline float fminf(float value1, float value2){
+  if(value1 < value2)
+    return value1;
+  else
+    return value2;
+}
+
+static inline double fmin(double value1, double value2){
+  if(value1 < value2)
+    return value1;
+  else
+    return value2;
+}
+
+static inline long double fminl(long double value1, long double value2){
+  if(value1 < value2)
+    return value1;
+  else
+    return value2;
+}
 
 // float constants
 
