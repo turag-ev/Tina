@@ -74,8 +74,8 @@
 # define info(msg) while(0)
 #endif
 
-#define menu_printf(format, args...) CMenu_Printf("^" CMENU_PREFIX format "\r\n", ##args)
-#define menu_print(msg) CMenu_Printf("^" CMENU_PREFIX msg "\r\n")
+#define menu_printf(format, args...) CMenu_Printf("^" CMENU_PREFIX format "\n\r", ##args)
+#define menu_print(msg) CMenu_Printf("^" CMENU_PREFIX msg "\n\r")
 
 #define bool_string(b) ((b)?"true":"false")
 #define bool_string_de(b) ((b)?"ja":"nein")

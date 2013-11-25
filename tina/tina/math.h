@@ -3,6 +3,10 @@
 
 #include <math.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #ifndef M_E
 # define M_E            2.7182818284590452354   /* e */
@@ -84,42 +88,14 @@
 
 // extra math functions
 
-static inline float fmaxf(float value1, float value2){
+inline float fmaxf(float value1, float value2){
   if(value1 > value2)
     return value1;
   else
     return value2;
 }
 
-static inline double fmax(double value1, double value2){
-  if(value1 > value2)
-    return value1;
-  else
-    return value2;
-}
-
-static inline long double fmaxl(long double value1, long double value2){
-  if(value1 > value2)
-    return value1;
-  else
-    return value2;
-}
-
-static inline float fminf(float value1, float value2){
-  if(value1 < value2)
-    return value1;
-  else
-    return value2;
-}
-
-static inline double fmin(double value1, double value2){
-  if(value1 < value2)
-    return value1;
-  else
-    return value2;
-}
-
-static inline long double fminl(long double value1, long double value2){
+inline float fminf(float value1, float value2){
   if(value1 < value2)
     return value1;
   else
@@ -129,5 +105,10 @@ static inline long double fminl(long double value1, long double value2){
 // float constants
 
 #define M_PIf ((float)M_PI)
+
+
+#ifdef __cplusplus
+// extern "C"
+#endif
 
 #endif // TINA_MATH_H

@@ -181,10 +181,10 @@ Length distance(const T1& a, const T2& b) {
 }
 
 // special versions
-math_constexpr Length distance(Point a, Point b) { return hypot(b.x - a.x, b.y - a.y); }
-math_constexpr Length distance(Pose  a, Point b) { return hypot(b.x - a.x, b.y - a.y); }
-math_constexpr Length distance(Point a, Pose  b) { return hypot(b.x - a.x, b.y - a.y); }
-math_constexpr Length distance(Pose  a, Pose  b) { return hypot(b.x - a.x, b.y - a.y); }
+math_constexpr inline Length distance(Point a, Point b) { return hypot(b.x - a.x, b.y - a.y); }
+math_constexpr inline Length distance(Pose  a, Point b) { return hypot(b.x - a.x, b.y - a.y); }
+math_constexpr inline Length distance(Point a, Pose  b) { return hypot(b.x - a.x, b.y - a.y); }
+math_constexpr inline Length distance(Pose  a, Pose  b) { return hypot(b.x - a.x, b.y - a.y); }
 
 template<typename T1, typename T2>
 bool in_range(const T1& a, const T2& b, Length range) {
