@@ -38,7 +38,9 @@
 // Compiler utils
 
 /// use it to shut the compiler up talking about unused variables
-#define UNUSED(x) (void)x
+#ifndef UNUSED
+#  define UNUSED(x) (void)x
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // INITIALIZATION and FINALIZATION
