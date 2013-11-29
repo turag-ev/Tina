@@ -10,7 +10,7 @@
 #define LOG_SOURCE "C"
 #include <tina/debug.h>
 
-#include "public/tina++/can.h"
+#include "../public/tina++/can.h"
 
 namespace TURAG {
 
