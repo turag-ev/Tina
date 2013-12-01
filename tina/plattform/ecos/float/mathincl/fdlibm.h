@@ -66,6 +66,7 @@
 #include <math.h>                  // Main header for math library
 #include <float.h>                 // Properties of FP representation on this
                                    // platform
+#include <sys/ieeefp.h>            // Cyg_libm_ieee_double_shape_type
 
 // SANITY CHECKS
 

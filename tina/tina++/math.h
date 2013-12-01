@@ -1,21 +1,26 @@
 #ifndef TINAPP_MATH_H
 #define TINAPP_MATH_H
 
-#ifndef ECOS
-# include <cmath>
-
-#else
-# include <math.h>
-namespace std {
-using ::sin;
-using ::cos;
-using ::sqrt;
-using ::atan2;
-using ::fabs;
-}
-#endif
-
+#include <tina/math.h>
 #include "tina.h"
+
+inline namespace std {
+using ::acos;
+using ::atan;
+using ::atan2;
+using ::ceil;
+using ::copysign;
+using ::cos;
+using ::fabs;
+using ::floor;
+using ::hypot;
+using ::pow;
+using ::sin;
+using ::sqrt;
+using ::tan;
+using ::scalbn;
+using ::lround;
+}
 
 namespace TURAG {
 
@@ -29,16 +34,6 @@ _always_inline constexpr
 float sgn(float x) {
   return (x > 0.f) ? 1.0f : ((x == 0.f) ? 0.f : -1.0f);
 }
-
-//_always_inline constexpr
-//float sgn(float x) {
-//  return (x == 0.f) ? 0.f : std::copysign(1.0f, x);
-//}
-
-//constexpr _always_inline
-//int hypot(int a, int b) {
-//  return std::sqrt(sqr(a)+sqr(b));
-//}
 
 /// Gibt die Dreieckszahl für n zurück
 /// https://de.wikipedia.org/wiki/Dreieckszahl

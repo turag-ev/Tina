@@ -129,7 +129,7 @@ TURAG_INLINE float fminf(float x, float y) {
 }
 
 #ifdef __cplusplus
-// extern "C"
+} // extern "C"
 #endif
 
 #endif // TINA_MATH_H

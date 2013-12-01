@@ -6,6 +6,7 @@ extern "C" {
 #endif
 
 float acosf(float);
+float asinf(float);
 float atanf(float);
 float atan2f(float,float);
 float ceilf(float);
@@ -18,6 +19,7 @@ float powf(float,float);
 float sinf(float);
 float sqrtf(float);
 float tanf(float);
+long int lroundf(float);
 float scalbnf(float,int);
 
 #ifdef __cplusplus

@@ -163,10 +163,10 @@ constexpr struct null_t {
 namespace detail {
   template<typename T, REQUIRES(std::is_floating_point<T>)> constexpr _always_inline
   int roundToInt(T value) {
-#if GCC_VERSION < 40700
+#if GCC_VERSION < 40700 && !defined(ECOS)
     return (value < 0.0f) ? ceil(value - 0.5f) : floor(value + 0.5f);
 #else
-    return lroundf(value);
+    return ::lroundf(value);
 #endif
   }
   
@@ -187,10 +187,10 @@ namespace detail {
   template<typename T, REQUIRES2(std::is_floating_point<T>::value && !std::is_floating_point<Value>::value)>
   constexpr
   Value toValue(T value) {
-#if GCC_VERSION < 40700 || defined(ECOS)
+#if GCC_VERSION < 40700 && !defined(ECOS)
     return (value < 0.0) ? ceil(value - 0.5) : floor(value + 0.5);
 #else
-    return ::lround(value);
+    return ::lroundf(value);
 #endif
   }
 }

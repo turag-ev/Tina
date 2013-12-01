@@ -50,11 +50,7 @@ Units::Angle atan2(Units::Length y, Units::Length x) {
 
 math_constexpr _always_inline
 Units::Length hypot(Units::Length x, Units::Length y) {
-#ifdef ECOS
-  return Units::Length(std::sqrt(x.value*x.value + y.value*y.value));
-#else
-  return Units::Length(::hypot(x.value, y.value));
-#endif
+  return Units::Length(::hypotf(x.value, y.value));
 }
 
 } // namespace TURAG
