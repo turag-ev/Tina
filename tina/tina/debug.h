@@ -35,47 +35,47 @@
 #endif
 
 #if DEBUG_LEVEL > 0
-# define system_printf(format, args...) debug_printf(";;" format "\n\r", ##args)
-# define system_print(msg) debug_puts(";;" msg "\n\r")
+# define system_printf(format, args...) debug_printf(";;" format "\n", ##args)
+# define system_print(msg) debug_puts(";;" msg "\n")
 #else
 # define system_printf(format, args...) while(0)
 # define system_print(msg) while(0)
 #endif
 
 #if DEBUG_LEVEL > 0
-# define errorf(format, args...) debug_printf(LOG_SOURCE ERROR_PREFIX format "\n\r", ##args)
-# define error(msg) debug_puts(LOG_SOURCE ERROR_PREFIX msg "\n\r")
+# define errorf(format, args...) debug_printf(LOG_SOURCE ERROR_PREFIX format "\n", ##args)
+# define error(msg) debug_puts(LOG_SOURCE ERROR_PREFIX msg "\n")
 #else
 # define errorf(format, args...) while(0)
 # define error(msg) while(0)
 #endif
 
 #if DEBUG_LEVEL > 1
-# define criticalf(format, args...) debug_printf(LOG_SOURCE CRITICAL_PREFIX format "\n\r", ##args)
-# define critical(msg) debug_puts(LOG_SOURCE CRITICAL_PREFIX msg "\n\r")
+# define criticalf(format, args...) debug_printf(LOG_SOURCE CRITICAL_PREFIX format "\n", ##args)
+# define critical(msg) debug_puts(LOG_SOURCE CRITICAL_PREFIX msg "\n")
 #else
 # define criticalf(format, args...) while(0)
 # define critical(msg) while(0)
 #endif
 
 #if DEBUG_LEVEL > 2
-# define warningf(format, args...) debug_printf(LOG_SOURCE WARN_PREFIX format "\n\r",  ##args)
-# define warning(msg) debug_puts(LOG_SOURCE WARN_PREFIX msg "\n\r")
+# define warningf(format, args...) debug_printf(LOG_SOURCE WARN_PREFIX format "\n",  ##args)
+# define warning(msg) debug_puts(LOG_SOURCE WARN_PREFIX msg "\n")
 #else
 # define warningf(format, args...) while(0)
 # define warning(msg) while(0)
 #endif
 
 #if DEBUG_LEVEL > 3
-# define infof(format, args...) debug_printf(LOG_SOURCE INFO_PREFIX format "\n\r", ##args)
-# define info(msg) debug_puts(LOG_SOURCE INFO_PREFIX msg "\n\r")
+# define infof(format, args...) debug_printf(LOG_SOURCE INFO_PREFIX format "\n", ##args)
+# define info(msg) debug_puts(LOG_SOURCE INFO_PREFIX msg "\n")
 #else
 # define infof(format, args...) while(0)
 # define info(msg) while(0)
 #endif
 
-#define menu_printf(format, args...) CMenu_Printf("^" CMENU_PREFIX format "\r\n", ##args)
-#define menu_print(msg) CMenu_Printf("^" CMENU_PREFIX msg "\r\n")
+#define menu_printf(format, args...) CMenu_Printf("^" CMENU_PREFIX format "\n", ##args)
+#define menu_print(msg) CMenu_Printf("^" CMENU_PREFIX msg "\n")
 
 #define bool_string(b) ((b)?"true":"false")
 #define bool_string_de(b) ((b)?"ja":"nein")
