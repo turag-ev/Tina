@@ -5,9 +5,7 @@
 - ScopedLock wieder als Standard nehmen (LockGuard bringt keinen Vorteil)
 - mehrere Eventqueues ermöglichen
 - Action: aus statische Funktionen als Zustände Methoden verwenden
-- Units: wenn Value-Typ Ganzzahltyp, wird beim Erstellung einer Variable nicht gerundet
 - init.h und final.h auflösen
-- pycrc für crc benutzen: https://github.com/tpircher/pycrc
 - normialize ergänzen um cross-c-c++ Makros:
     - constexpr in C ersetzen
     - _always_inline für c anpassen

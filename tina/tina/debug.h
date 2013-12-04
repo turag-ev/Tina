@@ -21,7 +21,8 @@
 #define CRITICAL_PREFIX "!"
 #define WARN_PREFIX     "?"
 #define INFO_PREFIX     "-"
-#define DEBUG_PREFIX    "-"
+#define DEBUG_PREFIX    "_"
+#define CMENU_PREFIX    "C"
 
 // debug level
 #ifndef DEBUG_LEVEL
@@ -76,6 +77,17 @@
 # define infof(format, args...) while(0)
 # define info(msg) while(0)
 #endif
+
+#if DEBUG_LEVEL > 4
+# define debugf(format, args...) debug_printf(LOG_SOURCE DEBUG_PREFIX format "\n\r", ##args)
+# define debug(msg) debug_puts(LOG_SOURCE DEBUG_PREFIX msg "\n\r")
+#else
+# define debugf(format, args...) while(0)
+# define debug(msg) while(0)
+#endif
+
+#define menu_printf(format, args...) CMenu_Printf("^" CMENU_PREFIX format "\r\n", ##args)
+#define menu_print(msg) CMenu_Printf("^" CMENU_PREFIX msg "\r\n")
 
 #define bool_string(b) ((b)?"true":"false")
 #define bool_string_de(b) ((b)?"ja":"nein")

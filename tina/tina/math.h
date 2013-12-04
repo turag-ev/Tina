@@ -107,6 +107,7 @@ extern "C" {
 #define SQUARE(x)     ((x)*(x))
 #define CUBIC(x)      ((x)*(x)*(x))
 
+
 TURAG_INLINE float sqrf(float x) {
   return x * x;
 }

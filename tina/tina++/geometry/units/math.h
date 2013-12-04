@@ -50,7 +50,7 @@ Units::Angle atan2(Units::Length y, Units::Length x) {
 
 math_constexpr _always_inline
 Units::Length hypot(Units::Length x, Units::Length y) {
-  return Units::Length(::hypotf(x.value, y.value));
+  return Units::Length(::hypot(x.value, y.value));
 }
 
 } // namespace TURAG
