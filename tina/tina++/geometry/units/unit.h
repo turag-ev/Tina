@@ -161,12 +161,12 @@ constexpr struct null_t {
 
 // roundToInt
 namespace detail {
-  template<typename T, REQUIRES(std::is_floating_point<T>)> constexpr _always_inline
+  template<typename T, REQUIRES(std::is_floating_point<T>)> math_constexpr _always_inline
   int roundToInt(T value) {
 #if GCC_VERSION < 40700 && !defined(ECOS)
     return (value < 0.0f) ? ceil(value - 0.5f) : floor(value + 0.5f);
 #else
-    return ::lroundf(value);
+    return ::lround(value);
 #endif
   }
   
@@ -263,7 +263,7 @@ struct Quantity<DimensionlessDimension> {
     return value / u.factor;
   }
 
-  constexpr
+  math_constexpr
   int toInt(Unit<DimensionlessDimension> u) const {
     return detail::roundToInt(value / u.factor);
   }

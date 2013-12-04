@@ -199,13 +199,9 @@ Angle angle_between(const T1& a, const T2& b) {
 }
 
 // round
-constexpr _always_inline
+math_constexpr _always_inline
 int round(float x) {
-#ifndef ECOS
   return lround(x);
-#else
-  return (x > 0.f) ? (x + 0.5f) : (x - 0.5f);
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////

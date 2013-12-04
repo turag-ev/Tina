@@ -7,7 +7,7 @@
  *
  */
 
-#define LOG_SOURCE "A"
+#define TURAG_DEBUG_LOG_SOURCE "A"
 #include "../debug.h"
 
 #include "state.h"

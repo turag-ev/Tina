@@ -17,28 +17,28 @@
 #define TURAG_DEBUG_LINE_PREFIX "\x02"
 
 // Debug prefixes
-#define ERROR_PREFIX    "!"
-#define CRITICAL_PREFIX "!"
-#define WARN_PREFIX     "?"
-#define INFO_PREFIX     "-"
-#define DEBUG_PREFIX    "_"
-#define CMENU_PREFIX    "C"
+#define TURAG_DEBUG_ERROR_PREFIX    "!"
+#define TURAG_DEBUG_CRITICAL_PREFIX "!"
+#define TURAG_DEBUG_WARN_PREFIX     "?"
+#define TURAG_DEBUG_INFO_PREFIX     "-"
+#define TURAG_DEBUG_DEBUG_PREFIX    "_"
+#define TURAG_DEBUG_REPORT_LOG_SOURCE_PREFIX  ">"
 
 // debug level
-#ifndef DEBUG_LEVEL
-#define DEBUG_LEVEL 5
+#ifndef TURAG_DEBUG_LEVEL
+#define TURAG_DEBUG_LEVEL 5
 #endif
 
 // log source
-#ifndef LOG_SOURCE
-# define LOG_SOURCE "_"
+#ifndef TURAG_DEBUG_LOG_SOURCE
+# define TURAG_DEBUG_LOG_SOURCE "_"
 #endif
 
-#if !defined(NDEBUG) && DEBUG_LEVEL < 1
+#if !defined(NDEBUG) && TURAG_DEBUG_DEBUG_LEVEL < 1
 # define NDEBUG
 #endif
 
-#if DEBUG_LEVEL > 0
+#if TURAG_DEBUG_LEVEL > 0
 # define system_printf(format, args...) debug_printf(TURAG_DEBUG_LINE_PREFIX ";;" format TURAG_DEBUG_NEWLINE, ##args)
 # define system_print(msg) debug_puts(TURAG_DEBUG_LINE_PREFIX ";;" msg TURAG_DEBUG_NEWLINE)
 #else
@@ -46,48 +46,45 @@
 # define system_print(msg) while(0)
 #endif
 
-#if DEBUG_LEVEL > 0
-# define errorf(format, args...) debug_printf(TURAG_DEBUG_LINE_PREFIX LOG_SOURCE ERROR_PREFIX format TURAG_DEBUG_NEWLINE, ##args)
-# define error(msg) debug_puts(TURAG_DEBUG_LINE_PREFIX LOG_SOURCE ERROR_PREFIX msg TURAG_DEBUG_NEWLINE)
+#if TURAG_DEBUG_LEVEL > 0
+# define errorf(format, args...) debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_ERROR_PREFIX format TURAG_DEBUG_NEWLINE, ##args)
+# define error(msg) debug_puts(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_ERROR_PREFIX msg TURAG_DEBUG_NEWLINE)
 #else
 # define errorf(format, args...) while(0)
 # define error(msg) while(0)
 #endif
 
-#if DEBUG_LEVEL > 1
-# define criticalf(format, args...) debug_printf(TURAG_DEBUG_LINE_PREFIX LOG_SOURCE CRITICAL_PREFIX format TURAG_DEBUG_NEWLINE, ##args)
-# define critical(msg) debug_puts(TURAG_DEBUG_LINE_PREFIX LOG_SOURCE CRITICAL_PREFIX msg TURAG_DEBUG_NEWLINE)
+#if TURAG_DEBUG_LEVEL > 1
+# define criticalf(format, args...) debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_CRITICAL_PREFIX format TURAG_DEBUG_NEWLINE, ##args)
+# define critical(msg) debug_puts(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_CRITICAL_PREFIX msg TURAG_DEBUG_NEWLINE)
 #else
 # define criticalf(format, args...) while(0)
 # define critical(msg) while(0)
 #endif
 
-#if DEBUG_LEVEL > 2
-# define warningf(format, args...) debug_printf(TURAG_DEBUG_LINE_PREFIX LOG_SOURCE WARN_PREFIX format TURAG_DEBUG_NEWLINE,  ##args)
-# define warning(msg) debug_puts(TURAG_DEBUG_LINE_PREFIX LOG_SOURCE WARN_PREFIX msg TURAG_DEBUG_NEWLINE)
+#if TURAG_DEBUG_LEVEL > 2
+# define warningf(format, args...) debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_WARN_PREFIX format TURAG_DEBUG_NEWLINE,  ##args)
+# define warning(msg) debug_puts(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_WARN_PREFIX msg TURAG_DEBUG_NEWLINE)
 #else
 # define warningf(format, args...) while(0)
 # define warning(msg) while(0)
 #endif
 
-#if DEBUG_LEVEL > 3
-# define infof(format, args...) debug_printf(TURAG_DEBUG_LINE_PREFIX LOG_SOURCE INFO_PREFIX format TURAG_DEBUG_NEWLINE, ##args)
-# define info(msg) debug_puts(TURAG_DEBUG_LINE_PREFIX LOG_SOURCE INFO_PREFIX msg TURAG_DEBUG_NEWLINE)
+#if TURAG_DEBUG_LEVEL > 3
+# define infof(format, args...) debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_INFO_PREFIX format TURAG_DEBUG_NEWLINE, ##args)
+# define info(msg) debug_puts(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_INFO_PREFIX msg TURAG_DEBUG_NEWLINE)
 #else
 # define infof(format, args...) while(0)
 # define info(msg) while(0)
 #endif
 
-#if DEBUG_LEVEL > 4
-# define debugf(format, args...) debug_printf(LOG_SOURCE DEBUG_PREFIX format "\n\r", ##args)
-# define debug(msg) debug_puts(LOG_SOURCE DEBUG_PREFIX msg "\n\r")
+#if TURAG_DEBUG_LEVEL > 4
+# define debugf(format, args...) debug_printf(LOG_SOURCE TURAG_DEBUG_DEBUG_PREFIX format "\n\r", ##args)
+# define debug(msg) debug_puts(TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_DEBUG_PREFIX msg "\n\r")
 #else
 # define debugf(format, args...) while(0)
 # define debug(msg) while(0)
 #endif
-
-#define menu_printf(format, args...) CMenu_Printf("^" CMENU_PREFIX format "\r\n", ##args)
-#define menu_print(msg) CMenu_Printf("^" CMENU_PREFIX msg "\r\n")
 
 #define bool_string(b) ((b)?"true":"false")
 #define bool_string_de(b) ((b)?"ja":"nein")

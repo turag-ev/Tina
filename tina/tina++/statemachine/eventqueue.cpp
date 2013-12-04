@@ -5,7 +5,7 @@
  *      Author: richard
  */
 
-#define LOG_SOURCE "E"
+#define TURAG_DEBUG_LOG_SOURCE "E"
 //#define DEBUG_LEVEL 3
 #define __STDC_FORMAT_MACROS
 
@@ -41,6 +41,7 @@ const EventClass EventNull("kein Event", EventQueue::event_null);
 
 static _hot
 void print_debug_info(const Event& e) {
+#if TURAG_DEBUG_LEVEL > 3
   EventId id = e.event_class->id;
   const char* name = (e.event_class->name) ? e.event_class->name : "";
 
@@ -60,6 +61,7 @@ void print_debug_info(const Event& e) {
           e.param,
           reinterpret_cast<ptrdiff_t>(e.method));
   }
+#endif
 }
 
 _hot
@@ -217,6 +219,7 @@ void EventQueue::removeCallback(EventMethod method) {
   remove_if(timequeue_, [&](const TimeEvent& tevent) { return tevent.event.method == method;});
 }
 
+#ifndef NDEBUG
 void EventQueue::printTimeQueue() {
   Mutex::Lock lock(mutex_);
 
@@ -265,6 +268,7 @@ EventQueue::printDebugInfo() {
   infof("  number of queue elements: %zu\n", size);
   infof("  number of timed queue elements: %zu\n", timequeue_size);
 }
+#endif // NDEBUG
 
 // C Schnittstelle
 
