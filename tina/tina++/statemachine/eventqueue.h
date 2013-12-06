@@ -20,6 +20,10 @@
 
 namespace TURAG {
 
+////////////////////////////////////////////////////////////////////////////////
+//     EventClass
+////////////////////////////////////////////////////////////////////////////////
+
 struct EventClass {
   MOVABLE(EventClass);
   COPYABLE(EventClass);
@@ -32,6 +36,18 @@ struct EventClass {
   const char* name;
   EventId id;
 };
+
+// for compatibility with old code
+template<EventId id>
+struct UnnamedEventClass {
+static const EventClass event_class;
+};
+
+template<EventId id>
+const EventClass UnnamedEventClass<id>::event_class("Unbekannt", id);
+
+#define DEFINE_EVENT_CLASS(name,event) static const EventClass name(#event, event)
+#define DEFINE_EVENT_CLASS_EXTRA(name,event,msg) static const EventClass name(#event ": " msg, event)
 
 ////////////////////////////////////////////////////////////////////////////////
 //     Event
@@ -71,14 +87,6 @@ struct TimeEvent {
   { }
 };
 
-template<EventId id>
-struct UnnamedEventClass {
-static const EventClass event_class;
-};
-
-template<EventId id>
-const EventClass UnnamedEventClass<id>::event_class("Unbekannt", id);
-
 ////////////////////////////////////////////////////////////////////////////////
 //     EventQueue
 ////////////////////////////////////////////////////////////////////////////////
@@ -98,14 +106,11 @@ public:
    *             searched. The found event is passed to the function. Is the
    *             event queue empty, EventQueue::event_null as id and nullptr as
    *             data parameter is passed as functon parameters.
-   * \param idle Event function that is executed, when the event queue is empty.
-   *             EventQueue::event_null as id and nullptr as data parameter is
-   *             passed as function parameters.
    */
 #ifdef TURAG_STATEMACHINE_FOREVER
-  void main(EventHandler handler) _noreturn;
+  void main(EventHandler handler, EventHandler tick) _noreturn;
 #else
-  void main(EventHandler handler);
+  void main(EventHandler handler, EventMethod tick);
 #endif
 
   bool processEvent(EventId id, EventArg param, EventMethod callback);
@@ -133,11 +138,12 @@ public:
     push(event_class, pack<EventArg>(param), method);
   }
 
+  // for compatibility with old code
   template<EventId id>
   void push(EventArg param = 0, EventMethod method = nullptr) {
     push(&UnnamedEventClass<id>::event_class, param, method);
   }
-
+  // for compatibility with old code
   template<EventId id, typename T, REQUIRES(!std::is_integral<T>)> _always_inline
   void push(T param, EventMethod method = nullptr) {
     push(&UnnamedEventClass<id>::event_class, pack<EventArg>(param), method);
@@ -152,11 +158,13 @@ public:
     pushToFront(event_class, pack<EventArg>(param), method);
   }
 
+  // for compatibility with old code
   template<EventId id>
   void pushToFront(EventArg param = 0, EventMethod method = nullptr) {
     pushToFront(&UnnamedEventClass<id>::event_class, param, method);
   }
 
+  // for compatibility with old code
   template<EventId id, typename T, REQUIRES(!std::is_integral<T>)> _always_inline
   void pushToFront(T param, EventMethod method = nullptr) {
     pushToFront(&UnnamedEventClass<id>::event_class, pack<EventArg>(param), method);
@@ -178,11 +186,13 @@ public:
     pushTimedelayed(ticks, event_class, pack<EventArg>(param), method);
   }
 
+  // for compatibility with old code
   template<EventId id>
   void pushTimedelayed(SystemTime ticks, EventArg param = 0, EventMethod method = nullptr) {
     pushTimedelayed(ticks, &UnnamedEventClass<id>::event_class, param, method);
   }
 
+  // for compatibility with old code
   template<EventId id, typename T, REQUIRES(!std::is_integral<T>)> _always_inline
   void pushTimedelayed(SystemTime ticks, T param, EventMethod method = nullptr) {
     pushTimedelayed(ticks, &UnnamedEventClass<id>::event_class, pack<EventArg>(param), method);

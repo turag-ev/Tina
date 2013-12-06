@@ -100,13 +100,13 @@ SystemTime EventQueue::getTimeToNextEvent() const {
     }
   }
 
-  return s_to_ticks(50);
+  return ms_to_ticks(100);
 }
 
 #ifdef TURAG_STATEMACHINE_FOREVER
 _noreturn
 #endif
-void EventQueue::main(EventHandler handler) {
+void EventQueue::main(EventHandler handler, EventMethod tick) {
   Event event(&EventNull, 0, nullptr);
 
   handler_ = handler;
@@ -127,6 +127,8 @@ void EventQueue::main(EventHandler handler) {
 #endif
 
     print_debug_info(event);
+
+    tick(event.event_class->id, event.param);
 
     if (event.method != nullptr) {
       (*event.method)(event.event_class->id, event.param);
@@ -186,6 +188,7 @@ void EventQueue::pushTimedelayed(SystemTime ticks, const EventClass* event_class
 void EventQueue::clear() {
   Mutex::Lock lock(mutex_);
   queue_.clear();
+  timequeue_.clear();
 }
 
 void EventQueue::discardEvents() {
