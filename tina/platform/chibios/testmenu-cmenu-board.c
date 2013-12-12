@@ -10,7 +10,7 @@
 #include "testmenu-cmenu-board.h"
 #include "xserial.h"
 #include "xadc.h"
-#include "plattform/hardware.h"
+#include "platform/hardware.h"
 #ifdef USE_CRASHRECOVERY
 #include <chrtclib.h>
 #include "crashrecovery.h"

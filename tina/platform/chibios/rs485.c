@@ -7,7 +7,7 @@
 // #include <hal.h>
 // #include <steuerungm.h>
 #warning backplane2013.h should not be included here.
-#include <plattform/chibios/backplane2013.h>
+#include <platform/chibios/backplane2013.h>
 
 /** USART3 --> RS485 */
 static SerialConfig serial_cfg_rs485 = {
