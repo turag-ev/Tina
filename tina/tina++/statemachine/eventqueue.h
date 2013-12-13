@@ -108,7 +108,7 @@ public:
    *             data parameter is passed as functon parameters.
    */
 #ifdef TURAG_STATEMACHINE_FOREVER
-  void main(EventHandler handler, EventHandler tick) _noreturn;
+  void main(EventHandler handler, EventMethod tick) _noreturn;
 #else
   void main(EventHandler handler, EventMethod tick);
 #endif
