@@ -79,8 +79,8 @@
 #endif
 
 #if TURAG_DEBUG_LEVEL > 4
-# define debugf(format, args...) debug_printf(LOG_SOURCE TURAG_DEBUG_DEBUG_PREFIX format "\n\r", ##args)
-# define debug(msg) debug_puts(TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_DEBUG_PREFIX msg "\n\r")
+# define debugf(format, args...) debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_DEBUG_PREFIX format "\n\r", ##args)
+# define debug(msg) debug_puts(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_DEBUG_PREFIX msg "\n\r")
 #else
 # define debugf(format, args...) while(0)
 # define debug(msg) while(0)
