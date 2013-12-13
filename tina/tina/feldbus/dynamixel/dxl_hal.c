@@ -1,5 +1,5 @@
 
-#include <tina/dxl_hal.h>
+#include "dxl_hal.h"
 #include <tina/rs485.h>
 
 
@@ -39,6 +39,7 @@ int turag_dxl_hal_rx( unsigned char *pPacket, int numPacket )
 
 
 void turag_dxl_hal_set_timeout( int NumRcvByte ) {
+    (void) NumRcvByte;
     return;
 }
 
