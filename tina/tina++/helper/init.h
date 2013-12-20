@@ -1,6 +1,8 @@
 #ifndef TINAPP_HELPER_INIT_H
 #define TINAPP_HELPER_INIT_H
 
+#include <memory>
+
 #include "macros.h"
 #include "normalize.h"
 
@@ -30,14 +32,14 @@ public:
 /// use: \code static initializer_call one(function_name); \endcode
 class initializer_call {
 public:
-  template<typename F>
-  _always_inline initializer_call(F func) {
-    func();
+  template<typename F, typename... Args>
+  _always_inline initializer_call(F func, Args&&... args) {
+      func(std::forward<Args>(args)...);
   }
 };
 
 /// macro for call a function initialization
-#define INIT_CALL(v) static initializer_call CONCAT(_initializer_,__COUNTER__) (v)
+#define INIT_CALL(v, ...) static initializer_call CONCAT(_initializer_,__COUNTER__) (v, ## __VA_ARGS__)
 
 } // namespace TURAG
 
