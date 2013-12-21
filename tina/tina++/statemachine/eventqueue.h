@@ -94,6 +94,7 @@ struct TimeEvent {
 class EventQueue {
 public:
   typedef bool (*EventHandler)(EventId id, EventArg data);
+  typedef void (*TickHandler)();
 
   EventQueue();
 
@@ -108,9 +109,9 @@ public:
    *             data parameter is passed as functon parameters.
    */
 #ifdef TURAG_STATEMACHINE_FOREVER
-  void main(EventHandler handler, EventMethod tick) _noreturn;
+  void main(EventHandler handler, TickHandler tick) _noreturn;
 #else
-  void main(EventHandler handler, EventMethod tick);
+  void main(EventHandler handler, TickHandler tick);
 #endif
 
   bool processEvent(EventId id, EventArg param, EventMethod callback);
@@ -245,6 +246,9 @@ public:
 
   /// Number of the maximum time events
   static const size_t timequeue_size = 16;
+
+  /// Maximum time between two calls of tick function
+  static constexpr SystemTime max_tick_time = ms_to_ticks(20);
 
 private:
   mutable Mutex mutex_;

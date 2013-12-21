@@ -94,47 +94,53 @@ SystemTime EventQueue::getTimeToNextEvent() const {
     const TimeEvent& first = timequeue_.back();
     int diff = first.time.value - get_current_tick().value;
     if (diff <= 0) {
-      return ms_to_ticks(1);
+      return SystemTime(0);
     } else {
-      return SystemTime(diff);
+      return SystemTime(std::min(TuragSystemTicks(diff), max_tick_time.value));
     }
   }
 
-  return ms_to_ticks(100);
+  return max_tick_time;
 }
 
 #ifdef TURAG_STATEMACHINE_FOREVER
 _noreturn
 #endif
-void EventQueue::main(EventHandler handler, EventMethod tick) {
+void EventQueue::main(EventHandler handler, TickHandler tick) {
   Event event(&EventNull, 0, nullptr);
 
   handler_ = handler;
 
   while (true) {
-    Mutex::Lock lock(mutex_);
+      Mutex::Lock lock(mutex_);
 
-    while (!loadEvent(&event)) {
-      // warte auf Event
-      var_.waitFor(getTimeToNextEvent());
-    }
+      while (!loadEvent(&event)) {
+          SystemTime wait_time = getTimeToNextEvent();
+          if (wait_time.value == 0) continue;
 
-    lock.unlock();
+          // warte auf Event
+          var_.waitFor(wait_time);
+
+          lock.unlock();
+          tick();
+          lock.lock();
+      }
+
+      lock.unlock();
 
 #ifndef TURAG_STATEMACHINE_FOREVER
-    if (event.event_class->id == event_quit)
-      break;
+      if (event.event_class->id == event_quit)
+          break;
 #endif
 
-    print_debug_info(event);
+      print_debug_info(event);
 
-    tick(event.event_class->id, event.param);
+      if (event.method != nullptr) {
+          (*event.method)(event.event_class->id, event.param);
+      } else {
+          handler_(event.event_class->id, event.param);
+      }
 
-    if (event.method != nullptr) {
-      (*event.method)(event.event_class->id, event.param);
-    } else {
-      handler_(event.event_class->id, event.param);
-    }
   }
 }
 
