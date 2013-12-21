@@ -4,7 +4,7 @@
 #include <tina/math.h>
 #include "tina.h"
 
-inline namespace std {
+namespace std {
 using ::acos;
 using ::atan;
 using ::atan2;
@@ -21,6 +21,22 @@ using ::tan;
 using ::scalbn;
 using ::lround;
 }
+
+using ::acos;
+using ::atan;
+using ::atan2;
+using ::ceil;
+using ::copysign;
+using ::cos;
+using ::fabs;
+using ::floor;
+using ::hypot;
+using ::pow;
+using ::sin;
+using ::sqrt;
+using ::tan;
+using ::scalbn;
+using ::lround;
 
 namespace TURAG {
 

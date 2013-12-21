@@ -10,7 +10,7 @@
 namespace TURAG {
 
 template<typename T>
-#if GCC_VERSION < 40800
+#if GCC_VERSION < 40800 && !defined(__clang__)
 struct is_trivially_destructible : public std::has_trivial_destructor<T> { };
 #else
 struct is_trivially_destructible : public std::is_trivially_destructible<T> { };

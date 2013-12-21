@@ -19,7 +19,7 @@
 #endif
 
 // constexpr for functions from math.h?
-#if GCC_VERSION < 40700 || defined(ECOS)
+#if GCC_VERSION < 40700 || defined(ECOS) || defined(__clang__)
 # define math_constexpr
 #else // GCC_VERSION < 40700
 # define math_constexpr constexpr

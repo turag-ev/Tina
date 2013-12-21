@@ -2,9 +2,15 @@
 #define TINA_HELPER_NORMALIZE_H
 
 /// get GCC version in useable format
+#ifndef __clang__
 #define GCC_VERSION (__GNUC__ * 10000 \
                      + __GNUC_MINOR__ * 100 \
                      + __GNUC_PATCHLEVEL__)
+
+#else
+// clang has everything :P
+#define GCC_VERSION (40700)
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // makros for compiler pragmas

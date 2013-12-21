@@ -27,7 +27,7 @@ unsigned abs(int a) {
 template<int Z, unsigned N>
 struct Rational {
   constexpr static int z() { return Z; }
-  constexpr static unsigned n() { return N; }
+  constexpr static long int n() { return N; }
 
   static_assert(N != 0, "interner Fehler: Nenner darf nicht Null sein!");
   static_assert(N > 0, "interner Fehler: Nenner darf nicht kleiner Null sein!");
