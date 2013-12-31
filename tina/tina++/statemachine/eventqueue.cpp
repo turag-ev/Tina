@@ -37,6 +37,8 @@ EventQueue::EventQueue() :
   handler_(nullptr)
 { }
 
+constexpr SystemTime EventQueue::max_tick_time;
+
 const EventClass EventNull("kein Event", EventQueue::event_null);
 
 static _hot
