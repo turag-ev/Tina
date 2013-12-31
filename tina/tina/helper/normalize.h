@@ -41,7 +41,7 @@
 
 #ifndef __cplusplus
 // C Version
-#define TURAG_INLINE extern __attribute__((always_inline)) inline
+#define TURAG_INLINE static __attribute__((always_inline)) inline
 #else
 // C++ Version
 #define TURAG_INLINE __attribute__((always_inline)) inline

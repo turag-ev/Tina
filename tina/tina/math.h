@@ -121,14 +121,6 @@ TURAG_INLINE float sgnf(float x) {
                    ((x > 0.0f) ? 1.0f : -1.0f);
 }
 
-TURAG_INLINE float fmaxf(float x, float y) {
-  return (x > y) ? x : y;
-}
-
-TURAG_INLINE float fminf(float x, float y) {
-  return (x < y) ? x : y;
-}
-
 #ifdef __cplusplus
 } // extern "C"
 #endif
