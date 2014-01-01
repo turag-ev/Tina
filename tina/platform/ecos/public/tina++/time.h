@@ -76,6 +76,13 @@ constexpr _always_inline unsigned ticks_to_us(SystemTime ticks) {
       / (1000ULL * static_cast<uint64_t>(CYGNUM_HAL_RTC_DENOMINATOR));
 }
 
+#if GCC_VERSION >= 40700
+constexpr SystemTime operator"" _s(long double a) { return s_to_ticks(a); }
+constexpr SystemTime operator"" _ms(long double a) { return ms_to_ticks(a); }
+constexpr SystemTime operator"" _s(unsigned long long a) { return s_to_ticks(a); }
+constexpr SystemTime operator"" _ms(unsigned long long a) { return ms_to_ticks(a); }
+#endif
+
 /// Get number of ecos ticks since system start
 /**
  * \return ecos ticks

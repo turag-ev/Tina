@@ -72,6 +72,13 @@ constexpr _always_inline unsigned ticks_to_us(SystemTime ticks) {
   return ((ticks.value - 1L) * 1000000L) / CH_FREQUENCY + 1L;
 }
 
+#if GCC_VERSION >= 40700
+constexpr SystemTime operator"" _s(long double a) { return s_to_ticks(a); }
+constexpr SystemTime operator"" _ms(long double a) { return ms_to_ticks(a); }
+constexpr SystemTime operator"" _s(unsigned long long a) { return s_to_ticks(a); }
+constexpr SystemTime operator"" _ms(unsigned long long a) { return ms_to_ticks(a); }
+#endif
+
 /// Get number of sys ticks since system start
 /**
  * \return sys ticks
