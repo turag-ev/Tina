@@ -50,6 +50,8 @@ public:
     return locked_;
   }
 
+  Mutex& getMutex() { return m_; }
+
 private:
   Mutex& m_;
   bool locked_;

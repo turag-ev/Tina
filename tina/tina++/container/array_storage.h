@@ -40,6 +40,9 @@ public:
   constexpr _always_inline
   array_storage() :
     data_()
+#ifdef TURAG_HEAVY_DEBUG
+    , ref(*reinterpret_cast<T(*)[N]>(data_))
+#endif
   {}
 
   // Create an object in aligned storage
@@ -89,6 +92,12 @@ public:
 private:
   // propertly aligned uninitialized storage for N T's
   typename storage<T>::type data_[N];
+
+#ifdef TURAG_HEAVY_DEBUG
+  // just for better debugging
+  // a reference to data_ only with type
+  T (& ref)[N];
+#endif
 };
 
 } // namespace TURAG

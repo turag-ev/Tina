@@ -92,10 +92,14 @@ bool EventQueue::loadEvent(Event* event) {
 }
 
 SystemTime EventQueue::getTimeToNextEvent() const {
+  if (!queue_.empty()) {
+      return SystemTime(0);
+  }
+
   if (!timequeue_.empty()) {
     const TimeEvent& first = timequeue_.back();
     int diff = first.time.value - get_current_tick().value;
-    if (diff <= 0) {
+    if (diff <= 0) {         
       return SystemTime(0);
     } else {
       return SystemTime(std::min(TuragSystemTicks(diff), max_tick_time.value));
@@ -113,7 +117,7 @@ void EventQueue::main(EventHandler handler, TickHandler tick) {
 
   handler_ = handler;
 
-  while (true) {
+  while (true) {      
       Mutex::Lock lock(mutex_);
 
       while (!loadEvent(&event)) {
@@ -185,12 +189,13 @@ void EventQueue::pushTimedelayed(SystemTime ticks, const EventClass* event_class
   }
   /*if (iter == p.timequeue.rend())*/ iter--;
   timequeue_.emplace(make_forward(iter), Event(event_class, param, method), t);
-
 #ifdef EVENTQUEUE_USAGE_MEASUREMENT
   if (timequeue_.size() > p.max_timed_events) {
     p.max_timed_events = timequeue_.size();
   }
 #endif
+
+  var_.signal();
 }
 
 void EventQueue::clear() {
