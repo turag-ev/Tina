@@ -19,7 +19,7 @@
 #include <tina/statemachine/eventqueue.h>
 #include "../container/array_buffer.h"
 #include "../container/circular_buffer.h"
-#include "../algorithm.h"
+#include "../range/algorithm.h"
 #include "eventqueue.h"
 #include "state.h"
 
