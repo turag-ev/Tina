@@ -17,12 +17,12 @@
   constexpr ClassName(const ClassName&) = default; \
   ClassName& operator=(const ClassName&) = default
 
-/// Forbid copying
+/// Forbid moving
 #define NOT_MOVABLE(ClassName) \
   ClassName(ClassName&&) = delete; \
   ClassName& operator=(ClassName&&) = delete
 
-/// use default copying
+/// use default moving
 #define MOVABLE(ClassName) \
   constexpr ClassName(ClassName&&) = default; \
   ClassName& operator=(ClassName&&) = default
