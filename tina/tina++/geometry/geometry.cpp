@@ -45,7 +45,7 @@ bool interselect(Circle one, Circle two, std::array<Point, 2>& results) {
   return true;
 }
 
-Angle norm_angle(Angle x){
+Angle norm_angle(Angle x) {
   while (x <= -angle_pi) {
     x += angle_pi * 2.f;
   }

@@ -14,16 +14,16 @@ constexpr Angle angle_pi = M_PI * rad;
 } // namespace Units
 
 template<typename Dim> constexpr _always_inline
-Units::Quantity< typename Units::dim_pow<Dim, 2>::type >
+Units::Quantity< typename Units::dim_pow<Dim, std::ratio<2> >::type >
 sqr(Units::Quantity<Dim> arg) {
-  return Units::Quantity< typename Units::dim_pow<Dim, 2>::type >
+  return Units::Quantity< typename Units::dim_pow<Dim, std::ratio<2> >::type >
       (arg.value * arg.value);
 }
 
 template<typename Dim> math_constexpr _always_inline
-Units::Quantity< typename Units::dim_root<Dim, 2>::type >
+Units::Quantity< typename Units::dim_root<Dim, std::ratio<2> >::type >
 sqrt(Units::Quantity<Dim> arg) {
-  return Units::Quantity< typename Units::dim_root<Dim, 2>::type >
+  return Units::Quantity< typename Units::dim_root<Dim, std::ratio<2> >::type >
       (std::sqrt(arg.value));
 }
 

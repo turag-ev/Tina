@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <type_traits>
+#include <ratio>
 
 #include "../../math.h"
 #include "config.h"
@@ -11,73 +12,8 @@
 namespace TURAG {
 namespace Units {
 
-namespace detail {
-
-// größter gemeinsamer Teiler
-constexpr
-unsigned gcd(unsigned n, unsigned m) {
-  return (m == 0) ? n : gcd(m, n % m);
-}
-
-constexpr
-unsigned abs(int a) {
-  return (a < 0) ? -a : a;
-}
-
-template<int Z, unsigned N>
-struct Rational {
-  constexpr static int z() { return Z; }
-  constexpr static long int n() { return N; }
-
-  static_assert(N != 0, "interner Fehler: Nenner darf nicht Null sein!");
-  static_assert(N > 0, "interner Fehler: Nenner darf nicht kleiner Null sein!");
-};
-
-template<typename Rtnl>
-struct rational_cancel_down {
-  constexpr static int gcd_ = gcd(abs(Rtnl::z()), Rtnl::n());
-  typedef Rational<Rtnl::z() / gcd_, Rtnl::n() / gcd_> type;
-};
-
-typedef Rational<0,1> Null;
-typedef Rational<1,1> One;
-
-template<typename Rtnl, int n>
-struct rational_mul {
-  typedef typename rational_cancel_down<Rational<Rtnl::z() * n, Rtnl::n()> >::type
-          type;
-};
-
-template<typename Rtnl, int n>
-struct rational_div {
-  typedef typename rational_cancel_down<Rational<Rtnl::z(), Rtnl::n() * n> >::type
-          type;
-};
-
-template<typename LhsRtnl, typename RhsRtnl>
-struct rational_add {
-  typedef typename rational_cancel_down<Rational<LhsRtnl::z()*RhsRtnl::n() + RhsRtnl::z()*LhsRtnl::n(), LhsRtnl::n()*RhsRtnl::n()> >::type
-          type;
-};
-
-template<typename LhsRtnl, typename RhsRtnl>
-struct rational_sub {
-  typedef typename rational_cancel_down<Rational<LhsRtnl::z()*RhsRtnl::n() - RhsRtnl::z()*LhsRtnl::n(), LhsRtnl::n()*RhsRtnl::n()> >::type
-          type;
-};
-
-/*
-template<typename LhsRtnl, typename RhsRtnl>
-struct rational_mul {
-  typedef typename rational_cancel_down<Rational<LhsRtnl::z * RhsRtnl::z, LhsRtnl::n * RhsRtnl::n> >::type
-          type;
-};
-
-template<typename LhsRtnl, typename RhsRtnl>
-struct rational_div {
-  typedef typename rational_cancel_down<Rational<LhsRtnl::z / RhsRtnl::z, LhsRtnl::n / RhsRtnl::n> >::type
-          type;
-};*/
+typedef std::ratio<0> RationalNull;
+typedef std::ratio<1> RationalOne;
 
 template<typename Length, typename Angle, typename Time>
 struct Dimension {
@@ -86,42 +22,40 @@ struct Dimension {
   typedef Time time;
 };
 
-} // namespace detail
-
-typedef detail::Dimension<detail::Null, detail::Null, detail::Null> DimensionlessDimension;
-typedef detail::Dimension<detail::One,  detail::Null, detail::Null> LengthDimension;
-typedef detail::Dimension<detail::Null, detail::One,  detail::Null> AngleDimension;
-typedef detail::Dimension<detail::Null, detail::Null, detail::One > TimeDimension;
+typedef Dimension<RationalNull, RationalNull, RationalNull> DimensionlessDimension;
+typedef Dimension<RationalOne,  RationalNull, RationalNull> LengthDimension;
+typedef Dimension<RationalNull, RationalOne,  RationalNull> AngleDimension;
+typedef Dimension<RationalNull, RationalNull, RationalOne > TimeDimension;
 
 template<typename LhsDimension, typename RhsDimension>
 struct dim_mul {
-  typedef detail::Dimension<typename detail::rational_add<typename LhsDimension::length, typename RhsDimension::length>::type,
-                            typename detail::rational_add<typename LhsDimension::angle,  typename RhsDimension::angle>::type,
-                            typename detail::rational_add<typename LhsDimension::time,   typename RhsDimension::time>::type>
+  typedef Dimension<typename std::ratio_add<typename LhsDimension::length, typename RhsDimension::length>::type,
+                            typename std::ratio_add<typename LhsDimension::angle,  typename RhsDimension::angle>::type,
+                            typename std::ratio_add<typename LhsDimension::time,   typename RhsDimension::time>::type>
           type;
 };
 
 template<typename LhsDimension, typename RhsDimension>
 struct dim_div {
-  typedef detail::Dimension<typename detail::rational_sub<typename LhsDimension::length, typename RhsDimension::length>::type,
-                            typename detail::rational_sub<typename LhsDimension::angle,  typename RhsDimension::angle>::type,
-                            typename detail::rational_sub<typename LhsDimension::time,   typename RhsDimension::time>::type>
+  typedef Dimension<typename std::ratio_subtract<typename LhsDimension::length, typename RhsDimension::length>::type,
+                            typename std::ratio_subtract<typename LhsDimension::angle,  typename RhsDimension::angle>::type,
+                            typename std::ratio_subtract<typename LhsDimension::time,   typename RhsDimension::time>::type>
           type;
 };
 
-template<typename Dim, int n>
+template<typename Dim, typename N>
 struct dim_root {
-  typedef detail::Dimension<typename detail::rational_div<typename Dim::length, n>::type,
-                            typename detail::rational_div<typename Dim::angle,  n>::type,
-                            typename detail::rational_div<typename Dim::time,   n>::type>
+  typedef Dimension<typename std::ratio_divide<typename Dim::length, N>::type,
+                            typename std::ratio_divide<typename Dim::angle,  N>::type,
+                            typename std::ratio_divide<typename Dim::time,   N>::type>
           type;
 };
 
-template<typename Dim, int n>
+template<typename Dim, typename N>
 struct dim_pow {
-  typedef detail::Dimension<typename detail::rational_mul<typename Dim::length, n>::type,
-                            typename detail::rational_mul<typename Dim::angle,  n>::type,
-                            typename detail::rational_mul<typename Dim::time,   n>::type>
+  typedef Dimension<typename std::ratio_multiply<typename Dim::length, N>::type,
+                            typename std::ratio_multiply<typename Dim::angle,  N>::type,
+                            typename std::ratio_multiply<typename Dim::time,   N>::type>
           type;
 };
 
