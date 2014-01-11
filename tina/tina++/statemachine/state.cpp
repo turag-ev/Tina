@@ -47,7 +47,10 @@ bool Action::exit(EventId eid) {
       if (parent_->about_to_close_) {
         parent_->cancel();
       } else {
-        parent_->func(Action::event_return, reinterpret_reference<EventArg>(eid));
+        bool handled = parent_->func(Action::event_return, eid);
+        if (!handled) {
+          criticalf("Exit of Action %s is not handled", name_);
+        }
       }
     }
     return true;
@@ -55,10 +58,10 @@ bool Action::exit(EventId eid) {
   } else {
     if (child_) {
       // Aktion beendet, aber eines der Kinderaktionen noch nicht
-      warningf("Tried to exit an nonactive action %s (with unclosed action %s)", name_, child_->name_);
+      criticalf("Tried to exit an nonactive action %s (with unclosed action %s)", name_, child_->name_);
       return false;
     } else {
-      warningf("Tried to exit an nonactive action %s", name_);
+      criticalf("Tried to exit an nonactive action %s", name_);
       return true;
     }
   }
@@ -100,7 +103,7 @@ bool Action::cancel() {
 
   } else {
     if (!child_) {
-      warningf("Tried to cancel an nonactive action %s", name_);
+      criticalf("Tried to cancel an nonactive action %s", name_);
       return true;
     } else {
       // Wenn man auf das Beenden einer Kindaktion wartet

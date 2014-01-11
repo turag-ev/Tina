@@ -52,13 +52,26 @@ Container& remove_if(Container& container, Predicate pred) {
   return container;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// useful extra funktions
-
 template <typename Range, typename T>
 bool any_of_value(const Range& t, const T& val) {
   return std::find(std::begin(t), std::end(t), val) != std::end(t);
 }
+
+template <typename Range, typename Pred>
+bool any_of(const Range& t, Pred pred) {
+  return std::any_of(std::begin(t), std::end(t), pred);
+}
+
+template <typename Range, typename T>
+bool none_of_value(const Range& t, const T& val) {
+  return std::find(std::begin(t), std::end(t), val) == std::end(t);
+}
+
+template <typename Range, typename Pred>
+bool none_of(const Range& t, Pred pred) {
+  return std::none_of(std::begin(t), std::end(t), pred);
+}
+
 
 /// get length of container
 template <typename Container>
