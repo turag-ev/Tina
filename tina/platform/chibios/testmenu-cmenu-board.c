@@ -261,6 +261,11 @@ static void cmd_adc(char cmd) {
     CMenu_Printf("Monitor 7V raw value: %d\r\n", adc_get_mon7v());
 }
 
+static void cmd_reset(char cmd) {
+	(void)cmd;
+	NVIC_SystemReset();
+}
+
 extern const CMenu_t mainMenu __attribute__((weak, alias("boardTestMenu")));
 
 CMENU(boardTestMenu, "board test menu")
@@ -278,11 +283,12 @@ CMENU(boardTestMenu, "board test menu")
     CMENU_ENTERSUBMENUITEM('r', RTC_Menu)
 #endif
 
-    CMENU_ITEM('Q', cmd_iminit, "Hardware init (don't do this)")
+    CMENU_ITEM('q', cmd_iminit, "Hardware init (don't do this)")
     CMENU_ENTERSUBMENUITEM('l', _TM_LedColor)
 #if CHIBIOS_BENCHMARK
     CMENU_ITEM('B', cmd_benchmark, "ChibiOS Benchmark")
 #endif
 
     CMENU_ITEM('a', cmd_adc, "ADC values")
+	CMENU_ITEM('Q', cmd_reset, "QUIT (Perform device reset)")
 CMENU_END
