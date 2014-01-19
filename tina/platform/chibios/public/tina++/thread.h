@@ -81,17 +81,69 @@ _always_inline void Thread_delay(SystemTime ticks) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Mutex
+// ConditionVariable
 
-/// Mutex
+namespace detail {
+	
+template<class Mutex>
+class ConditionVariable_detail {
+  NOT_COPYABLE(ConditionVariable_detail);
+
+public:
+  constexpr _always_inline
+  ConditionVariable_detail(Mutex* mutex) :
+    cond_(_CONDVAR_DATA(cond_)), mutex_(mutex)
+  { }
+
+  _always_inline bool wait() {
+    return chCondWait(&cond_) != 0;
+  }
+
+#ifdef CH_USE_CONDVARS_TIMEOUT
+
+// as opposed to the posix pthread_cond_timedwait-function the chibi function "chCondWaitTimeout"
+// does not reaquire the associated mutex when returning due to timeout thus requiring us to do
+// this manually
+
+  bool waitFor(SystemTime timeout) {
+	  msg_t result = chCondWaitTimeout(&cond_, timeout.value);
+	  if (result == RDY_TIMEOUT) mutex_->lock();
+      return result != RDY_TIMEOUT;
+  }
+  
+  bool waitUntil(SystemTime timeout) {
+	  msg_t result = chCondWaitTimeout(&cond_, timeout.value - chTimeNow());
+	  if (result == RDY_TIMEOUT) mutex_->lock();
+	  return result != RDY_TIMEOUT;
+  }
+#endif
+
+  _always_inline void signal() {
+    chCondSignal(&cond_);
+  }
+
+  _always_inline void broadcast() {
+    chCondBroadcast(&cond_);
+  }
+
+private:
+  CondVar cond_;
+  Mutex* mutex_;
+};
+
+} // namespace detail
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Mutex
 /**
  * NOTE: use ScopedLock to automatic unlock mutex.
  */
-
 namespace detail {
 
 class mutex_detail {
   NOT_COPYABLE(mutex_detail);
+  
 
 public:
   typedef ScopedLock<mutex_detail> Lock;
@@ -107,6 +159,7 @@ public:
 protected:
   // not for end-user use ScopedLock<Mutex> or Mutex::Lock!
   friend class ScopedLock<mutex_detail>;
+  friend class ConditionVariable_detail<mutex_detail>;
 
   _always_inline void lock() {
     chMtxLock(&mut_);
@@ -129,47 +182,12 @@ private:
 // work-around because chibios mutex structure is also named Mutex
 typedef detail::mutex_detail Mutex;
 
-////////////////////////////////////////////////////////////////////////////////
-// ConditionVariable
-
-class ConditionVariable {
-  NOT_COPYABLE(ConditionVariable);
-
-public:
-  constexpr _always_inline
-  ConditionVariable(Mutex*) :
-    cond_(_CONDVAR_DATA(cond_))
-  { }
-
-  _always_inline bool wait() {
-    return chCondWait(&cond_) != 0;
-  }
-
-#ifdef CH_USE_CONDVARS_TIMEOUT
-  _always_inline bool waitFor(SystemTime timeout) {
-    return chCondWaitTimeout(&cond_, timeout.value) != RDY_TIMEOUT;
-  }
-  
-  _always_inline bool waitUntil(SystemTime timeout) {
-    return chCondWaitTimeout(&cond_, timeout.value - chTimeNow()) != RDY_TIMEOUT;
-  }
-#endif
-
-  _always_inline void signal() {
-    chCondSignal(&cond_);
-  }
-
-  _always_inline void broadcast() {
-    chCondBroadcast(&cond_);
-  }
-
-private:
-  CondVar cond_;
-};
-
 // work-around because chibios thread structure is also named Thread
 // and WORKING_AREA have problems with this.
 template<size_t size = 0> class Thread : public detail::thread_detail<size> { };
+
+
+typedef detail::ConditionVariable_detail<Mutex> ConditionVariable;
 
 } // namespace TURAG
 
