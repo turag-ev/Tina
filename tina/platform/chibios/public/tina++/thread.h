@@ -135,6 +135,59 @@ private:
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// Mailbox
+namespace detail {
+
+#ifdef CH_USE_MAILBOXES
+
+template<std::size_t size>
+class mailbox_detail {
+
+private:
+    Mailbox mailbox_;
+    msg_t pointer_buffer_[size];
+
+public:
+    explicit mailbox_detail() :
+        mailbox_(_MAILBOX_DATA(mailbox_, pointer_buffer_, size)) { }
+
+    bool post(void* msg, SystemTime time) {
+        if (chMBPost(&mailbox_, static_cast<msg_t>(msg), time.value) == RDY_OK) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    bool post(void* msg) { return post(msg, TIME_INFINITE); }
+
+    bool postAhead(void* msg, SystemTime time) {
+        if (chMBPostAhead(&mailbox_, static_cast<msg_t>(msg), time.value) == RDY_OK) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    bool postAhead(void* msg) { return postAhead(msg, TIME_INFINITE); }
+
+    void* fetch(SystemTime time) {
+        msg_t msg;
+
+        if (chMBFetch(&mailbox_, &msg, time.value) == RDY_OK) {
+            return static_cast<void*>(msg);
+        } else {
+            return nullptr;
+        }
+    }
+    void* fetch(void) { return fetch(TIME_INFINITE); }
+
+};
+
+#endif // CH_USE_MAILBOXES
+
+} // namespace detail
+
+
+////////////////////////////////////////////////////////////////////////////////
 // Mutex
 /**
  * NOTE: use ScopedLock to automatic unlock mutex.
@@ -157,7 +210,7 @@ public:
   NativeHandle getNativeHandle() {return &mut_;}
   
 protected:
-  // not for end-user use ScopedLock<Mutex> or Mutex::Lock!
+  // not for end-user; use ScopedLock<Mutex> or Mutex::Lock!
   friend class ScopedLock<mutex_detail>;
   friend class ConditionVariable_detail<mutex_detail>;
 
@@ -179,14 +232,51 @@ private:
 
 } // namespace detail
 
+
+////////////////////////////////////////////////////////////////////////////////
+// Semaphore
+
+namespace detail {
+
+class semaphore_detail {
+  NOT_COPYABLE(semaphore_detail);
+
+private:
+  Semaphore sem_;
+
+public:
+  explicit semaphore_detail(int init_value = 0) :
+      sem_(_SEMAPHORE_DATA(sem_, init_value)) { }
+
+  void wait(void) { chSemWait(&sem_); }
+  bool wait(SystemTime time) {
+      if (chSemWaitTimeout(&sem_, time.value) == RDY_OK) {
+          return true;
+      } else {
+          return false;
+      }
+  }
+  void signal(void) { chSemSignal(&sem_); }
+
+};
+
+} // namespace detail
+
+
 // work-around because chibios mutex structure is also named Mutex
 typedef detail::mutex_detail Mutex;
+
+// work-around because chibios semaphore structure is also named Semaphore
+typedef detail::semaphore_detail Semaphore;
+
+// work-around because chibios mailbox structure is also named Mailbox
+template<std::size_t size> class Mailbox : public detail::mailbox_detail<size> { };
 
 // work-around because chibios thread structure is also named Thread
 // and WORKING_AREA have problems with this.
 template<size_t size = 0> class Thread : public detail::thread_detail<size> { };
 
-
+// typedef to get rid of template argument
 typedef detail::ConditionVariable_detail<Mutex> ConditionVariable;
 
 } // namespace TURAG
