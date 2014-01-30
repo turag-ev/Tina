@@ -245,19 +245,22 @@ private:
   Semaphore sem_;
 
 public:
-  explicit semaphore_detail(int init_value = 0) :
-      sem_(_SEMAPHORE_DATA(sem_, init_value)) { }
+  explicit semaphore_detail(int count = 0) :
+      sem_(_SEMAPHORE_DATA(sem_, count)) { }
 
-  void wait(void) { chSemWait(&sem_); }
+  void wait(void) { while (chSemWait(&sem_) == RDY_RESET); }
   bool wait(SystemTime time) {
-      if (chSemWaitTimeout(&sem_, time.value) == RDY_OK) {
-          return true;
-      } else {
-          return false;
+      while (1) {
+          msg_t result = chSemWaitTimeout(&sem_, time.value);
+
+          if (result == RDY_OK) {
+              return true;
+          } else if (result == RDY_TIMEOUT) {
+              return false;
+          }
       }
   }
   void signal(void) { chSemSignal(&sem_); }
-
 };
 
 } // namespace detail
