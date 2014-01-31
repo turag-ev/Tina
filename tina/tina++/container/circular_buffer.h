@@ -7,6 +7,7 @@
 #include "../tina.h"
 #include "../debug.h"
 #include "array_storage.h"
+#include "../helper/integer.h"
 
 namespace TURAG {
 
@@ -109,10 +110,11 @@ private:
   std::size_t pos_;
 };
 
+namespace detail {
 
 template<typename T, std::size_t N>
 class CircularBuffer {
-  static_assert(!(N & (N-1)), "CircularBuffer size must be a power of 2");
+  static_assert(!(N & (N-1)), "detail::CircularBuffer capacity must be a power of 2");
 
 public:
   // FIXME: create own copy und move constructors for not trivial desctructable types
@@ -399,6 +401,11 @@ private:
   // bytes needed to work a round the value ctor at construction
   array_storage<T, N> bytes_;
 };
+
+} // namespace detail
+
+template<typename T, std::size_t N>
+using CircularBuffer = detail::CircularBuffer<T, next_power_of_two(N+1)>;
 
 } // namespace TURAG
 

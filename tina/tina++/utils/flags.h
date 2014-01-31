@@ -217,7 +217,7 @@ public:
   }
 
 private:
-  typename unsigned_integer<Bits>::type i;
+  typename unsigned_integer_least_bits<Bits>::type i;
 };
 
 #define DEFINE_FLAGS(flags_, enum_) \
