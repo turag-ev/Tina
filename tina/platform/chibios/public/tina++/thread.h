@@ -248,18 +248,8 @@ public:
   explicit semaphore_detail(int count = 0) :
       sem_(_SEMAPHORE_DATA(sem_, count)) { }
 
-  void wait(void) { while (chSemWait(&sem_) == RDY_RESET); }
-  bool wait(SystemTime time) {
-      while (1) {
-          msg_t result = chSemWaitTimeout(&sem_, time.value);
-
-          if (result == RDY_OK) {
-              return true;
-          } else if (result == RDY_TIMEOUT) {
-              return false;
-          }
-      }
-  }
+  void wait(void);
+  bool wait(SystemTime time);
   void signal(void) { chSemSignal(&sem_); }
 };
 

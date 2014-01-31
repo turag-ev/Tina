@@ -34,6 +34,23 @@ size_t turag_thread_get_stack_usage(const TuragThread* thread) {
 
 #endif
 
+
 } // namespace detail
+
+bool Semaphore::wait(SystemTime time) {
+	while (1) {
+		msg_t result = chSemWaitTimeout(&sem_, time.value);
+
+		if (result == RDY_OK) {
+			return true;
+		} else if (result == RDY_TIMEOUT) {
+			return false;
+		}
+	}
+}
+
+void Semaphore::wait(void) {
+	while (chSemWait(&sem_) == RDY_RESET);
+}
 
 } /* namespace TURAG */

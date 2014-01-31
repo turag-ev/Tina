@@ -1,5 +1,5 @@
-#ifndef TINAPP_CHIBIOS_THREADFIFO_H 
-#define TINAPP_CHIBIOS_THREADFIFO_H
+#ifndef TINAPP_CONTAINER_THREADFIFO_H 
+#define TINAPP_CONTAINER_THREADFIFO_H
 
 #include <tina++/tina.h>
 #include <tina++/thread.h>
@@ -41,4 +41,4 @@ public:
 	
 }
 
-#endif // TINAPP_CHIBIOS_THREADFIFO_H
+#endif // TINAPP_CONTAINER_THREADFIFO_H
