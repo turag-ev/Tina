@@ -127,7 +127,6 @@ TURAG_THREAD_ENTRY static void main_thread_func(void) {
         // check DataProvider
         for (int i = 0; i < BLUETOOTH_NUMBER_OF_DATA_PROVIDERS; ++i) {
             Mutex::Lock lock(data_provider_mutex);
-            lock.lock();
             if (data_providers[i].buffer && data_providers[i].sendRequest) {
                 infof("DataProvider %d push to %d", i, data_providers[i].destination);
 
