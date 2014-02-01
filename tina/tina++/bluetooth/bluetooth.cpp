@@ -240,6 +240,9 @@ static bool addDataSink(uint8_t data_sink_id, uint8_t* storage_buffer, size_t le
     if (data_sink_id >= BLUETOOTH_NUMBER_OF_DATA_SINKS || !storage_buffer) {
         error("invalid DataSink ID or storage pointer zero");
         return false;
+	} else if (length > 92) {
+		error("DataSinks can not hold data bigger than 92 byte");
+		return false;
     } else {
         Mutex::Lock lock(data_sink_mutex);
         data_sinks[data_sink_id] = DataSink(storage_buffer, length);
@@ -273,6 +276,12 @@ static bool addDataProvider(uint8_t data_provider_id, uint8_t* storage_buffer, s
     if (data_provider_id >= BLUETOOTH_NUMBER_OF_DATA_PROVIDERS || !storage_buffer) {
         error("invalid DataProvider ID or storage pointer zero");
         return false;
+	} else if (length > 92) {
+		error("DataProvider can not hold data bigger than 92 byte");
+		return false;
+	} else if (destination > BLUETOOTH_NUMBER_OF_PEERS) {
+		error("DataSinks invalid peer ID");
+		return false;
     } else {
         Mutex::Lock lock(data_provider_mutex);
         data_providers[data_provider_id] = DataProvider(storage_buffer, length, destination);
