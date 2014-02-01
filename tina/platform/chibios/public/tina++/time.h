@@ -14,6 +14,9 @@ typedef TuragSystemTicks SystemTicks;
 struct SystemTime {
   SystemTicks value;
 
+  static constexpr SystemTicks INFINITE = TIME_INFINITE;
+
+  
   constexpr explicit _always_inline
   SystemTime(SystemTicks ticks = 0) :
     value(ticks)
