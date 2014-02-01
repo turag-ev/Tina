@@ -1,4 +1,7 @@
 
+#define LOG_SOURCE "Y"
+#include <tina++/debug.h>
+
 #include "bluetooth.h" 
 #include <tina/bluetooth_config.h>
 #include <tina++/thread.h>
@@ -92,6 +95,8 @@ void init(void) {
 }
 
 TURAG_THREAD_ENTRY static void main_thread_func(void) {
+    info("Bluetooth-High-Level thread started");
+
     Rpc_t rpc;
 
     while(1) {
@@ -102,9 +107,11 @@ TURAG_THREAD_ENTRY static void main_thread_func(void) {
                 lock.unlock();
 
                 if (callback) {
+                    infof("call RPC %d", rpc.data.rpc_id);
                     (*callback)(rpc.peer_id, rpc.data.param);
                 }
             } else {
+                infof("call Remote-RPC %d on peer %d", rpc.data.rpc_id, rpc.peer_id);
                 int buffer_size = Base64::encodeLength(rpc.data) + 2;
                 uint8_t buffer[buffer_size];
                 // start byte
@@ -118,10 +125,12 @@ TURAG_THREAD_ENTRY static void main_thread_func(void) {
         }
 
         // check DataProvider
-        Mutex::Lock lock(data_provider_mutex);
         for (int i = 0; i < BLUETOOTH_NUMBER_OF_DATA_PROVIDERS; ++i) {
+            Mutex::Lock lock(data_provider_mutex);
             lock.lock();
             if (data_providers[i].buffer && data_providers[i].sendRequest) {
+                infof("DataProvider %d push to %d", i, data_providers[i].destination);
+
                 int encoded_buffer_size = Base64::encodeLength(data_providers[i].buffer_size) + 3;
                 uint8_t buffer[encoded_buffer_size];
                 // start byte
@@ -135,7 +144,7 @@ TURAG_THREAD_ENTRY static void main_thread_func(void) {
                 uint8_t dest = data_providers[i].destination;
                 data_providers[i].sendRequest = false;
                 lock.unlock();
-                // write to bluetooth
+                // write to bluetooth, we unlock the mutex in case the writing takes a bit more time
                 write(dest, buffer, encoded_buffer_size);
             }
         }
@@ -155,28 +164,36 @@ void highlevelParseIncomingData(uint8_t sender, uint8_t* buffer, size_t buffer_s
             continue;
         } else if (buffer[i] == 3) {
             uint8_t decode_buffer[Base64::decodeLength(in_buffer[sender].index)];
-            size_t size = Base64::decode(in_buffer[sender].data, in_buffer[sender].index, decode_buffer);
+            size_t decoded_size = Base64::decode(in_buffer[sender].data, in_buffer[sender].index, decode_buffer);
 
             if (decode_buffer[0] < 64) {
                 // RPC
-                if (decode_buffer[0] < BLUETOOTH_NUMBER_OF_RPCS && size == sizeof(RpcData)) {
+                if (decode_buffer[0] >= BLUETOOTH_NUMBER_OF_RPCS) {
+                    criticalf("RPC %d recv from %d--> ID invalid", decode_buffer[0], sender);
+                } else if (decoded_size != sizeof(RpcData)) {
+                    criticalf("RPC %d recv from %d --> package size mismatch (%d)", decode_buffer[0], sender, decoded_size);
+                } else {
                     Rpc_t rpc;
                     std::memcpy(&rpc.data, decode_buffer, sizeof(RpcData));
                     rpc.peer_id = sender;
                     rpc.received = true;
                     rpc_fifo.post(rpc);
+                    infof("RPC %d recv from %d --> queued for exec", decode_buffer[0], sender);
                 }
             } else {
                 // data for DataSink
                 uint8_t data_sink_id = decode_buffer[0] - 64;
                 if (data_sink_id < BLUETOOTH_NUMBER_OF_DATA_SINKS) {
                     Mutex::Lock lock(data_sink_mutex);
-                    if (data_sinks[data_sink_id].buffer && (size - 1) == data_sinks[data_sink_id].buffer_size) {
-                        std::memcpy(data_sinks[data_sink_id].buffer, decode_buffer + 1, size - 1);
+                    if (data_sinks[data_sink_id].buffer && (decoded_size - 1) == data_sinks[data_sink_id].buffer_size && decoded_size > 1) {
+                        infof("DataSink %d recv data from %d", data_sink_id, sender);
+                        std::memcpy(data_sinks[data_sink_id].buffer, &decode_buffer[1], decoded_size - 1);
                         data_sinks[data_sink_id].lastSourceId = sender;
                         data_sinks[data_sink_id].newDataAvailable = true;
                     }
                     lock.unlock();
+                } else {
+                    criticalf("DataSink %d recv data from %d -> ID invalid!", data_sink_id, sender);
                 }
             }
         } else {
@@ -184,6 +201,7 @@ void highlevelParseIncomingData(uint8_t sender, uint8_t* buffer, size_t buffer_s
             ++in_buffer[sender].index;
             if (in_buffer[sender].index == sizeof(InBuffer::data)) {
                 in_buffer[sender].waitForStartByte = true;
+                warningf("Overflow in recv-buffer for peer %d", sender);
             }
         }
     }
@@ -198,6 +216,7 @@ bool registerRpcFunction(uint8_t rpc_id, RpcFunction callback) {
         lock.unlock();
         return true;
     } else {
+        error("invalid RPC ID");
         return false;
     }
 }
@@ -213,13 +232,17 @@ bool callRpc(uint8_t destination, uint8_t rpc_id, uint64_t param) {
         rpc_fifo.post(rpc);
         return true;
     } else {
+        error("invalid peer ID");
         return false;
     }
 }
 
-
+#pragma GCC diagnostic ignored "-Wunused-function"
 static bool addDataSink(uint8_t data_sink_id, uint8_t* storage_buffer, size_t length) {
-    if (data_sink_id >= BLUETOOTH_NUMBER_OF_DATA_SINKS || !storage_buffer) return false;
+    if (data_sink_id >= BLUETOOTH_NUMBER_OF_DATA_SINKS || !storage_buffer) {
+        error("invalid DataSink ID or storage pointer zero");
+        return false;
+    }
 
     Mutex::Lock lock(data_sink_mutex);
     data_sinks[data_sink_id] = DataSink(storage_buffer, length);
@@ -229,9 +252,11 @@ static bool addDataSink(uint8_t data_sink_id, uint8_t* storage_buffer, size_t le
 template<typename T> bool addDataSink(uint8_t data_sink_id, T* storage_buffer) {
     return addDataSink(data_sink_id, reinterpret_cast<uint8_t*>(storage_buffer), sizeof(*storage_buffer));
 }
-
 static bool getData(uint8_t data_sink_id, uint8_t* buffer, size_t length) {
-    if (data_sink_id >= BLUETOOTH_NUMBER_OF_DATA_SINKS || !buffer) return false;
+    if (data_sink_id >= BLUETOOTH_NUMBER_OF_DATA_SINKS || !buffer) {
+        error("invalid DataSink ID or buffer pointer zero");
+        return false;
+    }
 
     Mutex::Lock lock(data_sink_mutex);
     if (length != data_sinks[data_sink_id].buffer_size) return false;
@@ -246,7 +271,10 @@ template<typename T> bool getData(uint8_t data_sink_id, T* buffer) {
 
 
 static bool addDataProvider(uint8_t data_provider_id, uint8_t* storage_buffer, size_t length, uint8_t destination) {
-    if (data_provider_id >= BLUETOOTH_NUMBER_OF_DATA_PROVIDERS || !storage_buffer) return false;
+    if (data_provider_id >= BLUETOOTH_NUMBER_OF_DATA_PROVIDERS || !storage_buffer) {
+        error("invalid DataProvider ID or storage pointer zero");
+        return false;
+    }
 
     Mutex::Lock lock(data_provider_mutex);
     data_providers[data_provider_id] = DataProvider(storage_buffer, length, destination);
@@ -258,7 +286,10 @@ template<typename T> bool addDataProvider(uint8_t data_provider_id, T* storage_b
 }
 
 static bool pushData(uint8_t data_provider_id, uint8_t* data, size_t length) {
-    if (data_provider_id >= BLUETOOTH_NUMBER_OF_DATA_PROVIDERS || !data) return false;
+    if (data_provider_id >= BLUETOOTH_NUMBER_OF_DATA_PROVIDERS || !data) {
+        error("invalid DataProvider ID or data pointer zero");
+        return false;
+    }
 
     Mutex::Lock lock(data_provider_mutex);
     if (length != data_providers[data_provider_id].buffer_size) return false;
