@@ -48,6 +48,17 @@
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
+// constexpr
+
+#ifndef __cplusplus
+// C Version
+#define _constexpr_func __attribute__((const))
+#else
+// C++ Version
+#define _constexpr_func constexpr
+#endif
+
+////////////////////////////////////////////////////////////////////////////////
 // extra gcc attribute shortcuts
 
 /// Inline always (no compiler checking whether code will grow, might fail)

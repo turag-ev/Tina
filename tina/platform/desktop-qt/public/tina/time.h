@@ -13,10 +13,14 @@ typedef struct {
 } TuragSystemTime;
 
 // only for intern use!!!
-static _always_inline
+static _always_inline _constexpr_func
 TuragSystemTime _turag_ticks_to_time(TuragSystemTicks ticks) {
+#ifndef __cplusplus
   TuragSystemTime result = {ticks};
   return result;
+#else
+  return {ticks};
+#endif
 }
 
 static _always_inline
@@ -49,6 +53,8 @@ unsigned turag_ticks_to_us(TuragSystemTime time) {
   return time.value * 1000;
 }
 
+#define TURAG_TIME_INFINITE_TICKS UINT64_MAX
+#define TURAG_TIME_INFINITE _turag_ticks_to_time(UINT64_MAX)
 
 extern uint64_t turag_plattform_dependent_get_tick(void);
 
