@@ -24,27 +24,34 @@ public:
 
     void post(const T& mail) {
         empty_sem_.wait();
-        Mutex::Lock lock(buffer_mutex_);
-        buffer_.emplace_back(mail);
+        {
+            Mutex::Lock lock(buffer_mutex_);
+            buffer_.emplace_back(mail);
+        }
         full_sem_.signal();
     }
 
     bool fetch(T* mail, SystemTime time) {
         if (!full_sem_.wait(time)) {
             return false;
+        } else {
+            {
+                Mutex::Lock lock(buffer_mutex_);
+                *mail = buffer_.front();
+                buffer_.pop_front();
+            }
+            empty_sem_.signal();
+            return true;
         }
-        Mutex::Lock lock(buffer_mutex_);
-        *mail = buffer_.front();
-        buffer_.pop_front();
-        empty_sem_.signal();
-        return true;
     }
 
     void fetch(T* mail) {
         full_sem_.wait();
-        Mutex::Lock lock(buffer_mutex_);
-        *mail = buffer_.front();
-        buffer_.pop_front();
+        {
+            Mutex::Lock lock(buffer_mutex_);
+            *mail = buffer_.front();
+            buffer_.pop_front();
+        }
         empty_sem_.signal();
     }
 	
