@@ -191,7 +191,6 @@ void highlevelParseIncomingData(uint8_t sender, uint8_t* buffer, size_t buffer_s
                         data_sinks[data_sink_id].lastSourceId = sender;
                         data_sinks[data_sink_id].newDataAvailable = true;
                     }
-                    lock.unlock();
                 } else {
                     criticalf("DataSink %d recv data from %d -> ID invalid!", data_sink_id, sender);
                 }
@@ -213,7 +212,6 @@ bool registerRpcFunction(uint8_t rpc_id, RpcFunction callback) {
     if (rpc_id < BLUETOOTH_NUMBER_OF_RPCS) {
         Mutex::Lock lock(rpc_mutex);
         rpc_functions[rpc_id] = callback;
-        lock.unlock();
         return true;
     } else {
         error("invalid RPC ID");
@@ -242,12 +240,11 @@ static bool addDataSink(uint8_t data_sink_id, uint8_t* storage_buffer, size_t le
     if (data_sink_id >= BLUETOOTH_NUMBER_OF_DATA_SINKS || !storage_buffer) {
         error("invalid DataSink ID or storage pointer zero");
         return false;
+    } else {
+        Mutex::Lock lock(data_sink_mutex);
+        data_sinks[data_sink_id] = DataSink(storage_buffer, length);
+        return true;
     }
-
-    Mutex::Lock lock(data_sink_mutex);
-    data_sinks[data_sink_id] = DataSink(storage_buffer, length);
-    lock.unlock();
-    return true;
 }
 template<typename T> bool addDataSink(uint8_t data_sink_id, T* storage_buffer) {
     return addDataSink(data_sink_id, reinterpret_cast<uint8_t*>(storage_buffer), sizeof(*storage_buffer));
@@ -256,14 +253,16 @@ static bool getData(uint8_t data_sink_id, uint8_t* buffer, size_t length) {
     if (data_sink_id >= BLUETOOTH_NUMBER_OF_DATA_SINKS || !buffer) {
         error("invalid DataSink ID or buffer pointer zero");
         return false;
+    } else {
+        Mutex::Lock lock(data_sink_mutex);
+        if (length != data_sinks[data_sink_id].buffer_size) {
+            errorf("incorrect data length for DataSink %d", data_sink_id);
+            return false;
+        }
+        std::memcpy(buffer, data_sinks[data_sink_id].buffer, length);
+        data_sinks[data_sink_id].newDataAvailable = false;
+        return true;
     }
-
-    Mutex::Lock lock(data_sink_mutex);
-    if (length != data_sinks[data_sink_id].buffer_size) return false;
-    std::memcpy(buffer, data_sinks[data_sink_id].buffer, length);
-    data_sinks[data_sink_id].newDataAvailable = false;
-    lock.unlock();
-    return true;
 }
 template<typename T> bool getData(uint8_t data_sink_id, T* buffer) {
     return getData(data_sink_id, reinterpret_cast<uint8_t*>(buffer), sizeof(*buffer));
@@ -274,12 +273,11 @@ static bool addDataProvider(uint8_t data_provider_id, uint8_t* storage_buffer, s
     if (data_provider_id >= BLUETOOTH_NUMBER_OF_DATA_PROVIDERS || !storage_buffer) {
         error("invalid DataProvider ID or storage pointer zero");
         return false;
+    } else {
+        Mutex::Lock lock(data_provider_mutex);
+        data_providers[data_provider_id] = DataProvider(storage_buffer, length, destination);
+        return true;
     }
-
-    Mutex::Lock lock(data_provider_mutex);
-    data_providers[data_provider_id] = DataProvider(storage_buffer, length, destination);
-    lock.unlock();
-    return true;
 }
 template<typename T> bool addDataProvider(uint8_t data_provider_id, T* storage_buffer, uint8_t destination) {
     return addDataProvider(data_provider_id, reinterpret_cast<uint8_t*>(storage_buffer), sizeof(*storage_buffer), destination);
@@ -289,14 +287,16 @@ static bool pushData(uint8_t data_provider_id, uint8_t* data, size_t length) {
     if (data_provider_id >= BLUETOOTH_NUMBER_OF_DATA_PROVIDERS || !data) {
         error("invalid DataProvider ID or data pointer zero");
         return false;
+    } else {
+        Mutex::Lock lock(data_provider_mutex);
+        if (length != data_providers[data_provider_id].buffer_size) {
+            errorf("incorrect data length for DataProvider %d", data_provider_id);
+            return false;
+        }
+        std::memcpy(data_providers[data_provider_id].buffer, data, length);
+        data_providers[data_provider_id].sendRequest = true;
+        return true;
     }
-
-    Mutex::Lock lock(data_provider_mutex);
-    if (length != data_providers[data_provider_id].buffer_size) return false;
-    std::memcpy(data_providers[data_provider_id].buffer, data, length);
-    data_providers[data_provider_id].sendRequest = true;
-    lock.unlock();
-    return true;
 }
 template<typename T> bool pushData(uint8_t data_provider_id, T* data) {
     return pushData(data_provider_id, reinterpret_cast<uint8_t*>(data), sizeof(*data));
