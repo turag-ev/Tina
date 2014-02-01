@@ -118,9 +118,11 @@ void EventQueue::main(EventHandler handler, TickHandler tick) {
   handler_ = handler;
 
   while (true) {      
-      Mutex::Lock lock(mutex_);
 
-      while (!loadEvent(&event)) {
+
+      while (true) {
+          Mutex::Lock lock(mutex_);
+          if (loadEvent(&event)) break;
           SystemTime wait_time = getTimeToNextEvent();
           if (wait_time.value == 0) continue;
 
@@ -129,14 +131,12 @@ void EventQueue::main(EventHandler handler, TickHandler tick) {
 
           lock.unlock();
           tick();
-          lock.lock();
       }
 
-      lock.unlock();
-
 #ifndef TURAG_STATEMACHINE_FOREVER
-      if (event.event_class->id == event_quit)
+      if (event.event_class->id == event_quit) {
           break;
+      }
 #endif
 
       print_debug_info(event);
