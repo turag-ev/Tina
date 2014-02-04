@@ -16,20 +16,15 @@ extern "C" {
 ////////////////////////////////////////////////////////////////////////////////
 // C Interface Thread
 
-typedef struct {
-  pthread_t thread;
-  char* const stack;
-  size_t stack_size;
-} TuragThread;
+typedef void* TuragThread;
 
 #define TURAG_DEFINE_THREAD(name, stack_size) \
-  static char CONCAT(name, _stack_) [stack_size];\
-  TuragThread name = {0, CONCAT(name, _stack_), stack_size}
+  TuragThread name
   
 void turag_thread_start(TuragThread* thread, int priority, void (*entry) (void));
 
 /// returns maximal used stack size in bytes
-size_t turag_thread_get_stack_usage(const TuragThread* thread);
+#define turag_thread_get_stack_usage(thread) (0)
 
 /// lets the current thread sleeps for a time of ecos ticks
 void turag_thread_delay(TuragSystemTime d);

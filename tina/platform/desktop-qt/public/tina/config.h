@@ -1,8 +1,10 @@
-#ifndef TINA_DESKTOP_CONFIG_H
-#define TINA_DESKTOP_CONFIG_H
+#ifndef TINA_SIM_CONFIG_H
+#define TINA_SIM_CONFIG_H
+
+#include <tina/tina.h>
 
 /// Attribute für Thread-Startfunktion
-#define TURAG_THREAD_ENTRY
+#define TURAG_THREAD_ENTRY 
 
 /// Wenn definiert:
 /// Nach Aufruf von EventQueue::main() nicht mehr zurückkehren
@@ -12,8 +14,6 @@
 /// ASCII-Zeichen für neue Zeile für Debugausgaben
 #define TURAG_DEBUG_NEWLINE "\n"
 
-
 #define TURAG_FELDBUS_AKTOR_STRUCTURED_OUTPUT_AVAILABLE
 
-
-#endif // TINA_DESKTOP_CONFIG_H
+#endif // TINA_SIM_CONFIG_H
