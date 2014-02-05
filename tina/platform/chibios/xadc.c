@@ -13,6 +13,8 @@
  * @{
  */
 
+#define XADC_THREAD 1
+
 /* sample 1 channel */
 #define ADC_GRP1_NUM_CHANNELS   1
 /* take 8 samples per conversion series */
