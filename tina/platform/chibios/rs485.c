@@ -67,3 +67,8 @@ bool turag_rs485_transceive(uint8_t *input, int input_length, uint8_t *output, i
 
     return ok;
 }
+
+void turag_rs485_buffer_clear(void) {
+	uint8_t dummy[100];
+	while (sdAsynchronousRead(&SD3, dummy, sizeof(dummy)) == sizeof(dummy));
+}
