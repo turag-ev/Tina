@@ -3,11 +3,7 @@
 #include <tina/debug.h>
 #include <tina/tina.h>
 #include <tina/time.h>
-// #include <ch.h>
-// #include <hal.h>
-// #include <steuerungm.h>
-#warning backplane2013.h should not be included here.
-#include <platform/chibios/backplane2013.h>
+#include <platform/chibios/backplane.h>
 
 /** USART3 --> RS485 */
 static SerialConfig serial_cfg_rs485 = {
@@ -27,7 +23,7 @@ bool turag_rs485_init(uint32_t baud_rate, TuragSystemTime timeout) {
     chBSemInit(&_RS485_Sem, TRUE);
 
     serial_cfg_rs485.speed = baud_rate;
-    sdStart(&SD3, &serial_cfg_rs485);
+    sdStart(&SD3, &serial_cfg_rs485);       // CtrlM-specific
     rs485_timeout = timeout;
 
     // setup RTS output
