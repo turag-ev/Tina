@@ -2,7 +2,7 @@
 #define LOG_SOURCE "C"
 #include <tina/debug.h>
 
-#include <turag_board.h>
+#include <board_turag.h>
 #include <os_turag.h>
 #include "public/tina++/can.h"
 #include "public/tina/can.h"
