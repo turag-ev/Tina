@@ -1,9 +1,20 @@
 #define LOG_SOURCE "H"
 
+#include <ch.h>
+#include <hal.h>
 #include <tina/debug.h>
 #include <tina/tina.h>
 #include <tina/time.h>
 #include <platform/chibios/backplane.h>
+
+#ifdef EUROBOT_2013
+# warning "using EB13!"
+# define RS485SD SD3
+#elif defined(EUROBOT_2014)
+# define RS485SD SD2
+#else
+# error "no eurobot define!"
+#endif
 
 /** USART3 --> RS485 */
 static SerialConfig serial_cfg_rs485 = {
@@ -23,7 +34,7 @@ bool turag_rs485_init(uint32_t baud_rate, TuragSystemTime timeout) {
     chBSemInit(&_RS485_Sem, TRUE);
 
     serial_cfg_rs485.speed = baud_rate;
-    sdStart(&SD3, &serial_cfg_rs485);       // CtrlM-specific
+    sdStart(&RS485SD, &serial_cfg_rs485);       // CtrlM-specific
     rs485_timeout = timeout;
 
     // setup RTS output
@@ -31,8 +42,8 @@ bool turag_rs485_init(uint32_t baud_rate, TuragSystemTime timeout) {
     palClearPad(GPIOD, BPD_SC_RTS);
 
     // flush input queue
-    sdReadTimeout(&SD3, buf, 1, TIME_IMMEDIATE);
-    sdWriteTimeout(&SD3, buf, 1, TIME_IMMEDIATE);
+    sdReadTimeout(&RS485SD, buf, 1, TIME_IMMEDIATE);
+    sdWriteTimeout(&RS485SD, buf, 1, TIME_IMMEDIATE);
 
     // wait until slaves left their bootloaders
     chThdSleepMilliseconds(500);
@@ -50,13 +61,13 @@ bool turag_rs485_transceive(uint8_t *input, int input_length, uint8_t *output, i
     if (input && input_length > 0) {
         // activate RS485 driver for sending
         palSetPad(GPIOD, BPD_SC_RTS);
-        ok = sdWriteTimeout(&SD3, input, input_length, MS2ST(5));
+        ok = sdWriteTimeout(&RS485SD, input, input_length, MS2ST(5));
         // TC interrupt handler sets the RTS pin after transmission is completed
     }
 
     if (output && output_length > 0) {
         // read answer, timeout in systemticks!
-        ok = sdReadTimeout(&SD3, output, output_length, rs485_timeout.value);
+        ok = sdReadTimeout(&RS485SD, output, output_length, rs485_timeout.value);
     }
 
     chBSemSignal(&_RS485_Sem);
@@ -66,5 +77,5 @@ bool turag_rs485_transceive(uint8_t *input, int input_length, uint8_t *output, i
 
 void turag_rs485_buffer_clear(void) {
 	uint8_t dummy[100];
-	while (sdAsynchronousRead(&SD3, dummy, sizeof(dummy)) == sizeof(dummy));
+	while (sdAsynchronousRead(&RS485SD, dummy, sizeof(dummy)) == sizeof(dummy));
 }
