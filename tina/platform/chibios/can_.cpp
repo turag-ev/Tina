@@ -2,14 +2,10 @@
 #define LOG_SOURCE "C"
 #include <tina/debug.h>
 
-extern "C" {
-#include <casa/casa.h>
-#include <casa/blackboard.h>
-#include <casa/rpc.h>
-}
+#include <turag_board.h>
+#include <os_turag.h>
 #include "public/tina++/can.h"
 #include "public/tina/can.h"
-#include "xserial.h"
 
 namespace TURAG {
 
