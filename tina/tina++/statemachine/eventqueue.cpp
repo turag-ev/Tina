@@ -39,8 +39,6 @@ EventQueue::EventQueue() :
 
 constexpr SystemTime EventQueue::max_tick_time;
 
-const EventClass EventNull("kein Event", EventQueue::event_null);
-
 static _hot
 void print_debug_info(const Event& e) {
 #if TURAG_DEBUG_LEVEL > 3
@@ -72,7 +70,8 @@ bool EventQueue::loadEvent(Event* event) {
     SystemTime t = get_current_tick();
     const TimeEvent& first = timequeue_.back();
     if (first.time <= t) {
-      if (first.event.event_class->id != EventQueue::event_null) {
+      if (first.event.event_class != nullptr)
+      {
         *event = first.event;
         timequeue_.pop_back();
         return true;
@@ -85,7 +84,7 @@ bool EventQueue::loadEvent(Event* event) {
     // lade nächstes Event
     *event = queue_.front();
     queue_.pop_front();
-    return true;
+    return event.event_class != nullptr;
   }
 
   return false;
@@ -219,7 +218,7 @@ void EventQueue::removeEvent(EventId id) {
   Mutex::Lock lock(mutex_);
 
   for (auto& event : queue_) {
-    if (event.event_class->id == id) event.event_class = &EventNull;
+    if (event.event_class->id == id) event.event_class = nullptr;
   }
 
   remove_if(timequeue_, [&](const TimeEvent& tevent) { return tevent.event.event_class->id == id;});
@@ -229,7 +228,7 @@ void EventQueue::removeCallback(EventMethod method) {
   Mutex::Lock lock(mutex_);
 
   for (auto& event : queue_) {
-    if (event.method == method) event.event_class = &EventNull;
+    if (event.method == method) event.event_class = nullptr;
   }
 
   remove_if(timequeue_, [&](const TimeEvent& tevent) { return tevent.event.method == method;});
