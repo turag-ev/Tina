@@ -84,7 +84,7 @@ bool EventQueue::loadEvent(Event* event) {
     // lade nächstes Event
     *event = queue_.front();
     queue_.pop_front();
-    return event.event_class != nullptr;
+    return event->event_class != nullptr;
   }
 
   return false;
@@ -112,7 +112,7 @@ SystemTime EventQueue::getTimeToNextEvent() const {
 _noreturn
 #endif
 void EventQueue::main(EventHandler handler, TickHandler tick) {
-  Event event(&EventNull, 0, nullptr);
+  Event event(nullptr, 0, nullptr);
 
   handler_ = handler;
 
