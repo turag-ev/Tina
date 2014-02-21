@@ -61,7 +61,7 @@ uint64_t call(Id remote_id, FuncId func_id, uint64_t param, ErrorCode* error_res
     dataBuffer: NULL, \
     commBuffer: NULL, \
     buffer: { 0 } \
-  };
+  }
 
 /// Read value from CASA blackboard
 /// \param object a CASA blackboard
