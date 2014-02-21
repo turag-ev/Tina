@@ -56,20 +56,14 @@ struct DataProvider {
 struct DataSink {
     uint8_t* buffer;
     size_t buffer_size;
-    bool newDataAvailable;
-    uint8_t lastSourceId;
 
     DataSink() :
         buffer(nullptr),
-        buffer_size(0),
-        newDataAvailable(false),
-        lastSourceId(0) { }
+        buffer_size(0) { }
 
     DataSink(uint8_t* buf, size_t buf_size) :
         buffer(buf),
-        buffer_size(buf_size),
-        newDataAvailable(false),
-        lastSourceId(0) { }
+        buffer_size(buf_size) { }
 };
 
 static Thread<BLUETOOTH_SEND_THREAD_STACK_SIZE> main_thread;
@@ -187,8 +181,6 @@ void highlevelParseIncomingData(uint8_t sender, uint8_t* buffer, size_t buffer_s
                     if (data_sinks[data_sink_id].buffer && (decoded_size - 1) == data_sinks[data_sink_id].buffer_size && decoded_size > 1) {
                         infof("DataSink %d recv data from %d", data_sink_id, sender);
                         std::memcpy(data_sinks[data_sink_id].buffer, &decode_buffer[1], decoded_size - 1);
-                        data_sinks[data_sink_id].lastSourceId = sender;
-                        data_sinks[data_sink_id].newDataAvailable = true;
                     }
                 } else {
                     criticalf("DataSink %d recv data from %d -> ID invalid!", data_sink_id, sender);
@@ -234,8 +226,7 @@ bool callRpc(uint8_t destination, uint8_t rpc_id, uint64_t param) {
     }
 }
 
-#pragma GCC diagnostic ignored "-Wunused-function"
-static bool addDataSink(uint8_t data_sink_id, uint8_t* storage_buffer, size_t length) {
+bool addDataSink(uint8_t data_sink_id, uint8_t* storage_buffer, size_t length) {
     if (data_sink_id >= BLUETOOTH_NUMBER_OF_DATA_SINKS || !storage_buffer) {
         error("invalid DataSink ID or storage pointer zero");
         return false;
@@ -244,14 +235,15 @@ static bool addDataSink(uint8_t data_sink_id, uint8_t* storage_buffer, size_t le
 		return false;
     } else {
         Mutex::Lock lock(data_sink_mutex);
+        if (data_sinks[data_sink_id].buffer) {
+            warningf("datasink %d was overwritten", data_sink_id);
+        }
         data_sinks[data_sink_id] = DataSink(storage_buffer, length);
         return true;
     }
 }
-template<typename T> bool addDataSink(uint8_t data_sink_id, T* storage_buffer) {
-    return addDataSink(data_sink_id, reinterpret_cast<uint8_t*>(storage_buffer), sizeof(*storage_buffer));
-}
-static bool getData(uint8_t data_sink_id, uint8_t* buffer, size_t length) {
+
+bool getData(uint8_t data_sink_id, uint8_t* buffer, size_t length) {
     if (data_sink_id >= BLUETOOTH_NUMBER_OF_DATA_SINKS || !buffer) {
         error("invalid DataSink ID or buffer pointer zero");
         return false;
@@ -262,16 +254,12 @@ static bool getData(uint8_t data_sink_id, uint8_t* buffer, size_t length) {
             return false;
         }
         std::memcpy(buffer, data_sinks[data_sink_id].buffer, length);
-        data_sinks[data_sink_id].newDataAvailable = false;
         return true;
     }
 }
-template<typename T> bool getData(uint8_t data_sink_id, T* buffer) {
-    return getData(data_sink_id, reinterpret_cast<uint8_t*>(buffer), sizeof(*buffer));
-}
 
 
-static bool addDataProvider(uint8_t data_provider_id, uint8_t* storage_buffer, size_t length, uint8_t destination) {
+bool addDataProvider(uint8_t data_provider_id, uint8_t* storage_buffer, size_t length, uint8_t destination) {
     if (data_provider_id >= BLUETOOTH_NUMBER_OF_DATA_PROVIDERS || !storage_buffer) {
         error("invalid DataProvider ID or storage pointer zero");
         return false;
@@ -283,15 +271,15 @@ static bool addDataProvider(uint8_t data_provider_id, uint8_t* storage_buffer, s
 		return false;
     } else {
         Mutex::Lock lock(data_provider_mutex);
+        if (data_providers[data_provider_id].buffer) {
+            warningf("dataprovider %d was overwritten", data_provider_id);
+        }
         data_providers[data_provider_id] = DataProvider(storage_buffer, length, destination);
         return true;
     }
 }
-template<typename T> bool addDataProvider(uint8_t data_provider_id, T* storage_buffer, uint8_t destination) {
-    return addDataProvider(data_provider_id, reinterpret_cast<uint8_t*>(storage_buffer), sizeof(*storage_buffer), destination);
-}
 
-static bool pushData(uint8_t data_provider_id, uint8_t* data, size_t length) {
+bool pushData(uint8_t data_provider_id, uint8_t* data, size_t length) {
     if (data_provider_id >= BLUETOOTH_NUMBER_OF_DATA_PROVIDERS || !data) {
         error("invalid DataProvider ID or data pointer zero");
         return false;
@@ -305,9 +293,6 @@ static bool pushData(uint8_t data_provider_id, uint8_t* data, size_t length) {
         data_providers[data_provider_id].sendRequest = true;
         return true;
     }
-}
-template<typename T> bool pushData(uint8_t data_provider_id, T* data) {
-    return pushData(data_provider_id, reinterpret_cast<uint8_t*>(data), sizeof(*data));
 }
 
 
