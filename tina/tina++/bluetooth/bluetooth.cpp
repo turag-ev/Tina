@@ -67,7 +67,8 @@ struct DataSink {
         buffer_size(buf_size) { }
 };
 
-static Thread<BLUETOOTH_SEND_THREAD_STACK_SIZE> main_thread;
+// can't be static because simulation needs access
+Thread<BLUETOOTH_SEND_THREAD_STACK_SIZE> bluetooth_main_thread;
 static RpcFunction rpc_functions[BLUETOOTH_NUMBER_OF_RPCS] = {0};
 static Mutex rpc_mutex;
 static DataProvider data_providers[BLUETOOTH_NUMBER_OF_DATA_PROVIDERS];
@@ -80,21 +81,29 @@ static ThreadFifo<Rpc_t, 32> rpc_fifo;
 
 static InBuffer in_buffer[BLUETOOTH_NUMBER_OF_PEERS];
 
-
+#ifndef TURAG_THREADS_RUN_FOREVER
+static bool quit_thread = false;
+#endif
 
 
 void init(void) {
     lowlevelInit();
 
-    main_thread.start(BLUETOOTH_SEND_THREAD_PRIORITY, main_thread_func);
+    bluetooth_main_thread.start(BLUETOOTH_SEND_THREAD_PRIORITY, main_thread_func);
 }
 
 TURAG_THREAD_ENTRY static void main_thread_func(void) {
+    Thread<>::setName("bluetooth-high");
+
     info("Bluetooth-High-Level thread started");
 
     Rpc_t rpc;
 
+#ifdef TURAG_THREADS_RUN_FOREVER
     while(1) {
+#else
+    while(!quit_thread) {
+#endif
         if (rpc_fifo.fetch(&rpc, ms_to_ticks(BLUETOOTH_SEND_THREAD_RPC_WAIT_MS))) {
             if (rpc.received) {
                 Mutex::Lock lock(rpc_mutex);
@@ -146,6 +155,11 @@ TURAG_THREAD_ENTRY static void main_thread_func(void) {
 
 }
 
+#ifndef TURAG_THREADS_RUN_FOREVER
+void quit(void) {
+     quit_thread = true;
+}
+#endif
 
 void highlevelParseIncomingData(uint8_t sender, uint8_t* buffer, size_t buffer_size) {
     if (sender >= BLUETOOTH_NUMBER_OF_PEERS) return;
