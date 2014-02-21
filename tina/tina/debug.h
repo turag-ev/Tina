@@ -26,7 +26,7 @@
 
 // debug level
 #ifndef TURAG_DEBUG_LEVEL
-#define TURAG_DEBUG_LEVEL 5
+#define TURAG_DEBUG_LEVEL 4
 #endif
 
 // log source
