@@ -19,10 +19,15 @@ typedef Casa_BBObject_t Blackboard;
 /// RPC handler function type
 typedef uint64_t (*RpcHandler)(uint64_t param);
 
+
+constexpr ErrorCode NoError = -CASA_ENOERR;
+
+
 /// Call a CASA RPC
 /// \param remote_id id of the reciver
 /// \param func_id   id of the rpc
 /// \param param     64bit of data
+/// \param error_res if given, after the call the variable will hold a return value
 /// \returns return value of rpc as 64bit of data
 uint64_t call(Id remote_id, FuncId func_id, uint64_t param, ErrorCode* error_res = nullptr);
 
