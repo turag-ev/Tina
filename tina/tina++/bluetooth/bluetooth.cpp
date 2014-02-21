@@ -1,5 +1,6 @@
 
-#define LOG_SOURCE "Y"
+#define TURAG_DEBUG_LOG_SOURCE "Y"
+
 #include <tina++/debug.h>
 
 #include "bluetooth.h" 
@@ -122,7 +123,7 @@ TURAG_THREAD_ENTRY static void main_thread_func(void) {
         for (int i = 0; i < BLUETOOTH_NUMBER_OF_DATA_PROVIDERS; ++i) {
             Mutex::Lock lock(data_provider_mutex);
             if (data_providers[i].buffer && data_providers[i].sendRequest) {
-                infof("DataProvider %d push to %d", i, data_providers[i].destination);
+                debugf("DataProvider %d push to %d", i, data_providers[i].destination);
 
                 int encoded_buffer_size = Base64::encodeLength(data_providers[i].buffer_size) + 3;
                 uint8_t buffer[encoded_buffer_size];
@@ -164,7 +165,7 @@ void highlevelParseIncomingData(uint8_t sender, uint8_t* buffer, size_t buffer_s
                 if (decode_buffer[0] >= BLUETOOTH_NUMBER_OF_RPCS) {
                     criticalf("RPC %d recv from %d--> ID invalid", decode_buffer[0], sender);
                 } else if (decoded_size != sizeof(RpcData)) {
-                    criticalf("RPC %d recv from %d --> package size mismatch (%d)", decode_buffer[0], sender, decoded_size);
+                    criticalf("RPC %d recv from %d --> package size mismatch (%d)", decode_buffer[0], sender, static_cast<int>(decoded_size));
                 } else {
                     Rpc_t rpc;
                     std::memcpy(&rpc.data, decode_buffer, sizeof(RpcData));
