@@ -108,7 +108,7 @@ SystemTime EventQueue::getTimeToNextEvent() const {
   return max_tick_time;
 }
 
-#ifdef TURAG_STATEMACHINE_FOREVER
+#ifdef TURAG_THREADS_RUN_FOREVER
 _noreturn
 #endif
 void EventQueue::main(EventHandler handler, TickHandler tick) {
@@ -132,7 +132,7 @@ void EventQueue::main(EventHandler handler, TickHandler tick) {
           tick();
       }
 
-#ifndef TURAG_STATEMACHINE_FOREVER
+#ifndef TURAG_THREADS_RUN_FOREVER
       if (event.event_class->id == event_quit) {
           break;
       }
