@@ -1,6 +1,12 @@
 #ifndef TINA_H
 #define TINA_H
 
+/**
+ * \mainpage
+ *
+ */
+
+
 #ifndef TURAG_STD_CONFIG
 # include <tina/config.h>
 #else
