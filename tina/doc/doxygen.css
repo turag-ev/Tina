@@ -1,5 +1,7 @@
 /* The standard CSS for doxygen 1.8.4 */
 
+@import url(http://fonts.googleapis.com/css?family=Roboto);
+
 body, table, div, p, dl {
 	font: 400 12px Roboto,sans-serif;
 }
