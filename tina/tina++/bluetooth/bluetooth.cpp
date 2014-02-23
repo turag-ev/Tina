@@ -81,10 +81,6 @@ static ThreadFifo<Rpc_t, 32> rpc_fifo;
 
 static InBuffer in_buffer[BLUETOOTH_NUMBER_OF_PEERS];
 
-#ifndef TURAG_THREADS_RUN_FOREVER
-static bool quit_thread = false;
-#endif
-
 
 void init(void) {
     lowlevelInit();
@@ -102,7 +98,7 @@ TURAG_THREAD_ENTRY static void main_thread_func(void) {
 #ifdef TURAG_THREADS_RUN_FOREVER
     while(1) {
 #else
-    while(!quit_thread) {
+    while(!bluetooth_main_thread.shouldTerminate()) {
 #endif
         if (rpc_fifo.fetch(&rpc, ms_to_ticks(BLUETOOTH_SEND_THREAD_RPC_WAIT_MS))) {
             if (rpc.received) {
@@ -115,7 +111,6 @@ TURAG_THREAD_ENTRY static void main_thread_func(void) {
                     (*callback)(rpc.peer_id, rpc.data.param);
                 }
             } else {
-                infof("call Remote-RPC %d on peer %d", rpc.data.rpc_id, rpc.peer_id);
                 int buffer_size = Base64::encodeLength(rpc.data) + 2;
                 uint8_t buffer[buffer_size];
                 // start byte
@@ -124,7 +119,11 @@ TURAG_THREAD_ENTRY static void main_thread_func(void) {
                 Base64::encode(rpc.data, buffer + 1);
                 // end byte
                 buffer[buffer_size - 1] = 3;
-                write(rpc.peer_id, buffer, buffer_size);
+                if (write(rpc.peer_id, buffer, buffer_size)) {
+					infof("call Remote-RPC %d on peer %d", rpc.data.rpc_id, rpc.peer_id);
+                } else {
+					infof("call Remote-RPC %d on peer %d - FAILED", rpc.data.rpc_id, rpc.peer_id);
+                }
             }
         }
 
@@ -132,8 +131,6 @@ TURAG_THREAD_ENTRY static void main_thread_func(void) {
         for (int i = 0; i < BLUETOOTH_NUMBER_OF_DATA_PROVIDERS; ++i) {
             Mutex::Lock lock(data_provider_mutex);
             if (data_providers[i].buffer && data_providers[i].sendRequest) {
-                debugf("DataProvider %d push to %d", i, data_providers[i].destination);
-
                 int encoded_buffer_size = Base64::encodeLength(data_providers[i].buffer_size) + 3;
                 uint8_t buffer[encoded_buffer_size];
                 // start byte
@@ -148,18 +145,16 @@ TURAG_THREAD_ENTRY static void main_thread_func(void) {
                 data_providers[i].sendRequest = false;
                 lock.unlock();
                 // write to bluetooth, we unlock the mutex in case the writing takes a bit more time
-                write(dest, buffer, encoded_buffer_size);
+                if (write(dest, buffer, encoded_buffer_size)) {
+                    debugf("DataProvider %d push to %d", i, dest);
+                } else {
+                    debugf("DataProvider %d push to %d - FAILED", i, dest);
+                }
             }
         }
     }
 
 }
-
-#ifndef TURAG_THREADS_RUN_FOREVER
-void quit(void) {
-     quit_thread = true;
-}
-#endif
 
 void highlevelParseIncomingData(uint8_t sender, uint8_t* buffer, size_t buffer_size) {
     if (sender >= BLUETOOTH_NUMBER_OF_PEERS) return;

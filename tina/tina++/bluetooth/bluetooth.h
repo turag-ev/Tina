@@ -26,10 +26,6 @@ namespace Bluetooth {
 typedef void (*RpcFunction)(uint8_t sender, uint64_t param);
 
 void init(void);
-#ifndef TURAG_THREADS_RUN_FOREVER
- void quit(void);
-#endif
-
 void highlevelParseIncomingData(uint8_t sender, uint8_t* buffer, size_t buffer_size);
 
 bool registerRpcFunction(uint8_t rpc_id, RpcFunction callback);
