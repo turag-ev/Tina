@@ -9,11 +9,24 @@
 
 namespace TURAG {
 
+/// \cond INCLUDE_HELPER
+
+/// \brief Stellt Speicher für Klasse bereit, der entsprechend des Types ausgerichtet ist.
+/// \ingroup Helferklassen
+/// Wird verwendet in \a ArrayBuffer und \a CircularBuffer
 template<typename T>
 struct storage {
   typedef typename std::aligned_storage<sizeof(T), std::alignment_of<T>::value>::type type;
 };
 
+/// \brief Klasse die Speicher für Arrays bereitstellt
+/// \ingroup Helferklassen Container
+/// Es wird kein Konstruktor beim Erstellen von \a array_storage aufgerufen
+///
+/// Es wird auch keine Information gespeichert welche Elemente initalisiert sind.
+/// Dafür ist der Benutzer der Klasse verantwortlich.
+///
+/// Wird verwendet in \a ArrayBuffer und \a CircularBuffer
 template<typename T, size_t N>
 struct array_storage {
 public:
@@ -99,6 +112,8 @@ private:
   T (& ref)[N];
 #endif
 };
+
+/// \endcond
 
 } // namespace TURAG
 

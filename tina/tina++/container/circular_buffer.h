@@ -110,16 +110,24 @@ private:
   std::size_t pos_;
 };
 
+#ifndef DOXYGEN
+
 namespace detail {
 
+#endif
+
+/// \brief Ringbuffer
+/// \ingroup Container
 template<typename T, std::size_t N>
 class CircularBuffer {
   static_assert(!(N & (N-1)), "detail::CircularBuffer capacity must be a power of 2");
 
 public:
+#ifndef DOXYGEN
   // FIXME: create own copy und move constructors for not trivial desctructable types
   COPYABLE(CircularBuffer);
   MOVABLE(CircularBuffer);
+#endif
 
   // types
   typedef T value_type;
@@ -402,10 +410,14 @@ private:
   array_storage<T, N> bytes_;
 };
 
+#ifndef DOXYGEN
+
 } // namespace detail
 
 template<typename T, std::size_t N>
 using CircularBuffer = detail::CircularBuffer<T, next_power_of_two(N+1)>;
+
+#endif
 
 } // namespace TURAG
 

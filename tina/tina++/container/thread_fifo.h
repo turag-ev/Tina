@@ -7,6 +7,8 @@
 
 namespace TURAG {
 	
+/// \brief thread-sicherer FIFO
+/// \ingroup Container
 template <typename T, std::size_t size>
 class ThreadFifo {
 	NOT_COPYABLE(ThreadFifo);

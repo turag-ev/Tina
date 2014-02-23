@@ -5,24 +5,44 @@
 
 namespace TURAG {
 
-/// type for event ids
+/// @defgroup StateMaschines Zustandsmaschinen
+/// @{
+
+/// Typ für Event-IDs
 typedef TuragEventId EventId;
 
-/// function for event processing
+/// Typ für Funktionen, die Events verarbeiten
 typedef TuragEventMethod EventMethod;
 
+/// Typ für Event-spezifische Parameter
 typedef TuragEventArg EventArg;
 
-/// create a unsigned integer with the first three bytes filled with characters
-/// to build a namespace. The last byte can be used for any value >= 0 and < 256.
-/// example:
-/// \code enum { event_x = EventNamespace('X', 'X', 'X') + 100 }; \endcode
+/// \brief Erstellt Namesraum für Event-Ids
+/// Die Funktion erstellt aus drei ASCII-Zeichen einen Namesraum für eine Event-ID
+/// damit jede Event-ID einzigartig ist. Keine Zeichenfolge sollte doppelt verwendet werden.
+///
+/// Es wird ein 32-Bit \a unsigned \a integer erstellt, dabei werden die ersten 3 Byte mit den
+/// ASCII-Zeichen gefüllt werden. Das letzte Byte kann dafür genutzt werden 255
+/// Event-IDs für den Namesraum zu erstellen.
+///
+/// \code{.cpp}
+/// enum {
+///     event_zero = EventNamespace('A', 'B', 'C'), // Event mit Namespace ABC mit Index 0
+///     event_one,  // Event mit Namespace ABC mit Index 1
+/// };
+/// \endcode
+///
+/// \param a ASCII-Zeichen 1
+/// \param b ASCII-Zeichen 2
+/// \param c ASCII-Zeichen 3
+/// \returns Event-ID-Namesraum (als erste ID in Namesraum verwendbar)
 constexpr
-int32_t EventNamespace(char a, char b, char c) {
+EventId EventNamespace(char a, char b, char c) {
   return (a << 24) | (b << 16) | (c << 8);
 }
 
-} // namespace TURAG
+/// @}
 
+} // namespace TURAG
 
 #endif // TINAPP_STATEMACHINE_TYPES_H

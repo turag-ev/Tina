@@ -20,6 +20,9 @@
 
 namespace TURAG {
 
+/// @defgroup StateMaschines Zustandsmaschinen
+/// @{
+
 ////////////////////////////////////////////////////////////////////////////////
 //     EventClass
 ////////////////////////////////////////////////////////////////////////////////
@@ -264,6 +267,8 @@ private:
   bool loadEvent(Event* event);
   SystemTime getTimeToNextEvent() const;
 };
+
+/// @}
 
 } // namespace TURAG
 
