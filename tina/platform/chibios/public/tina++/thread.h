@@ -67,6 +67,11 @@ public:
   static _always_inline void setName(const char *name) {
     chRegSetThreadName(name);
   }
+  
+  _always_inline
+  bool shouldTerminate() {
+    return false;
+  }
 
 private:
   Thread *thread_;

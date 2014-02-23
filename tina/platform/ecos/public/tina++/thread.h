@@ -57,6 +57,11 @@ public:
   }
 
   static _always_inline void setName(const char *) { }
+  
+  _always_inline
+  bool shouldTerminate() {
+    return false;
+  }
 
 private:
   cyg_thread thread_;
