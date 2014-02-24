@@ -1,5 +1,5 @@
 /**
- * \file debug.h
+ * \file tina/debug.h
  * \author Richard Liebscher <richard.liebscher@googlemail.com>
  * \date 2012
  *

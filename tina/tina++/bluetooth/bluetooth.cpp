@@ -75,7 +75,7 @@ static DataProvider data_providers[BLUETOOTH_NUMBER_OF_DATA_PROVIDERS];
 static Mutex data_provider_mutex;
 static DataSink data_sinks[BLUETOOTH_NUMBER_OF_DATA_SINKS];
 static Mutex data_sink_mutex;
-TURAG_THREAD_ENTRY static void main_thread_func(void);
+static void main_thread_func(void);
 
 static ThreadFifo<Rpc_t, 32> rpc_fifo;
 
@@ -88,18 +88,14 @@ void init(void) {
     bluetooth_main_thread.start(BLUETOOTH_SEND_THREAD_PRIORITY, main_thread_func);
 }
 
-TURAG_THREAD_ENTRY static void main_thread_func(void) {
+static void main_thread_func(void) {
     Thread<>::setName("bluetooth-high");
 
     info("Bluetooth-High-Level thread started");
 
     Rpc_t rpc;
 
-#ifdef TURAG_THREADS_RUN_FOREVER
-    while(1) {
-#else
     while(!bluetooth_main_thread.shouldTerminate()) {
-#endif
         if (rpc_fifo.fetch(&rpc, ms_to_ticks(BLUETOOTH_SEND_THREAD_RPC_WAIT_MS))) {
             if (rpc.received) {
                 Mutex::Lock lock(rpc_mutex);
@@ -120,7 +116,7 @@ TURAG_THREAD_ENTRY static void main_thread_func(void) {
                 // end byte
                 buffer[buffer_size - 1] = 3;
                 if (write(rpc.peer_id, buffer, buffer_size)) {
-					infof("call Remote-RPC %d on peer %d", rpc.data.rpc_id, rpc.peer_id);
+					debugf("call Remote-RPC %d on peer %d", rpc.data.rpc_id, rpc.peer_id);
                 } else {
 					infof("call Remote-RPC %d on peer %d - FAILED", rpc.data.rpc_id, rpc.peer_id);
                 }
@@ -148,7 +144,7 @@ TURAG_THREAD_ENTRY static void main_thread_func(void) {
                 if (write(dest, buffer, encoded_buffer_size)) {
                     debugf("DataProvider %d push to %d", i, dest);
                 } else {
-                    debugf("DataProvider %d push to %d - FAILED", i, dest);
+                    infof("DataProvider %d push to %d - FAILED", i, dest);
                 }
             }
         }

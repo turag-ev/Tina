@@ -1,5 +1,5 @@
 /**
- * \file statemachine.h
+ * \file tina++/im/statemachine.h
  * \author Julius Hoffmann
  * \author Martin Oemus <martin@oemus.net>
  * \date 02.2014

@@ -1,5 +1,5 @@
 /**
- * \file types.h
+ * \file tina/helper/types.h
  * \author Richard Liebscher <richard.liebscher@googlemail.com>
  * \date 2011,2012
  *

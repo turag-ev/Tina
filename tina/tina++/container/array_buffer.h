@@ -53,7 +53,7 @@ struct _ArrayBufferHelper {
  * wird abgefangen und eine Fehlermeldung ausgegeben. Das Element was hinzugefügt werden soll wird ignoiert.
  * Deshalb die Größe entsprechend groß wählen, lieber mehr als zu wenig.
  *
- * Das hinzufügen am Anfang mit \a push_front ist deutlich langsamer als der Hinzufügen
+ * Das hinzufügen am Anfang mit \a push_front ist deutlich langsamer als das Hinzufügen
  * am Ende über \a push_back, da alle Elemente verschoben werden müssen. Gleiches gilt
  * für emplace_front, pop_front. Werden diese Funktionen oft aufgerufen, empfiehlt
  * es sich \a CircularBuffer zu verwenden.

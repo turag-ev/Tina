@@ -2,8 +2,14 @@
 #define TINA_H
 
 /**
- * \mainpage
- *
+ * \mainpage Introduction
+ * 
+ * TInA is repository of reusable und modularized source code 
+ * for development in the TURAG.
+ * 
+ * 
+ * 
+ * 
  */
 
 

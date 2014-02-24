@@ -1,5 +1,5 @@
 /**
- * \file eventqueue.h
+ * \file tina++/statemachine/eventqueue.h
  * \author Richard Liebscher <richard.liebscher@googlemail.com>
  * \date 2012
  *

@@ -74,7 +74,8 @@ private:
 
 /// create a bitmask
 /// \param bits number of bits
-/// \example create_bitmask(4) gives 00001111b = 0Fh
+/// example: 
+/// create_bitmask(4) gives 00001111b = 0Fh
 constexpr
 inline unsigned create_bitmask(size_t bits) {
   return static_cast<unsigned>((1<<bits)-1);

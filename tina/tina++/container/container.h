@@ -2,7 +2,7 @@
 #define CONTAINER_H
 
 /**
- * \defgroup Container
+ * \defgroup Container Container
  *
  * \brief Stellt Datenstrukturen für C++ bereit, die kein Heap (new) benötigen
  *

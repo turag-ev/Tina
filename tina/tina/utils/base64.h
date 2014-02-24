@@ -1,6 +1,6 @@
 /**
  *  @brief		Base64 encoding/decoding routines
- *  @file		base64.h
+ *  @file		tina/utils/base64.h
  *  @date		02.12.2013
  *  @author		Martin Oemus <martin@oemus.net>
  *
