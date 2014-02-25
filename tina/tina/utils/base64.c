@@ -1,11 +1,3 @@
-/**
- *  @brief		Base64 encoding/decoding routines
- *  @file		base64.c
- *  @date		02.12.2013
- *  @author		Martin Oemus <martin@oemus.net>
- *
- */
-
 
 #include "base64.h"
 

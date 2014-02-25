@@ -1059,7 +1059,7 @@ div.contents > * {
 	max-width: 800px;
 }
 
-div.contents div.fragment {
+div.contents div.fragment, div.contents hr {
 	max-width: 100%;
 }
 

@@ -10,6 +10,13 @@
  * 
  * 
  * 
+ * 
+ * 
+ * @namespace TURAG
+ * @brief Standard namespace for TInA.
+ * 
+ * @defgroup utilities Utilities
+ * Misc. useful tools.
  */
 
 

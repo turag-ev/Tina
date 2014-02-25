@@ -1,3 +1,12 @@
+/**
+ *  @brief		C++ interface to base64 encoder/decoder module
+ *  @file		tina++/utils/base64.h
+ *  @date		02.12.2013
+ *  @author		Martin Oemus <martin@oemus.net>
+ *
+ */
+
+
 #ifndef TINAPP_UTILS_BASE64_H
 #define TINAPP_UTILS_BASE64_H
 
@@ -7,23 +16,31 @@
 
 
 namespace TURAG {
-namespace Base64 {
-
-// These functions do not comply with any RFC as it does not
-// produce any trailing `=' padding characters!!!
+	
+/** 
+ * @ingroup base64
+ *@{
+ */
 
 /**
- * Calculates length of base64 encoded data
+ * @brief C++-Interface for base64 utilities module.
+ * @copydetails base64
+ */
+namespace Base64 {
+
+
+/**
+ * @brief Calculates length of base64 encoded data.
  * @param[in] len Length of data that is to be encoded
  * @return length of base64 encoded data
  */
 _always_inline
-size_t encodeLength(size_t len) {
-    return turag_base64_encode_len(len);
+constexpr size_t encodeLength(size_t len) {
+    return (len * 4 + 2) / 3;
 }
 
 /**
- * Calculates length of base64 encoded data
+ * @brief Calculates length of base64 encoded data.
  * @param[in] data data that is to be encoded
  * @return length of base64 encoded data
  */
@@ -33,7 +50,7 @@ constexpr size_t encodeLength(const T& data) {
 }
 
 /**
- * Encodes data to base64 encoded data
+ * @brief Encodes data to base64 encoded data.
  * @param[in] data data to encode
  * @param[in] len length of data
  * @param[out] encoded buffer holding base64 encoded data
@@ -45,7 +62,7 @@ int encode(const uint8_t *data, size_t len, uint8_t *encoded) {
 }
 
 /**
- * Encodes data to base64 encoded data
+ * @brief Encodes data to base64 encoded data.
  * @param[in] data data to encode
  * @param[out] encoded buffer holding base64 encoded data
  * @return length of base64 encoded data
@@ -57,30 +74,21 @@ int encode(const T& data, uint8_t *encoded) {
 
 
 /**
- * Calculates length of decoded data.
+ * @brief Calculates length of decoded data.
  * @param[in] len length of base64 encoded data
  * @return length of decoded data
  */
 _always_inline
-size_t decodeLength(size_t len) {
-    return turag_base64_decode_len(len);
+constexpr size_t decodeLength(size_t len) {
+    return len * 3 / 4;
 }
 
-/**
- * Calculates length of decoded data.
- * @param[in] data base64 encoded data
- * @return length of decoded data
- */
-template<typename T> _always_inline
-size_t decodeLength(const T& data) {
-    return sizeof(data) * 3 / 4;
-}
 
 /**
- * Decodes base64 encoded data
- * @param[in] bufcoded base64 encoded data
+ * @brief Decodes base64 encoded data.
+ * @param[in] encoded base64 encoded data
  * @param[in] len length of base64 encoded data
- * @param[out] bufplain buffer holding decoded data
+ * @param[out] data buffer holding decoded data
  * @return Length of decoded data
  */
 _always_inline
@@ -91,6 +99,11 @@ int decode(const uint8_t *encoded, size_t len, uint8_t *data) {
 
 
 } // namespace Base64
+
+/** 
+ * @}
+ */
+
 } // namespace TURAG
 
 
