@@ -177,7 +177,7 @@ void highlevelParseIncomingData(uint8_t sender, uint8_t* buffer, size_t buffer_s
                     rpc.peer_id = sender;
                     rpc.received = true;
                     rpc_fifo.post(rpc);
-                    infof("RPC %d recv from %d --> queued for exec", decode_buffer[0], sender);
+                    debugf("RPC %d recv from %d --> queued for exec", decode_buffer[0], sender);
                 }
             } else {
                 // data for DataSink
