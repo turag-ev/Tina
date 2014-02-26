@@ -118,7 +118,7 @@ static void main_thread_func(void) {
                 if (write(rpc.peer_id, buffer, buffer_size)) {
 					debugf("call Remote-RPC %d on peer %d", rpc.data.rpc_id, rpc.peer_id);
                 } else {
-					infof("call Remote-RPC %d on peer %d - FAILED", rpc.data.rpc_id, rpc.peer_id);
+                    infof("call Remote-RPC %d on peer %d - FAILED", rpc.data.rpc_id, rpc.peer_id);
                 }
             }
         }
@@ -144,7 +144,7 @@ static void main_thread_func(void) {
                 if (write(dest, buffer, encoded_buffer_size)) {
                     debugf("DataProvider %d push to %d", i, dest);
                 } else {
-                    infof("DataProvider %d push to %d - FAILED", i, dest);
+                    debugf("DataProvider %d push to %d - FAILED", i, dest);
                 }
             }
         }
