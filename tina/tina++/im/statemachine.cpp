@@ -12,31 +12,13 @@ namespace IM {
 Mutex interface_mutex;
 
 
-// -------------------------------------------------------------------
-// -------------------------------------------------------------------
-// ---- State classes
-// -------------------------------------------------------------------
-// -------------------------------------------------------------------
-State* DelayState::transition_function(void) {
-    if (myDelay <= ms_to_ticks(2)) {
-        return myNextState;
-    } else if (SystemTime::now() - myStartTime < myDelay) {
-        return this;
-    } else {
-        return myNextState;
-    }
+namespace {
+
+RedoState redo_state;
+FinishedState finished_state;
+
+
 }
-
-State* ImmediateAbort::transition_function(void) {
-    return Statemachine::finished;
-}
-
-
-static SpecialState redo_state;
-static SpecialState finished_state;
-
-static ImmediateAbort immediate_abort;
-
 
 // -------------------------------------------------------------------
 // -------------------------------------------------------------------
@@ -52,8 +34,6 @@ EventQueue* Statemachine::defaultEventqueue_ = nullptr;
 State* const Statemachine::restartState = &redo_state;
 State* const Statemachine::finished = &finished_state;
 State* const Statemachine::error = nullptr;
-
-State* const Statemachine::ImmediateAbort = &immediate_abort;
 
 
 Statemachine::Statemachine(
@@ -133,7 +113,7 @@ void Statemachine::stop(void) {
 bool Statemachine::sendSignal(int32_t signal) {
     Mutex::Lock lock(interface_mutex);
 
-    if (pcurrent_state) {
+    if (isRunningInternal()) {
         hasSignal_ = true;
         signal_ = signal;
         return true;
@@ -238,7 +218,7 @@ void Statemachine::doStatemachineProcessing(void) {
 
         // execute appropriate actions, depending on new state
         // don't do anything, if state == sm->pcurrent_state
-        if (state == nullptr) {
+        if (state == Statemachine::error) {
             sm->removeFromActiveList();
             sm->status_ = Status::stopped_on_error;
             sm->emitEvent(sm->myEventOnErrorShutdown);
@@ -285,9 +265,11 @@ bool Statemachine::change_state(State* next_state, ScopedLock<Mutex> *lock) {
         // before calling the state function, we forward argument
         // and eventqueue arguments into the state
         // this enables unlocked access to this data
-        pcurrent_state->setEventQueue(eventqueue_);
-        pcurrent_state->setArgument(argument_);
-        pcurrent_state->clearSignal();
+        next_state->setEventQueue(eventqueue_);
+        next_state->setArgument(argument_);
+        next_state->clearSignal();
+        next_state->setStarttime(SystemTime::now());
+        next_state->setStatemachineStarttime(startTime);
 
         // now we can safely unlock the mutex. This is good because
         // we don't know anything about this function and it could

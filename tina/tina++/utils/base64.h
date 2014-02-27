@@ -18,7 +18,7 @@
 namespace TURAG {
 	
 /** 
- * @ingroup base64
+ * @addtogroup base64
  *@{
  */
 

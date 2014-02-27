@@ -33,7 +33,7 @@ extern "C" {
 #endif
 
 /**
- * @ingroup base64
+ * @addtogroup base64
  * @{
  */
  
