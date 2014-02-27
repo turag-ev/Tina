@@ -49,8 +49,8 @@ static const EventClass event_class;
 template<EventId id>
 const EventClass UnnamedEventClass<id>::event_class("Unbekannt", id);
 
-#define DEFINE_EVENT_CLASS(name,event) static const EventClass name(#event, event)
-#define DEFINE_EVENT_CLASS_EXTRA(name,event,msg) static const EventClass name(#event ": " msg, event)
+#define DEFINE_EVENT_CLASS(name,event) const EventClass name(#event, event)
+#define DEFINE_EVENT_CLASS_EXTRA(name,event,msg) const EventClass name(#event ": " msg, event)
 
 ////////////////////////////////////////////////////////////////////////////////
 //     Event
