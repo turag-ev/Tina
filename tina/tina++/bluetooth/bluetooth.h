@@ -25,6 +25,18 @@ namespace Bluetooth {
 	
 typedef void (*RpcFunction)(uint8_t sender, uint64_t param);
 
+template <typename T>
+struct SinkData {
+    uint8_t id;
+    T data;
+} _packed;
+
+template <typename T>
+struct PushData {
+    uint8_t id;
+    T data;
+} _packed;
+
 void init(void);
 void highlevelParseIncomingData(uint8_t sender, uint8_t* buffer, size_t buffer_size);
 
@@ -34,7 +46,7 @@ bool callRpc(uint8_t destination, uint8_t rpc_id, uint64_t param);
 bool addDataSink(uint8_t data_sink_id, uint8_t* storage_buffer, size_t length);
 bool getData(uint8_t data_sink_id, uint8_t* buffer, size_t length);
 bool addDataProvider(uint8_t data_provider_id, uint8_t* storage_buffer, size_t length, uint8_t destination);
-bool pushData(uint8_t data_provider_id, uint8_t* data, size_t length);
+bool pushData(uint8_t data_provider_id, const uint8_t* data, size_t length);
 
 /**
  * Configures a data sink with the given ID. You need to supply a pointer to some struct
@@ -43,7 +55,7 @@ bool pushData(uint8_t data_provider_id, uint8_t* data, size_t length);
  * @param[in] storage_buffer
  * @return false if index was invalid, true otherwise
  */
-template<typename T> _always_inline bool addDataSink(uint8_t data_sink_id, T* storage_buffer) {
+template<typename T> _always_inline bool addDataSink(uint8_t data_sink_id, SinkData<T>* storage_buffer) {
     return addDataSink(data_sink_id, reinterpret_cast<uint8_t*>(storage_buffer), sizeof(*storage_buffer));
 }
 
@@ -53,7 +65,7 @@ template<typename T> _always_inline bool addDataSink(uint8_t data_sink_id, T* st
  * @param[out] buffer
  * @return false if index was invalid, true otherwise
  */
-template<typename T> _always_inline bool getData(uint8_t data_sink_id, T* buffer) {
+template<typename T> _always_inline bool getData(uint8_t data_sink_id, SinkData<T>* buffer) {
     return getData(data_sink_id, reinterpret_cast<uint8_t*>(buffer), sizeof(*buffer));
 }
 
@@ -66,7 +78,7 @@ template<typename T> _always_inline bool getData(uint8_t data_sink_id, T* buffer
  * @param[in] destination
  * @return false if index was invalid, true otherwise
  */
-template<typename T> _always_inline bool addDataProvider(uint8_t data_provider_id, T* storage_buffer, uint8_t destination) {
+template<typename T> _always_inline bool addDataProvider(uint8_t data_provider_id, PushData<T>* storage_buffer, uint8_t destination) {
     return addDataProvider(data_provider_id, reinterpret_cast<uint8_t*>(storage_buffer), sizeof(*storage_buffer), destination);
 }
 
@@ -76,8 +88,8 @@ template<typename T> _always_inline bool addDataProvider(uint8_t data_provider_i
  * @param[in] data
  * @return false if index was invalid, true otherwise
  */
-template<typename T> _always_inline bool pushData(uint8_t data_provider_id, T* data) {
-    return pushData(data_provider_id, reinterpret_cast<uint8_t*>(data), sizeof(*data));
+template<typename T> _always_inline bool pushData(uint8_t data_provider_id, const PushData<T>& data) {
+    return pushData(data_provider_id, reinterpret_cast<const uint8_t*>(&data), sizeof(data));
 }
 
 

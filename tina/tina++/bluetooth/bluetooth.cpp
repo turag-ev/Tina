@@ -103,7 +103,7 @@ static void main_thread_func(void) {
                 lock.unlock();
 
                 if (callback) {
-                    infof("call RPC %d", rpc.data.rpc_id);
+                    debugf("call RPC %d", rpc.data.rpc_id);
                     (*callback)(rpc.peer_id, rpc.data.param);
                 }
             } else {
@@ -116,9 +116,9 @@ static void main_thread_func(void) {
                 // end byte
                 buffer[buffer_size - 1] = 3;
                 if (write(rpc.peer_id, buffer, buffer_size)) {
-					debugf("call Remote-RPC %d on peer %d", rpc.data.rpc_id, rpc.peer_id);
+                    debugf("call Remote-RPC %d on peer %d", rpc.data.rpc_id, rpc.peer_id);
                 } else {
-                    infof("call Remote-RPC %d on peer %d - FAILED", rpc.data.rpc_id, rpc.peer_id);
+                    warningf("call Remote-RPC %d on peer %d - FAILED", rpc.data.rpc_id, rpc.peer_id);
                 }
             }
         }
@@ -127,14 +127,14 @@ static void main_thread_func(void) {
         for (int i = 0; i < BLUETOOTH_NUMBER_OF_DATA_PROVIDERS; ++i) {
             Mutex::Lock lock(data_provider_mutex);
             if (data_providers[i].buffer && data_providers[i].sendRequest) {
-                int encoded_buffer_size = Base64::encodeLength(data_providers[i].buffer_size) + 3;
+                int encoded_buffer_size = Base64::encodeLength(data_providers[i].buffer_size) + 2;
                 uint8_t buffer[encoded_buffer_size];
                 // start byte
                 buffer[0] = 2;
                 // ID
-                buffer[1] = i + 64;
+                data_providers[i].buffer[0] = i + 64;
                 // data
-                Base64::encode(data_providers[i].buffer, data_providers[i].buffer_size, buffer + 2);
+                Base64::encode(data_providers[i].buffer, data_providers[i].buffer_size, buffer + 1);
                 // end byte
                 buffer[encoded_buffer_size - 1] = 3;
                 uint8_t dest = data_providers[i].destination;
@@ -144,7 +144,7 @@ static void main_thread_func(void) {
                 if (write(dest, buffer, encoded_buffer_size)) {
                     debugf("DataProvider %d push to %d", i, dest);
                 } else {
-                    debugf("DataProvider %d push to %d - FAILED", i, dest);
+                    warningf("DataProvider %d push to %d - FAILED", i, dest);
                 }
             }
         }
@@ -184,9 +184,9 @@ void highlevelParseIncomingData(uint8_t sender, uint8_t* buffer, size_t buffer_s
                 uint8_t data_sink_id = decode_buffer[0] - 64;
                 if (data_sink_id < BLUETOOTH_NUMBER_OF_DATA_SINKS) {
                     Mutex::Lock lock(data_sink_mutex);
-                    if (data_sinks[data_sink_id].buffer && (decoded_size - 1) == data_sinks[data_sink_id].buffer_size && decoded_size > 1) {
-                        infof("DataSink %d recv data from %d", data_sink_id, sender);
-                        std::memcpy(data_sinks[data_sink_id].buffer, &decode_buffer[1], decoded_size - 1);
+                    if (data_sinks[data_sink_id].buffer && decoded_size == data_sinks[data_sink_id].buffer_size && decoded_size > 1) {
+                        debugf("DataSink %d recv data from %d", data_sink_id, sender);
+                        std::memcpy(data_sinks[data_sink_id].buffer, &decode_buffer, decoded_size);
                     }
                 } else {
                     criticalf("DataSink %d recv data from %d -> ID invalid!", data_sink_id, sender);
@@ -236,7 +236,7 @@ bool addDataSink(uint8_t data_sink_id, uint8_t* storage_buffer, size_t length) {
     if (data_sink_id >= BLUETOOTH_NUMBER_OF_DATA_SINKS || !storage_buffer) {
         error("invalid DataSink ID or storage pointer zero");
         return false;
-	} else if (length > 92) {
+    } else if (length > 92 + 1) {
 		error("DataSinks can not hold data bigger than 92 byte");
 		return false;
     } else {
@@ -269,7 +269,7 @@ bool addDataProvider(uint8_t data_provider_id, uint8_t* storage_buffer, size_t l
     if (data_provider_id >= BLUETOOTH_NUMBER_OF_DATA_PROVIDERS || !storage_buffer) {
         error("invalid DataProvider ID or storage pointer zero");
         return false;
-	} else if (length > 92) {
+    } else if (length > 92 + 1) {
 		error("DataProvider can not hold data bigger than 92 byte");
 		return false;
 	} else if (destination > BLUETOOTH_NUMBER_OF_PEERS) {
@@ -285,7 +285,7 @@ bool addDataProvider(uint8_t data_provider_id, uint8_t* storage_buffer, size_t l
     }
 }
 
-bool pushData(uint8_t data_provider_id, uint8_t* data, size_t length) {
+bool pushData(uint8_t data_provider_id, const uint8_t* data, size_t length) {
     if (data_provider_id >= BLUETOOTH_NUMBER_OF_DATA_PROVIDERS || !data) {
         error("invalid DataProvider ID or data pointer zero");
         return false;
