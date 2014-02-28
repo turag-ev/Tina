@@ -42,7 +42,7 @@
  * can be part of the stateflow of another one.
  *  - When started, a statemachine can get an argument, which is valid as long
  * as the execution lasts and is available in all associated states.
- *  - A state can wait for a speficic external signal. Signals are only valid
+ *  - A state can wait for a specific external signal. Signals are only valid
  * in the transition-function of the currently active state.
  *
  * \subsection defstatemachines Creating statemachines
