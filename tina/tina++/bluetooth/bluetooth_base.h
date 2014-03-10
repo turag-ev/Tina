@@ -1,5 +1,5 @@
 /*!
- * \file tina++/bluetooth/bluetooth.h
+ * \file tina++/bluetooth/bluetooth_base.h
  * \author Martin Oemus <martin@oemus.net>
  * \date March 2013
  *
@@ -7,13 +7,17 @@
  */
 
 
-#ifndef SYSTEMCONTROL_COMMON_BLUETOOTH_H
-#define SYSTEMCONTROL_COMMON_BLUETOOTH_H
+#ifndef TINAPP_BLUETOOTH_BLUETOOTHBASE_H
+#define TINAPP_BLUETOOTH_BLUETOOTHBASE_H
 
 #include <tina++/tina.h>
 #include <tina/config.h>
 #include <tina/bluetooth_config.h>
 #include <tina++/thread.h>
+#include <atomic>
+#include <tina++/container/thread_fifo.h>
+#include <array>
+#include <tina++/container/array_buffer.h>
 
 // -------------------------------------------------------------------
 // High-Level Functions
@@ -248,8 +252,9 @@ public:
      */
     static BluetoothBase* get(void) { return nullptr; }
 
-
 protected:
+    BluetoothBase(void) :
+        rpc_functions{0} { }
 
     /*!
      * \brief Parses incoming raw data.
@@ -266,8 +271,6 @@ protected:
      * \brief Low level initializations.
      * \details This function is called by init(). It is supposed to do all the steps
      * necessary to get the bluetooth hardware up and running.
-     * \note This function is part of the hardware abstraction and needs to be implemented
-     * separately.
      */
     // this function should be private - it's only protected to get it into the doxygen docs
     virtual void lowlevelInit(void) = 0;
@@ -287,8 +290,6 @@ protected:
      * to transmit data and return false or in other words: this function should only
      * transmit data, if getConnectionStatus returns Status::connected.
      *
-     * \note This function is part of the hardware abstraction and needs to be implemented
-     * separately.
      */
     // this function should be private - it's only protected to get it into the doxygen docs
     virtual bool write(uint8_t peer_id, uint8_t* buffer, size_t buffer_size) = 0;
@@ -298,8 +299,6 @@ protected:
      * \brief Returns the physical connection status of specified peer.
      * \param[in] peer_id
      * \return Connection status.
-     * \note This function is part of the hardware abstraction and needs to be implemented
-     * separately.
      * \note This function needs to be thread-safe.
      */
     // this function should be private - it's only protected to get it into the doxygen docs
@@ -314,7 +313,6 @@ protected:
      * to the peer. When called with false, it is allowed to release this connection yet not obligated.
      * \note This function is part of the hardware abstraction and needs to be implemented
      * separately.
-     * \note This function needs to be thread-safe.
      */
     // this function should be private - it's only protected to get it into the doxygen docs
     virtual void setPeerEnabledLowlevel(uint8_t peer_id, bool enabled) = 0;
@@ -374,7 +372,7 @@ private:
             buffer_size(buf_size) { }
     };
 
-    RpcFunction rpc_functions[BLUETOOTH_NUMBER_OF_RPCS] = {0};
+    RpcFunction rpc_functions[BLUETOOTH_NUMBER_OF_RPCS];
     Mutex rpc_mutex;
 
     ArrayBuffer<DataProvider, BLUETOOTH_NUMBER_OF_DATA_PROVIDERS> data_providers;
@@ -398,13 +396,16 @@ private:
 
     void main_thread_func(void);
 
+    static BluetoothBase* instance_;
+    static void thread_entry(void);
 };
 
 ///@}
+
 
 } // namespace TURAG
 
 
 
 
-#endif // SYSTEMCONTROL_COMMON_BLUETOOTH_H
+#endif // TINAPP_BLUETOOTH_BLUETOOTHBASE_H

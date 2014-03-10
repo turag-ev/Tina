@@ -3,40 +3,40 @@
 
 #include <tina++/debug.h>
 
-#include "bluetooth.h" 
+#include "bluetooth_base.h"
 #include <tina++/tina.h>
 #include <tina++/container/thread_fifo.h>
-#include <tina++/container/array_buffer.h>
 #include <tina++/utils/base64.h>
 #include <cstring>
 #include <array>
-#include <atomic>
 #include <algorithm>
 
 namespace TURAG {
 
 
-// static variables
-namespace {
+BluetoothBase* BluetoothBase::instance_ = nullptr;
 
 
-} // namespace
+// we need this dirty function because we can't start a thread
+// with a memeber function pointer.
+void BluetoothBase::thread_entry(void) {
+    if (instance_) {
+        instance_->main_thread_func();
+    }
+}
 
-
-Thread<BLUETOOTH_SEND_THREAD_STACK_SIZE> Bluetooth::bluetooth_main_thread;
-
-
-void Bluetooth::init(void) {
+void BluetoothBase::init(void) {
     for (int i = 0; i < BLUETOOTH_NUMBER_OF_PEERS; ++i) {
         peersEnabled[i].store(false);
     }
 
     lowlevelInit();
 
-    bluetooth_main_thread.start(BLUETOOTH_THREAD_PRIORITY, main_thread_func);
+    instance_ = this;
+    bluetooth_main_thread.start(BLUETOOTH_THREAD_PRIORITY, thread_entry);
 }
 
-void Bluetooth::main_thread_func(void) {
+void BluetoothBase::main_thread_func(void) {
     Thread<>::setName("bluetooth-high");
 
     info("Bluetooth-High-Level thread started");
@@ -72,7 +72,7 @@ void Bluetooth::main_thread_func(void) {
         }
 
         // check DataProvider
-        for (const DataProvider& provider: data_providers) {
+        for (DataProvider& provider: data_providers) {
             Mutex::Lock lock(data_provider_mutex);
             if (provider.sendRequest) {
                 int encoded_buffer_size = Base64::encodeLength(provider.buffer_size) + 2;
@@ -101,7 +101,7 @@ void Bluetooth::main_thread_func(void) {
 
 }
 
-void Bluetooth::highlevelParseIncomingData(uint8_t sender, uint8_t* buffer, size_t buffer_size) {
+void BluetoothBase::highlevelParseIncomingData(uint8_t sender, uint8_t* buffer, size_t buffer_size) {
     if (sender >= BLUETOOTH_NUMBER_OF_PEERS) return;
 
     for (unsigned i = 0; i < buffer_size; ++i) {
@@ -154,7 +154,7 @@ void Bluetooth::highlevelParseIncomingData(uint8_t sender, uint8_t* buffer, size
 
 
 
-bool Bluetooth::registerRpcFunction(uint8_t rpc_id, RpcFunction callback) {
+bool BluetoothBase::registerRpcFunction(uint8_t rpc_id, RpcFunction callback) {
     if (rpc_id < BLUETOOTH_NUMBER_OF_RPCS) {
         Mutex::Lock lock(rpc_mutex);
         rpc_functions[rpc_id] = callback;
@@ -166,7 +166,7 @@ bool Bluetooth::registerRpcFunction(uint8_t rpc_id, RpcFunction callback) {
 }
 
 
-bool Bluetooth::callRpc(uint8_t destination, uint8_t rpc_id, uint64_t param) {
+bool BluetoothBase::callRpc(uint8_t destination, uint8_t rpc_id, uint64_t param) {
     if (destination < BLUETOOTH_NUMBER_OF_PEERS) {
         Rpc_t rpc;
         rpc.data.rpc_id = rpc_id;
@@ -181,7 +181,7 @@ bool Bluetooth::callRpc(uint8_t destination, uint8_t rpc_id, uint64_t param) {
     }
 }
 
-bool Bluetooth::addDataSink(uint8_t data_sink_id, uint8_t* storage_buffer, size_t length) {
+bool BluetoothBase::addDataSink(uint8_t data_sink_id, uint8_t* storage_buffer, size_t length) {
     if (data_sink_id >= BLUETOOTH_NUMBER_OF_DATA_SINKS || !storage_buffer) {
         error("invalid DataSink ID or storage pointer zero");
         return false;
@@ -198,7 +198,7 @@ bool Bluetooth::addDataSink(uint8_t data_sink_id, uint8_t* storage_buffer, size_
     }
 }
 
-bool Bluetooth::getData(uint8_t data_sink_id, uint8_t* buffer, size_t length) {
+bool BluetoothBase::getData(uint8_t data_sink_id, uint8_t* buffer, size_t length) {
     if (data_sink_id >= BLUETOOTH_NUMBER_OF_DATA_SINKS || !buffer) {
         error("invalid DataSink ID or buffer pointer zero");
         return false;
@@ -214,7 +214,7 @@ bool Bluetooth::getData(uint8_t data_sink_id, uint8_t* buffer, size_t length) {
 }
 
 
-bool Bluetooth::addDataProvider(uint8_t destination, uint8_t data_provider_id, uint8_t* storage_buffer, size_t length) {
+bool BluetoothBase::addDataProvider(uint8_t destination, uint8_t data_provider_id, uint8_t* storage_buffer, size_t length) {
     if (!storage_buffer) {
         error("storage pointer zero");
         return false;
@@ -226,7 +226,7 @@ bool Bluetooth::addDataProvider(uint8_t destination, uint8_t data_provider_id, u
         return false;
     } else {
         Mutex::Lock lock(data_provider_mutex);
-        ArrayBuffer<DataProvider>::iterator provider = std::find_if(data_providers.begin(), data_providers.end(), [] (const DataProvider& provider) { return provider.destination == destination && provider.id == id; });
+        ArrayBuffer<DataProvider, BLUETOOTH_NUMBER_OF_DATA_PROVIDERS>::iterator provider = std::find_if(data_providers.begin(), data_providers.end(), [&] (const DataProvider& provider) { return provider.destination == destination && provider.id == data_provider_id; });
         if (provider != data_providers.end()) {
             warningf("dataprovider %d was overwritten", data_provider_id);
             provider->buffer = storage_buffer;
@@ -240,8 +240,8 @@ bool Bluetooth::addDataProvider(uint8_t destination, uint8_t data_provider_id, u
     }
 }
 
-bool Bluetooth::pushData(uint8_t destination, uint8_t data_provider_id, const uint8_t* data, size_t length) {
-    ArrayBuffer<DataProvider>::iterator provider = std::find_if(data_providers.begin(), data_providers.end(), [] (const DataProvider& provider) { return provider.destination == destination && provider.id == id; });
+bool BluetoothBase::pushData(uint8_t destination, uint8_t data_provider_id, const uint8_t* data, size_t length) {
+    ArrayBuffer<DataProvider, BLUETOOTH_NUMBER_OF_DATA_PROVIDERS>::iterator provider = std::find_if(data_providers.begin(), data_providers.end(), [&] (const DataProvider& provider) { return provider.destination == destination && provider.id == data_provider_id; });
     if (provider == data_providers.end()) {
         error("specified data provider couldn't be found");
         return false;
@@ -258,8 +258,8 @@ bool Bluetooth::pushData(uint8_t destination, uint8_t data_provider_id, const ui
 }
 
 
-bool Bluetooth::pushData(uint8_t destination, uint8_t data_provider_id) {
-    ArrayBuffer<DataProvider>::iterator provider = std::find_if(data_providers.begin(), data_providers.end(), [] (const DataProvider& provider) { return provider.destination == destination && provider.id == id; });
+bool BluetoothBase::pushData(uint8_t destination, uint8_t data_provider_id) {
+    ArrayBuffer<DataProvider, BLUETOOTH_NUMBER_OF_DATA_PROVIDERS>::iterator provider = std::find_if(data_providers.begin(), data_providers.end(), [&] (const DataProvider& provider) { return provider.destination == destination && provider.id == data_provider_id; });
     if (provider == data_providers.end()) {
         error("specified data provider couldn't be found");
         return false;
@@ -271,18 +271,18 @@ bool Bluetooth::pushData(uint8_t destination, uint8_t data_provider_id) {
 }
 
 
-Bluetooth::Status Bluetooth::getConnectionStatus(uint8_t peer_id) {
+BluetoothBase::Status BluetoothBase::getConnectionStatus(uint8_t peer_id) {
     if (peer_id >= BLUETOOTH_NUMBER_OF_PEERS) return Status::disconnected;
 
     if (peersEnabled[peer_id].load()) {
         return getConnectionStatusLowlevel(peer_id);
     } else {
-        Status::disconnected;
+        return Status::disconnected;
     }
 }
 
 
-void Bluetooth::setPeerEnabled(uint8_t peer_id, bool enabled) {
+void BluetoothBase::setPeerEnabled(uint8_t peer_id, bool enabled) {
     if (peer_id >= BLUETOOTH_NUMBER_OF_PEERS) return;
 
     peersEnabled[peer_id].store(enabled);
@@ -291,5 +291,4 @@ void Bluetooth::setPeerEnabled(uint8_t peer_id, bool enabled) {
 
 
 
-} // namespace Bluetooth
 } // namespace TURAG
