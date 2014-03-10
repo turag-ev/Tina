@@ -11,17 +11,14 @@
 #define TINAPP_BLUETOOTH_BLUETOOTHBASE_H
 
 #include <tina++/tina.h>
-#include <tina/config.h>
-#include <tina/bluetooth_config.h>
 #include <tina++/thread.h>
-#include <atomic>
 #include <tina++/container/thread_fifo.h>
-#include <array>
 #include <tina++/container/array_buffer.h>
+#include <atomic>
+#include <array>
 
-// -------------------------------------------------------------------
-// High-Level Functions
-// -------------------------------------------------------------------
+#include <tina/bluetooth_config.h>
+
 
 /*!
  * \defgroup bluetooth Bluetooth
@@ -120,7 +117,7 @@ public:
     /*!
      * \brief %Bluetooth thread.
      */
-    // can't be static because simulation needs access
+    // can't be private because simulation needs access
     Thread<BLUETOOTH_THREAD_STACK_SIZE> bluetooth_main_thread;
 
 

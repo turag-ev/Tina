@@ -1,15 +1,17 @@
 
 #define TURAG_DEBUG_LOG_SOURCE "Y"
 
-#include <tina++/debug.h>
-
 #include "bluetooth_base.h"
+
+#include <tina++/debug.h>
 #include <tina++/tina.h>
 #include <tina++/container/thread_fifo.h>
 #include <tina++/utils/base64.h>
+
 #include <cstring>
 #include <array>
 #include <algorithm>
+
 
 namespace TURAG {
 

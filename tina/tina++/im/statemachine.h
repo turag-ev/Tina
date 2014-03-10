@@ -409,7 +409,7 @@ class WaitForSignalState final : private State {
 public:
     /*!
      * \brief WaitForSignalState-Constructor
-     * \param nextState Pointer to the state that is entered when the delay has passed.
+     * \param nextState Pointer to the state that is entered when the signal was received.
      */
     WaitForSignalState(State* const nextState) :
         State("Wait for signal"), myNextState(nextState) { }
