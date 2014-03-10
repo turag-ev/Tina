@@ -25,7 +25,7 @@ namespace TURAG {
 namespace detail {
 
 extern "C" {
-extern void _turag_thread_entry(void* data) TURAG_THREAD_ENTRY;
+extern void _turag_thread_entry(void* data);
 }
 
 std::size_t thread_get_stack_usage(const char* stack, std::size_t stack_size);

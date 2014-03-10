@@ -15,7 +15,7 @@ namespace TURAG {
 
 
 extern "C" {
-extern void _turag_thread_entry(cyg_addrword_t data) TURAG_THREAD_ENTRY;
+extern void _turag_thread_entry(cyg_addrword_t data);
 }
 
 /**

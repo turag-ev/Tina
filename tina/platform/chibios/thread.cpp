@@ -12,9 +12,9 @@ namespace TURAG {
 
 namespace detail {
 
-extern "C" TURAG_THREAD_ENTRY
+extern "C"
 void _turag_thread_entry(void* data) {
-  TURAG_THREAD_ENTRY void (*entry)(void) = (void (*)(void))data;
+  void (*entry)(void) = (void (*)(void))data;
   entry();
   
   chThdExit(1);

@@ -111,11 +111,7 @@ public:
    *             event queue empty, EventQueue::event_null as id and nullptr as
    *             data parameter is passed as functon parameters.
    */
-#ifdef TURAG_THREADS_RUN_FOREVER
-  void main(EventHandler handler, TickHandler tick) _noreturn;
-#else
   void main(EventHandler handler, TickHandler tick);
-#endif
 
   bool processEvent(EventId id, EventArg param, EventMethod callback);
 
