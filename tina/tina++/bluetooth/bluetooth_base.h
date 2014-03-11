@@ -24,13 +24,13 @@
  * \defgroup bluetooth Bluetooth
  * \section bluetoothmodule Bluetooth module
  * This module offers various ways to exchange data via bluetooth between peers in a
- * thread-safe and flexible manner. It is implemented in a class with only static
- * functions (you can't instantiate the class).
+ * thread-safe and flexible manner. It is implemented as an abstract base class
+ * which needs to be extended with hardware specifics.
  *
  * All the time-consuming communication work is done
  * within a thread while all public access functions return within a minimum of time.
  * It builds on top of a set of low-level
- * functions that need to be implemented separately. This abstraction layer is responsible
+ * functions that need to be implemented in the derived subclass. This abstraction layer is responsible
  * for mapping the bluetooth hardware addresses to peer IDs which start with 0, for piping
  * received input into the appropriate high-level functions and for writing data back to
  * the hardware. The mapping of connected peers is limited to 256.
@@ -44,6 +44,22 @@
  * - BLUETOOTH_THREAD_STACK_SIZE
  * - BLUETOOTH_THREAD_PRIORITY
  * - BLUETOOTH_THREAD_RPC_WAIT_MS
+ *
+ * \subsection Implementingsubclasses Implementing subclasses
+ * When implementing the subclass you should make sure it can't be instantiated more than once
+ * as this wouldn't make any sense. For this purpose you should override the get()-function. Let's
+ * look at a small example. First we need some includes:
+ * \snippet bluetooth.h Includes
+ * Then we declare our subclass:
+ * \snippet bluetooth.h class
+ * There are a few interesting things to consider with this code:
+ * - the constructor is protected. This inhibits the creation of any instances from outside the class.
+ * - we have a static variable instance_ that holds our one and only instance of our class
+ * - we have the static function get() which returns a pointer to this instance
+ *
+ * You should be aware that implementing a singleton with a globally allocated static like in this case
+ * is problematic if you have other singletons taht are implemented in the same way depend on it.
+ * But at least it's thread-safe.
  *
  *
  * \subsection rpc RPCs
@@ -77,7 +93,8 @@ namespace TURAG {
  */
 
 /*!
- * \brief Class implementing the %Bluetooth module.
+ * \brief Base class implementing the high level functionality of
+ * the %Bluetooth module.
  */
 class BluetoothBase {
 public:
@@ -145,7 +162,8 @@ public:
      * \param[in] rpc_id RPC-ID to call.
      * \param[in] param Parameter to pass to the RPC-function.
      * \return True on success, false otherwise.
-     * \details This function fails if the destination peer-ID equals or exceeds the number of remote peers.
+     * \details This function fails if the destination peer-ID equals or exceeds the number of
+     * remote peers or if the remote peer was disabled.
      */
     bool callRpc(uint8_t destination, uint8_t rpc_id, uint64_t param);
 
@@ -198,6 +216,8 @@ public:
      * @return True on success, false otherwise.
      * @details For this function to succeed, you need to configure a data provider with the exact same
      * combination of destination and data_provider_id.
+     *
+     * This function will fail if the remote peer is disabled.
      */
     template<typename T> _always_inline bool pushData(uint8_t destination, uint8_t data_provider_id, const PushData<T>& data) {
         return pushData(destination, data_provider_id, reinterpret_cast<const uint8_t*>(&data), sizeof(data));
@@ -211,6 +231,8 @@ public:
      * @details For this function to succeed, you need to configure a data provider with the exact same
      * combination of destination and data_provider_id.
      *
+     * This function will fail if the remote peer is disabled.
+
      * This function is useful, if you have several peers whose data sinks are logically the same.
      * Then you can configure several data providers with the same storage buffer which needs to be updated
      * only once, for example wehn pushing to the first peer. The remaining peers can be updated with this
@@ -236,16 +258,16 @@ public:
      * \details This function works on a logical level: if you disable a peer it might still
      * be physically connected, yet every attempt to communicate with it will be blocked and fail.
      * At the same time disabling a peer can be seen as a recommondation for the underlying
-     * low level implementation to act accordingly but this is neither required nor of importance
+     * low level implementation to act accordingly, but this is neither required nor of importance
      * for the high level layer to work.
      */
     void setPeerEnabled(uint8_t peer_id, bool enabled);
 
     /*!
      * \brief Returns an instance of the class.
-     * \return Pointer to an instance.
-     * \detials This function should be overridden by a subclass to give access to
-     * the single instance.
+     * \return nullptr.
+     * \details This function should be overridden by a subclass to give access to
+     * the single instance of the subclass.
      */
     static BluetoothBase* get(void) { return nullptr; }
 
@@ -281,11 +303,8 @@ protected:
      * \details This function is only called in the context of the bluetooth thread
      * and therefore doesn't need to be thread-safe.
      *
-     * This function should return false, if the peer is disabled or not connected.
-     * This means that even if the peer might be physically connected, but
-     * the peer's connection wasn't enabled, this function should not attempt
-     * to transmit data and return false or in other words: this function should only
-     * transmit data, if getConnectionStatus returns Status::connected.
+     * The high level layer will never call this function, if the peer was disabled,
+     * so it's never necessary to inhibit the transmission if writing is physically possible.
      *
      */
     // this function should be private - it's only protected to get it into the doxygen docs
@@ -308,8 +327,7 @@ protected:
      * \details This functions is called by the high-level implementation when a peer is enabled
      * or disabled. When called with true, the hardware layer is requested to establish a connection
      * to the peer. When called with false, it is allowed to release this connection yet not obligated.
-     * \note This function is part of the hardware abstraction and needs to be implemented
-     * separately.
+     * \note This function needs to be thread-safe.
      */
     // this function should be private - it's only protected to get it into the doxygen docs
     virtual void setPeerEnabledLowlevel(uint8_t peer_id, bool enabled) = 0;
