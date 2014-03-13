@@ -50,8 +50,8 @@ ErrorCode read_blackboard(const Blackboard *object, pointer dest) {
         if (errorcnt++ <= 1) {
             errorf("CASA BlackBoard read failed with error code: 0x%.8x", error);
             if (errorcnt == 2)
-                errorf("(omitting the following 199 CASABB messages)");
-        } else if (errorcnt == 200) {
+                errorf("(omitting the following 999 CASABB messages)");
+        } else if (errorcnt == 999) {
             errorcnt = 0;
         }
     } else {
