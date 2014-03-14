@@ -113,9 +113,20 @@ void EventQueue::main(EventHandler handler, TickHandler tick) {
 
   handler_ = handler;
 
+  // execute tick() once. This is to avoid the case where the eventqueue is started
+  // with events pending in the queue - the would be executed before tick() ran
+  // for the first time.
+  tick();
+
   while (true) {      
 
-
+      // this block introduces the thread delay. If there are pending events,
+      // the are handled immediately. If there are only time-delayed events,
+      // we will wait for this event, execute tick(), and handle this event.
+      // Anyway, we will wait at most for max_tick_time. We also wait for this period
+      // of time if there is currently no event.
+      // If an event happens to arrive while waiting, we execute tick() and handle
+      // the event without any further delay.
       while (true) {
           Mutex::Lock lock(mutex_);
           if (loadEvent(&event)) break;
