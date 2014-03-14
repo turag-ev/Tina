@@ -357,14 +357,13 @@ private:
     struct DataProvider {
         uint8_t* buffer;
         size_t buffer_size;
-        bool sendRequest;
+        std::atomic_bool sendRequest;
         uint8_t destination;
         uint8_t id;
 
         DataProvider() :
             buffer(nullptr),
             buffer_size(0),
-            sendRequest(false),
             destination(0), id(0) { }
 
         DataProvider(uint8_t* buf, size_t buf_size, uint8_t dest, uint8_t id_) :
@@ -372,6 +371,14 @@ private:
             buffer_size(buf_size),
             sendRequest(false),
             destination(dest), id(id_) { }
+
+        DataProvider(const DataProvider& provider) :
+            buffer(provider.buffer),
+            buffer_size(provider.buffer_size),
+            destination(provider.destination),
+            id(provider.id) {
+            sendRequest.store(provider.sendRequest.load(std::memory_order_relaxed), std::memory_order_relaxed);
+        }
     };
 
     struct DataSink {

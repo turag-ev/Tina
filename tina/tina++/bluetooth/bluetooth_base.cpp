@@ -76,7 +76,7 @@ void BluetoothBase::main_thread_func(void) {
         // check DataProvider
         for (DataProvider& provider: data_providers) {
             Mutex::Lock lock(data_provider_mutex);
-            if (provider.sendRequest) {
+            if (provider.sendRequest.load(std::memory_order_relaxed)) {
                 int encoded_buffer_size = Base64::encodeLength(provider.buffer_size) + 2;
                 uint8_t buffer[encoded_buffer_size];
                 // start byte
@@ -89,11 +89,11 @@ void BluetoothBase::main_thread_func(void) {
                 buffer[encoded_buffer_size - 1] = 3;
                 uint8_t dest = provider.destination;
                 uint8_t id = provider.id;
-                provider.sendRequest = false;
                 lock.unlock();
                 // write to bluetooth, we unlock the mutex in case the writing takes a bit more time
                 if (getConnectionStatusLowlevel(dest) == Status::connected && write(dest, buffer, encoded_buffer_size)) {
                     debugf("DataProvider %d push to %d", id, dest);
+                    provider.sendRequest.store(false, std::memory_order_relaxed);
                 } else {
                     warningf("DataProvider %d push to %d - FAILED", id, dest);
                 }
@@ -258,7 +258,7 @@ bool BluetoothBase::pushData(uint8_t destination, uint8_t data_provider_id, cons
             return false;
         }
         std::memcpy(provider->buffer, data, length);
-        provider->sendRequest = true;
+        provider->sendRequest.store(true, std::memory_order_relaxed);
         return true;
     }
 }
@@ -272,8 +272,7 @@ bool BluetoothBase::pushData(uint8_t destination, uint8_t data_provider_id) {
     } else if (!peersEnabled[destination].load(std::memory_order_relaxed)) {
         return false;
     } else {
-        Mutex::Lock lock(data_provider_mutex);
-        provider->sendRequest = true;
+        provider->sendRequest.store(true, std::memory_order_relaxed);
         return true;
     }
 }
