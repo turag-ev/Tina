@@ -137,6 +137,9 @@ public:
     // can't be private because simulation needs access
     Thread<BLUETOOTH_THREAD_STACK_SIZE> bluetooth_main_thread;
 
+    inline Thread<BLUETOOTH_THREAD_STACK_SIZE> *getThreadPtr(void) {
+        return &bluetooth_main_thread;
+    }
 
     /*!
      * \brief Initializes the bluetooth-module.
