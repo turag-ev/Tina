@@ -30,6 +30,7 @@ void BluetoothBase::thread_entry(void) {
 void BluetoothBase::init(void) {
     for (int i = 0; i < BLUETOOTH_NUMBER_OF_PEERS; ++i) {
         peersEnabled[i].store(false, std::memory_order_relaxed);
+        peerConnectionSuccessfulOnce[i].store(false, std::memory_order_relaxed);
     }
 
     lowlevelInit();
@@ -44,31 +45,54 @@ void BluetoothBase::main_thread_func(void) {
     info("Bluetooth-High-Level thread started");
 
     Rpc_t rpc;
+    Status connectionStatus[BLUETOOTH_NUMBER_OF_PEERS] {Status::disconnected};
 
     while(!bluetooth_main_thread.shouldTerminate()) {
-        if (rpc_fifo.fetch(&rpc, ms_to_ticks(BLUETOOTH_THREAD_RPC_WAIT_MS))) {
-            if (rpc.received) {
-                Mutex::Lock lock(rpc_mutex);
-                RpcFunction callback = rpc_functions[rpc.data.rpc_id];
-                lock.unlock();
+        // this mechanism checks whether we already had a successful connection after enabling the
+        // peer. This is mainly used to control the output of debug messages.
+        for (int i = 0; i < BLUETOOTH_NUMBER_OF_PEERS; ++i) {
+            Status newConnectionStatus = getConnectionStatusLowlevel(i);
 
-                if (callback) {
-                    debugf("call RPC %d", rpc.data.rpc_id);
-                    (*callback)(rpc.peer_id, rpc.data.param);
+            if (connectionStatus[i] != Status::connected && newConnectionStatus == Status::connected) {
+                infof("Peer %d: connection established", i);
+                if (!peerConnectionSuccessfulOnce[i].load(std::memory_order_relaxed)) {
+                    peerConnectionSuccessfulOnce[i].store(true, std::memory_order_relaxed);
                 }
-            } else {
-                int buffer_size = Base64::encodeLength(rpc.data) + 2;
-                uint8_t buffer[buffer_size];
-                // start byte
-                buffer[0] = 2;
-                // data
-                Base64::encode(rpc.data, buffer + 1);
-                // end byte
-                buffer[buffer_size - 1] = 3;
-                if (getConnectionStatusLowlevel(rpc.peer_id) == Status::connected && write(rpc.peer_id, buffer, buffer_size)) {
-                    debugf("call Remote-RPC %d on peer %d", rpc.data.rpc_id, rpc.peer_id);
+            } else if (connectionStatus[i] == Status::connected && newConnectionStatus != Status::connected) {
+                warningf("Peer %d: connection LOST", i);
+            }
+            connectionStatus[i] = newConnectionStatus;
+        }
+
+        // TODO!!!!!
+        // try to resend rpcs if there is no connection
+        if (rpc_fifo.fetch(&rpc, ms_to_ticks(BLUETOOTH_THREAD_RPC_WAIT_MS))) {
+            if (peersEnabled[rpc.data.rpc_id].load(std::memory_order_relaxed)) {
+                if (rpc.received) {
+                    Mutex::Lock lock(rpc_mutex);
+                    RpcFunction callback = rpc_functions[rpc.data.rpc_id];
+                    lock.unlock();
+
+                    if (callback) {
+                        debugf("call RPC %d", rpc.data.rpc_id);
+                        (*callback)(rpc.peer_id, rpc.data.param);
+                    }
                 } else {
-                    warningf("call Remote-RPC %d on peer %d - FAILED", rpc.data.rpc_id, rpc.peer_id);
+                    int buffer_size = Base64::encodeLength(rpc.data) + 2;
+                    uint8_t buffer[buffer_size];
+                    // start byte
+                    buffer[0] = 2;
+                    // data
+                    Base64::encode(rpc.data, buffer + 1);
+                    // end byte
+                    buffer[buffer_size - 1] = 3;
+                    if (connectionStatus[rpc.peer_id] == Status::connected) {
+                        if (write(rpc.peer_id, buffer, buffer_size)) {
+                            debugf("call Remote-RPC %d on peer %d", rpc.data.rpc_id, rpc.peer_id);
+                        } else {
+                            warningf("call Remote-RPC %d on peer %d - FAILED", rpc.data.rpc_id, rpc.peer_id);
+                        }
+                    }
                 }
             }
         }
@@ -76,26 +100,34 @@ void BluetoothBase::main_thread_func(void) {
         // check DataProvider
         for (DataProvider& provider: data_providers) {
             Mutex::Lock lock(data_provider_mutex);
-            if (provider.sendRequest.load(std::memory_order_relaxed)) {
-                int encoded_buffer_size = Base64::encodeLength(provider.buffer_size) + 2;
-                uint8_t buffer[encoded_buffer_size];
-                // start byte
-                buffer[0] = 2;
-                // ID
-                provider.buffer[0] = provider.id + 64;
-                // data
-                Base64::encode(provider.buffer, provider.buffer_size, buffer + 1);
-                // end byte
-                buffer[encoded_buffer_size - 1] = 3;
-                uint8_t dest = provider.destination;
-                uint8_t id = provider.id;
-                lock.unlock();
-                // write to bluetooth, we unlock the mutex in case the writing takes a bit more time
-                if (getConnectionStatusLowlevel(dest) == Status::connected && write(dest, buffer, encoded_buffer_size)) {
-                    debugf("DataProvider %d push to %d", id, dest);
-                    provider.sendRequest.store(false, std::memory_order_relaxed);
+            if (peersEnabled[provider.destination].load(std::memory_order_relaxed)) {
+                // only attempt to write if we are enabled
+                // otherwise simply clear sendRequest
+                if (provider.sendRequest.load(std::memory_order_relaxed)) {
+                    int encoded_buffer_size = Base64::encodeLength(provider.buffer_size) + 2;
+                    uint8_t buffer[encoded_buffer_size];
+                    // start byte
+                    buffer[0] = 2;
+                    // ID
+                    provider.buffer[0] = provider.id + 64;
+                    // data
+                    Base64::encode(provider.buffer, provider.buffer_size, buffer + 1);
+                    // end byte
+                    buffer[encoded_buffer_size - 1] = 3;
+                    uint8_t dest = provider.destination;
+                    uint8_t id = provider.id;
+                    lock.unlock();
+                    // write to bluetooth, we unlock the mutex in case the writing takes a bit more time
+                    if (connectionStatus[dest] == Status::connected) {
+                        if (write(dest, buffer, encoded_buffer_size)) {
+                            debugf("DataProvider %d push to %d", id, dest);
+                            provider.sendRequest.store(false, std::memory_order_relaxed);
+                        } else {
+                            warningf("DataProvider %d push to %d - FAILED", id, dest);
+                        }
+                    }
                 } else {
-                    warningf("DataProvider %d push to %d - FAILED", id, dest);
+                    provider.sendRequest.store(false, std::memory_order_relaxed);
                 }
             }
         }
@@ -105,6 +137,12 @@ void BluetoothBase::main_thread_func(void) {
 
 void BluetoothBase::highlevelParseIncomingData(uint8_t sender, uint8_t* buffer, size_t buffer_size) {
     if (sender >= BLUETOOTH_NUMBER_OF_PEERS) return;
+
+    // ignore traffic from deactivated peers
+    if (!peersEnabled[sender].load(std::memory_order_relaxed)) {
+        in_buffer[sender].waitForStartByte = true;
+        return;
+    }
 
     for (unsigned i = 0; i < buffer_size; ++i) {
         if (buffer[i] == 2) {
@@ -288,12 +326,19 @@ BluetoothBase::Status BluetoothBase::getConnectionStatus(uint8_t peer_id) {
     }
 }
 
-
 void BluetoothBase::setPeerEnabled(uint8_t peer_id, bool enabled) {
     if (peer_id >= BLUETOOTH_NUMBER_OF_PEERS) return;
 
     peersEnabled[peer_id].store(enabled, std::memory_order_relaxed);
     setPeerEnabledLowlevel(peer_id, enabled);
+
+    if (enabled) {
+        infof("Peer %d enabled -> waiting for successful connection", peer_id);
+        peerConnectionSuccessfulOnce[peer_id].store(false, std::memory_order_relaxed);
+    } else {
+        infof("Peer %d disabled", peer_id);
+    }
+
 }
 
 

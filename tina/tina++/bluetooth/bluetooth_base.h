@@ -254,15 +254,39 @@ public:
      */
     Status getConnectionStatus(uint8_t peer_id);
 
+
+    /*!
+     * \brief Returns whether there was any successful connection since enabling the peer.
+     * \param[in] peer_id ID of peer to get information status from.
+     * \return True if there was ever a connection, false otherwise.
+     * \details This function returning false can either mean that you called it to soon
+     * after enabling the peer or that the peer is physically out of reach.
+     *
+     * You you should use this function when you want to check whether a peer is generally available
+     * rather then getConnectionStatus() as the latter might return Status::disconnected due to
+     * a temporary loss of connection.
+     */
+    bool getConnectionWasSuccessfulOnce(uint8_t peer_id) {
+        return peerConnectionSuccessfulOnce[peer_id].load(std::memory_order_relaxed);
+    }
+
     /*!
      * \brief Enables or disables a peer.
      * \param[in] peer_id Peer ID to enable/disable.
      * \param[in] enabled True: enable the peer, false: disable the peer.
-     * \details This function works on a logical level: if you disable a peer it might still
-     * be physically connected, yet every attempt to communicate with it will be blocked and fail.
-     * At the same time disabling a peer can be seen as a recommondation for the underlying
-     * low level implementation to act accordingly, but this is neither required nor of importance
-     * for the high level layer to work.
+     * \details If you disable a peer, every communication attempt with it
+     * is blocked, all queued RPC calls are removed and push requests for data providers
+     * are cancelled. Incoming data is ignored and already received data which was not
+     * processed yet is trashed. It is not guaranteed
+     * that the actual physical connection to the peer is cancelled.
+     *
+     * If you enable a peer, the low level layer is obligated to establish a
+     * connection as quickly as possible.
+     *
+     * Disabling a peer does not affect the transmission of already queued RPC-calls
+     * and pushed data.
+     *
+     *
      */
     void setPeerEnabled(uint8_t peer_id, bool enabled);
 
@@ -407,6 +431,7 @@ private:
     Mutex data_sink_mutex;
 
     std::array<std::atomic_bool, BLUETOOTH_NUMBER_OF_PEERS> peersEnabled;
+    std::array<std::atomic_bool, BLUETOOTH_NUMBER_OF_PEERS> peerConnectionSuccessfulOnce;
 
     ThreadFifo<Rpc_t, 32> rpc_fifo;
 
