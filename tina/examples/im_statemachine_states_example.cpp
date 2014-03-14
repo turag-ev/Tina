@@ -5,6 +5,7 @@
 
 namespace TURAG {
 namespace IM {
+namespace {
 //! [Includes]
 
 	
@@ -157,6 +158,8 @@ ShutdownHardware shutdownHardware(&rightDevice);
 }
 
 //! [Statemachine]
+} // namespace 
+
 Statemachine hardwareStatemachineLeft(
 	"Hardware statemachine",
 	&Left::prepareHardware,
