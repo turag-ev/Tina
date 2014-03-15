@@ -24,9 +24,22 @@
 #define TURAG_DEBUG_DEBUG_PREFIX    "_"
 #define TURAG_DEBUG_REPORT_LOG_SOURCE_PREFIX  ">"
 
+// graph output prefixes
+#define TURAG_DEBUG_GRAPH_PREFIX    "D"
+#define TURAG_DEBUG_GRAPH_CREATE    "n"
+#define TURAG_DEBUG_GRAPH_TITLE    "b"
+#define TURAG_DEBUG_GRAPH_DATA    "d"
+
 // debug level
 #ifndef TURAG_DEBUG_LEVEL
 #define TURAG_DEBUG_LEVEL 4
+#endif
+
+// output graphs
+#if !defined(TURAG_DEBUG_ENABLE_GRAPH)
+# if TURAG_DEBUG_LEVEL > 3
+#  define TURAG_DEBUG_ENABLE_GRAPH
+# endif
 #endif
 
 // log source
@@ -79,8 +92,8 @@
 #endif
 
 #if TURAG_DEBUG_LEVEL > 4
-# define debugf(format, args...) debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_DEBUG_PREFIX format "\n\r", ##args)
-# define debug(msg) debug_puts(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_DEBUG_PREFIX msg "\n\r")
+# define debugf(format, args...) debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_DEBUG_PREFIX format TURAG_DEBUG_NEWLINE, ##args)
+# define debug(msg) debug_puts(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_DEBUG_PREFIX msg TURAG_DEBUG_NEWLINE)
 #else
 # define debugf(format, args...) while(0)
 # define debug(msg) while(0)
@@ -88,6 +101,18 @@
 
 #define bool_string(b) ((b)?"true":"false")
 #define bool_string_de(b) ((b)?"ja":"nein")
+
+
+#ifdef TURAG_DEBUG_ENABLE_GRAPH
+# define turag_graph_create(index, name) debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_GRAPH_CREATE TURAG_DEBUG_GRAPH_PREFIX "%d %s", index, name)
+# define turag_graph_channel_title(index, title) debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_GRAPH_TITLE TURAG_DEBUG_GRAPH_PREFIX "%d %s", index, title)
+  void turag_graph_data(int index, float time, float* args, int count);
+#else
+# define turag_graph_create(index, name) while(0)
+# define turag_graph_channel_title(index, title) while(0)
+# define turag_graph_data(index, time, args, count) while(0)
+#endif
+
 
 #endif // TINA_DEBUG_H
 
