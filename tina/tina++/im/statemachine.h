@@ -192,6 +192,7 @@
 #include <tina++/time.h>
 #include <tina++/debug.h>
 #include <tina++/statemachine.h>
+#include <tina++/helper/scoped_lock.h>
 
 namespace TURAG {
 
