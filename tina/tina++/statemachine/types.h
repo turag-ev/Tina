@@ -5,8 +5,11 @@
 
 namespace TURAG {
 
-/// @defgroup StateMaschines Zustandsmaschinen
-/// @{
+/// \defgroup StateMaschines Zustandsmaschinen
+/// \{
+
+/// \defgroup Events Events
+/// \{
 
 /// Typ für Event-IDs
 typedef TuragEventId EventId;
@@ -32,6 +35,13 @@ typedef TuragEventArg EventArg;
 /// };
 /// \endcode
 ///
+/// \par Anwendungsrichtlinien (SystemControl):
+///   - '#' als erstes Zeichen für Events von Aktionen
+///   - '*' als erstes Zeichen für Events von Strategien
+///   - essentielle Klassen starten mit Großbuchstaben
+///   - alle weiteren Zeichen sollten so gewählt werden das Klassename erkennbar ist
+///   - niemals zwei gleiche Zeichenfolge benutzen, außer man addiert Wert hinzu
+///
 /// \param a ASCII-Zeichen 1
 /// \param b ASCII-Zeichen 2
 /// \param c ASCII-Zeichen 3
@@ -41,7 +51,8 @@ EventId EventNamespace(char a, char b, char c) {
   return (a << 24) | (b << 16) | (c << 8);
 }
 
-/// @}
+/// \}
+/// \}
 
 } // namespace TURAG
 

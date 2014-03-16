@@ -5,6 +5,9 @@
 
 namespace TURAG {
 
+/// @addtogroup Utils Werkzeuge
+/// @{
+
 ////////////////////////////////////////////////////////////////////////////////
 // timer (to stop times)
 
@@ -21,6 +24,8 @@ public:
 private:
   SystemTime start_time_;
 };
+
+/// @}
 
 } // namespace TURAG
 

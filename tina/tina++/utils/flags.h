@@ -7,6 +7,9 @@
 
 namespace TURAG {
 
+/// @addtogroup Utils Werkzeuge
+/// @{
+
 template<typename Enum, std::size_t Bits>
 class Flags {
 public:
@@ -235,6 +238,8 @@ private:
 
 template<typename Enum, std::size_t Bits>
 const Flags<Enum, Bits> Flags<Enum, Bits>::NOTHING;
+
+/// @}
 
 } // namespace TURAG
 

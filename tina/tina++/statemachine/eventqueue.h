@@ -20,26 +20,81 @@
 
 namespace TURAG {
 
-/// @defgroup StateMaschines Zustandsmaschinen
-/// @{
+/// \addtogroup StateMaschines Zustandsmaschinen
+/// \{
+
+/// \defgroup Events Events
+/// Erklärung in Code:
+/// \code{.cpp}
+///   // in anyaction.h
+///
+///   // Klasse, die Events generiert
+///   class AnyAction {
+///     enum Events {
+///       event_something_happend = EventNamespace('#', 'A', 'y'),
+///       event_something_else_happend,
+///     };
+///     // ...
+///   };
+///
+///   // in anyaction.cpp
+///
+///   // Eventklasse aus Id erstellen
+///   DEFINE_EVENT_CLASS(EventSomethingHappend, AnyAction::event_something_happend);
+///
+///   // Eventklasse mit zusätzlichen Debuginformationen erstellen
+///   DEFINE_EVENT_CLASS_EXTRA(EventSomethingElseHappend, AnyAction::event_something_else_happend, "Es ist etwas passiert!");
+///
+///   // Anwendung mit \ref EventQueue:
+///   // vorher definiert: EventQueue queue;
+///
+///   // Event ohne Argument oder spezielles Callback werfen
+///   queue.push(&EventSomethingHappend);
+///
+///   // Event mit Argument
+///   queue.push(&EventSomethingElseHappend, 42);
+///
+///   // Event von spezieller Funktion behandeln lassen:
+///   queue.push(&EventSomethingHappend, handle_event);
+///   queue.push(&EventSomethingElseHappend, 42, handle_event);
+///
+///   void handle_event(EventId id, EventArg data) {
+///     switch (id) {
+///     case AnyAction::event_something_happend:
+///       // Etwas machen
+///       break;
+///
+///     case AnyAction::event_something_else_happend:
+///       // Etwas anderes mit Argument `data' machen
+///       break;
+///     }
+///   }
+///
+/// \endcode
+/// \{
 
 ////////////////////////////////////////////////////////////////////////////////
 //     EventClass
 ////////////////////////////////////////////////////////////////////////////////
 
+/// \brief Klasse von Events, definiert durch Event-Id und Name
 struct EventClass {
-  MOVABLE(EventClass);
-  COPYABLE(EventClass);
+    /// Eventklasse erstellen
+    /// \param name Beschreibung von Event
+    /// \param id Id von Event
+    constexpr
+    EventClass(const char* name, EventId id) :
+        name(name), id(id)
+    { }
 
-  constexpr
-  EventClass(const char* name, EventId id) :
-    name(name), id(id)
-  { }
+    /// Beschreibung von Events dieser Eventklasse (nur als Debuginformation benutzbar)
+    const char* const name;
 
-  const char* name;
-  EventId id;
+    /// Event-Id von Events dieser Eventklasse (zur Identifikation von Events)
+    const EventId id;
 };
 
+#ifndef DOXYGEN
 // for compatibility with old code
 template<EventId id>
 struct UnnamedEventClass {
@@ -48,8 +103,27 @@ static const EventClass event_class;
 
 template<EventId id>
 const EventClass UnnamedEventClass<id>::event_class("Unbekannt", id);
+#endif
 
+/// Eventklasse \ref TURAG::EventClass definieren mit Eventname als Debugbeschreibung
+/// \param name Variablenname
+/// \param event Event-Id für Event
+///
+/// \code{.cpp}
+///   DEFINE_EVENT_CLASS(EventWon, WinAction::event_won);
+///   infof("%s", EventWon->name); // gibt "WinAction::event_won" aus
+/// \endcode
 #define DEFINE_EVENT_CLASS(name,event) const EventClass name(#event, event)
+
+/// Eventklasse \ref TURAG::EventClass definieren mit Eventname als Debugbeschreibung
+/// \param name Variablenname
+/// \param event Event-Id für Event
+/// \param msg Zusätzliche Debuginformation zu Eventklasse
+///
+/// \code{.cpp}
+///   DEFINE_EVENT_CLASS_EXTRA(EventWon, WinAction::event_won, "Wir haben gewonnen!");
+///   infof("%s", EventWon->name); // gibt "WinAction::event_won: Wir haben gewonnen!" aus
+/// \endcode
 #define DEFINE_EVENT_CLASS_EXTRA(name,event,msg) const EventClass name(#event ": " msg, event)
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -103,16 +177,18 @@ public:
 
   /// Start the event processing loop
   /**
-   * \param mainaction Main action that is started, when event queue starts.
-   *                   Events with no callback (method == nullptr) are passed to this
-   *                   action.
-   * \param tick Event function that is executed everytime a new event is
-   *             searched. The found event is passed to the function. Is the
-   *             event queue empty, EventQueue::event_null as id and nullptr as
-   *             data parameter is passed as functon parameters.
+   * \param handler Wenn keine Funktion in Event expliiz angegeben wurde, dann
+   *                Event von dieser Funktionen verarbeiten lassen.
+   * \param tick Funktion, die jedes mal aufgerufen wird, bevor Event verabeitet
+   *             wird oder mindestens in \ref max_tick_time Abständen. Bei letztem ist
+   *             der \a id Parameter EventQueue::event_null und der data Parameter 0.
    */
   void main(EventHandler handler, TickHandler tick);
 
+  /// Event direkt ohne Pufferung verarbeiten
+  /// \param id Event-Id von Event
+  /// \param param Argument von Event, sonst Null
+  /// \param callback explizite Angabe der Eventverarbeitungsfunktion, sonst \a nullptr
   bool processEvent(EventId id, EventArg param, EventMethod callback);
 
   /// Push quit event (\a EventQueue::event_quit) to front of event queue.
@@ -126,7 +202,7 @@ public:
 
   /// Push an new event to the event processing loop
   /**
-   * \param id     event id SHOULD NOT be event_null otherwise event will be ignored
+   * \param event_class Event-Klasse aus dem Event erstellt werden soll.
    * \param params pointer to data for extra information and/or further processing
    * \param method function for processing event or nullptr. When nullptr is passed,
    *               event is given to the main action event function.
@@ -174,7 +250,7 @@ public:
   /**
    * NOTE: timedelayed events are more privileged as normal events.
    * \param ticks  time from now in ecos ticks to process event
-   * \param id     event id SHOULD NOT be event_null otherwise event will be ignored
+   * \param event_class Event-Klasse aus dem Event erstellt werden soll.
    * \param param  parameter for data for extra information and/or further processing
    * \param method function for processing event or nullptr. When nullptr is passed,
    *               event is given to the main action event function.
@@ -247,7 +323,7 @@ public:
   static const size_t timequeue_size = 16;
 
   /// Maximum time between two calls of tick function
-  static constexpr SystemTime max_tick_time = ms_to_ticks(20);
+  static constexpr SystemTime max_tick_time = ms_to_ticks(10);
 
 private:
   mutable Mutex mutex_;
@@ -264,7 +340,8 @@ private:
   SystemTime getTimeToNextEvent() const;
 };
 
-/// @}
+/// \}
+/// \}
 
 } // namespace TURAG
 

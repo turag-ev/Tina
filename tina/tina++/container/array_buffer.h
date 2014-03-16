@@ -474,6 +474,8 @@ private:
 #endif // DOXYGEN
 };
 
+#ifndef DOXYGEN
+
 #ifdef NDEBUG
 template<typename T>
 bool _ArrayBufferHelper<T>::prepare_for_insert(iterator position, iterator end) {
@@ -503,6 +505,8 @@ bool _ArrayBufferHelper<T>::is_full(const_iterator end, const_iterator max_end) 
   return false;
 }
 #endif
+
+#endif // DOXYGEN
 
 } // namespace TURAG
 

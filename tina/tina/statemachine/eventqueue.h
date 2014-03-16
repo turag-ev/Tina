@@ -7,77 +7,65 @@
 extern "C" {
 #endif
 
-/// type for event ids
+/// Typ für Event-Ids (gleichzeitig Standardtyp für C-Enums)
 typedef int32_t TuragEventId;
 
+/// Typ für Parameter von Events
 typedef int32_t TuragEventArg;
 
-/// function for event processing
+/// Typ für Funktionen die Events verarbeiten
 typedef void (*TuragEventMethod)(TuragEventId id, TuragEventArg data);
 
-/// create a unsigned integer with the first three bytes filled with characters
-/// to build a namespace. The last byte can be used for any value >= 0 and < 256.
-/// example:
-/// \code enum { event_x = TURAG_EVENT_NAMESPACE('X', 'X', 'X') + 100 }; \endcode
+/// Makroversion von \ref TURAG::EventNamespace für C-Quellcode
 #define TURAG_EVENT_NAMESPACE(a,b,c) (((a) << 24) | ((b) << 16) | ((c) << 8))
 
+/// C-Typ für \ref TURAG::EventClass
 typedef struct {
   const char* name;
   TuragEventId id;
 } TuragEventClass;
 
-/// Event
+/// C-Typ für \ref TURAG::Event
 typedef struct {
   TuragEventId      id;        ///< event id
   TuragEventArg     params;    ///< parameters
   TuragEventMethod  method;    ///< event method for async method calls or \a nullptr
 } TuragEvent;
 
-/// Event with time information for timedelayed events
+/// C-Typ für \ref TURAG::TimeEvent
 typedef struct {
   TuragEvent    event;     ///< event to process
   TuragSystemTime time;      ///< time when event is due
 } TuragTimeEvent;
 
+#ifndef DOXYGEN
 struct _TuragEventQueue;
+#endif
+
+/// C-Dummy-Typ für Event-Schlangen
 typedef struct _TuragEventQueue TuragEventQueue;
 
 ////////////////////////////////////////////////////////////////////////////////
 //     EventQueue
 ////////////////////////////////////////////////////////////////////////////////
 /// Push an new event to the event processing loop
-/**
- * \param id     event id SHOULD NOT be event_null otherwise event will be ignored
- * \param params pointer to data for extra information and/or further processing
- * \param method function for processing event or nullptr. When nullptr is passed,
- *               event is given to the main action event function.
- */
 void turag_eventqueue_push(TuragEventQueue* queue,
                            const TuragEventClass* event_class, TuragEventArg params,
                            TuragEventMethod method);
 
 /// Push an new event to the front of the event processing loop
-/** Paramters the same as in push */
 void turag_eventqueue_push_to_front(TuragEventQueue* queue,
                                     const TuragEventClass* event_class,
                                     TuragEventArg params, TuragEventMethod method);
 
 /// Process event in a number of kernel ticks
-/**
- * NOTE: timedelayed events are more privileged as normal events.
- * \param ticks  time from now in ecos ticks to process event
- * \param id     event id SHOULD NOT be event_null otherwise event will be ignored
- * \param params pointer to data for extra information and/or further processing
- * \param method function for processing event or nullptr. When nullptr is passed,
- *               event is given to the main action event function.
- */
 void turag_eventqueue_push_timedelayed(TuragEventQueue* queue,
                                        TuragSystemTime ticks,
                                        const TuragEventClass* event_class,
                                        TuragEventArg param, TuragEventMethod method);
 
 enum {
-  turag_eventqueue_event_quit = -1,
+  turag_eventqueue_event_quit = -1, ///< \a EventId für Event-Schlangenverarbeitung beenden (nur in Desktopbereich verwenden)
   turag_eventqueue_event_null = 0, ///< \a EventId for do nothing
   turag_eventqueue_event_nonamed,  ///< \a EventId for do nothing
   turag_eventqueue_event_idle,     ///< \a EventId when nothing to do
