@@ -12,6 +12,7 @@
 
 #include "../public/tina++/can.h"
 
+
 namespace TURAG {
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -52,20 +53,22 @@ ErrorCode read_blackboard(const Blackboard *object, pointer dest) {
   return error;
 }
 
+
 // C Interface
 
 extern "C" __attribute__((hot))
 ErrorCode turag_can_read_blackboard(const Blackboard* object, pointer dest) {
-  uint64_t timestamp;
-  
-  ErrorCode error = Casa_BBRead(object, dest, &timestamp);
-  if (error) {
-    errorf("CASA BlackBoard read failed with error code: %d", error);
-  }
-  return error;
+	return read_blackboard(object, dest);
 }
+
+extern "C"
+uint64_t turag_can_call(Id remote_id, FuncId func_id, uint64_t param, ErrorCode* error_res) {
+	return call(remote_id, func_id, param, error_res);
+}
+
 
 } /* namespace CAN */
 
 } // namespace TURAG
+
 

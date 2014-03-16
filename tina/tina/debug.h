@@ -27,8 +27,8 @@
 // graph output prefixes
 #define TURAG_DEBUG_GRAPH_PREFIX    "D"
 #define TURAG_DEBUG_GRAPH_CREATE    "n"
-#define TURAG_DEBUG_GRAPH_TITLE    "b"
-#define TURAG_DEBUG_GRAPH_DATA    "d"
+#define TURAG_DEBUG_GRAPH_TITLE     "b"
+#define TURAG_DEBUG_GRAPH_DATA      "d"
 
 // debug level
 #ifndef TURAG_DEBUG_LEVEL
