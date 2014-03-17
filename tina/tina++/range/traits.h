@@ -3,10 +3,9 @@
 
 #include <iterator>
 
-// from boost 1.54.0
-
 namespace TURAG {
 
+#ifndef DOXYGEN
 namespace range_traits_detail {
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -84,9 +83,13 @@ struct range_size< T[sz] >
 };
 
 } // namespace range_traits_detail
+#endif DOXYGEN
 
 ////////////////////////////////////////////////////////////////////////////////
 // range_traits
+
+/// \addtogroup Ranges
+/// \{
 
 template< typename C >
 struct range_traits {
@@ -100,6 +103,8 @@ struct range_traits {
   typedef typename std::iterator_traits<iterator>::reference reference;
   typedef typename std::iterator_traits<iterator>::iterator_category iterator_category;
 };
+
+/// \}
 
 } // namespace TURAG
 

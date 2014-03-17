@@ -3,4 +3,4 @@ doc:
 	doxygen doxyfile
 
 clean:
-	rm -rf doc
+	rm -rf doc/html

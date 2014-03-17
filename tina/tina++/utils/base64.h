@@ -17,17 +17,20 @@
 
 namespace TURAG {
 	
-/** 
- * @addtogroup base64
- *@{
- */
-
 /**
  * @brief C++-Interface for base64 utilities module.
  * @copydetails base64
  */
 namespace Base64 {
 
+/**
+ * @addtogroup Utils
+ * @{
+ * @defgroup base64CPP Base64 [C++]
+ * @brief C++-Interface for base64 utilities module.
+ * @copydetails base64
+ * @{
+ */
 
 /**
  * @brief Calculates length of base64 encoded data.
@@ -96,13 +99,12 @@ int decode(const uint8_t *encoded, size_t len, uint8_t *data) {
     return turag_base64_decode(encoded, len, data);
 }
 
-
-
-} // namespace Base64
-
-/** 
+/**
+ * @}
  * @}
  */
+
+} // namespace Base64
 
 } // namespace TURAG
 

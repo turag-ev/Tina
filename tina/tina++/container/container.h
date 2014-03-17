@@ -2,7 +2,7 @@
 #define CONTAINER_H
 
 /**
- * \defgroup Container Container
+ * \defgroup Container Container [C++]
  *
  * \brief Stellt Datenstrukturen für C++ bereit, die kein Heap (new) benötigen
  *
@@ -12,5 +12,9 @@
  *
  * Die Kapazität eines Containers muss beim Compilieren bekannt sein.
  */
+
+#include "array_buffer.h"
+#include "circular_buffer.h"
+#include "thread_fifo.h"
 
 #endif // CONTAINER_H

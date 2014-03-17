@@ -3,6 +3,9 @@
 
 namespace TURAG {
 
+/// \addtogroup Utils
+/// \{
+
 ////////////////////////////////////////////////////////////////////////////////
 // Pointer casts
 
@@ -37,6 +40,8 @@ template<typename Unpacked, typename Packed>
 inline const Unpacked& reinterpret_reference(const Packed& src) {
   return *reinterpret_cast<const Unpacked*>(&src);
 }
+
+/// \}
 
 } // namespace TURAG
 

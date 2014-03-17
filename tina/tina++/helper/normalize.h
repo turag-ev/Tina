@@ -3,6 +3,9 @@
 
 #include <tina/helper/normalize.h>
 
+/// \file
+/// Makros damit Code für C++11 und neuer nicht bei alten Compilieren zu Fehlern führt
+
 ////////////////////////////////////////////////////////////////////////////////
 // override and final
 
@@ -28,7 +31,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // nullptr
 
-#if GCC_VERSION < 40600
+#if GCC_VERSION < 40600 && !defined(DOXYGEN)
 
 namespace std {
 

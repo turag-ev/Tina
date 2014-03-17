@@ -8,6 +8,9 @@
 
 namespace TURAG {
 
+/// \addtogroup Utils
+/// \{
+
 ////////////////////////////////////////////////////////////////////////////////
 // initializer (startup code)
 
@@ -40,6 +43,8 @@ public:
 
 /// macro for call a function initialization
 #define INIT_CALL(v, ...) static initializer_call CONCAT(_initializer_,__COUNTER__) (v, ## __VA_ARGS__)
+
+/// \}
 
 } // namespace TURAG
 

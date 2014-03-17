@@ -20,10 +20,10 @@
 
 namespace TURAG {
 
-/// \addtogroup StateMaschines Zustandsmaschinen
+/// \addtogroup StateMaschines
 /// \{
 
-/// \defgroup Events Events
+/// \defgroup Events Events [C++]
 /// Erklärung in Code:
 /// \code{.cpp}
 ///   // in anyaction.h

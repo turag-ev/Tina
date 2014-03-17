@@ -9,6 +9,9 @@
 
 namespace TURAG {
 
+/// \defgroup Geometry Geometrie [C++]
+/// \{
+
 ///
 typedef Units::Angle Angle;
 typedef Units::Length Length;
@@ -225,6 +228,8 @@ struct Circle {
 };
 
 bool interselect(Circle one, Circle two, std::array<Point, 2>& results);
+
+/// \}
 
 } // namespace TURAG
 

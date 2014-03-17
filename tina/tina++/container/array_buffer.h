@@ -340,7 +340,7 @@ public:
   ///
   /// Wie ArrayBuffer::emplace_back wird Element vorne angefügt. Dadurch müssen
   /// alle folgenden Elemente verschoben werden, was entsprechend Zeit kostet.
-  /// \param val Argumente für einen Konstruktor von Typ \a T um Element zu erstellen
+  /// \param args Argumente für einen Konstruktor von Typ \a T um Element zu erstellen
   template<class... Args> _always_inline
   void emplace_front(Args&&... args) {
     if (prepare_for_insert(begin())) {
@@ -377,7 +377,7 @@ public:
   /// array.insert(array.begin() + 1, 3);
   /// // array = {1, 3, 2}
   /// \endcode
-  /// \param position Zeiger auf Element in Array an das Element eingefügt werden soll
+  /// \param position Iterator auf Element in Array an das Element eingefügt werden soll
   /// \param val einzufügendes Element
   void insert(iterator position, value_type val) {
     if (prepare_for_insert(position)) {
@@ -407,7 +407,7 @@ public:
   /// array.emplace(array.begin() + 1, 3, 7);
   /// // array = { {x: 1, y: 1}, {x: 3, y: 7}, {x: 2, y: 5} }
   /// \endcode
-  /// \param position Zeiger auf Element in Array an das Element eingefügt werden soll
+  /// \param position Iterator auf Element in Array an das Element eingefügt werden soll
   /// \param args Argumente für einen Konstruktor von Typ \a T um Element zu erstellen
   template<class... Args> _always_inline
   void emplace(iterator position, Args&&... args) {
@@ -418,7 +418,7 @@ public:
   }
 
   /// Element entfernen
-  /// \param Zeiger auf Element, was entfernt werden soll
+  /// \param position Iterator auf Element, was entfernt werden soll
   void erase(iterator position) {
     std::move(position + 1, end(), position);
     length_--;
@@ -438,8 +438,8 @@ public:
   ///
   /// // array = {1, 4}
   /// \endcode
-  /// \param first Zeiger auf erstes zu entfernendes Element
-  /// \param last Zeiger erstes nicht zu entfernendes Element
+  /// \param first Iterator auf erstes zu entfernendes Element
+  /// \param last Iterator erstes nicht zu entfernendes Element
   void erase(iterator first, iterator last) {
     iterator new_end = std::move(last, end(), first);
     bytes_.erase(new_end, end());

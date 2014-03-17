@@ -8,6 +8,9 @@
 
 namespace TURAG {
 
+/// \addtogroup Ranges
+/// \{
+
 // from boost 1.54.0
 
 namespace iterator_range_detail {
@@ -401,6 +404,8 @@ make_iterator_range( const Range& r,
 {
     return iterator_range_detail::make_range_impl( r, advance_begin, advance_end );
 }
+
+/// \}
 
 } // namespace TURAG
 

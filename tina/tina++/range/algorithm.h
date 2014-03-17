@@ -7,9 +7,13 @@
 
 namespace TURAG {
 
+/// \addtogroup Ranges
+/// \{
+
 ////////////////////////////////////////////////////////////////////////////////
 // predicates for std algorithm e.x. std::find, ...
 
+#ifndef DOXYGEN
 template<typename T>
 struct is_equal_predicate {
   typedef T type;
@@ -27,6 +31,7 @@ struct is_equal_predicate {
 
   T value;
 };
+#endif
 
 template<typename T> constexpr
 is_equal_predicate<typename std::remove_reference<T>::type> is_equal(T&& t) {
@@ -93,6 +98,8 @@ template <class ReverseIterator>
 typename ReverseIterator::iterator_type make_forward(ReverseIterator rit) {
   return rit.base() - 1;
 }
+
+/// \}
 
 } // namespace TURAG
 

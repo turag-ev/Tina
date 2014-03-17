@@ -5,10 +5,10 @@
 
 namespace TURAG {
 
-/// \defgroup StateMaschines Zustandsmaschinen
+/// \defgroup StateMaschines Zustandsmaschinen [C++]
 /// \{
 
-/// \defgroup Events Events
+/// \addtogroup Events
 /// \{
 
 /// Typ für Event-IDs

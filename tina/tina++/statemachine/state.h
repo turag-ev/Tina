@@ -17,8 +17,12 @@ IGNORE_WARNING("-Wunused-parameter");
 
 namespace TURAG {
 
-/// @defgroup StateMaschines Zustandsmaschinen
+/// @addtogroup StateMaschines
 /// @{
+///
+/// @defgroup Actions Aktionen [C++]
+/// @{
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //     Action State Model
@@ -80,6 +84,7 @@ public:
   bool isActive() const {
     return currentstate_ != nullptr;
   }
+
 
   constexpr _always_inline
   State getState() const {
@@ -245,6 +250,24 @@ private:
 template<typename A>
 A StaticAction<A>::instance;
 
+
+
+#ifdef DOXYGEN
+
+/// \brief Aktionsklasse definieren
+#define ACTION_CLASS(name)
+
+/// \brief Zustände für Aktion definieren
+#define ACTION_STATES(name, s1, ...)
+
+/// \brief einfache Aktionsklasse mit einem Makro
+#define SIMPLE_ACTION_CLASS(name, ...) \
+  ACTION_CLASS(name) { \
+    ACTION_STATES(name, __VA_ARGS__) \
+  }
+
+#else // DOXYGEN
+
 #define ACTION_CLASS(name) \
   class name : public StaticAction<name>
 
@@ -262,9 +285,7 @@ A StaticAction<A>::instance;
     ACTION_STATES(name, __VA_ARGS__) \
   }
 
-
 // intern macros
-#ifndef DOXYGEN
 //#define ACTION_I_DECL(...)
 #define ACTION_I_DECL(n) ACTION_I_DECL_I(n)
 #define ACTION_I_DECL_I(n) ACTION_I_DECL ## n
@@ -436,7 +457,8 @@ A StaticAction<A>::instance;
 
 #endif
 
-/// @}
+/// \}
+/// \}
 
 } // namespace TURAG
 

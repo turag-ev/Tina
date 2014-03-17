@@ -9,6 +9,9 @@
 
 namespace TURAG {
 
+/// \addtogroup Utils
+/// \{
+
 template<typename T>
 #if GCC_VERSION < 40800 && !defined(__clang__)
 struct is_trivially_destructible : public std::has_trivial_destructor<T> { };
@@ -42,6 +45,8 @@ void destruct(ForwardIterator first, ForwardIterator last) {
     destruct(std::addressof(*first));
   }
 }
+
+/// \}
 
 } // namespace TURAG
 

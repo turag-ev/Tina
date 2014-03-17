@@ -6,6 +6,9 @@
 
 namespace TURAG {
 
+/// \addtogroup Utils
+/// \{
+
 ////////////////////////////////////////////////////////////////////////////////
 // ScopedLock
 
@@ -56,6 +59,8 @@ private:
   Mutex& m_;
   bool locked_;
 };
+
+/// \}
 
 } // namespace TURAG
 

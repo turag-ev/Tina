@@ -6,6 +6,9 @@
 
 namespace TURAG {
 
+/// \addtogroup Ranges
+/// \{
+
 template< class ForwardRange >
 class sub_range : public iterator_range< typename range_traits<ForwardRange>::iterator >
 {
@@ -124,6 +127,8 @@ inline bool operator<( const sub_range<ForwardRange>& l,
 {
     return iterator_range_detail::less_than( l, r );
 }
+
+/// \}
 
 } // namespace TURAG
 

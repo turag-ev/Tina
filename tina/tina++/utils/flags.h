@@ -7,7 +7,7 @@
 
 namespace TURAG {
 
-/// @addtogroup Utils Werkzeuge
+/// @addtogroup Utils
 /// @{
 
 template<typename Enum, std::size_t Bits>

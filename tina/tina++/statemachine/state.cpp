@@ -18,7 +18,7 @@ namespace TURAG {
 
 // Mögliche Zustände für Aktionen:
 //                     | currentstate_ | parent_  | child_   | about_to_close_
-// -----------------------------------------------------------------------------
+// --------------------+---------------+----------+----------+------------------
 // aktiv               | !nullptr      | undef.   | undef.   | false
 // wartet auf Beenden  | !nullptr      | undef.   | !nullptr | true
 // wird beendet        | !nullptr      | undef.   | nullptr  | true

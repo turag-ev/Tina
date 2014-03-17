@@ -12,7 +12,7 @@ namespace TURAG {
 /// \cond INCLUDE_HELPER
 
 /// \brief Stellt Speicher für Klasse bereit, der entsprechend des Types ausgerichtet ist.
-/// \ingroup Helferklassen
+/// \ingroup Utils
 /// Wird verwendet in \a ArrayBuffer und \a CircularBuffer
 template<typename T>
 struct storage {
