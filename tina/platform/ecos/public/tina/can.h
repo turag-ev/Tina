@@ -29,7 +29,7 @@ TuragCanErrorCode turag_can_read_blackboard(const TuragCanBlackboard* object, vo
 /// \returns return value of rpc as 64bit of data
 uint64_t turag_can_call(TuragCanId remote_id, TuragCanFuncId func_id, uint64_t param, TuragCanErrorCode* error_res);
 
-// CASA_RPC_BIND C++ replacement
+// CASA_RPC_BIND C replacement
 #define CAN_RPC_BIND(function, id) \
   Casa_RpcBinding_t _Casa_RpcHandlerTableEntry_##id CYG_HAL_TABLE_ENTRY(Casa_RpcHandlers) = { \
     funcId: id, handler: function \
@@ -37,13 +37,13 @@ uint64_t turag_can_call(TuragCanId remote_id, TuragCanFuncId func_id, uint64_t p
 
 #define CAN_RPC_HANDLER_DEF(id) uint64_t Casa_RpcHandler_##id (uint64_t)
 
-// CASA_RPC_HANDLER C++ replacement
+// CASA_RPC_HANDLER C replacement
 #define CAN_RPC_HANDLER(id, param) \
   uint64_t Casa_RpcHandler_##id (uint64_t); \
   CAN_RPC_BIND(Casa_RpcHandler_##id, id); \
   uint64_t Casa_RpcHandler_##id (uint64_t param)
 
-// CASA_BBOBJECT C++ replacement
+// CASA_BBOBJECT C replacement
 #define CAN_BBOBJECT(name, objectId, objectOwner, dataSize) \
   static struct { \
     Casa_BBObject_RuntimeData_t rtData; \
