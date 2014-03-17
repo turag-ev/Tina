@@ -46,7 +46,7 @@ void print_debug_info(const Event& e) {
   const char* name = (e.event_class->name) ? e.event_class->name : "";
 
   if ((id >> 8) != 0) {
-    infof("Event: %s (id: %c%c%c%u param: %" PRIu32 " method: 0x%zx)",
+      infof("Event: %s (id: %c%c%c%u param: %" PRIu32 " method: 0x" PRIxPTR ")",
           name,
           static_cast<char>(id >> 24),
           static_cast<char>(id >> 16),
@@ -55,7 +55,7 @@ void print_debug_info(const Event& e) {
           e.param,
           reinterpret_cast<ptrdiff_t>(e.method));
   } else {
-    infof("Event: %s (id: %u param: %" PRIu32 " method: 0x%zx)",
+    infof("Event: %s (id: %u param: %" PRIu32 " method: 0x" PRIxPTR ")",
           name,
           static_cast<unsigned>(id),
           e.param,
@@ -251,7 +251,7 @@ void EventQueue::printTimeQueue() {
     for (const auto& tevent : timequeue_) {
       EventId id = tevent.event.event_class->id;
 
-      infof("  @%u ms %c%c%c%u %zx\n",
+      infof("  @%u ms %c%c%c%u " PRIxPTR "\n",
             ticks_to_ms(tevent.time),
             static_cast<char>(id >> 24),
             static_cast<char>(id >> 16),
@@ -285,9 +285,9 @@ EventQueue::printDebugInfo() {
   printQueue();
 
   info ("Stack:\n");
-  infof("  size of EventQueue: %zu bytes\n", sizeof(EventQueue));
-  infof("  number of queue elements: %zu\n", size);
-  infof("  number of timed queue elements: %zu\n", timequeue_size);
+  infof("  size of EventQueue: " PRIuPTR " bytes\n", sizeof(EventQueue));
+  infof("  number of queue elements: " PRIuPTR "\n", size);
+  infof("  number of timed queue elements: " PRIuPTR "\n", timequeue_size);
 }
 #endif // NDEBUG
 
