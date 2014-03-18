@@ -5,6 +5,15 @@
 
 #ifdef TURAG_DEBUG_ENABLE_GRAPH
 
+unsigned turag_graph_index = 0;
+
+
+unsigned turag_graph_create(const char* name) {
+    debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_GRAPH_CREATE TURAG_DEBUG_GRAPH_PREFIX "%d %s" TURAG_DEBUG_NEWLINE, turag_graph_index, name);
+    return turag_graph_index++;
+}
+
+
 void turag_graph_data(int index, float time, float* args, int count) {
     debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_GRAPH_DATA TURAG_DEBUG_GRAPH_PREFIX "%d ", index);
 
