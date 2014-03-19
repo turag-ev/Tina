@@ -47,7 +47,7 @@
 # define TURAG_DEBUG_LOG_SOURCE "_"
 #endif
 
-#if !defined(NDEBUG) && TURAG_DEBUG_DEBUG_LEVEL < 1
+#if !defined(NDEBUG) && TURAG_DEBUG_LEVEL < 1
 # define NDEBUG
 #endif
 
@@ -104,11 +104,11 @@
 
 
 #ifdef TURAG_DEBUG_ENABLE_GRAPH
-# define turag_graph_create(index, name) debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_GRAPH_CREATE TURAG_DEBUG_GRAPH_PREFIX "%d %s", index, name)
-# define turag_graph_channel_title(index, title) debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_GRAPH_TITLE TURAG_DEBUG_GRAPH_PREFIX "%d %s", index, title)
+  unsigned turag_graph_create(const char* name);
+# define turag_graph_channel_title(index, title) debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_GRAPH_TITLE TURAG_DEBUG_GRAPH_PREFIX "%d %s" TURAG_DEBUG_NEWLINE, index, title)
   void turag_graph_data(int index, float time, float* args, int count);
 #else
-# define turag_graph_create(index, name) while(0)
+# define turag_graph_create(name) while(0)
 # define turag_graph_channel_title(index, title) while(0)
 # define turag_graph_data(index, time, args, count) while(0)
 #endif
