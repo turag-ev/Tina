@@ -300,7 +300,7 @@ A StaticAction<A>::instance;
     static bool s3(EventId, EventArg)
 #define ACTION_I_DECL4(s1, s2, s3, s4) \
     ACTION_I_DECL3(s1, s2, s3); \
-    static bool s4 (EventId, EventArg)
+    static bool s4(EventId, EventArg)
 #define ACTION_I_DECL5(s1, s2, s3, s4, s5) \
     ACTION_I_DECL4(s1, s2, s3, s4); \
     static bool s5 (EventId, EventArg)
