@@ -10,7 +10,8 @@
 #ifndef TINA_DEBUG_H
 #define TINA_DEBUG_H
 
-#include <tina/debug/functions.h>
+#include <tina/debug/print.h>
+#include <tina/debug/graph.h>
 
 #if TURAG_DEBUG_LEVEL > 0
 # define system_printf(format, args...) \

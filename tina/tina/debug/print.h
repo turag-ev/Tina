@@ -1,17 +1,34 @@
-#ifndef FUNCTIONS_H
-#define FUNCTIONS_H
+#ifndef TINA_DEBUG_PRINT_H
+#define TINA_DEBUG_PRINT_H
 
 #include <tina/debugprint.h>
 #include "defines.h"
 
 /// \addtogroup Debug
 /// \{
+/// \defgroup Debugprint Meldungsausgabe
+/// \{
+
+/// Prefix für Fehlermeldung
+#define TURAG_DEBUG_ERROR_PREFIX    "!"
+
+/// Prefix für kritische Debugmeldungen
+#define TURAG_DEBUG_CRITICAL_PREFIX "!"
+
+/// Prefix für Warnungen
+#define TURAG_DEBUG_WARN_PREFIX     "?"
+
+/// Prefix für informative Meldungen
+#define TURAG_DEBUG_INFO_PREFIX     "-"
+
+/// Prefix für Debugmeldungen
+#define TURAG_DEBUG_DEBUG_PREFIX    "_"
 
 #ifdef DOXYGEN
 
 /// \brief Gibt Systemmeldungen formatiert aus.
 ///
-/// Zur Formatierungen weitere Informationen unter: <a href="http://en.cppreference.com/w/c/io/fprintf">printf</a>
+/// Zur Formatierungen weitere Informationen unter <a href="http://en.cppreference.com/w/c/io/fprintf">printf</a>.
 /// Nur bei der Definition von \ref TURAG_DEBUG_LEVEL größer 0 wird tatsächlich Meldung ausgegeben.
 /// \param format Formatstring entsprechend printf aus stdio.h
 /// \param ... Formatargumente entsprechend Formatstring
@@ -19,7 +36,7 @@ void turag_system_printf(const char* format, ...);
 
 /// \brief Gibt Systemmeldungen aus.
 ///
-/// Zur Formatierungen weitere Informationen unter: <a href="http://en.cppreference.com/w/c/io/fprintf">printf</a>
+/// Zur Formatierungen weitere Informationen unter <a href="http://en.cppreference.com/w/c/io/fprintf">printf</a>.
 /// Nur bei der Definition von \ref TURAG_DEBUG_LEVEL größer 0 wird tatsächlich Meldung ausgegeben.
 /// \param msg Zeichenkette, die ausgeben werden soll
 void turag_system_print(const char* msg);
@@ -42,7 +59,7 @@ void turag_system_print(const char* msg);
 
 /// \brief Gibt Fehlermeldungen formatiert aus.
 ///
-/// Zur Formatierungen weitere Informationen unter: <a href="http://en.cppreference.com/w/c/io/fprintf">printf</a>
+/// Zur Formatierungen weitere Informationen unter <a href="http://en.cppreference.com/w/c/io/fprintf">printf</a>.
 /// Nur bei der Definition von \ref TURAG_DEBUG_LEVEL größer 0 wird tatsächlich Meldung ausgegeben.
 /// \param format Formatstring entsprechend printf aus stdio.h
 /// \param ... Formatargumente entsprechend Formatstring
@@ -50,7 +67,7 @@ void turag_errorf(const char* format, ...);
 
 /// \brief Gibt Fehlermeldungen aus.
 ///
-/// Zur Formatierungen weitere Informationen unter: <a href="http://en.cppreference.com/w/c/io/fprintf">printf</a>
+/// Zur Formatierungen weitere Informationen unter <a href="http://en.cppreference.com/w/c/io/fprintf">printf</a>.
 /// Nur bei der Definition von \ref TURAG_DEBUG_LEVEL größer 0 wird tatsächlich Meldung ausgegeben.
 /// \param msg Zeichenkette, die ausgeben werden soll
 void turag_error(const char* msg);
@@ -73,7 +90,7 @@ void turag_error(const char* msg);
 
 /// \brief Gibt Meldungen über kritischen Zustand formatiert aus.
 ///
-/// Zur Formatierungen weitere Informationen unter: <a href="http://en.cppreference.com/w/c/io/fprintf">printf</a>
+/// Zur Formatierungen weitere Informationen unter <a href="http://en.cppreference.com/w/c/io/fprintf">printf</a>.
 /// Nur bei der Definition von \ref TURAG_DEBUG_LEVEL größer 1 wird tatsächlich Meldung ausgegeben.
 /// \param format Formatstring entsprechend printf aus stdio.h
 /// \param ... Formatargumente entsprechend Formatstring
@@ -81,7 +98,7 @@ void turag_criticalf(const char* format, ...);
 
 /// \brief Gibt Meldungen über kritischen Zustand aus.
 ///
-/// Zur Formatierungen weitere Informationen unter: <a href="http://en.cppreference.com/w/c/io/fprintf">printf</a>
+/// Zur Formatierungen weitere Informationen unter <a href="http://en.cppreference.com/w/c/io/fprintf">printf</a>.
 /// Nur bei der Definition von \ref TURAG_DEBUG_LEVEL größer 1 wird tatsächlich Meldung ausgegeben.
 /// \param msg Zeichenkette, die ausgeben werden soll
 void turag_critical(const char* msg);
@@ -104,7 +121,7 @@ void turag_critical(const char* msg);
 
 /// \brief Gibt Warningsmeldungen formatiert aus.
 ///
-/// Zur Formatierungen weitere Informationen unter: <a href="http://en.cppreference.com/w/c/io/fprintf">printf</a>
+/// Zur Formatierungen weitere Informationen unter <a href="http://en.cppreference.com/w/c/io/fprintf">printf</a>.
 /// Nur bei der Definition von \ref TURAG_DEBUG_LEVEL größer 2 wird tatsächlich Meldung ausgegeben.
 /// \param format Formatstring entsprechend printf aus stdio.h
 /// \param ... Formatargumente entsprechend Formatstring
@@ -112,7 +129,7 @@ void turag_warningf(const char* format, ...);
 
 /// \brief Gibt Warningsmeldungen aus.
 ///
-/// Zur Formatierungen weitere Informationen unter: <a href="http://en.cppreference.com/w/c/io/fprintf">printf</a>
+/// Zur Formatierungen weitere Informationen unter <a href="http://en.cppreference.com/w/c/io/fprintf">printf</a>.
 /// Nur bei der Definition von \ref TURAG_DEBUG_LEVEL größer 2 wird tatsächlich Meldung ausgegeben.
 /// \param msg Zeichenkette, die ausgeben werden soll
 void turag_warning(const char* msg);
@@ -133,17 +150,17 @@ void turag_warning(const char* msg);
 
 #ifdef DOXYGEN
 
-/// \brief Gibt einfache Meldungen formatiert aus.
+/// \brief Gibt informative Meldungen formatiert aus.
 ///
-/// Zur Formatierungen weitere Informationen unter: <a href="http://en.cppreference.com/w/c/io/fprintf">printf</a>
+/// Zur Formatierungen weitere Informationen unter <a href="http://en.cppreference.com/w/c/io/fprintf">printf</a>.
 /// Nur bei der Definition von \ref TURAG_DEBUG_LEVEL größer 3 wird tatsächlich Meldung ausgegeben.
 /// \param format Formatstring entsprechend printf aus stdio.h
 /// \param ... Formatargumente entsprechend Formatstring
 void turag_infof(const char* format, ...);
 
-/// \brief Gibt einfache Meldungen aus.
+/// \brief Gibt informative Meldungen aus.
 ///
-/// Zur Formatierungen weitere Informationen unter: <a href="http://en.cppreference.com/w/c/io/fprintf">printf</a>
+/// Zur Formatierungen weitere Informationen unter <a href="http://en.cppreference.com/w/c/io/fprintf">printf</a>.
 /// Nur bei der Definition von \ref TURAG_DEBUG_LEVEL größer 3 wird tatsächlich Meldung ausgegeben.
 /// \param msg Zeichenkette, die ausgeben werden soll
 void turag_info(const char* msg);
@@ -166,7 +183,7 @@ void turag_info(const char* msg);
 
 /// \brief Gibt Warningsmeldungen formatiert aus.
 ///
-/// Zur Formatierungen weitere Informationen unter: <a href="http://en.cppreference.com/w/c/io/fprintf">printf</a>
+/// Zur Formatierungen weitere Informationen unter <a href="http://en.cppreference.com/w/c/io/fprintf">printf</a>.
 /// Nur bei der Definition von \ref TURAG_DEBUG_LEVEL größer 4 wird tatsächlich Meldung ausgegeben.
 /// \warning Standardmäßig ist TURAG_DEBUG_LEVEL gleich 4, womit Meldungen von
 ///         \ref turag_debugf ignoriert werden. Wenn turag_debugf für eine Datei
@@ -178,7 +195,7 @@ void turag_debugf(const char* format, ...);
 
 /// \brief Gibt Warningsmeldungen aus.
 ///
-/// Zur Formatierungen weitere Informationen unter: <a href="http://en.cppreference.com/w/c/io/fprintf">printf</a>
+/// Zur Formatierungen weitere Informationen unter <a href="http://en.cppreference.com/w/c/io/fprintf">printf</a>.
 /// Nur bei der Definition von \ref TURAG_DEBUG_LEVEL größer 4 wird tatsächlich Meldung ausgegeben.
 /// \warning Standardmäßig ist TURAG_DEBUG_LEVEL gleich 4, womit Meldungen von
 ///         \ref turag_debug ignoriert werden. Wenn \ref turag_debug für eine Datei
@@ -201,38 +218,17 @@ void turag_debug(const char* msg);
 
 #endif // DOXYGEN
 
-#ifdef TURAG_DEBUG_ENABLE_GRAPH
-
-  unsigned turag_graph_create(const char* name);
-
-#ifdef DOXYGEN
-///
-void turag_graph_channel_title(int index, const char* title);
-#else // DOXYGEN
-# define turag_graph_channel_title(index, title) \
-    turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_GRAPH_TITLE TURAG_DEBUG_GRAPH_PREFIX "%d %s" TURAG_DEBUG_NEWLINE, index, title)
-#endif // DOXYGEN
-
-  void turag_graph_data(int index, float time, float* args, int count);
-
-#else
-
-# define turag_graph_create(name) while(0)
-# define turag_graph_channel_title(index, title) while(0)
-# define turag_graph_data(index, time, args, count) while(0)
-
-#endif
-
 /// Gibt Zeichenketten entsprechend in englischer Sprache für Boolean zurück.
-/// \param b Boolean-Wert
+/// \param boolean Boolean-Wert
 /// \returns Zeichenekette "yes" wenn \p b wahr, sonst "no"
-#define turag_bool_string(b) ((b)?"yes":"no")
+#define turag_bool_string(boolean) ((boolean)?"yes":"no")
 
 /// Gibt Zeichenketten entsprechend in deutscher Sprache für Boolean zurück.
-/// \param b Boolean-Wert
+/// \param boolean Boolean-Wert
 /// \returns Zeichenekette "ja" wenn \p b wahr, sonst "nein"
-#define turag_bool_string_de(b) ((b)?"ja":"nein")
+#define turag_bool_string_de(boolean) ((boolean)?"ja":"nein")
 
 /// \}
+/// \}
 
-#endif // FUNCTIONS_H
+#endif // TINA_DEBUG_PRINT_H
