@@ -7,7 +7,7 @@
 #include <algorithm>
 
 #include "../tina.h"
-#include "../debug.h"
+#include <tina/debug.h>
 #include "array_storage.h"
 
 namespace TURAG {

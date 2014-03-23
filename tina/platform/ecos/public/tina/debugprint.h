@@ -10,10 +10,10 @@ extern "C" {
 // repariert das von eCos zerstörte __PRETTY_FUNCTION__ Makro:
 #undef __PRETTY_FUNCTION__
 
-void debug_puts(const char* s);
+void turag_debug_puts(const char* s);
 
 /// Zeichenkette formatiert ausgeben
-#define debug_printf printf
+#define turag_debug_printf printf
 
 #ifdef __cplusplus
 } // extern "C"

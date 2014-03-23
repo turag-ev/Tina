@@ -10,7 +10,7 @@
 #ifndef TINAPP_DEBUG_H
 #define TINAPP_DEBUG_H
 
-#include <tina/debug.h>
+#include <tina/debug/functions.h>
 
 #endif // UTILS_DEBUG_H
 

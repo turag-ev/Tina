@@ -7,8 +7,8 @@
 extern "C" {
 #endif
 
-#define debug_puts      SC_DEBUG
-#define debug_printf    SC_DEBUG
+#define turag_debug_puts      SC_DEBUG
+#define turag_debug_printf    SC_DEBUG
 
 #ifdef __cplusplus
 } // extern "C"
