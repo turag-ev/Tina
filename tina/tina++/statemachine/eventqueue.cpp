@@ -46,7 +46,7 @@ void print_debug_info(const Event& e) {
   const char* name = (e.event_class->name) ? e.event_class->name : "";
 
   if ((id >> 8) != 0) {
-      infof("Event: %s (id: %c%c%c%u param: %" PRIu32 " method: 0x%" PRIxPTR ")",
+      turag_infof("Event: %s (id: %c%c%c%u param: %" PRIu32 " method: 0x%" PRIxPTR ")",
           name,
           static_cast<char>(id >> 24),
           static_cast<char>(id >> 16),
@@ -55,7 +55,7 @@ void print_debug_info(const Event& e) {
           e.param,
           reinterpret_cast<std::size_t>(e.method));
   } else {
-    infof("Event: %s (id: %u param: %" PRIu32 " method: 0x%" PRIxPTR ")",
+    turag_infof("Event: %s (id: %u param: %" PRIu32 " method: 0x%" PRIxPTR ")",
           name,
           static_cast<unsigned>(id),
           e.param,
@@ -244,14 +244,14 @@ void EventQueue::removeCallback(EventMethod method) {
 void EventQueue::printTimeQueue() {
   Mutex::Lock lock(mutex_);
 
-  infof("Timed Events:\n");
-  infof("  current time: %u ms\n", ticks_to_ms(get_current_tick()));
+  turag_infof("Timed Events:\n");
+  turag_infof("  current time: %u ms\n", ticks_to_ms(get_current_tick()));
 
   if (!timequeue_.empty()) {
     for (const auto& tevent : timequeue_) {
       EventId id = tevent.event.event_class->id;
 
-      infof("  @%u ms %c%c%c%u %" PRIxPTR "\n",
+      turag_infof("  @%u ms %c%c%c%u %" PRIxPTR "\n",
             ticks_to_ms(tevent.time),
             static_cast<char>(id >> 24),
             static_cast<char>(id >> 16),
@@ -260,7 +260,7 @@ void EventQueue::printTimeQueue() {
             reinterpret_cast<ptrdiff_t>(tevent.event.method));
     }
   } else {
-    info("  timed event queue is empty\n");
+    turag_info("  timed event queue is empty\n");
   }
 }
 
@@ -268,14 +268,14 @@ void
 EventQueue::printQueue() {
   Mutex::Lock lock(mutex_);
 
-  info("EventQueue Debug Information:");
-  info(" - Events:");
+  turag_info("EventQueue Debug Information:");
+  turag_info(" - Events:");
   if (!queue_.empty()) {
     for (const auto& event : queue_) {
       print_debug_info(event);
     }
   } else {
-    info("  event queue is empty");
+    turag_info("  event queue is empty");
   }
 }
 
@@ -284,10 +284,10 @@ EventQueue::printDebugInfo() {
   printTimeQueue();
   printQueue();
 
-  info ("Stack:\n");
-  infof("  size of EventQueue: %" PRIuPTR " bytes\n", sizeof(EventQueue));
-  infof("  number of queue elements: %" PRIuPTR "\n", size);
-  infof("  number of timed queue elements: %" PRIuPTR "\n", timequeue_size);
+  turag_info ("Stack:\n");
+  turag_infof("  size of EventQueue: %" PRIuPTR " bytes\n", sizeof(EventQueue));
+  turag_infof("  number of queue elements: %" PRIuPTR "\n", size);
+  turag_infof("  number of timed queue elements: %" PRIuPTR "\n", timequeue_size);
 }
 #endif // NDEBUG
 

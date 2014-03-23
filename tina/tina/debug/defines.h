@@ -20,10 +20,10 @@
 /// Zum Abschicken von Debugausgaben stehen Funktionen zur Verfügung, die sich ähnlich wie ''printf'' verhalten:
 /// \code{.cpp}
 /// // freigeschaltet bei DEBUG_LEVEL > 3
-/// turag_infof("formatierte Ausgabe %s", "von einfachen Informationen");
+/// turag_turag_infof("formatierte Ausgabe %s", "von einfachen Informationen");
 ///
 /// // freigeschaltet bei DEBUG_LEVEL > 2
-/// turag_warningf("formatierte Ausgabe %s", "von Warnungen");
+/// turag_turag_warningf("formatierte Ausgabe %s", "von Warnungen");
 ///
 /// // freigeschaltet bei DEBUG_LEVEL > 1
 /// turag_criticalf("formatierte Ausgabe %s", "von kritischen Fehlern");

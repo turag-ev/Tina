@@ -111,7 +111,7 @@ const EventClass UnnamedEventClass<id>::event_class("Unbekannt", id);
 ///
 /// \code{.cpp}
 ///   DEFINE_EVENT_CLASS(EventWon, WinAction::event_won);
-///   infof("%s", EventWon->name); // gibt "WinAction::event_won" aus
+///   turag_infof("%s", EventWon->name); // gibt "WinAction::event_won" aus
 /// \endcode
 #define DEFINE_EVENT_CLASS(name,event) const EventClass name(#event, event)
 
@@ -122,7 +122,7 @@ const EventClass UnnamedEventClass<id>::event_class("Unbekannt", id);
 ///
 /// \code{.cpp}
 ///   DEFINE_EVENT_CLASS_EXTRA(EventWon, WinAction::event_won, "Wir haben gewonnen!");
-///   infof("%s", EventWon->name); // gibt "WinAction::event_won: Wir haben gewonnen!" aus
+///   turag_infof("%s", EventWon->name); // gibt "WinAction::event_won: Wir haben gewonnen!" aus
 /// \endcode
 #define DEFINE_EVENT_CLASS_EXTRA(name,event,msg) const EventClass name(#event ": " msg, event)
 

@@ -42,7 +42,7 @@ void BluetoothBase::init(void) {
 void BluetoothBase::main_thread_func(void) {
     Thread<>::setName("bluetooth-high");
 
-    info("Bluetooth-High-Level thread started");
+    turag_info("Bluetooth-High-Level thread started");
 
     Rpc_t rpc;
     Status connectionStatus[BLUETOOTH_NUMBER_OF_PEERS] {Status::disconnected};
@@ -54,12 +54,12 @@ void BluetoothBase::main_thread_func(void) {
             Status newConnectionStatus = getConnectionStatusLowlevel(i);
 
             if (connectionStatus[i] != Status::connected && newConnectionStatus == Status::connected) {
-                infof("Peer %d: connection established", i);
+                turag_infof("Peer %d: connection established", i);
                 if (!peerConnectionSuccessfulOnce[i].load(std::memory_order_relaxed)) {
                     peerConnectionSuccessfulOnce[i].store(true, std::memory_order_relaxed);
                 }
             } else if (connectionStatus[i] == Status::connected && newConnectionStatus != Status::connected) {
-                warningf("Peer %d: connection LOST", i);
+                turag_warningf("Peer %d: connection LOST", i);
             }
             connectionStatus[i] = newConnectionStatus;
         }
@@ -74,7 +74,7 @@ void BluetoothBase::main_thread_func(void) {
                     lock.unlock();
 
                     if (callback) {
-                        debugf("call RPC %d", rpc.data.rpc_id);
+                        turag_debugf("call RPC %d", rpc.data.rpc_id);
                         (*callback)(rpc.peer_id, rpc.data.param);
                     }
                 } else {
@@ -88,9 +88,9 @@ void BluetoothBase::main_thread_func(void) {
                     buffer[buffer_size - 1] = 3;
                     if (connectionStatus[rpc.peer_id] == Status::connected) {
                         if (write(rpc.peer_id, buffer, buffer_size)) {
-                            debugf("call Remote-RPC %d on peer %d", rpc.data.rpc_id, rpc.peer_id);
+                            turag_debugf("call Remote-RPC %d on peer %d", rpc.data.rpc_id, rpc.peer_id);
                         } else {
-                            warningf("call Remote-RPC %d on peer %d - FAILED", rpc.data.rpc_id, rpc.peer_id);
+                            turag_warningf("call Remote-RPC %d on peer %d - FAILED", rpc.data.rpc_id, rpc.peer_id);
                         }
                     }
                 }
@@ -120,10 +120,10 @@ void BluetoothBase::main_thread_func(void) {
                     // write to bluetooth, we unlock the mutex in case the writing takes a bit more time
                     if (connectionStatus[dest] == Status::connected) {
                         if (write(dest, buffer, encoded_buffer_size)) {
-                            debugf("DataProvider %d push to %d", id, dest);
+                            turag_debugf("DataProvider %d push to %d", id, dest);
                             provider.sendRequest.store(false, std::memory_order_relaxed);
                         } else {
-                            warningf("DataProvider %d push to %d - FAILED", id, dest);
+                            turag_warningf("DataProvider %d push to %d - FAILED", id, dest);
                         }
                     }
                 } else {
@@ -157,16 +157,16 @@ void BluetoothBase::highlevelParseIncomingData(uint8_t sender, uint8_t* buffer, 
             if (decode_buffer[0] < 64) {
                 // RPC
                 if (decode_buffer[0] >= BLUETOOTH_NUMBER_OF_RPCS) {
-                    criticalf("RPC %d recv from %d--> ID invalid", decode_buffer[0], sender);
+                    turag_criticalf("RPC %d recv from %d--> ID invalid", decode_buffer[0], sender);
                 } else if (decoded_size != sizeof(RpcData)) {
-                    criticalf("RPC %d recv from %d --> package size mismatch (%d)", decode_buffer[0], sender, static_cast<int>(decoded_size));
+                    turag_criticalf("RPC %d recv from %d --> package size mismatch (%d)", decode_buffer[0], sender, static_cast<int>(decoded_size));
                 } else {
                     Rpc_t rpc;
                     std::memcpy(&rpc.data, decode_buffer, sizeof(RpcData));
                     rpc.peer_id = sender;
                     rpc.received = true;
                     rpc_fifo.post(rpc);
-                    debugf("RPC %d recv from %d --> queued for exec", decode_buffer[0], sender);
+                    turag_debugf("RPC %d recv from %d --> queued for exec", decode_buffer[0], sender);
                 }
             } else {
                 // data for DataSink
@@ -174,11 +174,11 @@ void BluetoothBase::highlevelParseIncomingData(uint8_t sender, uint8_t* buffer, 
                 if (data_sink_id < BLUETOOTH_NUMBER_OF_DATA_SINKS) {
                     Mutex::Lock lock(data_sink_mutex);
                     if (data_sinks[data_sink_id].buffer && decoded_size == data_sinks[data_sink_id].buffer_size && decoded_size > 1) {
-                        debugf("DataSink %d recv data from %d", data_sink_id, sender);
+                        turag_debugf("DataSink %d recv data from %d", data_sink_id, sender);
                         std::memcpy(data_sinks[data_sink_id].buffer, &decode_buffer, decoded_size);
                     }
                 } else {
-                    criticalf("DataSink %d recv data from %d -> ID invalid!", data_sink_id, sender);
+                    turag_criticalf("DataSink %d recv data from %d -> ID invalid!", data_sink_id, sender);
                 }
             }
         } else {
@@ -186,7 +186,7 @@ void BluetoothBase::highlevelParseIncomingData(uint8_t sender, uint8_t* buffer, 
             ++in_buffer[sender].index;
             if (in_buffer[sender].index == sizeof(InBuffer::data)) {
                 in_buffer[sender].waitForStartByte = true;
-                warningf("Overflow in recv-buffer for peer %d", sender);
+                turag_warningf("Overflow in recv-buffer for peer %d", sender);
             }
         }
     }
@@ -200,7 +200,7 @@ bool BluetoothBase::registerRpcFunction(uint8_t rpc_id, RpcFunction callback) {
         rpc_functions[rpc_id] = callback;
         return true;
     } else {
-        error("invalid RPC ID");
+        turag_error("invalid RPC ID");
         return false;
     }
 }
@@ -208,7 +208,7 @@ bool BluetoothBase::registerRpcFunction(uint8_t rpc_id, RpcFunction callback) {
 
 bool BluetoothBase::callRpc(uint8_t destination, uint8_t rpc_id, uint64_t param) {
     if (destination >= BLUETOOTH_NUMBER_OF_PEERS) {
-        error("invalid peer ID");
+        turag_error("invalid peer ID");
         return false;
     } else if (!peersEnabled[destination].load(std::memory_order_relaxed)) {
         return false;
@@ -225,15 +225,15 @@ bool BluetoothBase::callRpc(uint8_t destination, uint8_t rpc_id, uint64_t param)
 
 bool BluetoothBase::addDataSink(uint8_t data_sink_id, uint8_t* storage_buffer, size_t length) {
     if (data_sink_id >= BLUETOOTH_NUMBER_OF_DATA_SINKS || !storage_buffer) {
-        error("invalid DataSink ID or storage pointer zero");
+        turag_error("invalid DataSink ID or storage pointer zero");
         return false;
     } else if (length > 92 + 1) {
-		error("DataSinks can not hold data bigger than 92 byte");
+        turag_error("DataSinks can not hold data bigger than 92 byte");
 		return false;
     } else {
         Mutex::Lock lock(data_sink_mutex);
         if (data_sinks[data_sink_id].buffer) {
-            warningf("datasink %d was overwritten", data_sink_id);
+            turag_warningf("datasink %d was overwritten", data_sink_id);
         }
         data_sinks[data_sink_id] = DataSink(storage_buffer, length);
         return true;
@@ -242,12 +242,12 @@ bool BluetoothBase::addDataSink(uint8_t data_sink_id, uint8_t* storage_buffer, s
 
 bool BluetoothBase::getData(uint8_t data_sink_id, uint8_t* buffer, size_t length) {
     if (data_sink_id >= BLUETOOTH_NUMBER_OF_DATA_SINKS || !buffer) {
-        error("invalid DataSink ID or buffer pointer zero");
+        turag_error("invalid DataSink ID or buffer pointer zero");
         return false;
     } else {
         Mutex::Lock lock(data_sink_mutex);
         if (length != data_sinks[data_sink_id].buffer_size) {
-            errorf("incorrect data length for DataSink %d", data_sink_id);
+            turag_errorf("incorrect data length for DataSink %d", data_sink_id);
             return false;
         }
         std::memcpy(buffer, data_sinks[data_sink_id].buffer, length);
@@ -258,19 +258,19 @@ bool BluetoothBase::getData(uint8_t data_sink_id, uint8_t* buffer, size_t length
 
 bool BluetoothBase::addDataProvider(uint8_t destination, uint8_t data_provider_id, uint8_t* storage_buffer, size_t length) {
     if (!storage_buffer) {
-        error("storage pointer zero");
+        turag_error("storage pointer zero");
         return false;
     } else if (length > 92 + 1) {
-        error("DataProvider can not hold data bigger than 92 byte");
+        turag_error("DataProvider can not hold data bigger than 92 byte");
         return false;
     } else if (destination > BLUETOOTH_NUMBER_OF_PEERS) {
-        error("DataSinks invalid peer ID");
+        turag_error("DataSinks invalid peer ID");
         return false;
     } else {
         Mutex::Lock lock(data_provider_mutex);
         ArrayBuffer<DataProvider, BLUETOOTH_NUMBER_OF_DATA_PROVIDERS>::iterator provider = std::find_if(data_providers.begin(), data_providers.end(), [&] (const DataProvider& provider) { return provider.destination == destination && provider.id == data_provider_id; });
         if (provider != data_providers.end()) {
-            warningf("dataprovider %d was overwritten", data_provider_id);
+            turag_warningf("dataprovider %d was overwritten", data_provider_id);
             provider->buffer = storage_buffer;
             provider->buffer_size = length;
             provider->destination = destination;
@@ -285,14 +285,14 @@ bool BluetoothBase::addDataProvider(uint8_t destination, uint8_t data_provider_i
 bool BluetoothBase::pushData(uint8_t destination, uint8_t data_provider_id, const uint8_t* data, size_t length) {
     ArrayBuffer<DataProvider, BLUETOOTH_NUMBER_OF_DATA_PROVIDERS>::iterator provider = std::find_if(data_providers.begin(), data_providers.end(), [&] (const DataProvider& provider) { return provider.destination == destination && provider.id == data_provider_id; });
     if (provider == data_providers.end()) {
-        error("specified data provider couldn't be found");
+        turag_error("specified data provider couldn't be found");
         return false;
     } else if (!peersEnabled[destination].load(std::memory_order_relaxed)) {
         return false;
     } else {
         Mutex::Lock lock(data_provider_mutex);
         if (length != provider->buffer_size) {
-            errorf("incorrect data length (pushData dest=%d id=%d)", destination, data_provider_id);
+            turag_errorf("incorrect data length (pushData dest=%d id=%d)", destination, data_provider_id);
             return false;
         }
         std::memcpy(provider->buffer, data, length);
@@ -305,7 +305,7 @@ bool BluetoothBase::pushData(uint8_t destination, uint8_t data_provider_id, cons
 bool BluetoothBase::pushData(uint8_t destination, uint8_t data_provider_id) {
     ArrayBuffer<DataProvider, BLUETOOTH_NUMBER_OF_DATA_PROVIDERS>::iterator provider = std::find_if(data_providers.begin(), data_providers.end(), [&] (const DataProvider& provider) { return provider.destination == destination && provider.id == data_provider_id; });
     if (provider == data_providers.end()) {
-        error("specified data provider couldn't be found");
+        turag_error("specified data provider couldn't be found");
         return false;
     } else if (!peersEnabled[destination].load(std::memory_order_relaxed)) {
         return false;
@@ -333,10 +333,10 @@ void BluetoothBase::setPeerEnabled(uint8_t peer_id, bool enabled) {
     setPeerEnabledLowlevel(peer_id, enabled);
 
     if (enabled) {
-        infof("Peer %d enabled -> waiting for successful connection", peer_id);
+        turag_infof("Peer %d enabled -> waiting for successful connection", peer_id);
         peerConnectionSuccessfulOnce[peer_id].store(false, std::memory_order_relaxed);
     } else {
-        infof("Peer %d disabled", peer_id);
+        turag_infof("Peer %d disabled", peer_id);
     }
 
 }

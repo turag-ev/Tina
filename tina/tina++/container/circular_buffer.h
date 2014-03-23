@@ -5,7 +5,7 @@
 #include <iterator>
 
 #include "../tina.h"
-#include <tina/debug.h>
+#include "../debug.h"
 #include "array_storage.h"
 #include "../helper/integer.h"
 
@@ -283,7 +283,7 @@ public:
 
 #ifndef NDEBUG
     if (first_ == last_) {
-      error("CircularBuffer overflow!");
+      turag_error("CircularBuffer overflow!");
       --last_;
       return ;
     }
@@ -298,7 +298,7 @@ public:
 
 #ifndef NDEBUG
     if (first_.n_ == last_.n_) {
-      error("CircularBuffer overflow!");
+      turag_error("CircularBuffer overflow!");
       --last_;
       return ;
     }
@@ -313,7 +313,7 @@ public:
 
 #ifndef NDEBUG
     if (last_ == first_) {
-      error("CircularBuffer overflow!");
+      turag_error("CircularBuffer overflow!");
       ++first_;
       return ;
     }
@@ -327,7 +327,7 @@ public:
 
 #ifndef NDEBUG
     if (last_.n_ == first_.n_) {
-      error("CircularBuffer overflow!");
+      turag_error("CircularBuffer overflow!");
       ++first_;
       return ;
     }

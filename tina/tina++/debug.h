@@ -21,12 +21,12 @@ namespace TURAG {
 /// \{
 
 /// \copydoc turag_bool_string
-inline const char* bool_string(bool boolean) {
+inline const char* bool_str(bool boolean) {
     return boolean ? "yes" : "no";
 }
 
 /// \copydoc turag_bool_string_de
-inline const char* bool_string_de(bool boolean) {
+inline const char* bool_str_de(bool boolean) {
     return boolean ? "ja" : "nein";
 }
 

@@ -25,7 +25,7 @@ namespace TURAG {
 
 bool Action::exit(EventId eid) {
   if (isActive() && !about_to_close_) {
-    infof("#####-##### EXIT %s #####-#####", name_);
+    turag_infof("#####-##### EXIT %s #####-#####", name_);
 
     currentstate_ = nullptr;
     if (child_) {
@@ -49,7 +49,7 @@ bool Action::exit(EventId eid) {
       } else {
         bool handled = parent_->func(Action::event_return, eid);
         if (!handled) {
-          criticalf("Exit of Action %s is not handled", name_);
+          turag_criticalf("Exit of Action %s is not handled", name_);
         }
       }
     }
@@ -58,10 +58,10 @@ bool Action::exit(EventId eid) {
   } else {
     if (child_) {
       // Aktion beendet, aber eines der Kinderaktionen noch nicht
-      criticalf("Tried to exit an nonactive action %s (with unclosed action %s)", name_, child_->name_);
+      turag_criticalf("Tried to exit an nonactive action %s (with unclosed action %s)", name_, child_->name_);
       return false;
     } else {
-      criticalf("Tried to exit an nonactive action %s", name_);
+      turag_criticalf("Tried to exit an nonactive action %s", name_);
       return true;
     }
   }
@@ -69,7 +69,7 @@ bool Action::exit(EventId eid) {
 
 bool Action::cancel() {
   if (isActive() && !about_to_close_) {
-    infof("#####-##### CANCEL %s #####-#####", name_);
+    turag_infof("#####-##### CANCEL %s #####-#####", name_);
     if (child_) {
       bool nondelayed_close = child_->cancel();
       if (nondelayed_close) {
@@ -103,7 +103,7 @@ bool Action::cancel() {
 
   } else {
     if (!child_) {
-      criticalf("Tried to cancel an nonactive action %s", name_);
+      turag_criticalf("Tried to cancel an nonactive action %s", name_);
       return true;
     } else {
       // Wenn man auf das Beenden einer Kindaktion wartet
@@ -116,7 +116,7 @@ void Action::nextState(State next, EventArg data) {
   if (isActive() && !about_to_close_) {
     if (child_) {
       if (!child_->cancel()) {
-        errorf("called nextState in action %s with not trivial cancelable child action %s", name_, child_->name_);
+        turag_errorf("called nextState in action %s with not trivial cancelable child action %s", name_, child_->name_);
         // TODO: Zustand zulassen
 
         // Sollte nicht passieren: siehe Hinweis
@@ -130,13 +130,13 @@ void Action::nextState(State next, EventArg data) {
     currentstate_(Action::event_start, data);
 
   } else {
-    criticalf("Tried to change state of nonactive action %s", name_);
+    turag_criticalf("Tried to change state of nonactive action %s", name_);
   }
 }
 
 void Action::start(Action *parent, EventArg data) {
   if (!isActive() && !about_to_close_) {
-    infof("#####-##### START %s #####-#####", name_);
+    turag_infof("#####-##### START %s #####-#####", name_);
     parent_ = parent;
     child_ = nullptr;
     currentstate_ = startstate_;
@@ -144,7 +144,7 @@ void Action::start(Action *parent, EventArg data) {
     currentstate_(Action::event_start, data);
 
   } else {
-    criticalf("Tried to start an active action %s", name_);
+    turag_criticalf("Tried to start an active action %s", name_);
   }
 }
 
@@ -165,7 +165,7 @@ bool Action::func(EventId id, EventArg data) {
     }
 
   } else {
-    criticalf("Tried to call an nonactive action %s", name_);
+    turag_criticalf("Tried to call an nonactive action %s", name_);
     return false;
   }
 }
@@ -177,10 +177,10 @@ void Action::setChildAction(Action* child, EventArg data) {
       child->start(this, data);
 
     } else {
-      criticalf("Tried to set child of action %s, that has already a active child action: %s.", name_, child_->name_);
+      turag_criticalf("Tried to set child of action %s, that has already a active child action: %s.", name_, child_->name_);
     }
   } else {
-    criticalf("Tried to set child of non-active action %s to %s", name_, child->name_);
+    turag_criticalf("Tried to set child of non-active action %s to %s", name_, child->name_);
   }
 }
 
