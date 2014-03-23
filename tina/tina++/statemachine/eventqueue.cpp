@@ -27,17 +27,6 @@
 # undef EVENTQUEUE_USAGE_MEASUREMENT
 #endif
 
-// fix this for chibios:
-#undef PRIxPTR
-#undef PRIuPTR
-#if __WORDSIZE == 64
-# define PRIxPTR	"lx"
-# define PRIuPTR	"lu"
-#else
-# define PRIxPTR	"x"
-# define PRIuPTR	"u"
-#endif
-
 namespace TURAG {
 
 EventQueue::EventQueue() :
