@@ -7,7 +7,6 @@
 
 #include "public/tina++/thread.h"
 #include "public/tina/thread.h"
-#include <tina/debug.h>
 
 #ifdef NDEBUG
 # undef THREADS_STACK_MEASUREMENT
