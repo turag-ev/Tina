@@ -18,17 +18,18 @@
 #ifdef TURAG_DEBUG_ENABLE_GRAPH
 
 ///
-/// \brief turag_graph_create
-/// \param name
+/// \brief Creates a new diagram.
+/// \param name Title of the diagram.
+/// \return Index of the newly created diagram.
 ///
 unsigned turag_graph_create(const char* name);
 
 #ifdef DOXYGEN
 
-/// \brief turag_graph_channel_title
-/// \param index
-/// \param title
-void turag_graph_channel_title(int index, const char* title);
+/// \brief Add channels to a diagram and name them.
+/// \param index Index of the diagram to add the channels to.
+/// \param title Title of the channel.
+void turag_graph_channel_title(unsigned index, const char* title);
 
 #else // DOXYGEN
 
@@ -37,12 +38,12 @@ void turag_graph_channel_title(int index, const char* title);
 
 #endif // DOXYGEN
 
-/// \brief turag_graph_data
-/// \param index
-/// \param time
-/// \param args
-/// \param count
-void turag_graph_data(int index, float time, float* args, int count);
+/// \brief Add data to a diagram.
+/// \param index Index of the diagram to add data to.
+/// \param time Data for x-axis.
+/// \param args Pointer to data for the y-axis starting with the first channel.
+/// \param count Number of entries in args.
+void turag_graph_data(unsigned index, float time, float* args, int count);
 
 #else // TURAG_DEBUG_ENABLE_GRAPH
 

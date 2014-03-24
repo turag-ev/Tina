@@ -68,7 +68,7 @@ void turag_errorf(const char* format, ...);
 /// \brief Gibt Fehlermeldungen aus.
 ///
 /// Zur Formatierungen weitere Informationen unter <a href="http://en.cppreference.com/w/c/io/fprintf">printf</a>.
-/// Nur bei der Definition von \ref TURAG_DEBUG_LEVEL größer 0 wird tatsächlich Meldung ausgegeben.
+/// Nur bei der Definition von \ref TURAG_DEBUG_LEVEL größer 0 wird tatsächlich eine Meldung ausgegeben.
 /// \param msg Zeichenkette, die ausgeben werden soll
 void turag_error(const char* msg);
 
