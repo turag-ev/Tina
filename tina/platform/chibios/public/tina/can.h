@@ -4,6 +4,7 @@
 #include <casa/casa.h>
 #include <casa/blackboard.h>
 #include <casa/rpc.h>
+#include <tina/time.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,6 +21,9 @@ typedef Casa_Errno_t TuragCanErrorCode;
 typedef Casa_BBObject_t TuragCanBlackboard;
 typedef Casa_Id_t TuragCanId;
 typedef Casa_FuncId_t TuragCanFuncId;
+
+/// Blackboard callback function type
+typedef Casa_BBCallback_t TuragBlackboardCallback;
 
 TuragCanErrorCode turag_can_read_blackboard(const TuragCanBlackboard* object, void* dest);
 
@@ -55,12 +59,24 @@ uint64_t turag_can_call(TuragCanId remote_id, TuragCanFuncId func_id, uint64_t p
     writer: 0, \
     byteIndex: 0, \
     lastWrite: 0, \
-    /*callback: 0,*/ \
-    /*callbackData: 0,*/ \
+    callback: 0, \
+    callbackData: 0, \
     dataBuffer: NULL, \
     commBuffer: NULL, \
     buffer: { 0 } \
   }
+  
+/// Set Callback that is called, when new values arrive
+/// \param object Blackboard
+/// \param callback Callback that will be called
+/// \param user_data Data that will be the last argument to callback. Can be used for any user data.
+inline
+bool turag_set_blackboard_notify_callback(const TuragCanBlackboard* object,
+                                          TuragBlackboardCallback callback,
+                                          uint64_t callbackData)
+{
+    return object && (Casa_BBSetCallback(object->id, callback, callbackData) == -CASA_ENOERR);
+}
 
 #ifdef __cplusplus
 } // extern "C"

@@ -21,6 +21,8 @@ typedef Casa_BBObject_t Blackboard;
 /// RPC handler function type
 typedef uint64_t (*RpcHandler)(uint64_t param);
 
+/// Blackboard callback function type
+typedef Casa_BBCallback_t BlackboardCallback;
 
 constexpr ErrorCode NoError = -CASA_ENOERR;
 constexpr ErrorCode Invalid = -CASA_EINVAL;
@@ -41,6 +43,15 @@ uint64_t call(Id remote_id, FuncId func_id, uint64_t param, ErrorCode* error_res
 /// \param object a CASA blackboard
 /// \param dest   destination of blackboard value
 ErrorCode read_blackboard(const Blackboard* object, pointer dest);
+
+/// \copydoc turag_set_blackboard_notify_callback
+inline
+bool set_blackboard_notify_callback(const Blackboard* object,
+                                    TuragBlackboardCallback callback,
+                                    uint64_t callbackData)
+{
+    return object && (Casa_BBSetCallback(object->id, callback, callbackData) == -CASA_ENOERR);
+}
 
 } // namespace CAN
 
