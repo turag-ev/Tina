@@ -4,7 +4,7 @@
 #include "statemachine.h"
 #include <tina++/thread.h>
 #include <tina++/debug.h>
-
+#include <tina/debug.h>
 
 namespace TURAG {
 namespace IM {
