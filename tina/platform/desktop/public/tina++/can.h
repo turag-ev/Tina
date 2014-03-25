@@ -77,6 +77,14 @@ extern RpcHandler ui_can_rpc_table[];
 /// \param dest   destination of blackboard value
 ErrorCode read_blackboard(const Blackboard* object, pointer dest);
 
+/// Setze Funktion, die aufrufen wird, wenn neuer Wert in Blackboard geschreiben wurde
+/// \param object Blackboard
+/// \param callback aufzurufende Funktion
+/// \param data Der Funktion mit zu übergebende Benutzerdaten
+bool set_blackboard_notify_callback(const Blackboard* object,
+                                    BlackboardCallback callback,
+                                    uint64_t data);
+
 } // namespace CAN
 
 } // namespace TURAG
