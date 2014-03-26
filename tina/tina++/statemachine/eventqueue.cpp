@@ -46,6 +46,9 @@ void print_debug_info(const Event& e) {
   const char* name = (e.event_class->name) ? e.event_class->name : "";
 
   if ((id >> 8) != 0) {
+      // erstes Zeichen ist Null -> nicht loggen
+      if ((id >> 24) == 0) return;
+
       turag_infof("Event: %s (id: %c%c%c%u param: %" PRIu32 " method: 0x%" PRIxPTR ")",
           name,
           static_cast<char>(id >> 24),
