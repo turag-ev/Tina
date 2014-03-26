@@ -220,17 +220,22 @@ void EventQueue::discardEvents() {
 void EventQueue::removeTimedelayed(EventId id) {
   Mutex::Lock lock(mutex_);
 
-  remove_if(timequeue_, [&](const TimeEvent& tevent) { return tevent.event.event_class->id == id;});
+  remove_if(timequeue_, [&](const TimeEvent& tevent) {
+      return tevent.event.event_class && tevent.event.event_class->id == id;
+  });
 }
 
 void EventQueue::removeEvent(EventId id) {
   Mutex::Lock lock(mutex_);
 
   for (auto& event : queue_) {
-    if (event.event_class->id == id) event.event_class = nullptr;
+    if (event.event_class && event.event_class->id == id)
+        event.event_class = nullptr;
   }
 
-  remove_if(timequeue_, [&](const TimeEvent& tevent) { return tevent.event.event_class->id == id;});
+  remove_if(timequeue_, [&](const TimeEvent& tevent) {
+      return tevent.event.event_class && tevent.event.event_class->id == id;
+  });
 }
 
 void EventQueue::removeCallback(EventMethod method) {
@@ -245,26 +250,28 @@ void EventQueue::removeCallback(EventMethod method) {
 
 #ifndef NDEBUG
 void EventQueue::printTimeQueue() {
-  Mutex::Lock lock(mutex_);
+    Mutex::Lock lock(mutex_);
 
-  turag_infof("Timed Events:\n");
-  turag_infof("  current time: %u ms\n", ticks_to_ms(get_current_tick()));
+    turag_infof("Timed Events:\n");
+    turag_infof("  current time: %u ms\n", ticks_to_ms(get_current_tick()));
 
-  if (!timequeue_.empty()) {
-    for (const auto& tevent : timequeue_) {
-      EventId id = tevent.event.event_class->id;
+    if (!timequeue_.empty()) {
+        for (const auto& tevent : timequeue_) {
+            if (tevent.event.event_class) {
+                EventId id = tevent.event.event_class->id;
 
-      turag_infof("  @%u ms %c%c%c%u %" PRIxPTR "\n",
-            ticks_to_ms(tevent.time),
-            static_cast<char>(id >> 24),
-            static_cast<char>(id >> 16),
-            static_cast<char>(id >> 8),
-            static_cast<unsigned>(id & 0xFF),
-            reinterpret_cast<ptrdiff_t>(tevent.event.method));
+                turag_infof("  @%u ms %c%c%c%u %" PRIxPTR "\n",
+                            ticks_to_ms(tevent.time),
+                            static_cast<char>(id >> 24),
+                            static_cast<char>(id >> 16),
+                            static_cast<char>(id >> 8),
+                            static_cast<unsigned>(id & 0xFF),
+                            reinterpret_cast<ptrdiff_t>(tevent.event.method));
+            }
+        }
+    } else {
+        turag_info("  timed event queue is empty\n");
     }
-  } else {
-    turag_info("  timed event queue is empty\n");
-  }
 }
 
 void
