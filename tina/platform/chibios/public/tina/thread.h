@@ -61,6 +61,35 @@ typedef Mutex TuragMutex;
 #define turag_mutex_try_lock        chMtxTryLock
 #define turag_mutex_unlock(mutex)   chMtxUnlock()
 
+
+////////////////////////////////////////////////////////////////////////////////
+// C Interface Semaphore
+
+typedef Semaphore TuragSemaphore;
+
+static inline void turag_semaphore_init(TuragSemaphore* sem, int32_t n) {
+	chSemInit(sem, n);
+}
+
+static inline void turag_semaphore_wait(TuragSemaphore* sem) {
+	chSemWait(sem); 
+}
+
+static inline bool turag_semaphore_timed_wait(TuragSemaphore* sem, TuragSystemTime timeout) {
+	return chSemWaitTimeout(sem, timeout.value) == RDY_OK;
+}
+
+static inline bool turag_semaphore_try_wait(TuragSemaphore* sem) {
+	return chSemWaitTimeout(sem, TIME_IMMEDIATE) == RDY_OK;
+}
+
+static inline void turag_semaphore_post(TuragSemaphore* sem) {
+	chSemSignal(sem);
+}
+
+
+
+
 #ifdef __cplusplus
 } // extern "C"
 #endif

@@ -1,10 +1,10 @@
 #ifndef TINA_ECOS_THREAD_H
 #define TINA_ECOS_THREAD_H
 
-#include <cyg/kernel/kapi.h>
-
 #include <tina/tina.h>
 #include "time.h"
+
+#include <cyg/kernel/kapi.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -62,6 +62,34 @@ typedef cyg_mutex_t TuragMutex;
 #define turag_mutex_lock     cyg_mutex_lock
 #define turag_mutex_try_lock cyg_mutex_trylock
 #define turag_mutex_unlock   cyg_mutex_unlock
+
+
+////////////////////////////////////////////////////////////////////////////////
+// C Interface Mutex
+
+typedef cyg_sem_t TuragSemaphore;
+
+static inline void turag_semaphore_init(TuragSemaphore* sem, int32_t n) {
+	cyg_semaphore_init(sem, n);
+}
+
+static inline void turag_semaphore_wait(TuragSemaphore* sem) {
+	cyg_semaphore_wait(sem); 
+}
+
+static inline bool turag_semaphore_timed_wait(TuragSemaphore* sem, TuragSystemTime timeout) {
+	return cyg_semaphore_timed_wait(sem, cyg_current_time() + timeout.value);
+}
+
+static inline bool turag_semaphore_try_wait(TuragSemaphore* sem) {
+	return cyg_semaphore_trywait(sem);
+}
+
+static inline void turag_semaphore_post(TuragSemaphore* sem) {
+	cyg_semaphore_post(sem);
+}
+
+
 
 #ifdef __cplusplus
 } // extern "C"
