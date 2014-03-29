@@ -6,13 +6,33 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Preprocessor utils
 
-#define CONCAT_(x, y) x##y
+/// \defgroup Macros Makrohelfer [C/C++]
+/// \{
+
+#ifndef DOXYGEN
+
+// Interna
+#define TURAG_CONCAT_(x,y) x##y
+#define TURAG_CONCAT3_(a,b,c) a##b##c
+#define TURAG_CONCAT4_(a,b,c,d) a##b##c##d
+
+#endif // DOXYGEN
+
 /// Concat two symbols
 /// \code CONCAT(A, BC) will give ABC \endcode
-#define CONCAT(x, y) CONCAT_(x, y)
+#define TURAG_CONCAT(x,y) TURAG_CONCAT_(x,y)
 
-/// Get number of arguments in a macro function
-/// from here: https://groups.google.com/group/comp.std.c/browse_thread/thread/77ee8c8f92e4a3fb/346fc464319b1ee5?pli=1
+/// Concat three symbols
+/// \code CONCAT(A, B, C) will give ABC \endcode
+#define TURAG_CONCAT3(a,b,c) TURAG_CONCAT3_(a,b,c)
+
+/// Concat three symbols
+/// \code CONCAT(A, B, C, D) will give ABCD \endcode
+#define TURAG_CONCAT4(a,b,c,d) TURAG_CONCAT4_(a,b,c,d)
+
+
+#ifndef DOXYGEN
+
 #define __NARG__(...) \
          __NARG_I_(__VA_ARGS__,__RSEQ_N())
 #define __NARG_I_(...) \
@@ -33,6 +53,15 @@
          29,28,27,26,25,24,23,22,21,20, \
          19,18,17,16,15,14,13,12,11,10, \
          9,8,7,6,5,4,3,2,1,0
+         
+#else // DOXYGEN
+
+///  \brief Get number of arguments in a macro function
+///
+/// from here: https://groups.google.com/group/comp.std.c/browse_thread/thread/77ee8c8f92e4a3fb/346fc464319b1ee5?pli=1
+#define __NARG__(...)
+
+#endif // DOXYGEN
 
 ////////////////////////////////////////////////////////////////////////////////
 // Compiler utils
@@ -45,18 +74,22 @@
 ////////////////////////////////////////////////////////////////////////////////
 // INITIALIZATION and FINALIZATION
 
-/// macro for initialization code, called before main()
+/// \brief macro for initialization code, called before \a main()
+///
 /// usage: \code INITIALIZATION {
 ///   function(parameter);
 /// } \endcode
 #define INITIALIZATION \
   static _constructor void CONCAT(_initialization_code_, __COUNTER__)()
 
-/// macro for finalization code, called after main returns
+/// macro for finalization code, called after \a main returns
+///
 /// usage: \code FINALIZATION {
 ///   function(parameter);
 /// } \endcode
 #define FINALIZATION \
   static _destructor void CONCAT(_finalization_code, __COUNTER__)()
+  
+/// \}
 
 #endif // TINA_HELPER_MACROS_H

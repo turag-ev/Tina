@@ -4,9 +4,9 @@ CXX = g++
 RM = rm
 
 # Compiler flags
-CFLAGS = -Wall -I.. -I.
+CFLAGS = -Wall -I.. -I. -g -O0 -DTURAG_HEAVY_DEBUG
 CXXFLAGS = $(CFLAGS) -std=c++0x
-LDFLAGS = -Wall
+LDFLAGS = -Wall -std=c++0x -g -O0
 
 # Output file
 PROGRAM = tests

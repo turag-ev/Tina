@@ -255,12 +255,12 @@ public:
   }
 
   reference operator[](size_type n) {
-    return bytes_[first_ + n + 1];
+    return bytes_[first_ + (n + 1)];
   }
 
   constexpr
   const_reference operator[](size_type n) const {
-    return bytes_[first_ + n + 1];
+    return bytes_[first_ + (n + 1)];
   }
 
   // modifiers
@@ -289,7 +289,7 @@ public:
     }
 #endif
 
-    bytes_[last_.n_] = x;
+    bytes_.emplace(last_.n_, x);
   }
 
   template< class... Args >
@@ -308,7 +308,7 @@ public:
   }
 
   void push_front(const T& x) {
-    element(first_.n_) = x;
+    bytes_.emplace(first_.n_,  x);
     --first_;
 
 #ifndef NDEBUG

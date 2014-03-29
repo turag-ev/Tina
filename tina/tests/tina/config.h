@@ -3,5 +3,6 @@
 
 #include <tina/tina.h>
 
+#define TURAG_DEBUG_NEWLINE "\n"
 
 #endif // TINA_SIM_CONFIG_H

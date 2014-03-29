@@ -3,7 +3,7 @@
 
 #include <cstdio>
 
-#define debug_print printf
-#define debug_puts puts
+#define turag_debug_print printf
+#define turag_debug_puts puts
 
 #endif // DEBUG_PRINTF

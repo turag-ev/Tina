@@ -1,12 +1,12 @@
 #include "container_test.h"
-#include <tina++/container/array_buffer.h>
+#include <deque>
 
 using namespace TURAG;
 
-BOOST_AUTO_TEST_SUITE(ArrayBufferTests)
+BOOST_AUTO_TEST_SUITE(ContainerTestTests)
 
-#define CONTAINER ArrayBuffer<Dummy, 20>
-#define CONTAINER_NAME ArrayBuffer
+#define CONTAINER std::deque<Dummy>
+#define CONTAINER_NAME Deque
 
 #include "container_test.inc"
 #include "container_test_push_pop.inc"
