@@ -80,7 +80,7 @@
 ///   function(parameter);
 /// } \endcode
 #define INITIALIZATION \
-  static _constructor void CONCAT(_initialization_code_, __COUNTER__)()
+  static _constructor void TURAG_CONCAT(_initialization_code_, __COUNTER__)()
 
 /// macro for finalization code, called after \a main returns
 ///
@@ -88,7 +88,7 @@
 ///   function(parameter);
 /// } \endcode
 #define FINALIZATION \
-  static _destructor void CONCAT(_finalization_code, __COUNTER__)()
+  static _destructor void TURAG_CONCAT(_finalization_code, __COUNTER__)()
   
 /// \}
 
