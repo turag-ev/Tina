@@ -18,9 +18,9 @@ typedef struct {
 } TuragThread;
 
 #define TURAG_DEFINE_THREAD(name, stack_size) \
-  static char CONCAT(name, _stack_) [stack_size] __attribute__((aligned(4))); \
-  static cyg_thread CONCAT(name, _thread_); \
-  TuragThread name = {(char*)&CONCAT(name, _stack_), stack_size, &CONCAT(name, _thread_), 0};
+  static char TURAG_CONCAT(name, _stack_) [stack_size] __attribute__((aligned(4))); \
+  static cyg_thread TURAG_CONCAT(name, _thread_); \
+  TuragThread name = {(char*)&TURAG_CONCAT(name, _stack_), stack_size, &TURAG_CONCAT(name, _thread_), 0};
   
   
 extern void _turag_thread_entry(cyg_addrword_t data);

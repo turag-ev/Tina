@@ -18,8 +18,8 @@ typedef struct {
 } TuragThread;
 
 #define TURAG_DEFINE_THREAD(name, stack_size) \
-  static WORKING_AREA(CONCAT(name, _stack_), stack_size); \
-  TuragThread name = {0, &CONCAT(name, _stack_), sizeof(CONCAT(name, _stack_))}
+  static WORKING_AREA(TURAG_CONCAT(name, _stack_), stack_size); \
+  TuragThread name = {0, &TURAG_CONCAT(name, _stack_), sizeof(TURAG_CONCAT(name, _stack_))}
   
 extern void _turag_thread_entry(void* data);
 
