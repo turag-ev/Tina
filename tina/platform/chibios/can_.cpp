@@ -1,5 +1,5 @@
 #include <cstdio>
-#define LOG_SOURCE "C"
+#define TURAG_LOG_SOURCE "C"
 #include <tina/debug.h>
 
 #include <board_turag.h>

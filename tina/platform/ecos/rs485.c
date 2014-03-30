@@ -1,4 +1,4 @@
-#define LOG_SOURCE "H"
+#define TURAG_LOG_SOURCE "H"
 
 #include <cyg/io/io.h>
 #include <cyg/hal/hal_io.h>

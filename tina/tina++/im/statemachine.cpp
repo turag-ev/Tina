@@ -1,5 +1,5 @@
 
-#define LOG_SOURCE "J"
+#define TURAG_LOG_SOURCE "J"
 
 #include "statemachine.h"
 #include <tina++/thread.h>
