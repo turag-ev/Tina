@@ -7,7 +7,7 @@
 
 #include <cstdio>
 
-#define TURAG_LOG_SOURCE "C"
+#define TURAG_DEBUG_LOG_SOURCE "C"
 #include <tina/debug.h>
 
 #include "../public/tina++/can.h"
