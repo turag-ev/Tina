@@ -49,30 +49,41 @@ bool turag_rs485_init(uint32_t baud_rate, TuragSystemTime timeout) {
     chThdSleepMilliseconds(500);
     chBSemSignal(&_RS485_Sem);
 
-    infof("RS485 inited\n");
-    return true;
+    infof("RS485 init: %u baud, timeout %u ms -> status %d\n", (unsigned int)baud_rate, (unsigned int)timeout.value, RS485SD.state);
+
+    if (RS485SD.state != SD_READY) {
+        error("RS485 init FAILED!");
+    }
+
+    return (RS485SD.state == SD_READY);
 }
 
 bool turag_rs485_transceive(uint8_t *input, int input_length, uint8_t *output, int output_length) {
-    bool ok = true;
+    bool send_ok = true, recv_ok = true;
 
     chBSemWait(&_RS485_Sem);
 
     if (input && input_length > 0) {
         // activate RS485 driver for sending
         palSetPad(GPIOD, BPD_SC_RTS);
-        ok = sdWriteTimeout(&RS485SD, input, input_length, MS2ST(5));
+        int ok = sdWriteTimeout(&RS485SD, input, input_length, MS2ST(5));
         // TC interrupt handler sets the RTS pin after transmission is completed
+
+        send_ok = (ok == input_length);
+        infof("turag_rs485_transceive: sending %d bytes, %d bytes written ok, driver state %d, OK: %d", input_length, ok, RS485SD.state, send_ok);
     }
 
     if (output && output_length > 0) {
         // read answer, timeout in systemticks!
-        ok = sdReadTimeout(&RS485SD, output, output_length, rs485_timeout.value);
+        int ok = sdReadTimeout(&RS485SD, output, output_length, rs485_timeout.value);
+
+        recv_ok = (ok == output_length);
+        infof("turag_rs485_transceive: receiving %d bytes, retval %d, driver state %d, OK: %d", output_length, ok, RS485SD.state, recv_ok);
     }
 
     chBSemSignal(&_RS485_Sem);
 
-    return ok;
+    return (send_ok && recv_ok);
 }
 
 void turag_rs485_buffer_clear(void) {
