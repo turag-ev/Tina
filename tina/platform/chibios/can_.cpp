@@ -23,11 +23,11 @@ uint64_t call(Id remote_id, FuncId func_id, uint64_t param, ErrorCode* error_res
 
     // with unconnected CAN bus this does spam-a-lot
     if (error != -CASA_ENOERR) {
-        if (errorcnt++ <= 1) {
-            errorf("CASA RPC (Id: %d / Func: %d) failed with error code: 0x%.8x", remote_id, func_id, error);
-            if (errorcnt == 2)
-                errorf("(omitting the following 199 CASARPC messages)");
-        } else if (errorcnt == 200) {
+        if (errorcnt++ <= 4) {
+            errorf("CASA RPC (Id: %d / Func: %d) failed with error code: %d (0x%.8x)", remote_id, func_id, error, error);
+            if (errorcnt == 5)
+                errorf("(omitting the following 500 CASARPC messages)");
+        } else if (errorcnt == 500) {
             errorcnt = 0;
         }
     } else {
@@ -47,11 +47,11 @@ ErrorCode read_blackboard(const Blackboard *object, pointer dest) {
     ErrorCode error = Casa_BBRead((Casa_BBObject_t*)object, dest, (systime_t*)&timestamp);
 
     if (error != -CASA_ENOERR) {
-        if (errorcnt++ <= 1) {
-            errorf("CASA BlackBoard read failed with error code: 0x%.8x", error);
-            if (errorcnt == 2)
-                errorf("(omitting the following 999 CASABB messages)");
-        } else if (errorcnt == 999) {
+        if (errorcnt++ <= 4) {
+            errorf("CASA BlackBoard read failed with error code: %d (0x%.8x)", error, error);
+            if (errorcnt == 5)
+                errorf("(omitting the following 5k CASABB messages)");
+        } else if (errorcnt == 5000) {
             errorcnt = 0;
         }
     } else {
