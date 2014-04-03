@@ -70,7 +70,7 @@ bool turag_rs485_transceive(uint8_t *input, int input_length, uint8_t *output, i
         // TC interrupt handler sets the RTS pin after transmission is completed
 
         send_ok = (ok == input_length);
-        infof("turag_rs485_transceive: sending %d bytes, %d bytes written ok, driver state %d, OK: %d", input_length, ok, RS485SD.state, send_ok);
+        debugf("turag_rs485_transceive: sending %d bytes, %d bytes written ok, driver state %d, OK: %d", input_length, ok, RS485SD.state, send_ok);
     }
 
     if (output && output_length > 0) {
@@ -78,7 +78,7 @@ bool turag_rs485_transceive(uint8_t *input, int input_length, uint8_t *output, i
         int ok = sdReadTimeout(&RS485SD, output, output_length, rs485_timeout.value);
 
         recv_ok = (ok == output_length);
-        infof("turag_rs485_transceive: receiving %d bytes, retval %d, driver state %d, OK: %d", output_length, ok, RS485SD.state, recv_ok);
+        debugf("turag_rs485_transceive: receiving %d bytes, retval %d, driver state %d, OK: %d", output_length, ok, RS485SD.state, recv_ok);
     }
 
     chBSemSignal(&_RS485_Sem);
