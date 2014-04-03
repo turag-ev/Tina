@@ -623,9 +623,13 @@ private:
     Statemachine* next_active;
     Statemachine* last_active;
 
-    // singly linked list for statemachines, that should be activated
+    // doubly linked list for statemachines that should be activated
+    // we need a doubly linked list to enable the activation of
+    // statemachines from within statemachines
     static Statemachine* first_to_be_activated_statemachine;
+    static Statemachine* last_to_be_activated_statemachine;
     Statemachine* next_to_be_activated;
+    Statemachine* previous_to_be_activated;
 
     // singly linked list for statemachines, that should be stopped
     static Statemachine* first_to_be_stopped_statemachine;

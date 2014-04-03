@@ -26,6 +26,7 @@ FinishedState finished_state;
 // -------------------------------------------------------------------
 Statemachine* Statemachine::first_active_statemachine = nullptr;
 Statemachine* Statemachine::first_to_be_activated_statemachine = nullptr;
+Statemachine* Statemachine::last_to_be_activated_statemachine = nullptr;
 Statemachine* Statemachine::first_to_be_stopped_statemachine = nullptr;
 
 EventQueue* Statemachine::defaultEventqueue_ = nullptr;
@@ -46,6 +47,7 @@ Statemachine::Statemachine(
 	next_active(nullptr),
 	last_active(nullptr),
 	next_to_be_activated(nullptr),
+    previous_to_be_activated(nullptr),
 	next_to_be_stopped(nullptr),
     name(pname),
     startTime(0),
@@ -84,9 +86,16 @@ void Statemachine::start(EventQueue* eventqueue, int32_t argument) {
         // send initialized event but only if we are already initialized
         emitEvent(myEventOnSuccessfulInitialization);
     } else {
-        next_to_be_activated = Statemachine::first_to_be_activated_statemachine;
-        Statemachine::first_to_be_activated_statemachine = this;
-        status_ = Status::waiting_for_activation;
+        if (Statemachine::last_to_be_activated_statemachine) {
+            previous_to_be_activated = Statemachine::last_to_be_activated_statemachine;
+            previous_to_be_activated->next_to_be_activated = this;
+            Statemachine::last_to_be_activated_statemachine = this;
+        } else {
+            Statemachine::first_to_be_activated_statemachine = this;
+            Statemachine::last_to_be_activated_statemachine = this;
+            next_to_be_activated = nullptr;
+        }
+        next_to_be_activated = nullptr;
     }
 }
 
@@ -178,7 +187,7 @@ void Statemachine::doStatemachineProcessing(void) {
         sm = sm->next_to_be_activated;
     }
     Statemachine::first_to_be_activated_statemachine = nullptr;
-
+    Statemachine::last_to_be_activated_statemachine = nullptr;
 
     // deactivate statemachines that are in deactivation queue
     sm = Statemachine::first_to_be_stopped_statemachine;
