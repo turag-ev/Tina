@@ -367,14 +367,16 @@ public:
      * \brief DelayState-Constructor
      * \param delay Time between entering this state and activating the next one.
      * \param nextState Pointer to the state that is entered when the delay has passed.
+     * \param event Event that is emitted after the delay time has passed.
      */
-    DelayState(SystemTime delay, State* const nextState) :
-        State("DelayState"), myDelay(delay), myStartTime(), myNextState(nextState) {}
+    DelayState(SystemTime delay, State* const nextState, const EventClass* event = nullptr) :
+        State("DelayState"), myDelay(delay), myStartTime(), myNextState(nextState), myEvent(event) {}
 
 private:
     const SystemTime myDelay;
     SystemTime myStartTime;
     State* const myNextState;
+    const EventClass* myEvent;
 
     bool state_function(void) {
         myStartTime = SystemTime::now();
@@ -384,10 +386,12 @@ private:
         // This was necessary to avoid some trouble in the
         // behaviour of SystemTime on chibi.
         if (myDelay <= ms_to_ticks(2)) {
+            if (myEvent) emitEvent(myEvent);
             return myNextState;
         } else if (SystemTime::now() - myStartTime < myDelay) {
             return this;
         } else {
+            if (myEvent) emitEvent(myEvent);
             return myNextState;
         }
     }
