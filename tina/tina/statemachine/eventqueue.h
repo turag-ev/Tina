@@ -3,6 +3,10 @@
 
 #include <tina/time.h>
 
+/// \defgroup EventQueue Events [C]
+/// \brief C-Schnittstelle für die \ref TURAG::EventQueue
+/// \{
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -75,5 +79,7 @@ enum {
 #ifdef __cplusplus
 } // extern "C"
 #endif
+
+/// \}
 
 #endif // TINA_STATEMACHINE_EVENTQUEUE_H

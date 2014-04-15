@@ -48,14 +48,15 @@
 #define REQUIRES(...) typename std::enable_if<__VA_ARGS__::value, bool>::type = false
 
 /// Helfermakro zur Benutzung mit std::enable_if (ausführlichere Version)
-///
+/// Im Gegensatz zu REQUIRES kann diese Variante genutzt werden um auch
+/// Booleasche Operatoren zu benutzen
 /// \code{.cpp}
 ///   template<T, REQUIRES2(std::is_integral<T>::value) >
 ///   T add_int(T a, T b) {
 ///       return a + b;
 ///   }
 /// \endcode
-#define REQUIRES2(...) typename std::enable_if<__VA_ARGS__, bool>::type = false
+#define REQUIRES2(...) typename std::enable_if<(__VA_ARGS__), bool>::type = false
 
 /// \}
 

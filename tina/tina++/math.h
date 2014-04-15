@@ -20,6 +20,7 @@ using ::sqrt;
 using ::tan;
 using ::scalbn;
 using ::lround;
+using ::cbrt;
 }
 
 using ::acos;

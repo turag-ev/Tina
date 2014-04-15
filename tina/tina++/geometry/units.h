@@ -10,7 +10,7 @@
 
 /// \defgroup Units Einheiten [C++]
 /// \ingroup Geometry
-///
+/// \brief Einheitensystem für Raum- und Zeitgrößen
 ///
 ///
 /// \}
