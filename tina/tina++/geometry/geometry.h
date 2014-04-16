@@ -40,7 +40,7 @@ struct Vector {
 //  { }
 };
 
-// point
+/// Punkt im zweidimensionalen Raum
 struct Point {
   Length x;
   Length y;

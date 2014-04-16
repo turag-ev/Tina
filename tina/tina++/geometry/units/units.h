@@ -7,11 +7,10 @@
 namespace TURAG {
 namespace Units {
 
-/// \addtogroup Units
-/// \{
-///
 /// \defgroup UnitsDefs Einheitendefinitionen
+/// \ingroup Units
 /// \brief SI-Einheiten für die konkrette Anwendung
+/// 
 /// \{
 
 /// Definition für Millimeter
@@ -59,7 +58,7 @@ constexpr Angle operator"" _deg(long double x) { return x * deg; }
 constexpr Angle operator"" _deg(long long unsigned x) { return x * deg; }
 #endif
 
-/// \} \}
+/// \}
 
 } // namespace Units
 } // namespace TURAG

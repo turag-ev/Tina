@@ -5,15 +5,11 @@
 #include "units/units.h"
 #include "units/math.h"
 
-/// \addtogroup Geometry
-/// \{
-
-/// \defgroup Units Einheiten [C++]
+/// \defgroup Units Einheiten
+/// \brief Einheitensystem für Raum- und Zeitgrößen.
 /// \ingroup Geometry
-/// \brief Einheitensystem für Raum- und Zeitgrößen
-///
-///
-/// \}
+/// \par Include-Header
+/// <tt>\#include &lt;tina++/geometry/units.h&gt;</tt>
 
 #endif // TINAPP_GEOMETRY_UNITS_H
 

@@ -7,11 +7,9 @@
 namespace TURAG {
 namespace Units {
 
-/// \addtogroup Units
-/// \{
-///
 /// \defgroup UnitsConsts mathematische Konstanten
 /// \brief mathematische Konstantanten mit zugehörigier Einheit
+/// \ingroup Units
 /// \{
 
 /// Kreizahl Pi
@@ -20,14 +18,12 @@ constexpr Dimensionless pi = M_PI;
 /// Pi für die Berechung von Winkeln
 constexpr Angle angle_pi = M_PI * rad;
 
-/// \} \}
+/// \}
 
 } // namespace Units
 
-/// \addtogroup Units
-/// \{
-///
 /// \defgroup UnitsMath mathematische Funktionen
+/// \ingroup Units
 /// \{
 
 /// Quadrat bilden
@@ -212,7 +208,7 @@ Units::Length hypot(Units::Length x, Units::Length y) {
     return Units::Length(::hypot(x.value, y.value));
 }
 
-/// \} \}
+/// \}
 
 } // namespace TURAG
 
