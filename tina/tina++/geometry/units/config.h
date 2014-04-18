@@ -10,14 +10,17 @@ namespace Units {
 /// \defgroup UnitsConfig Konfiguration für Einheitensystem
 /// \brief Konfiguration des Einheitensystems.
 ///
+/// Die Konfiguration kann in der benutzererstellten tina/config.h eingetragen
+/// werden.
+///
 /// Die Standardkonfiguration ist für Embedded-Prozessoren mit FPU geeigent:
 /// \code
-/// typedef float Real;
-/// typedef Real Value;
-/// typedef Real UnitFactor;
-/// constexpr UnitFactor FROM_SI_CONVERT_FACTOR_LENGTH = 1000.f;
-/// constexpr UnitFactor FROM_SI_CONVERT_FACTOR_ANGLE  =    1.f;
-/// constexpr UnitFactor FROM_SI_CONVERT_FACTOR_TIME   =    1.f;
+/// #define TURAG_UNITS_REAL_TYPE float
+/// #define TURAG_UNITS_VALUE_TYPE float
+///
+/// #define TURAG_UNITS_FACTOR_TO_METER  1000.f;
+/// #define TURAG_UNITS_FACTOR_TO_RADIAN    1.f;
+/// #define TURAG_UNITS_FACTOR_TO_SECOND    1.f;
 /// \endcode
 /// Dabei werden Werte in 32-Bit-Gleitkommavariablen gespeichert. Intern wird
 /// in Millimetern, Radiand und Sekunden gespeichert.
@@ -26,49 +29,79 @@ namespace Units {
 /// sehr prozessorlastig. Deshalb wird dafür folgenden Konfiguration empfohlen, die
 /// Ganzzahlwerte, Milliradiand und Millisekunden zum Speichern verwendet:
 /// \code
-/// typedef float Real;
-/// typedef int Value;
-/// typedef Real UnitFactor;
-/// constexpr UnitFactor FROM_SI_CONVERT_FACTOR_LENGTH = 1000.f;
-/// constexpr UnitFactor FROM_SI_CONVERT_FACTOR_ANGLE  = 1000.f;
-/// constexpr UnitFactor FROM_SI_CONVERT_FACTOR_TIME   = 1000.f;
+/// #define TURAG_UNITS_REAL_TYPE float
+/// #define TURAG_UNITS_VALUE_TYPE int
+///
+/// #define TURAG_UNITS_FACTOR_TO_METER  1000.f;
+/// #define TURAG_UNITS_FACTOR_TO_RADIAN 1000.f;
+/// #define TURAG_UNITS_FACTOR_TO_SECOND 1000.f;
 /// \endcode
 /// \{
 
-/// Typ für Gleitkommazahlen.
+#ifndef TURAG_UNITS_REAL_TYPE
+/// \brief konfigurierbarer Typ für Gleitkommazahlen.
 ///
 /// \par Standardwert
 ///   float
-typedef float Real;
+#define TURAG_UNITS_REAL_TYPE float
+#endif
+
+#ifndef TURAG_UNITS_VALUE_TYPE
+/// \brief konfigurierbarer Typ mit dem Variablen gespeichert werden sollen.
+///
+/// \par Standardwert
+///   float
+#define TURAG_UNITS_VALUE_TYPE float
+#endif
+
+#ifndef TURAG_UNITS_FACTOR_TO_METER
+/// Faktor zwischen internem zu speichernden Wert in Meter
+///
+/// \par Standardwert
+///   1000.f
+#define TURAG_UNITS_FACTOR_TO_METER 1000.f
+#endif
+
+#ifndef TURAG_UNITS_FACTOR_TO_RADIAN
+/// Faktor zwischen internem zu speichernden Wert in Radian
+///
+/// \par Standardwert
+///   1.f
+#define TURAG_UNITS_FACTOR_TO_RADIAN 1.f
+#endif
+
+#ifndef TURAG_UNITS_FACTOR_TO_SECOND
+/// Faktor zwischen internem zu speichernden Wert in Sekunden
+///
+/// \par Standardwert
+///   1.f
+#define TURAG_UNITS_FACTOR_TO_SECOND 1.f
+#endif
+
+/// Typ für Gleitkommazahlen
+///
+/// Konfigurierbar über Definition von \ref TURAG_UNITS_REAL_TYPE
+///
+/// \par Standardwert
+///   float
+typedef TURAG_UNITS_REAL_TYPE Real;
 
 /// Typ mit dem Variablen gespeichert werden sollen.
 ///
+/// Konfigurierbar über Definition von \ref TURAG_UNITS_VALUE_TYPE
+///
 /// \par Standardwert
-///   Real
-typedef Real Value;
+///   float
+typedef TURAG_UNITS_VALUE_TYPE Value;
 
 /// Typ mit dem Einheitenumwandlungsfaktoren gespeichert werden sollen.
-///
-/// Sollte ein Gleit- oder Festkommatyp sein.
-/// \par Standardwert
-///   Real
 typedef Real UnitFactor;
 
-/// Angabe der Relation zwischen gespeichertem Wert und SI-Einheiten.
-///
-/// Die Angabe fordert den Wert um die SI-Einheit in den internen Wert durch Multipizieren zu konvertieren.
-/// Standard ist 1000, was bedeutet, dass der Wert intern in Millimetern gespeichert wird.
-constexpr UnitFactor FROM_SI_CONVERT_FACTOR_LENGTH = 1000.f; // mm
-
-/// Angabe der Relation zwischen gespeichertem Wert und SI-Einheiten.
-///
-/// Die Angabe fordert den Wert um die SI-Einheit in den internen Wert durch Multipizieren zu konvertieren.
-constexpr UnitFactor FROM_SI_CONVERT_FACTOR_ANGLE  =    1.f; // rad
-
-/// Angabe der Relation zwischen gespeichertem Wert und SI-Einheiten.
-///
-/// Die Angabe fordert den Wert um die SI-Einheit in den internen Wert durch Multipizieren zu konvertieren.
-constexpr UnitFactor FROM_SI_CONVERT_FACTOR_TIME   =    1.f; // s
+#ifndef DOXYGEN
+constexpr UnitFactor FROM_SI_CONVERT_FACTOR_LENGTH = TURAG_UNITS_FACTOR_TO_METER; // mm
+constexpr UnitFactor FROM_SI_CONVERT_FACTOR_ANGLE  = TURAG_UNITS_FACTOR_TO_RADIAN; // rad
+constexpr UnitFactor FROM_SI_CONVERT_FACTOR_TIME   = TURAG_UNITS_FACTOR_TO_SECOND; // s
+#endif
 
 /// \} \}
 
