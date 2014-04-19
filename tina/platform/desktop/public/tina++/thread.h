@@ -13,6 +13,7 @@
 #include <mutex>
 #include <thread>
 #include <condition_variable>
+#include <atomic>
 
 #include <tina++/tina.h>
 #include <tina++/time.h>
@@ -34,7 +35,8 @@ class Thread {
     NOT_COPYABLE(Thread);
 
 public:
-    explicit Thread()
+    explicit Thread() :
+      terminate_request_(false)
     { }
 
     _always_inline
@@ -52,9 +54,21 @@ public:
     void start(int, void (*entry) ()) {
         thread_.reset(new std::thread(entry));
     }
+    
+    _always_inline
+    void terminate() {
+      terminate_request_ = true;
+    }
+    
+    _always_inline
+    bool shouldTerminate() {
+      return terminate_request_;
+    }
 
 private:
     std::unique_ptr<std::thread> thread_;
+    
+    std::atomic<bool> terminate_request_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -109,7 +123,7 @@ public:
         std::unique_lock<std::mutex> lock(workaround_mut_);
         Unlocker unlock(*mut_);
         return cond_.wait_for(lock,
-                              std::chrono::microseconds(ticks_to_ms(timeout)))
+                              std::chrono::milliseconds(ticks_to_ms(timeout)))
                 == std::cv_status::no_timeout;
     }
 
@@ -144,7 +158,7 @@ public:
         : mutex_(), condition_(), count_(count)
     { }
 
-    void notify() {
+    void signal() {
         std::unique_lock<std::mutex> lock(mutex_);
         ++count_;
         condition_.notify_one();
@@ -161,7 +175,7 @@ public:
         std::unique_lock<std::mutex> lock(mutex_);
         while (!count_) {
             std::cv_status status = condition_.wait_for(lock,
-                std::chrono::microseconds(ticks_to_ms(timeout)));
+                std::chrono::milliseconds(ticks_to_ms(timeout)));
             if (status == std::cv_status::timeout)
                 return false;
         }
