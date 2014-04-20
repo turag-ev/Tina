@@ -49,8 +49,16 @@ bool Semaphore::wait(SystemTime time) {
 	}
 }
 
-void Semaphore::wait(void) {
-	while (chSemWait(&sem_) == RDY_RESET);
+bool BinarySemaphore::wait(SystemTime time) {
+	while (1) {
+		msg_t result = chBSemWaitTimeout(&sem_, time.value);
+
+		if (result == RDY_OK) {
+			return true;
+		} else if (result == RDY_TIMEOUT) {
+			return false;
+		}
+	}
 }
 
 } /* namespace TURAG */

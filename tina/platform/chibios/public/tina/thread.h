@@ -76,15 +76,58 @@ static inline void turag_semaphore_wait(TuragSemaphore* sem) {
 }
 
 static inline bool turag_semaphore_timed_wait(TuragSemaphore* sem, TuragSystemTime timeout) {
-	return chSemWaitTimeout(sem, timeout.value) == RDY_OK;
+	while (1) {
+		msg_t result = chSemWaitTimeout(sem, timeout.value);
+
+		if (result == RDY_OK) {
+			return true;
+		} else if (result == RDY_TIMEOUT) {
+			return false;
+		}
+	}
 }
 
 static inline bool turag_semaphore_try_wait(TuragSemaphore* sem) {
 	return chSemWaitTimeout(sem, TIME_IMMEDIATE) == RDY_OK;
 }
 
-static inline void turag_semaphore_post(TuragSemaphore* sem) {
+static inline void turag_semaphore_signal(TuragSemaphore* sem) {
 	chSemSignal(sem);
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// C Interface Binary Semaphore
+
+typedef BinarySemaphore TuragBinarySemaphore;
+
+static inline void turag_binary_semaphore_init(TuragBinarySemaphore* sem, bool taken) {
+	chBSemInit(sem, taken);
+}
+
+static inline void turag_binary_semaphore_wait(TuragBinarySemaphore* sem) {
+	chBSemWait(sem); 
+}
+
+static inline bool turag_binary_semaphore_timed_wait(TuragBinarySemaphore* sem, TuragSystemTime timeout) {
+	while (1) {
+		msg_t result = chBSemWaitTimeout(sem, timeout.value);
+
+		if (result == RDY_OK) {
+			return true;
+		} else if (result == RDY_TIMEOUT) {
+			return false;
+		}
+	}
+}
+
+static inline bool turag_binary_semaphore_try_wait(TuragBinarySemaphore* sem) {
+	return chBSemWaitTimeout(sem, TIME_IMMEDIATE) == RDY_OK;
+}
+
+static inline void turag_binary_semaphore_signal(TuragBinarySemaphore* sem) {
+	chBSemSignal(sem);
 }
 
 

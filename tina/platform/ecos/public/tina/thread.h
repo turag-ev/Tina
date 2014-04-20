@@ -65,7 +65,7 @@ typedef cyg_mutex_t TuragMutex;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// C Interface Mutex
+// C Interface Semaphore
 
 typedef cyg_sem_t TuragSemaphore;
 
@@ -85,8 +85,35 @@ static inline bool turag_semaphore_try_wait(TuragSemaphore* sem) {
 	return cyg_semaphore_trywait(sem);
 }
 
-static inline void turag_semaphore_post(TuragSemaphore* sem) {
+static inline void turag_semaphore_signal(TuragSemaphore* sem) {
 	cyg_semaphore_post(sem);
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// C Interface Binary Semaphore
+
+typedef cyg_binary_sem_t TuragBinarySemaphore;
+
+static inline void turag_binary_semaphore_init(TuragBinarySemaphore* sem, bool taken) {
+	cyg_binary_semaphore_init(sem, taken ? false : true);
+}
+
+static inline void turag_binary_semaphore_wait(TuragBinarySemaphore* sem) {
+	cyg_binary_semaphore_wait(sem); 
+}
+
+static inline bool turag_binary_semaphore_timed_wait(TuragBinarySemaphore* sem, TuragSystemTime timeout) {
+	return cyg_binary_semaphore_timed_wait(sem, cyg_current_time() + timeout.value);
+}
+
+static inline bool turag_binary_semaphore_try_wait(TuragBinarySemaphore* sem) {
+	return cyg_binary_semaphore_trywait(sem);
+}
+
+static inline void turag_binary_semaphore_signal(TuragBinarySemaphore* sem) {
+	cyg_binary_semaphore_post(sem);
 }
 
 

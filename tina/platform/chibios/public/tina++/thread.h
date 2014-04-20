@@ -253,9 +253,32 @@ public:
   explicit semaphore_detail(int count = 0) :
       sem_(_SEMAPHORE_DATA(sem_, count)) { }
 
-  void wait(void);
+  void wait(void) { while (chSemWait(&sem_) == RDY_RESET); }
   bool wait(SystemTime time);
   void signal(void) { chSemSignal(&sem_); }
+};
+
+} // namespace detail
+
+
+////////////////////////////////////////////////////////////////////////////////
+// BinarySemaphore
+
+namespace detail {
+
+class binary_semaphore_detail {
+  NOT_COPYABLE(binary_semaphore_detail);
+
+private:
+  BinarySemaphore sem_;
+
+public:
+  explicit binary_semaphore_detail(bool taken = true) :
+      sem_(_BSEMAPHORE_DATA(sem_, taken)) { }
+
+  void wait(void) { while (chBSemWait(&sem_) == RDY_RESET); }
+  bool wait(SystemTime time);
+  void signal(void) { chBSemSignal(&sem_); }
 };
 
 } // namespace detail
@@ -266,6 +289,9 @@ typedef detail::mutex_detail Mutex;
 
 // work-around because chibios semaphore structure is also named Semaphore
 typedef detail::semaphore_detail Semaphore;
+
+// work-around because chibios binary semaphore structure is also named BinarySemaphore
+typedef detail::binary_semaphore_detail BinarySemaphore;
 
 // work-around because chibios mailbox structure is also named Mailbox
 template<std::size_t size> class Mailbox : public detail::mailbox_detail<size> { };
