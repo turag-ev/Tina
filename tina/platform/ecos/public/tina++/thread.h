@@ -125,6 +125,31 @@ class ConditionVariable {
   NOT_COPYABLE(ConditionVariable);
 
 public:
+		typedef Mutex Mutex;
+		class Lock : public ScopedLock<Mutex> {
+		public:
+				ScopedConditionVariable(ConditionVariable& condvar) :
+					  ScopedLock<Mutex>(condvar.getMutex()),
+					  condvar_(condvar)
+				{ }
+
+				_always_inline bool wait() {
+					  return condvar_.wait();
+				}
+
+				_always_inline bool waitFor(SystemTime timeout) {
+					  return condvar_.waitFor(timeout);
+				}
+
+				_always_inline bool waitUntil(SystemTime timeout) {
+					  return condvar_.waitUntil(timeout);
+				}
+
+		private:
+				ConditionVariable& condvar_;
+		};
+
+public:
   _always_inline ConditionVariable(Mutex* mutex) {
     cyg_cond_init(&cond_, mutex->getNativeHandle());
   }

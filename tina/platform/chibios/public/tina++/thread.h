@@ -90,13 +90,43 @@ _always_inline void Thread_delay(SystemTime ticks) {
 
 namespace detail {
 	
-template<class Mutex>
+template<class TMutex>
 class ConditionVariable_detail {
   NOT_COPYABLE(ConditionVariable_detail);
 
 public:
+  typedef TMutex Mutex;
+  
+	class Lock : public ScopedLock<TMutex> {
+	public:
+		  Lock(ConditionVariable_detail& condvar) :
+		      ScopedLock<TMutex>(condvar.getMutex()),
+		      condvar_(condvar)
+		  { }
+
+		  _always_inline bool wait() {
+		      return condvar_.wait();
+		  }
+
+#ifdef CH_USE_CONDVARS_TIMEOUT
+
+		  _always_inline bool waitFor(SystemTime timeout) {
+		      return condvar_.waitFor(*this, timeout);
+		  }
+
+		  _always_inline bool waitUntil(SystemTime timeout) {
+		      return condvar_.waitUntil(*this, timeout);
+		  }
+
+#endif
+
+	private:
+		  ConditionVariable_detail& condvar_;
+	};
+
+public:
   constexpr _always_inline
-  ConditionVariable_detail(Mutex* mutex) :
+  ConditionVariable_detail(TMutex* mutex) :
     cond_(_CONDVAR_DATA(cond_)), mutex_(mutex)
   { }
 
@@ -113,7 +143,13 @@ public:
   bool waitFor(SystemTime timeout) {
 	  msg_t result = chCondWaitTimeout(&cond_, timeout.value);
 	  if (result == RDY_TIMEOUT) mutex_->lock();
-      return result != RDY_TIMEOUT;
+    return result != RDY_TIMEOUT;
+  }
+  
+  _always_inline bool waitFor(Lock& lock, SystemTime timeout) {
+	  msg_t result = chCondWaitTimeout(&cond_, timeout.value);
+	  if (result == RDY_TIMEOUT) lock.externUnlocked();
+    return result != RDY_TIMEOUT;
   }
   
   bool waitUntil(SystemTime timeout) {
@@ -121,6 +157,13 @@ public:
 	  if (result == RDY_TIMEOUT) mutex_->lock();
 	  return result != RDY_TIMEOUT;
   }
+  
+  _always_inline bool waitUntil(Lock& lock, SystemTime timeout) {
+	  msg_t result = chCondWaitTimeout(&cond_, timeout.value - chTimeNow());
+	  if (result == RDY_TIMEOUT) lock.externUnlocked();
+	  return result != RDY_TIMEOUT;
+  }
+  
 #endif
 
   _always_inline void signal() {
@@ -130,10 +173,14 @@ public:
   _always_inline void broadcast() {
     chCondBroadcast(&cond_);
   }
+  
+  TMutex& getMutex() {
+    return *mutex_;
+  }
 
 private:
   CondVar cond_;
-  Mutex* mutex_;
+  TMutex* mutex_;
 };
 
 } // namespace detail
@@ -202,7 +249,6 @@ namespace detail {
 class mutex_detail {
   NOT_COPYABLE(mutex_detail);
   
-
 public:
   typedef ScopedLock<mutex_detail> Lock;
 

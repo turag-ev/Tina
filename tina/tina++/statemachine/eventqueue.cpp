@@ -131,13 +131,13 @@ void EventQueue::main(EventHandler handler, TickHandler tick) {
       // If an event happens to arrive while waiting, we execute tick() and handle
       // the event without any further delay.
       while (true) {
-          Mutex::Lock lock(mutex_);
+          ConditionVariable::Lock lock(var_);
           if (loadEvent(&event)) break;
           SystemTime wait_time = getTimeToNextEvent();
           if (wait_time.value == 0) continue;
 
           // warte auf Event
-          var_.waitFor(wait_time);
+          lock.waitFor(wait_time);
 
           lock.unlock();
           tick();
