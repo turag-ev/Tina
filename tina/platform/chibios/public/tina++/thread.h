@@ -291,7 +291,7 @@ typedef detail::mutex_detail Mutex;
 typedef detail::semaphore_detail Semaphore;
 
 // work-around because chibios binary semaphore structure is also named BinarySemaphore
-typedef detail::binary_semaphore_detail BinarySemaphore;
+//typedef detail::binary_semaphore_detail BinarySemaphore;
 
 // work-around because chibios mailbox structure is also named Mailbox
 template<std::size_t size> class Mailbox : public detail::mailbox_detail<size> { };
