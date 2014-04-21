@@ -102,10 +102,17 @@ extern "C" {
 #endif
 
 // extra math functions
+#define mRadToRad(x)        ((x) * 0.001f)
+#define radTomRad(x)        ((x) * 1000.0f)
+#define mmTom(x)            ((x) * 0.001f)
+#define mTomm(x)            ((x) * 1000.0f)
 
-#define DOT(v1,v2) 		((((v1).x)*((v2).x)) + (((v1).y)*((v2).y)))
-#define SQUARE(x)     ((x)*(x))
-#define CUBIC(x)      ((x)*(x)*(x))
+#define degToRad(x)       ((x) * M_PIf / 180.0f)
+#define radToDeg(x)       ((x) * 180.0f / M_PIf)
+
+#define square(x)           ((x) * (x))
+
+
 
 
 TURAG_INLINE float sqrf(float x) {
