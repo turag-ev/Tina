@@ -131,6 +131,35 @@ static inline void turag_binary_semaphore_signal(TuragBinarySemaphore* sem) {
 }
 
 
+////////////////////////////////////////////////////////////////////////////////
+// C Interface Condition Variable
+typedef struct {
+	CondVar condvar;
+	TuragMutex* mutex;
+} TuragConditionVariable;
+
+static inline void turag_condition_variable_init(TuragConditionVariable* cond, TuragMutex* mutex_) {
+	cond->mutex = mutex_;
+	chCondInit(&cond->condvar);
+}
+
+static inline void turag_condition_variable_wait(TuragConditionVariable* cond) {
+	chCondWait(&cond->condvar);
+}
+
+static inline bool turag_condition_variable_timed_wait(TuragConditionVariable* cond, TuragSystemTime timeout) {
+	msg_t result = chCondWaitTimeout(&cond->condvar, timeout.value);
+	if (result == RDY_TIMEOUT) turag_mutex_lock(cond->mutex);
+    return result != RDY_TIMEOUT;
+}
+
+static inline void turag_condition_variable_signal(TuragConditionVariable* cond) {
+	chCondSignal(&cond->condvar);
+}
+
+static inline void turag_condition_variable_broadcast(TuragConditionVariable* cond) {
+	chCondBroadcast(&cond->condvar);
+}
 
 
 #ifdef __cplusplus
