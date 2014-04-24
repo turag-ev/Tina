@@ -93,7 +93,7 @@ typedef sig_atomic_t turag_sig_atomic_t;
 #define turag_atomic_load(name, destination)	\
 		turag_mutex_lock(&(name).mutex);		\
 		destination = (name).value;				\
-		turag_mutex_lock(&(name).mutex)
+        turag_mutex_unlock(&(name).mutex)
 		
 /*!
  * \brief Assign a new value to an atomic variable.
@@ -103,7 +103,7 @@ typedef sig_atomic_t turag_sig_atomic_t;
 #define turag_atomic_store(name, new_value)		\
 		turag_mutex_lock(&(name).mutex);		\
 		(name).value = new_value;				\
-		turag_mutex_lock(&(name).mutex)
+        turag_mutex_unlock(&(name).mutex)
 
 #ifndef DOXYGEN
 typedef turag_atomic(bool) turag_atomic_bool_t;
