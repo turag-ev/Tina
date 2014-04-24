@@ -16,7 +16,7 @@ extern "C"
 void _turag_thread_entry(void* data) {
   void (*entry)(void) = (void (*)(void))data;
   entry();
-  
+
   chThdExit(1);
 }
 
@@ -39,7 +39,7 @@ size_t turag_thread_get_stack_usage(const TuragThread* thread) {
 
 bool Semaphore::wait(SystemTime time) {
 	while (1) {
-		msg_t result = chSemWaitTimeout(&sem_, time.value);
+		msg_t result = chSemWaitTimeout(&sem_, time.toTicks());
 
 		if (result == RDY_OK) {
 			return true;

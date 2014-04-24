@@ -235,7 +235,7 @@ struct Pose {
 ///
 /// \warning in realen Situationen sind zwei Positionen nur sehr selten gleich,
 /// weil es immer zu Abweichungen kommt, deswegen sorgsam verwenden! Wenn zwei
-/// Posen vergliechen werden sollen, ist fast immer \ref TURAG::in_range besser.
+/// Posen vergliechen werden sollen, ist fast immer \ref TURAG::in_range besser geeignet.
 ///
 constexpr _always_inline
 bool operator==(const Pose& l, const Pose& r) {
@@ -246,7 +246,7 @@ bool operator==(const Pose& l, const Pose& r) {
 ///
 /// \warning in realen Situationen sind zwei Positionen nur sehr selten gleich,
 /// weil es immer zu Abweichungen kommt, deswegen sorgsam verwenden! Wenn zwei
-/// Punkte vergliechen werden sollen, ist fast immer \ref TURAG::in_range besser.
+/// Punkte vergliechen werden sollen, ist fast immer \ref TURAG::in_range besser geeignet.
 ///
 constexpr _always_inline
 bool operator==(const Point& l, const Point& r) {
@@ -259,12 +259,12 @@ bool operator==(const Point& l, const Point& r) {
 /// allgemeine Implementation um den quatratischen Abstand zwischen zwei
 /// kartesischen Punkten zubestimmen.
 ///
-/// <code>
+/// \code{.cpp}
 /// template<typename T1, typename T2>
 /// Units::Area distance_sqr(const T1& a, const T2& b) {
 ///     return sqr(a.x - b.x)  + sqr(a.y - b.y);
 /// }
-/// </code>
+/// \endcode
 template<typename T1, typename T2>
 constexpr _always_inline
 Units::Area distance_sqr(const T1& a, const T2& b) {
@@ -299,7 +299,7 @@ math_constexpr inline Length distance(Point a, Pose  b) { return hypot(b.x - a.x
 /// einfachen Abstand zwischen zwei kartesischen Punkten zubestimmen.
 math_constexpr inline Length distance(Pose  a, Pose  b) { return hypot(b.x - a.x, b.y - a.y); }
 
-/// Schauen ob Punkt \a a und einem maximalen Radius \a r zu Punkt \a b liegt
+/// Schauen ob Punkt \a a in einem maximalen Radius \a r zu Punkt \a b liegt.
 /// \returns \f$ (x_a - x_b)^2 + (y_a - y_b)^2 \leq r^2 \f$
 template<typename T1, typename T2>
 constexpr

@@ -7,9 +7,8 @@
 
 namespace TURAG {
 
-/// @addtogroup Utils
-/// @{
-
+/// \ingroup Misc
+/// \brief Bitflags
 template<typename Enum, std::size_t Bits>
 class Flags {
 public:
@@ -130,16 +129,19 @@ public:
     return i & bit(f);
   }
 
+  /// \brief Ist mindestens ein Flag gesetzt?
   constexpr
   _always_inline bool any() const {
     return i != 0;
   }
 
+  /// \brief Ist kein Flag gesetzt?
   constexpr
   _always_inline bool none() const {
     return i == 0;
   }
 
+  /// \brief Anzahl der gesetzten Flags
   _always_inline bool count() const {
     constexpr static unsigned max_bit = 1 << (sizeof(i)*8-1);
     int result = 0;
@@ -238,8 +240,6 @@ private:
 
 template<typename Enum, std::size_t Bits>
 const Flags<Enum, Bits> Flags<Enum, Bits>::NOTHING;
-
-/// @}
 
 } // namespace TURAG
 

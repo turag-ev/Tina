@@ -323,7 +323,7 @@ public:
   static const size_t timequeue_size = 16;
 
   /// Maximum time between two calls of tick function
-  static constexpr SystemTime max_tick_time = ms_to_ticks(25);
+  static constexpr SystemTime max_tick_time = 25_ms;
 
 private:
   mutable Mutex mutex_;

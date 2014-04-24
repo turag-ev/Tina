@@ -220,12 +220,14 @@ void turag_debug(const char* msg);
 
 /// Gibt Zeichenketten entsprechend in englischer Sprache für Boolean zurück.
 /// \param boolean Boolean-Wert
-/// \returns Zeichenekette "yes" wenn \p b wahr, sonst "no"
+/// \retval "yes", wenn \p b wahr
+/// \retval "no", sonst
 #define turag_bool_string(boolean) ((boolean)?"yes":"no")
 
 /// Gibt Zeichenketten entsprechend in deutscher Sprache für Boolean zurück.
 /// \param boolean Boolean-Wert
-/// \returns Zeichenekette "ja" wenn \p b wahr, sonst "nein"
+/// \retval "ja", wenn \p b wahr
+/// \retval "nein", sonst
 #define turag_bool_string_de(boolean) ((boolean)?"ja":"nein")
 
 /// \}

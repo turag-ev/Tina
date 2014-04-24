@@ -70,7 +70,7 @@ void print_debug_info(const Event& e) {
 _hot
 bool EventQueue::loadEvent(Event* event) {
   if (!timequeue_.empty()) {
-    SystemTime t = get_current_tick();
+    SystemTime t = SystemTime::now();
     const TimeEvent& first = timequeue_.back();
     if (first.time <= t) {
       if (first.event.event_class != nullptr)
@@ -100,11 +100,11 @@ SystemTime EventQueue::getTimeToNextEvent() const {
 
   if (!timequeue_.empty()) {
     const TimeEvent& first = timequeue_.back();
-    int diff = first.time.value - get_current_tick().value;
+    int diff = first.time.toTicks() - SystemTime::now().toTicks();
     if (diff <= 0) {         
       return SystemTime(0);
     } else {
-      return SystemTime(std::min(TuragSystemTicks(diff), max_tick_time.value));
+        return SystemTime(std::min(TuragSystemTicks(diff), max_tick_time.toTicks()));
     }
   }
 
@@ -134,7 +134,7 @@ void EventQueue::main(EventHandler handler, TickHandler tick) {
           ConditionVariable::Lock lock(var_);
           if (loadEvent(&event)) break;
           SystemTime wait_time = getTimeToNextEvent();
-          if (wait_time.value == 0) continue;
+          if (wait_time.toTicks() == 0) continue;
 
           // warte auf Event
           lock.waitFor(wait_time);
@@ -187,7 +187,7 @@ void EventQueue::pushToFront(const EventClass* event_class, EventArg param, Even
 void EventQueue::pushTimedelayed(SystemTime ticks, const EventClass* event_class,
                                   EventArg param, EventMethod method)
 {
-  SystemTime t = get_current_tick() + ticks;
+  SystemTime t = SystemTime::now() + ticks;
   Mutex::Lock lock(mutex_);
 
   // search for item to insert after
@@ -253,7 +253,7 @@ void EventQueue::printTimeQueue() {
     Mutex::Lock lock(mutex_);
 
     turag_infof("Timed Events:\n");
-    turag_infof("  current time: %u ms\n", ticks_to_ms(get_current_tick()));
+    turag_infof("  current time: %u ms\n", SystemTime::now().toMsec());
 
     if (!timequeue_.empty()) {
         for (const auto& tevent : timequeue_) {
@@ -261,7 +261,7 @@ void EventQueue::printTimeQueue() {
                 EventId id = tevent.event.event_class->id;
 
                 turag_infof("  @%u ms %c%c%c%u %" PRIxPTR "\n",
-                            ticks_to_ms(tevent.time),
+                            tevent.time.toMsec(),
                             static_cast<char>(id >> 24),
                             static_cast<char>(id >> 16),
                             static_cast<char>(id >> 8),

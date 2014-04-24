@@ -66,7 +66,7 @@ void BluetoothBase::main_thread_func(void) {
 
         // TODO!!!!!
         // try to resend rpcs if there is no connection
-        if (rpc_fifo.fetch(&rpc, ms_to_ticks(BLUETOOTH_THREAD_RPC_WAIT_MS))) {
+        if (rpc_fifo.fetch(&rpc, SystemTime::fromMsec(BLUETOOTH_THREAD_RPC_WAIT_MS))) {
             if (peersEnabled[rpc.data.rpc_id].load(std::memory_order_relaxed)) {
                 if (rpc.received) {
                     Mutex::Lock lock(rpc_mutex);

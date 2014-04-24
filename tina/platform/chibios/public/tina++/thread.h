@@ -56,7 +56,7 @@ public:
 #endif
   }
 
-  // returns size of stack 
+  // returns size of stack
   static constexpr unsigned getStackSize() { return size; }
 
   /// lets the current thread sleeps for a time of ecos ticks
@@ -67,7 +67,7 @@ public:
   static _always_inline void setName(const char *name) {
     chRegSetThreadName(name);
   }
-  
+
   _always_inline
   bool shouldTerminate() {
     return false;
@@ -82,21 +82,21 @@ private:
 
 /// lets the current thread sleeps for a time of ecos ticks
 _always_inline void Thread_delay(SystemTime ticks) {
-  chThdSleep(ticks.value);
+  chThdSleep(ticks.toTicks());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // ConditionVariable
 
 namespace detail {
-	
+
 template<class TMutex>
 class ConditionVariable_detail {
   NOT_COPYABLE(ConditionVariable_detail);
 
 public:
   typedef TMutex Mutex;
-  
+
 	class Lock : public ScopedLock<TMutex> {
 	public:
 		  Lock(ConditionVariable_detail& condvar) :
@@ -141,29 +141,29 @@ public:
 // this manually
 
   bool waitFor(SystemTime timeout) {
-	  msg_t result = chCondWaitTimeout(&cond_, timeout.value);
+	  msg_t result = chCondWaitTimeout(&cond_, timeout.toTicks());
 	  if (result == RDY_TIMEOUT) mutex_->lock();
     return result != RDY_TIMEOUT;
   }
-  
+
   _always_inline bool waitFor(Lock& lock, SystemTime timeout) {
-	  msg_t result = chCondWaitTimeout(&cond_, timeout.value);
+	  msg_t result = chCondWaitTimeout(&cond_, timeout.toTicks());
 	  if (result == RDY_TIMEOUT) lock.externUnlocked();
     return result != RDY_TIMEOUT;
   }
-  
+
   bool waitUntil(SystemTime timeout) {
-	  msg_t result = chCondWaitTimeout(&cond_, timeout.value - chTimeNow());
+	  msg_t result = chCondWaitTimeout(&cond_, timeout.toTicks() - chTimeNow());
 	  if (result == RDY_TIMEOUT) mutex_->lock();
 	  return result != RDY_TIMEOUT;
   }
-  
+
   _always_inline bool waitUntil(Lock& lock, SystemTime timeout) {
-	  msg_t result = chCondWaitTimeout(&cond_, timeout.value - chTimeNow());
+	  msg_t result = chCondWaitTimeout(&cond_, timeout.toTicks() - chTimeNow());
 	  if (result == RDY_TIMEOUT) lock.externUnlocked();
 	  return result != RDY_TIMEOUT;
   }
-  
+
 #endif
 
   _always_inline void signal() {
@@ -173,7 +173,7 @@ public:
   _always_inline void broadcast() {
     chCondBroadcast(&cond_);
   }
-  
+
   TMutex& getMutex() {
     return *mutex_;
   }
@@ -248,7 +248,7 @@ namespace detail {
 
 class mutex_detail {
   NOT_COPYABLE(mutex_detail);
-  
+
 public:
   typedef ScopedLock<mutex_detail> Lock;
 
@@ -256,10 +256,10 @@ public:
   mutex_detail() :
     mut_(_MUTEX_DATA(mut_))
   { }
-  
+
   typedef Mutex* NativeHandle;
   NativeHandle getNativeHandle() {return &mut_;}
-  
+
 protected:
   // not for end-user; use ScopedLock<Mutex> or Mutex::Lock!
   friend class ScopedLock<mutex_detail>;

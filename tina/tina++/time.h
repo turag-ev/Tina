@@ -6,110 +6,176 @@
 
 namespace TURAG {
 
+/// \defgroup Time Zeit [C/C++]
+/// \{
+
+/// \brief Zeitpunkt in Systemzeit
+///
+///
 class SystemTime {
 public:
-    TuragSystemTicks value;
-
+    /// Systemzeit aus Systemticks erstellen
     constexpr explicit
     SystemTime(TuragSystemTicks ticks = 0) :
         value(ticks)
     { }
 
+    /// implizit Systemzeit aus äquivalenten C-Typ erstellen
     constexpr
     SystemTime(TuragSystemTime time) :
         value(time.value)
     { }
 
+    /// Kopierkonstruktor
+    constexpr SystemTime(const SystemTime& time) = default;
+
+    /// Kopierkonstruktor
+    SystemTime& operator=(const SystemTime&) = default;
+
+    /// implizit in äquivalenten C-Typ umwandeln
     constexpr
     operator TuragSystemTime () {
         return TuragSystemTime{value};
     }
 
+    /// Systemzeit aus \p ms Millisekunden erstellen
     constexpr
-    static SystemTime from_ms(unsigned ms) {
+    static SystemTime fromMsec(unsigned ms) {
         return turag_ms_to_ticks(ms);
     }
 
+    /// Systemzeit aus \p s Sekunden erstellen
     constexpr
-    static SystemTime from_s(unsigned s) {
+    static SystemTime fromSec(unsigned s) {
         return turag_s_to_ticks(s);
     }
 
-    void assign_from_ms(unsigned ms) {
+    /// gespeicherte Systemzeit auf \p ms Millisekunden setzen
+    void assignFromMsec(unsigned ms) {
         *this = turag_ms_to_ticks(ms);
     }
 
-    void assign_from_s(unsigned s) {
+    /// gespeicherte Systemzeit auf \p s Sekunden setzen
+    void assignFromSec(unsigned s) {
         *this = turag_s_to_ticks(s);
     }
 
+    /// gespeicherte Systemzeit in Millisekunden
     constexpr
-    unsigned to_ms() const {
+    unsigned toMsec() const {
         return turag_ticks_to_ms(TuragSystemTime{value});
     }
 
+    /// gespeicherte Systemzeit in Sekunden
     constexpr
-    unsigned to_s() const {
+    unsigned toSec() const {
         return turag_ticks_to_s(TuragSystemTime{value});
     }
 
-    TuragSystemTicks getNativeValue() const {
+    /// gespeicherte Systemzeit plattformabhängigen Ticks
+    constexpr
+    TuragSystemTicks toTicks() const {
         return value;
     }
 
+    /// aktuelle Systemzeit
     static SystemTime now() {
         return turag_get_current_tick();
     }
 
+    /// unendliche Zeit für Parameter
     constexpr
     static SystemTime infinite() {
         return SystemTime(TURAG_TIME_INFINITE_TICKS);
     }
+
+private:
+    TuragSystemTicks value;
 };
 
-constexpr SystemTime operator + (SystemTime arg) { return arg; }
-constexpr SystemTime operator + (SystemTime lhs, SystemTime rhs) { return SystemTime{lhs.value + rhs.value}; }
-constexpr SystemTime operator - (SystemTime lhs, SystemTime rhs) { return SystemTime{lhs.value - rhs.value}; }
-constexpr bool operator <= (SystemTime lhs, SystemTime rhs) { return lhs.value <= rhs.value; }
-constexpr bool operator >= (SystemTime lhs, SystemTime rhs) { return lhs.value >= rhs.value; }
-constexpr bool operator == (SystemTime lhs, SystemTime rhs) { return lhs.value == rhs.value; }
-constexpr bool operator != (SystemTime lhs, SystemTime rhs) { return lhs.value != rhs.value; }
-constexpr bool operator <  (SystemTime lhs, SystemTime rhs) { return lhs.value < rhs.value;  }
-constexpr bool operator >  (SystemTime lhs, SystemTime rhs) { return lhs.value > rhs.value;  }
-
-constexpr SystemTime operator * (SystemTime lhs, unsigned rhs) { return SystemTime(lhs.value * rhs); }
-constexpr SystemTime operator * (unsigned lhs, SystemTime rhs) { return SystemTime(lhs * rhs.value); }
-
-constexpr _always_inline SystemTime s_to_ticks(unsigned s) {
-    return SystemTime::from_s(s);
+/// \{
+/// \brief Systemzeit vergleichen
+///
+constexpr SystemTime operator + (SystemTime arg) {
+    return arg;
 }
 
-constexpr _always_inline SystemTime ms_to_ticks(unsigned ms) {
-    return SystemTime::from_ms(ms);
+constexpr SystemTime operator + (SystemTime lhs, SystemTime rhs) {
+    return SystemTime{lhs.toTicks() + rhs.toTicks()};
 }
 
-constexpr _always_inline unsigned ticks_to_s(SystemTime ticks) {
-    return ticks.to_s();
+/// \}
+
+/// Differenz zwischen zwei Systemzeitpunkten bilden
+constexpr SystemTime operator - (SystemTime lhs, SystemTime rhs) {
+    return SystemTime{lhs.toTicks() - rhs.toTicks()};
 }
 
-constexpr _always_inline unsigned ticks_to_ms(SystemTime ticks) {
-    return ticks.to_ms();
+/// \{
+/// \brief Systemzeit multiplizieren
+
+constexpr SystemTime operator * (SystemTime lhs, unsigned rhs) {
+    return SystemTime(lhs.toTicks() * rhs);
 }
 
-#if GCC_VERSION >= 40700
-constexpr SystemTime operator"" _s(long double a) { return SystemTime::from_s(a); }
-constexpr SystemTime operator"" _ms(long double a) { return SystemTime::from_ms(a); }
-constexpr SystemTime operator"" _s(unsigned long long a) { return SystemTime::from_s(a); }
-constexpr SystemTime operator"" _ms(unsigned long long a) { return SystemTime::from_ms(a); }
+constexpr SystemTime operator * (unsigned lhs, SystemTime rhs) {
+    return SystemTime(lhs * rhs.toTicks());
+}
+
+/// \}
+
+/// \{
+/// \brief Systemzeit vergleichen
+constexpr bool operator <= (SystemTime lhs, SystemTime rhs) { return lhs.toTicks() <= rhs.toTicks(); }
+constexpr bool operator >= (SystemTime lhs, SystemTime rhs) { return lhs.toTicks() >= rhs.toTicks(); }
+constexpr bool operator == (SystemTime lhs, SystemTime rhs) { return lhs.toTicks() == rhs.toTicks(); }
+constexpr bool operator != (SystemTime lhs, SystemTime rhs) { return lhs.toTicks() != rhs.toTicks(); }
+constexpr bool operator <  (SystemTime lhs, SystemTime rhs) { return lhs.toTicks() <  rhs.toTicks();  }
+constexpr bool operator >  (SystemTime lhs, SystemTime rhs) { return lhs.toTicks() >  rhs.toTicks();  }
+/// \}
+
+#if GCC_VERSION >= 40700 || defined(DOXYGEN)
+
+/// \{
+/// Systemzeit aus Sekundenangabe erstellen
+constexpr SystemTime operator"" _s(long double a) { return SystemTime::fromMsec(a / 1000.0); }
+constexpr SystemTime operator"" _s(unsigned long long a) { return SystemTime::fromSec(a); }
+/// \}
+
+/// \{
+/// Systemzeit aus Millisekundenangabe erstellen
+constexpr SystemTime operator"" _ms(unsigned long long a) { return SystemTime::fromMsec(a); }
+/// \}
+
 #endif
 
-/// Get number of ecos ticks since system start
-/**
- * \return ecos ticks
- */
-_always_inline SystemTime get_current_tick() { // [tick]
-    return SystemTime::now();
+// alte Versionen:
+
+/// Systemzeit aus \p ms Millisekunden erstellen
+constexpr _always_inline
+static SystemTime ms_to_ticks(unsigned ms) {
+    return turag_ms_to_ticks(ms);
 }
+
+/// Systemzeit aus \p s Sekunden erstellen
+constexpr _always_inline
+static SystemTime s_to_ticks(unsigned s) {
+    return turag_s_to_ticks(s);
+}
+
+/// gespeicherte Systemzeit in Millisekunden
+constexpr _always_inline
+unsigned ticks_to_ms(SystemTime time) {
+    return turag_ticks_to_ms(time);
+}
+
+/// gespeicherte Systemzeit in Sekunden
+constexpr _always_inline
+unsigned ticks_to_s(SystemTime time) {
+    return turag_ticks_to_s(time);
+}
+
+/// \}
 
 } // namespace TURAG
 

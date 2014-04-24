@@ -385,7 +385,7 @@ private:
     State* transition_function(void) {
         // This was necessary to avoid some trouble in the
         // behaviour of SystemTime on chibi.
-        if (myDelay <= ms_to_ticks(2)) {
+        if (myDelay <= 2_ms) {
             if (myEvent) emitEvent(myEvent);
             return myNextState;
         } else if (SystemTime::now() - myStartTime < myDelay) {
