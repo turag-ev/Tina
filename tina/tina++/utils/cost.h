@@ -61,7 +61,7 @@ public:
         return *this += other.cost_;
     }
 
-    Cost operator+(Cost other) {
+    Cost operator+(Cost other) const {
         return Cost(*this) += other.cost_;
     }
 

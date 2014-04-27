@@ -12,7 +12,7 @@ LDFLAGS = -Wall -std=c++0x -g -O0
 PROGRAM = tests
 
 # Input files
-SRCFILES = $(wildcard *.cpp)
+SRCFILES = $(wildcard *.cpp) ../tina++/utils/cost.cpp
 LIBS = -lboost_unit_test_framework
 
 ################################################################################
