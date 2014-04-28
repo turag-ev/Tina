@@ -139,6 +139,17 @@
 # endif
 #endif
 
+// output images
+#if !defined(TURAG_DEBUG_ENABLE_IMAGE)
+# if TURAG_DEBUG_LEVEL > 3
+/// \brief Wenn definiert werden Bilder ausgegeben
+///
+/// Kann über Makefile oder in Zeilen vor erstem Include definiert werden.
+/// Wird standardmäßig bei TURAG_DEBUG_LEVEL größer 3 definiert.
+#  define TURAG_DEBUG_ENABLE_IMAGE
+# endif
+#endif
+
 // log source
 #ifndef TURAG_DEBUG_LOG_SOURCE
 /// \brief Debugquelle
