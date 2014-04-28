@@ -9,7 +9,8 @@ static unsigned turag_image_index = 0;
 /**
  * Fun Fact: Typ und Meldungslevel ergeben zusammen :B
  *
- * Inhalt Daten (not exactly EBNF, but for consistency with the rest of tina):
+ * Nachrichten im Protokoll (not exactly EBNF, but for consistency with the rest of tina):
+ * \verbatim
  * <Kanalname, [%s]><' '>
  * <Timestamp in Systemticks, [%d]><' '>
  * <Farbraum, [R]=RGB><' '>
@@ -17,6 +18,7 @@ static unsigned turag_image_index = 0;
  * <y-Auflösung in Pixel, [%d]><' '>
  * <Farbtiefe, Bytes (!=Bits) pro Pixel [%d]><' '>
  * <Bild-Daten, Base64-kodiert>
+ * \endverbatim
  */
 
 unsigned turag_image_transmit(const char* channel_name, const unsigned timestamp_ticks, const char colorspace_abbrev,
