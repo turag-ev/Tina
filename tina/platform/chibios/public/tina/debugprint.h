@@ -37,8 +37,8 @@
 extern "C" {
 #endif
 
-#define turag_debug_puts      SC_DEBUG
-#define turag_debug_printf    SC_DEBUG
+#define turag_debug_puts      TINA_DEBUG
+#define turag_debug_printf    TINA_DEBUG
 
 #ifdef __cplusplus
 } // extern "C"
