@@ -20,7 +20,7 @@ extern "C" {
 #endif
 
 /**
- * @brief turag_image_transmit Transmits an image.
+ * @brief Transmits an image.
  * @param channel_name Name of image source.
  * @param timestamp_ticks System tick value when image was shot
  * @param colorspace_abbrev Color space: H=HSV, R=RGB
@@ -35,7 +35,7 @@ unsigned turag_image_transmit(const char* channel_name, const unsigned timestamp
                               const char* image_buffer);
 
 /**
- * @brief turag_image_doge Do nothing, so scare.
+ * @brief Do nothing, so scare. Or maybe print something if TURAG_DEBUG_ENABLE_IMAGE_DOGE is set.
  * @verbatim
 ░░░░░░░░░▄░░░░░░░░░░░░░░▄░░░░
 ░░░░░░░░▌▒█░░░░░░░░░░░▄▀▒▌░░░
