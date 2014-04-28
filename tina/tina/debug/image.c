@@ -42,9 +42,9 @@ unsigned turag_image_transmit(const char* channel_name, const unsigned timestamp
     // print base64-encoded image data
     uint8_t encoded[7] = {0};
     unsigned i;
-    unsigned buffer_pixels = resolution_x * resolution_y;
+    unsigned buffer_pixels = (resolution_x * resolution_y * resolution_depth)/4;
     for (i = 0; i < buffer_pixels; ++i) {
-        turag_base64_encode((const uint8_t*)&image_buffer[i*resolution_depth], resolution_depth, encoded);
+        turag_base64_encode((const uint8_t*)&image_buffer[i*4], 4, encoded);
         turag_debug_puts((char*)encoded);
     }
 
