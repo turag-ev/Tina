@@ -11,14 +11,14 @@ static unsigned turag_image_index = 0;
  *
  * Nachrichten im Protokoll (not exactly EBNF, but for consistency with the rest of tina):
  * \verbatim
- * <Kanalname, [%s]><' '>
- * <Timestamp in Systemticks, [%d]><' '>
- * <Farbraum, [R]=RGB><' '>
- * <x-Auflösung in Pixel, [%d]><' '>
- * <y-Auflösung in Pixel, [%d]><' '>
- * <Farbtiefe, Bytes (!=Bits) pro Pixel [%d]><' '>
- * <Bild-Daten, Base64-kodiert>
- * \endverbatim
+<Kanalname, [%s]><' '>
+<Timestamp in Systemticks, [%d]><' '>
+<Farbraum, [R]=RGB><' '>
+<x-Auflösung in Pixel, [%d]><' '>
+<y-Auflösung in Pixel, [%d]><' '>
+<Farbtiefe, Bytes (!=Bits) pro Pixel [%d]><' '>
+<Bild-Daten, Base64-kodiert>
+\endverbatim
  */
 
 unsigned turag_image_transmit(const char* channel_name, const unsigned timestamp_ticks, const char colorspace_abbrev,

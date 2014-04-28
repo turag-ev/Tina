@@ -6,7 +6,7 @@
 
 /// \addtogroup Debug
 /// \{
-/// \defgroup Debug Ausgabe von Bilddaten
+/// \defgroup Debugimage Ausgabe von Bilddaten
 /// \{
 
 // graph output prefixes
