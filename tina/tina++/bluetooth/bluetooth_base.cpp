@@ -1,4 +1,3 @@
-
 #define TURAG_DEBUG_LOG_SOURCE "Y"
 
 #include "bluetooth_base.h"
@@ -67,7 +66,7 @@ void BluetoothBase::main_thread_func(void) {
         // TODO!!!!!
         // try to resend rpcs if there is no connection
         if (rpc_fifo.fetch(&rpc, SystemTime::fromMsec(BLUETOOTH_THREAD_RPC_WAIT_MS))) {
-            if (peersEnabled[rpc.data.rpc_id].load(std::memory_order_relaxed)) {
+			if (peersEnabled[rpc.peer_id].load(std::memory_order_relaxed)) {
                 if (rpc.received) {
                     Mutex::Lock lock(rpc_mutex);
                     RpcFunction callback = rpc_functions[rpc.data.rpc_id];
@@ -211,7 +210,8 @@ bool BluetoothBase::callRpc(uint8_t destination, uint8_t rpc_id, uint64_t param)
         turag_error("invalid peer ID");
         return false;
     } else if (!peersEnabled[destination].load(std::memory_order_relaxed)) {
-        return false;
+		turag_warningf("peer not enabled");
+		return false;
     } else {
         Rpc_t rpc;
         rpc.data.rpc_id = rpc_id;
