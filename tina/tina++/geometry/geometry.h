@@ -30,67 +30,67 @@ Angle norm_angle(Angle x);
 /// \tparam U Typ der Koordinaten (Standardmäßig \ref TURAG::Length)
 template<typename U = Length>
 struct Vector {
-    /// x - Koordinate
-    U x;
+	/// x - Koordinate
+	U x;
 
-    /// y - Koordinate
-    U y;
+	/// y - Koordinate
+	U y;
 
-    /// Vektor aus Komponeten erstellen
-    /// \param x,y Koordinaten
-    constexpr
-    Vector(U x, U y) :
-        x(x), y(y)
-    { }
+	/// Vektor aus Komponeten erstellen
+	/// \param x,y Koordinaten
+	constexpr
+	Vector(U x, U y) :
+		x(x), y(y)
+	{ }
 
-    /// \{
-    /// Kopieroperator
-    Vector(const Vector& p) = default;
-    Vector() = default;
-    /// \}
+	/// \{
+	/// Kopieroperator
+	Vector(const Vector& p) = default;
+	Vector() = default;
+	/// \}
 };
 
 /// zweidimensionaler kartesischer Punkt
 struct Point {
-    /// x - Koordinate
-    Length x;
+	/// x - Koordinate
+	Length x;
 
-    /// y - Koordinate
-    Length y;
+	/// y - Koordinate
+	Length y;
 
-    /// Punkt aus zwei kartesischen Korrdinaten erstellen
-    constexpr
-    Point(Length x, Length y) :
-        x(x), y(y)
-    { }
+	/// Punkt aus zwei kartesischen Korrdinaten erstellen
+	constexpr
+	Point(Length x, Length y) :
+		x(x), y(y)
+	{ }
 
-    /// Kopierkonstruktor
-    constexpr
-    Point(const Point& p) = default;
+	/// Kopierkonstruktor
+	constexpr
+	Point(const Point& p) = default;
 
-    /// Nullpunkt erstellen
-    constexpr
-    Point() :
-        x(0), y(0)
-    { }
+	/// Nullpunkt erstellen
+	constexpr
+	Point() :
+		x(0), y(0)
+	{ }
 
-    /// zwei Punkte addieren
-    constexpr
-    Vector<Length> operator+(const Point& other) {
-        return Vector<Length>(x + other.x, y + other.y);
-    }
+	/// zwei Punkte addieren
+	constexpr
+	Vector<Length> operator+(const Point& other) {
+		return Vector<Length>(x + other.x, y + other.y);
+	}
 
-    /// relativer Vektor zwischen zwei Punkte erhalten
-    constexpr
-    Vector<Length> operator-(const Point& other) {
-        return Vector<Length>(x - other.x, y - other.y);
-    }
+	/// relativer Vektor zwischen zwei Punkte erhalten
+	constexpr
+	Vector<Length> operator-(const Point& other) {
+		return Vector<Length>(x - other.x, y - other.y);
+	}
 
-    /// zwei Punkte vergleichen
-    constexpr
-    bool operator!=(const Point& other) {
-        return (x != other.x) || (y != other.y);
-    }
+	/// zwei Punkte vergleichen
+	constexpr
+	bool operator!=(const Point& other) {
+		return (x != other.x) || (y != other.y);
+	}
 };
 
 /// Darstellung für zweidimensionalen Polarvektor
@@ -99,134 +99,134 @@ struct Point {
 /// \tparam U2 Typ des Winkels (Standardmäßig \ref TURAG::Angle)
 template<typename U1 = Length, typename U2 = Angle>
 struct VectorPolar {
-    /// Radius - Koordinate
-    U1 r;
+	/// Radius - Koordinate
+	U1 r;
 
-    /// Winkel - Koordinate
-    U2 phi;
+	/// Winkel - Koordinate
+	U2 phi;
 
-    /// Punkt aus zwei Polarkorrdinaten erstellen
-    constexpr
-    VectorPolar(U1 r, U2 phi) :
-        r(r), phi(phi)
-    { }
+	/// Punkt aus zwei Polarkorrdinaten erstellen
+	constexpr
+	VectorPolar(U1 r, U2 phi) :
+		r(r), phi(phi)
+	{ }
 
-    /// Kopierkonstruktor
-    constexpr
-    VectorPolar(const VectorPolar& p) = default;
+	/// Kopierkonstruktor
+	constexpr
+	VectorPolar(const VectorPolar& p) = default;
 
-    /// Nullvektor erstellen
-    constexpr
-    VectorPolar() :
-        r(0), phi(0)
-    { }
+	/// Nullvektor erstellen
+	constexpr
+	VectorPolar() :
+		r(0), phi(0)
+	{ }
 };
 
 /// \brief Pose im zweidimensionalen Raum
 ///
 /// zweidimensionaler kartesischer Punkt mit Winkel, der Ausrichtung darstellt.
 struct Pose {
-    /// x - Koordinate
-    Length x;
+	/// x - Koordinate
+	Length x;
 
-    /// y - Koordinate
-    Length y;
+	/// y - Koordinate
+	Length y;
 
-    /// Winkel - Koordinate
-    Angle phi;
+	/// Winkel - Koordinate
+	Angle phi;
 
-    /// Pose aus zwei kartesischen Korrdinaten und Winkel erstellen
-    constexpr
-    Pose(Length x, Length y, Angle phi) :
-        x(x), y(y), phi(phi)
-    { }
+	/// Pose aus zwei kartesischen Korrdinaten und Winkel erstellen
+	constexpr
+	Pose(Length x, Length y, Angle phi) :
+		x(x), y(y), phi(phi)
+	{ }
 
-    /// Kopierkonstruktor
-    constexpr Pose(const Pose&) = default;
+	/// Kopierkonstruktor
+	constexpr Pose(const Pose&) = default;
 
-    /// Kopierkonstruktor
-    Pose& operator=(const Pose&) = default;
+	/// Kopierkonstruktor
+	Pose& operator=(const Pose&) = default;
 
-    /// Nullpose erstellen
-    constexpr
-    Pose() :
-        x(0), y(0), phi(0)
-    { }
+	/// Nullpose erstellen
+	constexpr
+	Pose() :
+		x(0), y(0), phi(0)
+	{ }
 
-    /// Pose aus kartesischen Punkt und Winkel erstellen
-    explicit constexpr
-    Pose(const Point& p, Angle a = Units::null) :
-        x(p.x), y(p.y), phi(a)
-    { }
+	/// Pose aus kartesischen Punkt und Winkel erstellen
+	explicit constexpr
+	Pose(const Point& p, Angle a = Units::null) :
+		x(p.x), y(p.y), phi(a)
+	{ }
 
-    /// Position aus kartesischen Punkt übernehmen. Winkel wird nicht geändert.
-    void assign(const Point& p) {
-        x = p.x;
-        y = p.y;
-    }
+	/// Position aus kartesischen Punkt übernehmen. Winkel wird nicht geändert.
+	void assign(const Point& p) {
+		x = p.x;
+		y = p.y;
+	}
 
-    /// zugehörigen Punkt zurück geben
-    Point toPoint() const {
-        return Point(x, y);
-    }
+	/// zugehörigen Punkt zurück geben
+	Point toPoint() const {
+		return Point(x, y);
+	}
 
-    /// Pose um sich selber drehen (Winkel wird normalisiert).
-    Pose& turn(Angle a) {
-        phi = norm_angle(phi + a);
-        return *this;
-    }
+	/// Pose um sich selber drehen (Winkel wird normalisiert).
+	Pose& turn(Angle a) {
+		phi = norm_angle(phi + a);
+		return *this;
+	}
 
-    /// Pose in Blickrichtung verschieben
-    /// \param trans Länge, um den die Position in Winkelrichtung verschoben werden soll.
-    Pose& translate(Length trans);
+	/// Pose in Blickrichtung verschieben
+	/// \param trans Länge, um den die Position in Winkelrichtung verschoben werden soll.
+	Pose& translate(Length trans);
 
-    /// Pose in Blickrichtung verschieben
-    /// \param other Vektor, um den die Position in Winkelrichtung verschoben werden soll.
-    Pose& translate(const Point& other);
+	/// Pose in Blickrichtung verschieben
+	/// \param other Vektor, um den die Position in Winkelrichtung verschoben werden soll.
+	Pose& translate(const Point& other);
 
-    /// Pose in Blickrichtung verschieben und drehen
-    /// \param other
-    ///    Vektor, um den die Position in Winkelrichtung verschoben werden soll,
-    ///    und Winkel um den gedreht werden soll.
-    Pose& translate(const Pose& other);
+	/// Pose in Blickrichtung verschieben und drehen
+	/// \param other
+	///    Vektor, um den die Position in Winkelrichtung verschoben werden soll,
+	///    und Winkel um den gedreht werden soll.
+	Pose& translate(const Pose& other);
 
-    /// neue Pose mit zusätzlichen Winkel erstellen
-    Pose getTurnedPose(Angle a) const {
-        return Pose(*this).turn(a);
-    }
+	/// neue Pose mit zusätzlichen Winkel erstellen
+	Pose getTurnedPose(Angle a) const {
+		return Pose(*this).turn(a);
+	}
 
-    /// neuen in Blickrichtung verschobenen Punkt erstellen
-    /// \param trans Länge, um den die Position in Winkelrichtung verschoben ist.
-    Point getRelativePoint(Length trans) const;
+	/// neuen in Blickrichtung verschobenen Punkt erstellen
+	/// \param trans Länge, um den die Position in Winkelrichtung verschoben ist.
+	Point getRelativePoint(Length trans) const;
 
-    /// neue in Blickrichtung verschobene Punkt erstellen
-    /// \param other Vektor, um den die Position in Winkelrichtung verschoben ist.
-    Point getRelativePoint(const Point& other) const;
+	/// neue in Blickrichtung verschobene Punkt erstellen
+	/// \param other Vektor, um den die Position in Winkelrichtung verschoben ist.
+	Point getRelativePoint(const Point& other) const;
 
-    /// neue in Blickrichtung verschobene Punkt erstellen
-    /// \param other Vektor, um den die Position in Winkelrichtung verschoben ist (Winkel wird ignoriert).
-    Point getRelativePoint(const Pose& other) const;
+	/// neue in Blickrichtung verschobene Punkt erstellen
+	/// \param other Vektor, um den die Position in Winkelrichtung verschoben ist (Winkel wird ignoriert).
+	Point getRelativePoint(const Pose& other) const;
 
 
-    /// neuen in Blickrichtung verschobenen Punkt erstellen
-    /// \param trans Länge, um den die Position in Winkelrichtung verschoben ist.
-    Pose getRelativePose(Length trans) const {
-        return Pose(*this).translate(trans);
-    }
+	/// neuen, in Blickrichtung verschobenen Punkt erstellen
+	/// \param trans Länge, um den die Position in Winkelrichtung verschoben ist.
+	Pose getRelativePose(Length trans) const {
+		return Pose(*this).translate(trans);
+	}
 
-    /// neue in Blickrichtung verschobene Punkt erstellen
-    /// \param other Vektor, um den die Position in Winkelrichtung verschoben ist.
-    Pose getRelativePose(const Point& other) const {
-        return Pose(*this).translate(other);
-    }
+	/// neuen, in Blickrichtung verschobene Punkt erstellen
+	/// \param other Vektor, um den die Position in Winkelrichtung verschoben ist.
+	Pose getRelativePose(const Point& other) const {
+		return Pose(*this).translate(other);
+	}
 
-    /// neue in Blickrichtung verschobene Punkt erstellen
-    /// \param other
-    ///    Vektor, um den die Position in Winkelrichtung verschoben ist,
-    ///    und Winkel um den gedreht wird.
-    Pose getRelativePose(const Pose& other) const {
-        return Pose(*this).translate(other);
-    }
+	/// neue in Blickrichtung verschobene Punkt erstellen
+	/// \param other
+	///    Vektor, um den die Position in Winkelrichtung verschoben ist,
+	///    und Winkel um den gedreht wird.
+	Pose getRelativePose(const Pose& other) const {
+		return Pose(*this).translate(other);
+	}
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -321,31 +321,31 @@ Angle angle_between(const T1& a, const T2& b) {
 /// Darstellung für Kreis aus Mittelpunkt und Radius
 struct Circle {
 
-    /// Kreis aus kartesischen Punkt und Radius erstellen
-    /// \tparam Typ mit x- und y-Koordinate
-    template<typename P>
-    constexpr explicit
-    Circle(const P& t, Length r) :
-        m(t.x, t.y), r(r)
-    { }
+	/// Kreis aus kartesischen Punkt und Radius erstellen
+	/// \tparam Typ mit x- und y-Koordinate
+	template<typename P>
+	constexpr explicit
+	Circle(const P& t, Length r) :
+		m(t.x, t.y), r(r)
+	{ }
 
-    /// unintialisieren Kreis erstellen (Radius ist negativ)
-    constexpr explicit
-    Circle() :
-        m(), r(-1.f*Units::mm)
-    { }
+	/// unintialisieren Kreis erstellen (Radius ist negativ)
+	constexpr explicit
+	Circle() :
+		m(), r(-1.f*Units::mm)
+	{ }
 
-    /// Kopierkonstruktor
-    constexpr Circle(const Circle&) = default;
+	/// Kopierkonstruktor
+	constexpr Circle(const Circle&) = default;
 
-    /// Kopierkonstruktor
-    Circle& operator=(const Circle&) = default;
+	/// Kopierkonstruktor
+	Circle& operator=(const Circle&) = default;
 
-    /// Mittelpunkt des Kreies
-    Point m;
+	/// Mittelpunkt des Kreies
+	Point m;
 
-    /// Radius des Kreises
-    Length r;
+	/// Radius des Kreises
+	Length r;
 };
 
 /// Schnittpunkt zwischen zwei Kreisen zurückgeben
