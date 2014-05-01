@@ -4,8 +4,8 @@
 /// get GCC version in useable format
 #ifndef __clang__
 #define GCC_VERSION (__GNUC__ * 10000 \
-                     + __GNUC_MINOR__ * 100 \
-                     + __GNUC_PATCHLEVEL__)
+					 + __GNUC_MINOR__ * 100 \
+					 + __GNUC_PATCHLEVEL__)
 
 #else
 // clang has everything :P
@@ -70,13 +70,13 @@
 /// mark a function, that only use it's arguments
 #define _const __attribute__((const))
 
-/// mark a function, that very often
+/// mark a function, that is called very often
 #define _hot __attribute__((hot))
 
 /// mark a function, that is called very seldom
 #define _cold __attribute__((cold))
 
-/// mark a function, that dont return like \a exit and \a abort
+/// mark a function, that does not return like \a exit and \a abort
 #define _noreturn __attribute__((noreturn))
 
 /// optimize function with given level, e.x. \code _optimize("O3") \endcode
