@@ -110,7 +110,7 @@ public:
     struct SinkData {
         uint8_t id;     ///< for internal use only.
         T data;         ///< data structure that will contain received data.
-    } _packed;
+	}; //FIXME is _packed here necessary
 
     /*!
      * @brief Wrapper-structure for data providers.
@@ -119,7 +119,7 @@ public:
     struct PushData {
         uint8_t id;     ///< for internal use only.
         T data;         ///< data structure that contains data to send.
-    } _packed;
+	}; //FIXME is _packed here necessary
 
 
     /*!
