@@ -107,10 +107,11 @@ extern "C" {
 #define mmTom(x)            ((x) * 0.001f)
 #define mTomm(x)            ((x) * 1000.0f)
 
-#define degToRad(x)       ((x) * M_PIf / 180.0f)
-#define radToDeg(x)       ((x) * 180.0f / M_PIf)
+#define degToRad(x)  	((x) * M_PIf / 180.0f)
+#define radToDeg(x)     ((x) * 180.0f / M_PIf)
 
-#define square(x)           ((x) * (x))
+#define square(x)     	((x) * (x))
+#define cubic(x)		((x)*(x)*(x))
 
 
 
