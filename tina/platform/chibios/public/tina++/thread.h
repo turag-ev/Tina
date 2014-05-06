@@ -61,7 +61,7 @@ public:
 
   /// lets the current thread sleeps for a time of ecos ticks
   static _always_inline void delay(SystemTime ticks) {
-    chThdSleep(ticks.value);
+    chThdSleep(ticks.toTicks());
   }
 
   static _always_inline void setName(const char *name) {
