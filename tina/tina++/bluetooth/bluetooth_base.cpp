@@ -235,6 +235,7 @@ bool BluetoothBase::addDataSink(uint8_t data_sink_id, uint8_t* storage_buffer, s
         if (data_sinks[data_sink_id].buffer) {
             turag_warningf("datasink %d was overwritten", data_sink_id);
         }
+        turag_infof("added datasink %d with size %d", (int)data_sink_id, (int)length);
         data_sinks[data_sink_id] = DataSink(storage_buffer, length);
         return true;
     }
@@ -246,8 +247,10 @@ bool BluetoothBase::getData(uint8_t data_sink_id, uint8_t* buffer, size_t length
         return false;
     } else {
         Mutex::Lock lock(data_sink_mutex);
-        if (length != data_sinks[data_sink_id].buffer_size) {
-            turag_errorf("incorrect data length for DataSink %d", data_sink_id);
+        if (!data_sinks[data_sink_id].buffer) {
+            turag_errorf("Tried to read data from unitialized data sink %d", (int)data_sink_id);
+        } else if (length != data_sinks[data_sink_id].buffer_size) {
+            turag_errorf("incorrect data length for DataSink %d (given: %d, expected: %d)", (int)data_sink_id, (int)length, (int)data_sinks[data_sink_id].buffer_size);
             return false;
         }
         std::memcpy(buffer, data_sinks[data_sink_id].buffer, length);
@@ -276,6 +279,7 @@ bool BluetoothBase::addDataProvider(uint8_t destination, uint8_t data_provider_i
             provider->destination = destination;
             provider->id = data_provider_id;
         } else {
+            turag_infof("added dataprovider id: %d peer: %d size: %d", (int)data_provider_id, (int)destination, (int)length);
             data_providers.emplace_back(DataProvider(storage_buffer, length, destination, data_provider_id));
         }
         return true;
