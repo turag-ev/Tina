@@ -39,13 +39,13 @@ size_t turag_thread_get_stack_usage(const TuragThread* thread);
 #endif
 
 /// lets the current thread sleeps for a time of ecos ticks
-_always_inline
+TURAG_INLINE
 void turag_thread_delay(TuragSystemTime ticks) {
   chThdSleep(ticks.value);
 }
 
 /// sets the name of the current thread (only for chibios)
-_always_inline
+TURAG_INLINE
 void turag_thread_set_name(const char* name) {
   chRegSetThreadName(name);
 }

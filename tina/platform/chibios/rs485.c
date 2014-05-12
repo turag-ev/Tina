@@ -95,6 +95,9 @@ bool turag_rs485_transceive(uint8_t *input, int input_length, uint8_t *output, i
 }
 
 void turag_rs485_buffer_clear(void) {
-	uint8_t dummy[100];
-	while (sdAsynchronousRead(&RS485SD, dummy, sizeof(dummy)) == sizeof(dummy));
+    while (!turag_rs485_ready()) {
+        chThdSleepMilliseconds(10);
+    }
+
+    while (sdGetTimeout(&RS485SD, TIME_IMMEDIATE) != Q_TIMEOUT);
 }
