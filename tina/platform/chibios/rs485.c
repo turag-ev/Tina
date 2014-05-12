@@ -58,12 +58,15 @@ bool turag_rs485_init(uint32_t baud_rate, TuragSystemTime timeout) {
     return (RS485SD.state == SD_READY);
 }
 
-bool turag_rs485_ready(void)
-{
+bool turag_rs485_ready(void) {
     return (RS485SD.state == SD_READY);
 }
 
 bool turag_rs485_transceive(uint8_t *input, int input_length, uint8_t *output, int output_length) {
+    while (!turag_rs485_ready()) {
+        chThdSleepMilliseconds(10);
+    }
+
     bool send_ok = true, recv_ok = true;
 
     chBSemWait(&_RS485_Sem);
