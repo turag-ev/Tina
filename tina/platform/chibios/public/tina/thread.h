@@ -5,6 +5,7 @@
 #include <stddef.h>
 
 #include <tina/tina.h>
+#include <os_turag.h>
 #include "time.h"
 
 #ifdef __cplusplus
@@ -20,7 +21,11 @@ typedef struct {
 #define TURAG_DEFINE_THREAD(name, stack_size) \
   static WORKING_AREA(TURAG_CONCAT(name, _stack_), stack_size); \
   TuragThread name = {0, &TURAG_CONCAT(name, _stack_), sizeof(TURAG_CONCAT(name, _stack_))}
-  
+
+#define TURAG_DEFINE_THREAD_CCM(name, stack_size) \
+  static ATTRIB_SECTION_CCMSTACK WORKING_AREA(TURAG_CONCAT(name, _stack_), stack_size); \
+  TuragThread name = {0, &TURAG_CONCAT(name, _stack_), sizeof(TURAG_CONCAT(name, _stack_))}
+
 extern void _turag_thread_entry(void* data);
 
 static _always_inline
@@ -49,7 +54,7 @@ TURAG_INLINE
 void turag_thread_set_name(const char* name) {
   chRegSetThreadName(name);
 }
- 
+
 ////////////////////////////////////////////////////////////////////////////////
 // C Interface Mutex
 
@@ -72,7 +77,7 @@ static inline void turag_semaphore_init(TuragSemaphore* sem, int32_t n) {
 }
 
 static inline void turag_semaphore_wait(TuragSemaphore* sem) {
-	chSemWait(sem); 
+	chSemWait(sem);
 }
 
 static inline bool turag_semaphore_timed_wait(TuragSemaphore* sem, TuragSystemTime timeout) {
@@ -107,7 +112,7 @@ static inline void turag_binary_semaphore_init(TuragBinarySemaphore* sem, bool t
 }
 
 static inline void turag_binary_semaphore_wait(TuragBinarySemaphore* sem) {
-	chBSemWait(sem); 
+	chBSemWait(sem);
 }
 
 static inline bool turag_binary_semaphore_timed_wait(TuragBinarySemaphore* sem, TuragSystemTime timeout) {
