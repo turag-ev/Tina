@@ -20,7 +20,11 @@ typedef void* TuragThread;
 
 #define TURAG_DEFINE_THREAD(name, stack_size) \
   TuragThread name
-  
+
+#define TURAG_DEFINE_THREAD_CCM TURAG_DEFINE_THREAD
+
+#define ATTRIB_SECTION_CCM
+
 void turag_thread_start(TuragThread* thread, int priority, void (*entry) (void));
 
 /// returns maximal used stack size in bytes
