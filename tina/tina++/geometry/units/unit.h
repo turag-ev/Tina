@@ -35,33 +35,33 @@ typedef Dimension<RationalNull, RationalNull, RationalOne > TimeDimension;
 template<typename LhsDimension, typename RhsDimension>
 struct dim_mul {
   typedef Dimension<typename std::ratio_add<typename LhsDimension::length, typename RhsDimension::length>::type,
-                            typename std::ratio_add<typename LhsDimension::angle,  typename RhsDimension::angle>::type,
-                            typename std::ratio_add<typename LhsDimension::time,   typename RhsDimension::time>::type>
-          type;
+							typename std::ratio_add<typename LhsDimension::angle,  typename RhsDimension::angle>::type,
+							typename std::ratio_add<typename LhsDimension::time,   typename RhsDimension::time>::type>
+		  type;
 };
 
 template<typename LhsDimension, typename RhsDimension>
 struct dim_div {
   typedef Dimension<typename std::ratio_subtract<typename LhsDimension::length, typename RhsDimension::length>::type,
-                            typename std::ratio_subtract<typename LhsDimension::angle,  typename RhsDimension::angle>::type,
-                            typename std::ratio_subtract<typename LhsDimension::time,   typename RhsDimension::time>::type>
-          type;
+							typename std::ratio_subtract<typename LhsDimension::angle,  typename RhsDimension::angle>::type,
+							typename std::ratio_subtract<typename LhsDimension::time,   typename RhsDimension::time>::type>
+		  type;
 };
 
 template<typename Dim, typename N>
 struct dim_root {
   typedef Dimension<typename std::ratio_divide<typename Dim::length, N>::type,
-                            typename std::ratio_divide<typename Dim::angle,  N>::type,
-                            typename std::ratio_divide<typename Dim::time,   N>::type>
-          type;
+							typename std::ratio_divide<typename Dim::angle,  N>::type,
+							typename std::ratio_divide<typename Dim::time,   N>::type>
+		  type;
 };
 
 template<typename Dim, typename N>
 struct dim_pow {
   typedef Dimension<typename std::ratio_multiply<typename Dim::length, N>::type,
-                            typename std::ratio_multiply<typename Dim::angle,  N>::type,
-                            typename std::ratio_multiply<typename Dim::time,   N>::type>
-          type;
+							typename std::ratio_multiply<typename Dim::angle,  N>::type,
+							typename std::ratio_multiply<typename Dim::time,   N>::type>
+		  type;
 };
 
 #endif
@@ -75,7 +75,7 @@ public:
   /// Einheit aus Konvertierungsfaktor zu interner Einheit erstellen
   constexpr explicit
   Unit(UnitFactor fac) :
-    factor(fac)
+	factor(fac)
   { }
 
   /// Faktor zur Konvertierung von Zahl in Wert von interner Einheit
@@ -128,15 +128,15 @@ namespace detail {
   template<typename T, REQUIRES(std::is_floating_point<T>)> math_constexpr _always_inline
   int roundToInt(T value) {
 #if GCC_VERSION < 40700 && !defined(ECOS)
-    return (value < 0.0f) ? ceil(value - 0.5f) : floor(value + 0.5f);
+	return (value < 0.0f) ? ceil(value - 0.5f) : floor(value + 0.5f);
 #else
-    return ::lround(value);
+	return ::lround(value);
 #endif
   }
-  
+
   template<typename T, REQUIRES(!std::is_floating_point<T>)> constexpr
   int roundToInt(T value) {
-    return value;
+	return value;
   }
 }
 
@@ -145,16 +145,16 @@ namespace detail {
   template<typename T, REQUIRES2(!std::is_floating_point<T>::value || std::is_floating_point<Value>::value)>
   constexpr
   Value toValue(T value) {
-    return value;
+	return value;
   }
-  
+
   template<typename T, REQUIRES2(std::is_floating_point<T>::value && !std::is_floating_point<Value>::value)>
   constexpr
   Value toValue(T value) {
 #if GCC_VERSION < 40700 && !defined(ECOS)
-    return (value < 0.0) ? ceil(value - 0.5) : floor(value + 0.5);
+	return (value < 0.0) ? ceil(value - 0.5) : floor(value + 0.5);
 #else
-    return ::lroundf(value);
+	return ::lroundf(value);
 #endif
   }
 }
@@ -181,13 +181,13 @@ struct Quantity {
   /// Variable mit Einheit und Wert Null erstellen
   constexpr
   Quantity() :
-    value(0)
+	value(0)
   { }
 
   /// Variable mit Einheit und Wert Null erstellen
   constexpr
   Quantity(null_t) :
-    value(0)
+	value(0)
   { }
 
   /// Wert in Einheit \a u zurückgeben
@@ -197,7 +197,7 @@ struct Quantity {
   /// \returns Wert in Einheit \a u
   constexpr
   Real to(Unit<Dim> u) const {
-    return value / u.factor;
+	return value / u.factor;
   }
 
   /// gerundeter Ganzzahlwert in Einheit \a u zurückgeben
@@ -205,32 +205,32 @@ struct Quantity {
   /// \returns gerundeter Ganzzahlwert in Einheit \a u
   constexpr
   int toInt(Unit<Dim> u) const {
-    return detail::roundToInt(value / u.factor);
+	return detail::roundToInt(value / u.factor);
   }
 
   ///
   const Quantity&
   operator += (Quantity arg) {
-      value += arg.value;
-      return *this;
+	  value += arg.value;
+	  return *this;
   }
 
   const Quantity&
   operator -= (Quantity arg) {
-      value -= arg.value;
-      return *this;
+	  value -= arg.value;
+	  return *this;
   }
 
   const Quantity&
   operator *= (Value arg) {
-      value *= arg;
-      return *this;
+	  value *= arg;
+	  return *this;
   }
 
   const Quantity&
   operator /= (Value arg) {
-      value /= arg;
-      return *this;
+	  value /= arg;
+	  return *this;
   }
 
   /// Wert in Konfiguration festgelegter Einheit
@@ -241,8 +241,8 @@ struct Quantity {
 // QuantityResultType ist für Dim != DimensionlessDimension: QuantityBase<Dim> sonst: Value
 template <typename Dim>
 using QuantityResultType = typename std::conditional<
-    !std::is_same<Dim, DimensionlessDimension>(),
-    Quantity<Dim>, Value>::type;
+	!std::is_same<Dim, DimensionlessDimension>(),
+	Quantity<Dim>, Value>::type;
 
 /// Einheit mit Zahl multipilizieren
 ///
@@ -272,7 +272,7 @@ Quantity<typename dim_div<DimensionlessDimension, Dim>::type>
 operator / (Value value, Unit<Dim> unit)
 {
   return Quantity<typename dim_div<DimensionlessDimension, Dim>::type>
-      (value / unit.factor);
+	  (value / unit.factor);
 }
 
 /// Einheit durch Zahl dividieren
@@ -417,7 +417,7 @@ QuantityResultType<typename dim_div<DimensionlessDimension, Dim>::type>
 operator / (Value lhs, Quantity<Dim> rhs)
 {
   return QuantityResultType<typename dim_div<DimensionlessDimension, Dim>::type>
-      (lhs / rhs.value);
+	  (lhs / rhs.value);
 }
 
 /// Variable mit Einheit durch Zahl dividieren
@@ -445,8 +445,9 @@ typedef Quantity<TimeDimension> Time;
 /// Typ für Flächen
 typedef Quantity< typename dim_mul<LengthDimension, LengthDimension>::type > Area;
 
-/// Typ für Geschwindigkeit
+/// Typen für Geschwindigkeit
 typedef Quantity< typename dim_div<LengthDimension, TimeDimension>::type > Velocity;
+typedef Quantity< typename dim_div<TimeDimension, LengthDimension>::type > InverseVelocity;
 
 /// Typ für Winkelgeschwindigkeit
 typedef Quantity< typename dim_div<AngleDimension, TimeDimension>::type > AngularVelocity;
