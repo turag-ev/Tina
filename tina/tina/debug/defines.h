@@ -20,10 +20,10 @@
 /// Zum Abschicken von Debugausgaben stehen Funktionen zur Verfügung, die sich ähnlich wie ''printf'' verhalten:
 /// \code{.cpp}
 /// // freigeschaltet bei DEBUG_LEVEL > 3
-/// turag_turag_infof("formatierte Ausgabe %s", "von einfachen Informationen");
+/// turag_infof("formatierte Ausgabe %s", "von einfachen Informationen");
 ///
 /// // freigeschaltet bei DEBUG_LEVEL > 2
-/// turag_turag_warningf("formatierte Ausgabe %s", "von Warnungen");
+/// turag_warningf("formatierte Ausgabe %s", "von Warnungen");
 ///
 /// // freigeschaltet bei DEBUG_LEVEL > 1
 /// turag_criticalf("formatierte Ausgabe %s", "von kritischen Fehlern");
@@ -56,14 +56,14 @@
 ///
 /// Das zweite Zeichen stellt die Herkunft der Ausgabe dar. Im Beispiel ist es
 /// ''T'' was für Testausgaben stehen soll. Die Herkunft muss im Makro
-/// ''LOG_SOURCE'' definiert werden bevor ''utils/debug.h'' eingebunden wird.
+/// ''TURAG_DEBUG_LOG_SOURCE'' definiert werden bevor ''utils/debug.h'' eingebunden wird.
 /// Es sollte somit definiert werden bevor überhaupt etwas eingebunden wird.
 /// Die Definition sollte auch nur ein Quelldateien geschehen, weil sie in
 /// Headerdateien sinnlos ist. Es sind nur ASCII-Zeichen erlaubt. Ist das Makro
 /// beim einbinden nicht definiert wird ''_'' gewählt.
 /// \code{.cpp}
 /// // Quelldatei beispiel.cpp:
-/// #define LOG_SOURCE "T"
+/// #define TURAG_DEBUG_LOG_SOURCE "T"
 /// #include <tina/debug.h>
 ///
 /// // weitere includes
@@ -101,10 +101,10 @@
 /// \endcode
 ///
 /// Will man nur für eine Quelldatei die Debugmeldungen abschalten, so kann, wie
-/// bei ''LOG_SOURCE'', vor dem Einbinden der gewünschte Wert gesetzt werden:
+/// bei ''TURAG_DEBUG_LOG_SOURCE'', vor dem Einbinden der gewünschte Wert gesetzt werden:
 /// \code{.cpp}
 /// // Quelldatei beispiel.cpp:
-/// #define LOG_SOURCE "T"
+/// #define TURAG_DEBUG_LOG_SOURCE "T"
 /// #define DEBUG_LEVEL 3 // Debuginformationen ausblenden
 /// #include <utils/debug.h>
 ///
