@@ -13,10 +13,10 @@
 #define TURAG_DEBUG_ERROR_PREFIX    "!"
 
 /// Prefix für kritische Debugmeldungen
-#define TURAG_DEBUG_CRITICAL_PREFIX "!"
+#define TURAG_DEBUG_CRITICAL_PREFIX "?"
 
 /// Prefix für Warnungen
-#define TURAG_DEBUG_WARN_PREFIX     "?"
+#define TURAG_DEBUG_WARN_PREFIX     "#"
 
 /// Prefix für informative Meldungen
 #define TURAG_DEBUG_INFO_PREFIX     "-"
