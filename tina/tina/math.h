@@ -129,6 +129,11 @@ TURAG_INLINE float sgnf(float x) {
                    ((x > 0.0f) ? 1.0f : -1.0f);
 }
 
+TURAG_INLINE int sgn(int x) {
+  return (x==0) ? 0 :
+                   ((x > 0) ? 1 : -1);
+}
+
 #ifdef __cplusplus
 } // extern "C"
 #endif
