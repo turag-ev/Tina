@@ -24,6 +24,10 @@
 /// Prefix für Debugmeldungen
 #define TURAG_DEBUG_DEBUG_PREFIX    "_"
 
+/// Prefix für Spielzeitausgaben
+#define TURAG_DEBUG_GAMETIME_PREFIX "T"
+
+
 #ifdef DOXYGEN
 
 /// \brief Gibt Systemmeldungen formatiert aus.
@@ -229,6 +233,47 @@ void turag_debug(const char* msg);
 /// \retval "ja", wenn \p b wahr
 /// \retval "nein", sonst
 #define turag_bool_string_de(boolean) ((boolean)?"ja":"nein")
+
+
+
+#ifdef DOXYGEN
+
+/// \brief Gibt aktuelle Spielzeit in speziellem Format aus.
+///
+/// Nur bei der Definition von \ref TURAG_DEBUG_LEVEL größer 0 wird die Spielzeit tatsächlich ausgegeben.
+/// \param gametime Aktuelle Spielzeit
+void turag_print_gametime(TuragSystemTime gametime);
+
+#else // DOXYGEN
+
+#if TURAG_DEBUG_LEVEL > 0
+# define turag_print_gametime(gametime) \
+    turag_debug_printf(TURAG_DEBUG_LINE_PREFIX "GT%x" TURAG_DEBUG_NEWLINE, turag_ticks_to_ms(gametime))
+#else
+# define turag_print_gametime(gametime) while(0)
+#endif
+
+#endif // DOXYGEN
+
+#ifdef DOXYGEN
+
+/// \brief Gibt aktuelle Spielzeit in speziellem Format aus.
+///
+/// Nur bei der Definition von \ref TURAG_DEBUG_LEVEL größer 0 wird die Spielzeit tatsächlich ausgegeben.
+/// \param gametime Aktuelle Spielzeit in Millisekunden.
+void turag_print_gametime_ms(unsigned gametime);
+
+#else // DOXYGEN
+
+#if TURAG_DEBUG_LEVEL > 0
+# define turag_print_gametime_ms(gametime) \
+    turag_debug_printf(TURAG_DEBUG_LINE_PREFIX "GT%x" TURAG_DEBUG_NEWLINE, gametime)
+#else
+# define turag_print_gametime_ms(gametime) while(0)
+#endif
+
+#endif // DOXYGEN
+
 
 /// \}
 /// \}
