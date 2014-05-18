@@ -227,7 +227,6 @@ public:
      */
     State(const char* const name_) :
         name(name_), hasSignal_(false), signal_(0), eventqueue_(nullptr) {}
-    virtual ~State(void) {}
 
 protected:
     /*!
