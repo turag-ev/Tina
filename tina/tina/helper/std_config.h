@@ -10,4 +10,7 @@
 /// require dynamic memory
 // #define TURAG_FELDBUS_AKTOR_STRUCTURED_OUTPUT_AVAILABLE
 
+/// enable this if you link with c++ runtime support.
+// #define TURAG_LIBSTDCPP_SUPPORT
+
 #endif // TINA_STD_CONFIG_H
