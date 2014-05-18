@@ -214,6 +214,11 @@ public:
   }
 
   constexpr
+  bool full() const {
+    return size() == capacity();
+  }
+
+  constexpr
   size_type size() const {
     return (first_.n_ <= last_.n_)
         ? last_.n_ - first_.n_
