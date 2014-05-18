@@ -58,14 +58,14 @@
  * - we have the static function get() which returns a pointer to this instance
  *
  * You should be aware that implementing a singleton with a globally allocated static like in this case
- * is problematic if you have other singletons taht are implemented in the same way depend on it.
+ * is problematic if you have other singletons that are implemented in the same way depend on it.
  * But at least it's thread-safe.
  *
  *
  * \subsection rpc RPCs
  * Every peer can offer RPCs. You need to register them at the bluetooth module with
- * an ID that starts with zero. After registering the RPC any connected peer can call
- * the RPC that knows the correct RPC id which will then result in the callback function getting called. The calling
+ * an ID that starts with zero. After registering the RPC any connected peer that knows the correct RPC id can call
+ * the RPC. This will then result in the callback function getting called. The calling
  * peer can pass along an argument of 8 bytes size. A maximum number of 64 RPCs are supported.
  *
  * If you call an RPC, it is enqueued for transmit. The bluetooth thread handles transmitting
@@ -236,9 +236,9 @@ public:
      *
      * This function will fail if the remote peer is disabled.
 
-     * This function is useful, if you have several peers whose data sinks are logically the same.
+     * This function is useful if you have several peers whose data sinks are logically the same.
      * Then you can configure several data providers with the same storage buffer which needs to be updated
-     * only once, for example wehn pushing to the first peer. The remaining peers can be updated with this
+     * only once, for example when pushing to the first peer. The remaining peers can be updated with this
      * version of pushData.
      */
     template<typename T> _always_inline bool pushData(uint8_t destination, uint8_t data_provider_id) {
