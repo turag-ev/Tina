@@ -22,10 +22,6 @@ typedef struct {
   static WORKING_AREA(TURAG_CONCAT(name, _stack_), stack_size); \
   TuragThread name = {0, &TURAG_CONCAT(name, _stack_), sizeof(TURAG_CONCAT(name, _stack_))}
 
-#define TURAG_DEFINE_THREAD_CCM(name, stack_size) \
-  static ATTRIB_SECTION_CCMSTACK WORKING_AREA(TURAG_CONCAT(name, _stack_), stack_size); \
-  TuragThread name = {0, &TURAG_CONCAT(name, _stack_), sizeof(TURAG_CONCAT(name, _stack_))}
-
 extern void _turag_thread_entry(void* data);
 
 static _always_inline
