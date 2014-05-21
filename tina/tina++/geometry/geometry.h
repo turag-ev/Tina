@@ -315,6 +315,7 @@ Angle angle_between(const T1& a, const T2& b) {
   return atan2(b.y - a.y, b.x - a.x);
 }
 
+
 ////////////////////////////////////////////////////////////////////////////////
 // Circle
 
@@ -347,6 +348,37 @@ struct Circle {
 	/// Radius des Kreises
 	Length r;
 };
+
+// Rectangle
+
+template<typename T>
+class Rect {
+public:
+	T a, b;
+
+	inline Rect(void) :
+		a(),
+		b()
+	{
+	}
+	inline Rect(T _a, T _b) :
+		a(_a),
+		b(_b)
+	{
+	}
+	inline T getCenter(void) {
+		return T((b.x + a.x)/2, (b.y + a.y)/2);
+	}
+};
+
+template<typename T1>
+constexpr
+bool in_rect_area(const Rect<T1>& r, const T1& b) {
+	return (b.x >= std::min(r.a.x, r.b.x)
+		&& b.x <= std::max(r.a.x, r.b.x)
+		&& b.y >= std::min(r.a.y, r.b.y)
+		&& b.y <= std::max(r.a.y, r.b.y));
+}
 
 /// Schnittpunkt zwischen zwei Kreisen zurückgeben
 /// \param one,two Kreise
