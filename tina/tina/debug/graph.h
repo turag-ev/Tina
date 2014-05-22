@@ -10,10 +10,11 @@
 /// \{
 
 // graph output prefixes
-#define TURAG_DEBUG_GRAPH_PREFIX    "D"
-#define TURAG_DEBUG_GRAPH_CREATE    "n"
-#define TURAG_DEBUG_GRAPH_TITLE     "b"
-#define TURAG_DEBUG_GRAPH_DATA      "d"
+#define TURAG_DEBUG_GRAPH_PREFIX    		"D"
+#define TURAG_DEBUG_GRAPH_CREATE    		"n"
+#define TURAG_DEBUG_GRAPH_CHANNEL   		"b"
+#define TURAG_DEBUG_GRAPH_CHANNEL_FIXED     "B"
+#define TURAG_DEBUG_GRAPH_DATA      		"d"
 
 #ifdef TURAG_DEBUG_ENABLE_GRAPH
 
@@ -34,7 +35,7 @@ void turag_graph_add_channel(unsigned index, const char* title);
 #else // DOXYGEN
 
 # define turag_graph_add_channel(index, title) \
-    turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_GRAPH_TITLE TURAG_DEBUG_GRAPH_PREFIX "%d 0 %s" TURAG_DEBUG_NEWLINE, index, title)
+    turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_GRAPH_CHANNEL TURAG_DEBUG_GRAPH_PREFIX "%d 0 %s" TURAG_DEBUG_NEWLINE, index, title)
 
 #endif // DOXYGEN
 
@@ -49,7 +50,27 @@ void turag_graph_add_channel_fixed_time(unsigned index, const char* title, unsig
 #else // DOXYGEN
 
 # define turag_graph_add_channel_fixed_time(index, title, time) \
-    turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_GRAPH_TITLE TURAG_DEBUG_GRAPH_PREFIX "%d %d %s" TURAG_DEBUG_NEWLINE, index, time, title)
+    turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_GRAPH_CHANNEL TURAG_DEBUG_GRAPH_PREFIX "%d %d %s" TURAG_DEBUG_NEWLINE, index, time, title)
+
+#endif // DOXYGEN
+
+#ifdef DOXYGEN
+
+/// \brief Add channels with fixed axes to a diagram and name them.
+/// \param index Index of the diagram to add the channels to.
+/// \param title Title of the channel.
+/// \param x_left Minimum value of the x-axis.
+/// \param y_bottom Minimum value of the y-axis.
+/// \param width With of the x-axis.
+/// \param height Height of the y-axis.
+
+void turag_graph_add_channel_fixed_xy(unsigned index, const char* title, int x_left, int y_bottom, unsigned width, unsigned height);
+
+#else // DOXYGEN
+
+# define turag_graph_add_channel_fixed_xy(index, title, x_left, y_bottom, width, height) \
+    turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_GRAPH_CHANNEL_FIXED TURAG_DEBUG_GRAPH_PREFIX "%d %d %d %d %d %s" TURAG_DEBUG_NEWLINE, \
+    		index, x_left, y_bottom, width, height, title)
 
 #endif // DOXYGEN
 
