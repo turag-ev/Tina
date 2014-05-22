@@ -4,6 +4,12 @@
 #include <tina/debugprint.h>
 #include "defines.h"
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 /// \addtogroup Debug
 /// \{
 /// \defgroup Debuggraph Messdatenausgabe
@@ -92,5 +98,10 @@ void turag_graph_data(unsigned index, float time, float* args, int count);
 /// \}
 /// \}
 /// \}
+
+#ifdef __cplusplus
+}           /* closing brace for extern "C" */
+#endif
+
 
 #endif // TINA_DEBUG_GRAPH_H
