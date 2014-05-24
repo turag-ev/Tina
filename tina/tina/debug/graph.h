@@ -21,6 +21,8 @@ extern "C" {
 #define TURAG_DEBUG_GRAPH_CHANNEL   		"b"
 #define TURAG_DEBUG_GRAPH_CHANNEL_FIXED     "B"
 #define TURAG_DEBUG_GRAPH_DATA      		"d"
+#define TURAG_DEBUG_GRAPH_VERTICAL_MARKER  	"m"
+#define TURAG_DEBUG_GRAPH_CHANNELGROUP  	"g"
 
 #ifdef TURAG_DEBUG_ENABLE_GRAPH
 
@@ -28,7 +30,6 @@ extern "C" {
 /// \brief Creates a new diagram.
 /// \param name Title of the diagram.
 /// \return Index of the newly created diagram.
-///
 unsigned turag_graph_create(const char* name);
 
 #ifdef DOXYGEN
@@ -69,7 +70,6 @@ void turag_graph_add_channel_fixed_time(unsigned index, const char* title, unsig
 /// \param y_bottom Minimum value of the y-axis.
 /// \param width With of the x-axis.
 /// \param height Height of the y-axis.
-
 void turag_graph_add_channel_fixed_xy(unsigned index, const char* title, int x_left, int y_bottom, unsigned width, unsigned height);
 
 #else // DOXYGEN
@@ -87,11 +87,31 @@ void turag_graph_add_channel_fixed_xy(unsigned index, const char* title, int x_l
 /// \param count Number of entries in args.
 void turag_graph_data(unsigned index, float time, float* args, int count);
 
+
+/// \brief Add a vertical marker to a diagram.
+/// \param index Index of the diagram to add the channels to.
+/// \param label Label.
+/// \param time Time.
+void turag_graph_add_vertical_marker(unsigned index, const char* label, float time);
+
+/// \brief Defines a channel grouping.
+/// \param index Index of the diagram to define the channel group for.
+/// \param label Label.
+/// \param count Number of channels in the group.
+/// \param ... Channel indices to add to the group.
+void turag_graph_add_channel_group(unsigned index, const char* label, unsigned count, ...);
+
+
+
 #else // TURAG_DEBUG_ENABLE_GRAPH
 
 # define turag_graph_create(name) while(0)
-# define turag_graph_channel_title(index, title) while(0)
+# define turag_graph_add_channel(index, title) while(0)
+# define turag_graph_add_channel_fixed_xy(index, title, x_left, y_bottom, width, height) while(0)
+# define turag_graph_add_channel_fixed_time(index, title, time) while(0)
 # define turag_graph_data(index, time, args, count) while(0)
+# define turag_graph_add_vertical_marker(index, label, time) while(0)
+# define turag_graph_add_channel_group(index, label, count, ...) while(0)
 
 #endif // TURAG_DEBUG_ENABLE_GRAPH
 
