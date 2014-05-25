@@ -68,7 +68,8 @@ public:
     startstate_(startstate),
     name_(name),
     child_(0),
-    about_to_close_(false)
+    about_to_close_(false),
+    can_be_added_to_blacklist_(true)
   { }
 
   /// Start action
@@ -116,6 +117,14 @@ public:
   /// get name of Action
   const char* getName() const {
     return name_;
+  }
+
+  /** define if Action can be added to the Troubleshooter's blacklist
+   * this is useful for actions with dynamic entry points.
+   */
+  constexpr _always_inline
+  bool canBeAddedToBlacklist(void) {
+    return can_be_added_to_blacklist_;
   }
 
 protected:
@@ -173,6 +182,12 @@ protected:
   /// cancel a child action correct.
   void killChildActions();
 
+  /// set to false to avoid being put into the Troubleshooter blacklist
+  _always_inline
+  void setCanBeAddedToBlacklist(bool val) {
+      can_be_added_to_blacklist_ = val;
+  }
+
 private:
   Action* parent_;
   State currentstate_;
@@ -180,6 +195,7 @@ private:
   const char* const name_;
   Action* child_;
   bool about_to_close_;
+  bool can_be_added_to_blacklist_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -217,6 +233,10 @@ public:
     instance.Action::start(parent, data);
   }
 
+  constexpr _always_inline bool canBeAddedToBlacklist(void) {
+    return instance.Action::canBeAddedToBlacklist();
+  }
+
 protected:
   static _always_inline bool exit(EventId eid) {
     return instance.Action::exit(eid);
@@ -241,6 +261,10 @@ protected:
 
   static _always_inline Action* getChildAction() {
     return instance.Action::getChildAction();
+  }
+
+  static _always_inline void setCanBeAddedToBlacklist(bool val) {
+    instance.Action::setCanBeAddedToBlacklist(val);
   }
 
 private:
