@@ -386,7 +386,7 @@ bool in_rect_area(const Rect<T1>& r, const T1& b) {
 ///
 /// \retval true es existiert endliche Anzahl an Schnittpunkten, die in \a results gespeichert wird.
 /// \retval false es existiert kein Schnittpunkt zwischen den beiden Kreisen oder beide Kreise sind gleich (unendlich viele Schnittpunkte)
-bool interselect(Circle one, Circle two, std::array<Point, 2>& results);
+bool intersect(Circle one, Circle two, std::array<Point, 2>& results);
 
 /// \}
 

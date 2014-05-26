@@ -4,7 +4,7 @@ namespace TURAG {
 
 using namespace Units;
 
-bool interselect(Circle one, Circle two, std::array<Point, 2>& results) {
+bool intersect(Circle one, Circle two, std::array<Point, 2>& results) {
   // dx and dy are the vertical and horizontal distances between
   // the circle centers.
   Vector<Length> diff = two.m - one.m;
