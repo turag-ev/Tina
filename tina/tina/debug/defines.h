@@ -179,7 +179,7 @@
 ///
 /// Sollte über Makefile oder in Zeilen vor erstem Include umdefiniert werden.
 /// Standardmäßig deaktiviert.
-# define DTURAG_ALWAYS_PRINT_GAMETIME 0
+# define TURAG_ALWAYS_PRINT_GAMETIME 0
 #endif
 
 /// \}
