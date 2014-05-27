@@ -19,19 +19,19 @@
 ///
 /// Zum Abschicken von Debugausgaben stehen Funktionen zur Verfügung, die sich ähnlich wie ''printf'' verhalten:
 /// \code{.cpp}
-/// // freigeschaltet bei DEBUG_LEVEL > 3
+/// // freigeschaltet bei TURAG_DEBUG_LEVEL > 3
 /// turag_infof("formatierte Ausgabe %s", "von einfachen Informationen");
 ///
-/// // freigeschaltet bei DEBUG_LEVEL > 2
+/// // freigeschaltet bei TURAG_DEBUG_LEVEL > 2
 /// turag_warningf("formatierte Ausgabe %s", "von Warnungen");
 ///
-/// // freigeschaltet bei DEBUG_LEVEL > 1
+/// // freigeschaltet bei TURAG_DEBUG_LEVEL > 1
 /// turag_criticalf("formatierte Ausgabe %s", "von kritischen Fehlern");
 ///
-/// // freigeschaltet bei DEBUG_LEVEL > 0
+/// // freigeschaltet bei TURAG_DEBUG_LEVEL > 0
 /// turag_errorf("formatierte Ausgabe %s", "von fatalen Fehlern");
 /// \endcode
-/// Ein Zeilenumbruch am Ende der Zeile ist nicht notwendig. Die TURAG-Console
+/// Ein Zeilenumbruch am Ende der Zeile ist nicht zulässig!. Die TURAG-Console
 /// kommt mit Zeilenumbrüchen in der Mitte von einer Ausgabe nicht klar,
 /// deswegen dann eher zwei Funktionsaufrufe tätigen.
 ///
@@ -94,10 +94,10 @@
 /// ----------------------------------------------
 ///
 /// Zum Abschalten über alle Quelldateien muss im Makefile nur ein gewünschter
-/// Wert für ''DEBUG_LEVEL'' angegeben werden.
+/// Wert für ''TURAG_DEBUG_LEVEL'' angegeben werden.
 /// \code{Makefile}
 /// # um nur fatale Fehler anzuzeigen:
-/// DDEF += -DDEBUG_LEVEL=1
+/// DDEF += -DTURAG_DEBUG_LEVEL=1
 /// \endcode
 ///
 /// Will man nur für eine Quelldatei die Debugmeldungen abschalten, so kann, wie
@@ -105,13 +105,24 @@
 /// \code{.cpp}
 /// // Quelldatei beispiel.cpp:
 /// #define TURAG_DEBUG_LOG_SOURCE "T"
-/// #define DEBUG_LEVEL 3 // Debuginformationen ausblenden
+/// #define TURAG_DEBUG_LEVEL 3 // Debuginformationen ausblenden
 /// #include <utils/debug.h>
 ///
 /// // weitere includes
 ///
 /// // Quelltext
 /// \endcode
+///
+/// Ausgabe der Spielzeit mit jeder Debug-Ausgabe
+/// ----------------------------------------------
+/// Zur Ausgabe der Spielzeit mit jeder Text-Ausgabe muss dieses Symbol
+/// definiert sein:
+///
+/// \code{Makefile}
+/// # um die Spielzeit auszugeben:
+/// DDEF += -DTURAG_ALWAYS_PRINT_GAMETIME=1
+/// \endcode
+///
 ///
 /// \{
 
@@ -160,6 +171,15 @@
 
 #if !defined(NDEBUG) && TURAG_DEBUG_LEVEL < 1
 # define NDEBUG
+#endif
+
+// automatic game time printing
+#ifndef TURAG_ALWAYS_PRINT_GAMETIME
+/// \brief Automatische Spielzeitausgabe
+///
+/// Sollte über Makefile oder in Zeilen vor erstem Include umdefiniert werden.
+/// Standardmäßig deaktiviert.
+# define DTURAG_ALWAYS_PRINT_GAMETIME 0
 #endif
 
 /// \}
