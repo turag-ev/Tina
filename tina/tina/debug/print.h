@@ -30,6 +30,7 @@
 
 
 extern TuragSystemTime turag_debug_print_gametime_gamestarttime;
+extern int turag_debug_print_gametime_auto_output_enabled;
 
 #ifdef DOXYGEN
 
@@ -77,16 +78,16 @@ void turag_print_gametime_ms(unsigned gametime);
 ///
 /// Nur bei der Definition von \ref TURAG_DEBUG_LEVEL größer 0 wird die Spielzeit tatsächlich ausgegeben.
 /// Die übermittelte Zeit entspricht der Systemzeit, sofern sie nicht durch Aufruf von
-/// turag_print_gametime_auto_reset_gametime() zurückgesetzt wurde.
-void turag_print_gametime_auto();
+/// turag_print_system_gametime_reset() zurückgesetzt wurde.
+void turag_print_system_gametime();
 
 #else // DOXYGEN
 
 #if TURAG_DEBUG_LEVEL > 0
-# define turag_print_gametime_auto() \
+# define turag_print_system_gametime() \
     turag_print_gametime(_turag_ticks_to_time(turag_get_current_tick().value - turag_debug_print_gametime_gamestarttime.value))
 #else
-# define turag_print_gametime_auto() while(0)
+# define turag_print_system_gametime() while(0)
 #endif
 
 #endif // DOXYGEN
@@ -94,15 +95,58 @@ void turag_print_gametime_auto();
 
 #ifdef DOXYGEN
 
-/// \brief Setzt die von turag_print_gametime_auto() verwendete Spielzeit auf 0 zurück.
-void turag_print_gametime_auto_reset_gametime(void);
+/// \brief Setzt die von turag_print_system_gametime() verwendete Spielzeit auf 0 zurück.
+void turag_print_system_gametime_reset(void);
 
 #else // DOXYGEN
 
-# define turag_print_gametime_auto_reset_gametime() \
+# if TURAG_DEBUG_LEVEL > 0
+#  define turag_print_system_gametime_reset() \
     turag_debug_print_gametime_gamestarttime = turag_get_current_tick()
+# else
+#  define turag_print_system_gametime_reset() while(0)
+# endif
 
 #endif // DOXYGEN
+
+
+#ifdef DOXYGEN
+
+/// \brief Aktiviert die automatische Ausagbe der System-Spielzeit mit jeder Debugausgabe.
+///
+/// Diese Funktion hat nur einen Effekt, wenn TURAG_PRINT_GAMETIME_AUTOMATIC auf 1 definiert wurde.
+void turag_print_gametime_automatic_enable();
+
+#else // DOXYGEN
+
+#if TURAG_DEBUG_LEVEL > 0 && TURAG_PRINT_GAMETIME_AUTOMATIC == 1
+# define turag_print_gametime_automatic_enable() \
+    turag_debug_print_gametime_auto_output_enabled = 1;
+#else
+# define turag_print_gametime_automatic_enable() while(0)
+#endif
+
+#endif // DOXYGEN
+
+
+#ifdef DOXYGEN
+
+/// \brief Deaktiviert die automatische Ausagbe der System-Spielzeit mit jeder Debugausgabe.
+///
+/// Diese Funktion hat nur einen Effekt, wenn TURAG_PRINT_GAMETIME_AUTOMATIC auf 1 definiert wurde.
+void turag_print_gametime_automatic_disable();
+
+#else // DOXYGEN
+
+#if TURAG_DEBUG_LEVEL > 0 && TURAG_PRINT_GAMETIME_AUTOMATIC == 1
+# define turag_print_gametime_automatic_disable() \
+    turag_debug_print_gametime_auto_output_enabled = 0;
+#else
+# define turag_print_gametime_automatic_disable() while(0)
+#endif
+
+#endif // DOXYGEN
+
 
 
 
@@ -127,13 +171,17 @@ void turag_system_print(const char* msg);
 #else // DOXYGEN
 
 #if TURAG_DEBUG_LEVEL > 0
-# if TURAG_ALWAYS_PRINT_GAMETIME == 1
+# if TURAG_PRINT_GAMETIME_AUTOMATIC == 1
 #  define turag_system_printf(format, args...)  \
-    turag_print_gametime_auto();                \
-    turag_debug_printf(TURAG_DEBUG_LINE_PREFIX ";;" format TURAG_DEBUG_NEWLINE, ##args)
+	do{ \
+    if (turag_debug_print_gametime_auto_output_enabled) {turag_print_system_gametime(); }             \
+    turag_debug_printf(TURAG_DEBUG_LINE_PREFIX ";;" format TURAG_DEBUG_NEWLINE, ##args);				\
+	}while(0)
 #  define turag_system_print(msg)   \
-    turag_print_gametime_auto();    \
-    turag_debug_puts(TURAG_DEBUG_LINE_PREFIX ";;" msg TURAG_DEBUG_NEWLINE)
+	do{ \
+    if (turag_debug_print_gametime_auto_output_enabled) {turag_print_system_gametime(); }    \
+    turag_debug_puts(TURAG_DEBUG_LINE_PREFIX ";;" msg TURAG_DEBUG_NEWLINE);					\
+	}while(0)
 # else
 #  define turag_system_printf(format, args...) \
     turag_debug_printf(TURAG_DEBUG_LINE_PREFIX ";;" format TURAG_DEBUG_NEWLINE, ##args)
@@ -167,13 +215,17 @@ void turag_error(const char* msg);
 #else // DOXYGEN
 
 #if TURAG_DEBUG_LEVEL > 0
-# if TURAG_ALWAYS_PRINT_GAMETIME == 1
+# if TURAG_PRINT_GAMETIME_AUTOMATIC == 1
 #  define turag_errorf(format, args...) \
-    turag_print_gametime_auto();                \
-    turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_ERROR_PREFIX format TURAG_DEBUG_NEWLINE, ##args)
+	do{ \
+    if (turag_debug_print_gametime_auto_output_enabled) {turag_print_system_gametime(); }              \
+    turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_ERROR_PREFIX format TURAG_DEBUG_NEWLINE, ##args); \
+	}while(0)
 #  define turag_error(msg) \
-    turag_print_gametime_auto();                \
-    turag_debug_puts(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_ERROR_PREFIX msg TURAG_DEBUG_NEWLINE)
+	do{ \
+    if (turag_debug_print_gametime_auto_output_enabled) {turag_print_system_gametime(); }               \
+    turag_debug_puts(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_ERROR_PREFIX msg TURAG_DEBUG_NEWLINE); \
+	}while(0)
 # else
 #  define turag_errorf(format, args...) \
     turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_ERROR_PREFIX format TURAG_DEBUG_NEWLINE, ##args)
@@ -207,13 +259,17 @@ void turag_critical(const char* msg);
 #else // DOXYGEN
 
 #if TURAG_DEBUG_LEVEL > 1
-# if TURAG_ALWAYS_PRINT_GAMETIME == 1
+# if TURAG_PRINT_GAMETIME_AUTOMATIC == 1
 #  define turag_criticalf(format, args...) \
-    turag_print_gametime_auto();                \
-    turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_CRITICAL_PREFIX format TURAG_DEBUG_NEWLINE, ##args)
+	do{ \
+    if (turag_debug_print_gametime_auto_output_enabled) {turag_print_system_gametime(); }              \
+    turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_CRITICAL_PREFIX format TURAG_DEBUG_NEWLINE, ##args); \
+	}while(0)
 #  define turag_critical(msg) \
-    turag_print_gametime_auto();                \
-    turag_debug_puts(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_CRITICAL_PREFIX msg TURAG_DEBUG_NEWLINE)
+	do{ \
+    if (turag_debug_print_gametime_auto_output_enabled) {turag_print_system_gametime(); }               \
+    turag_debug_puts(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_CRITICAL_PREFIX msg TURAG_DEBUG_NEWLINE); \
+	}while(0)
 # else
 #  define turag_criticalf(format, args...) \
     turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_CRITICAL_PREFIX format TURAG_DEBUG_NEWLINE, ##args)
@@ -247,13 +303,17 @@ void turag_warning(const char* msg);
 #else // DOXYGEN
 
 #if TURAG_DEBUG_LEVEL > 2
-# if TURAG_ALWAYS_PRINT_GAMETIME == 1
+# if TURAG_PRINT_GAMETIME_AUTOMATIC == 1
 #  define turag_warningf(format, args...) \
-    turag_print_gametime_auto();                \
-    turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_WARN_PREFIX format TURAG_DEBUG_NEWLINE,  ##args)
+	do{ \
+    if (turag_debug_print_gametime_auto_output_enabled) {turag_print_system_gametime(); }               \
+    turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_WARN_PREFIX format TURAG_DEBUG_NEWLINE,  ##args); \
+	}while(0)
 #  define turag_warning(msg) \
-    turag_print_gametime_auto();                \
-    turag_debug_puts(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_WARN_PREFIX msg TURAG_DEBUG_NEWLINE)
+	do{ \
+    if (turag_debug_print_gametime_auto_output_enabled) {turag_print_system_gametime(); }               \
+    turag_debug_puts(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_WARN_PREFIX msg TURAG_DEBUG_NEWLINE); \
+	}while(0)
 # else
 #  define turag_warningf(format, args...) \
     turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_WARN_PREFIX format TURAG_DEBUG_NEWLINE,  ##args)
@@ -287,13 +347,17 @@ void turag_info(const char* msg);
 #else // DOXYGEN
 
 #if TURAG_DEBUG_LEVEL > 3
-# if TURAG_ALWAYS_PRINT_GAMETIME == 1
+# if TURAG_PRINT_GAMETIME_AUTOMATIC == 1
 #  define turag_infof(format, args...) \
-    turag_print_gametime_auto();                \
-    turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_INFO_PREFIX format TURAG_DEBUG_NEWLINE, ##args)
+	do{ \
+    if (turag_debug_print_gametime_auto_output_enabled) {turag_print_system_gametime(); }               \
+    turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_INFO_PREFIX format TURAG_DEBUG_NEWLINE, ##args); \
+	}while(0)
 #  define turag_info(msg) \
-    turag_print_gametime_auto();                \
-    turag_debug_puts(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_INFO_PREFIX msg TURAG_DEBUG_NEWLINE)
+	do{ \
+    if (turag_debug_print_gametime_auto_output_enabled) {turag_print_system_gametime(); }               \
+    turag_debug_puts(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_INFO_PREFIX msg TURAG_DEBUG_NEWLINE); \
+    }while(0)
 # else
 #  define turag_infof(format, args...) \
     turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_INFO_PREFIX format TURAG_DEBUG_NEWLINE, ##args)
@@ -335,13 +399,17 @@ void turag_debug(const char* msg);
 #else // DOXYGEN
 
 #if TURAG_DEBUG_LEVEL > 4
-# if TURAG_ALWAYS_PRINT_GAMETIME == 1
+# if TURAG_PRINT_GAMETIME_AUTOMATIC == 1
 #  define turag_debugf(format, args...) \
-    turag_print_gametime_auto();                \
-    turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_DEBUG_PREFIX format TURAG_DEBUG_NEWLINE, ##args)
+	do{ \
+    if (turag_debug_print_gametime_auto_output_enabled) {turag_print_system_gametime(); }               \
+    turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_DEBUG_PREFIX format TURAG_DEBUG_NEWLINE, ##args); \
+	}while(0)
 #  define turag_debug(msg) \
-    turag_print_gametime_auto();                \
-    turag_debug_puts(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_DEBUG_PREFIX msg TURAG_DEBUG_NEWLINE)
+	do{ \
+    if (turag_debug_print_gametime_auto_output_enabled) {turag_print_system_gametime(); }               \
+    turag_debug_puts(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_DEBUG_PREFIX msg TURAG_DEBUG_NEWLINE); \
+	}while(0)
 # else
 #  define turag_debugf(format, args...) \
     turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_DEBUG_PREFIX format TURAG_DEBUG_NEWLINE, ##args)

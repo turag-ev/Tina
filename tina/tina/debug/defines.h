@@ -174,12 +174,15 @@
 #endif
 
 // automatic game time printing
-#ifndef TURAG_ALWAYS_PRINT_GAMETIME
+#ifndef TURAG_PRINT_GAMETIME_AUTOMATIC
 /// \brief Automatische Spielzeitausgabe
 ///
 /// Sollte über Makefile oder in Zeilen vor erstem Include umdefiniert werden.
 /// Standardmäßig deaktiviert.
-# define TURAG_ALWAYS_PRINT_GAMETIME 0
+/// Die Makrodefinition schaltet das Feature lediglich frei - die tatsächliche
+/// Ausgabe muss explizit durch einen Aufruf von turag_print_gametime_automatic_enable() 
+/// aktiviert werden.
+# define TURAG_PRINT_GAMETIME_AUTOMATIC 0
 #endif
 
 /// \}

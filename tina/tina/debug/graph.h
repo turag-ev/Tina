@@ -105,7 +105,7 @@ void turag_graph_add_channel_group(unsigned graph_index, const char* label, unsi
 
 #else // TURAG_DEBUG_ENABLE_GRAPH
 
-# define turag_graph_create(name) while(0)
+# define turag_graph_create(name) 0
 # define turag_graph_add_channel(index, title) while(0)
 # define turag_graph_add_channel_fixed_xy(index, title, x_left, y_bottom, width, height) while(0)
 # define turag_graph_add_channel_fixed_time(index, title, time) while(0)

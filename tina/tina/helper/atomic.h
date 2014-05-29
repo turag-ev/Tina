@@ -81,9 +81,11 @@ typedef sig_atomic_t turag_sig_atomic_t;
  * \param[in] init_value Initial value to assign to the atomic variable.
  */
 #define turag_atomic_init(name, init_value) 	\
-		(name).value = init_value;				\
-		turag_mutex_init(&(name).mutex)
-		
+    do{                                     \
+    (name).value = init_value;				\
+    turag_mutex_init(&(name).mutex);         \
+    }while(0)
+
 /*!
  * \brief Assign the value of an atomic variable to a different variable.
  * \param[in] name Name of the atomic variable to load from.
@@ -91,19 +93,23 @@ typedef sig_atomic_t turag_sig_atomic_t;
  * This macro works on plain variables as the output argument rather than on pointers.
  */
 #define turag_atomic_load(name, destination)	\
-		turag_mutex_lock(&(name).mutex);		\
-		destination = (name).value;				\
-        turag_mutex_unlock(&(name).mutex)
-		
+    do{                                     \
+    turag_mutex_lock(&(name).mutex);		\
+    destination = (name).value;				\
+    turag_mutex_unlock(&(name).mutex);       \
+    }while(0)
+
 /*!
  * \brief Assign a new value to an atomic variable.
  * \param[in] name Name of the atomic variable to store data in.
  * \param[in] new_value New data.
  */
 #define turag_atomic_store(name, new_value)		\
-		turag_mutex_lock(&(name).mutex);		\
-		(name).value = new_value;				\
-        turag_mutex_unlock(&(name).mutex)
+    do{                                     \
+    turag_mutex_lock(&(name).mutex);		\
+    (name).value = new_value;				\
+    turag_mutex_unlock(&(name).mutex);       \
+    }while(0)
 
 #ifndef DOXYGEN
 typedef turag_atomic(bool) turag_atomic_bool_t;
