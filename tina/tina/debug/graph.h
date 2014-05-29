@@ -99,7 +99,7 @@ void turag_graph_add_vertical_marker(unsigned index, const char* label, float ti
 /// \param label Label.
 /// \param count Number of channels in the group.
 /// \param ... Channel indices to add to the group.
-void turag_graph_add_channel_group(unsigned index, const char* label, unsigned count, ...);
+void turag_graph_add_channel_group(unsigned graph_index, const char* label, unsigned count, ...);
 
 
 
