@@ -3,13 +3,13 @@
 #include <stdarg.h>
 
 
-void turag_debug_puts(const char* s){
-    printf("%s",s);
+void turag_debug_puts(const char* s) {
+    printf("%s", s);
 }
 
-void turag_debug_printf(const char* fmt, ...){
+void turag_debug_printf(const char* fmt, ...) {
     va_list args;
     va_start(args, fmt);
-    printf(fmt,args);
+    vprintf(fmt, args);
     va_end(args);
 }
