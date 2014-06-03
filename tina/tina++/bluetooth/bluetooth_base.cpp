@@ -273,6 +273,7 @@ bool BluetoothBase::callRpc(uint8_t destination, uint8_t rpc_id, uint64_t param)
 		turag_warningf("peer not enabled");
 		return false;
     } else {
+        turag_debug("trying to post rpc to outQueue...");
         if (!outQueue.post(QueueElement_t(rpc_id, destination, param), SystemTime::fromMsec(10))) {
             turag_criticalf("Couldn't call RPC %d on peer %d; Buffer full", rpc_id, destination);
             return false;
