@@ -1,5 +1,5 @@
 #define TURAG_DEBUG_LOG_SOURCE "Y"
-#define TURAG_DEBUG_LEVEL 5
+//#define TURAG_DEBUG_LEVEL 5
 
 #include "bluetooth_base.h"
 
