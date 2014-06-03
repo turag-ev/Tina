@@ -1,4 +1,5 @@
 #define TURAG_DEBUG_LOG_SOURCE "Y"
+#define TURAG_DEBUG_LEVEL 5
 
 #include "bluetooth_base.h"
 
@@ -26,6 +27,14 @@ void BluetoothBase::thread_entry(void) {
     }
 }
 
+// we need this dirty function because we can't start a thread
+// with a member function pointer.
+void BluetoothBase::worker_thread_entry(void) {
+    if (instance_) {
+        instance_->worker_thread_func();
+    }
+}
+
 void BluetoothBase::init(void) {
     for (int i = 0; i < BLUETOOTH_NUMBER_OF_PEERS; ++i) {
         peersEnabled[i].store(false, std::memory_order_relaxed);
@@ -36,6 +45,7 @@ void BluetoothBase::init(void) {
 
     instance_ = this;
     bluetooth_main_thread.start(BLUETOOTH_THREAD_PRIORITY, thread_entry);
+    bluetooth_worker_thread.start(BLUETOOTH_WORKER_THREAD_PRIORITY, worker_thread_entry);
 }
 
 void BluetoothBase::main_thread_func(void) {
@@ -43,7 +53,7 @@ void BluetoothBase::main_thread_func(void) {
 
     turag_info("Bluetooth-High-Level thread started");
 
-    Rpc_t rpc;
+    QueueElement_t mail;
     Status connectionStatus[BLUETOOTH_NUMBER_OF_PEERS] {Status::disconnected};
 
     while (!bluetooth_main_thread.shouldTerminate()) {
@@ -63,82 +73,104 @@ void BluetoothBase::main_thread_func(void) {
             connectionStatus[i] = newConnectionStatus;
         }
 
-        if (rpc_fifo.wait(&rpc, SystemTime::fromMsec(BLUETOOTH_THREAD_RPC_WAIT_MS))) {
-			if (peersEnabled[rpc.peer_id].load(std::memory_order_relaxed)) {
-                if (rpc.received) {
-                    // remove element from queue
-                    rpc_fifo.fetch();
-                    Mutex::Lock lock(rpc_mutex);
-                    // we don't need to check the ID here. Calls with invalid IDs
-                    // are rejected upon reception and not queued.
-                    RpcFunction callback = rpc_functions[rpc.data.rpc_id];
-                    lock.unlock();
-
-                    if (callback) {
-                        turag_debugf("call RPC %d", rpc.data.rpc_id);
-                        (*callback)(rpc.peer_id, rpc.data.param);
-                    }
-                } else {
-                    int buffer_size = Base64::encodeLength(rpc.data) + 2;
-                    uint8_t buffer[buffer_size];
-                    // start byte
-                    buffer[0] = 2;
-                    // data
-                    Base64::encode(rpc.data, buffer + 1);
-                    // end byte
-                    buffer[buffer_size - 1] = 3;
-                    if (connectionStatus[rpc.peer_id] == Status::connected) {
-                        if (write(rpc.peer_id, buffer, buffer_size)) {
-                            // Remove element from queue only if peer is connected and writing was successful.
-                            // If it isn't connected then we are obviously waiting for a connection. If not
-                            // we should realize that when we try again next time.
-                            rpc_fifo.fetch();
-                            turag_debugf("call Remote-RPC %d on peer %d", rpc.data.rpc_id, rpc.peer_id);
-                        } else {
-                            turag_warningf("call Remote-RPC %d on peer %d - FAILED", rpc.data.rpc_id, rpc.peer_id);
-                        }
-                    }
-                }
-            } else {
-                // Remove element from queue if peer is enabled. This should only
-                // happen on the rare occasion that the peer was disabled while some
-                // old rpc calls were still waiting in the queue.
-                rpc_fifo.fetch();
-            }
+        if (!outQueue.wait(&mail, SystemTime::fromMsec(50))) continue;
+        if (!peersEnabled[mail.peer_id].load(std::memory_order_relaxed)) {
+            // Remove element from queue if peer is enabled. This should only
+            // happen on the rare occasion that the peer was disabled while some
+            // old rpc calls were still waiting in the queue.
+            outQueue.fetch();
+            continue;
         }
+        if (connectionStatus[mail.peer_id] != Status::connected) continue;
 
-        // check DataProvider
-        for (DataProvider& provider: data_providers) {
+        if (mail.isRpc) {
+            RpcData rpc {mail.index, mail.rpcParam };
+
+            int buffer_size = Base64::encodeLength(rpc) + 2;
+            uint8_t buffer[buffer_size];
+            // start byte
+            buffer[0] = 2;
+            // data
+            Base64::encode(rpc, buffer + 1);
+            // end byte
+            buffer[buffer_size - 1] = 3;
+
+            if (write(mail.peer_id, buffer, buffer_size)) {
+                // Remove element from queue only if peer is connected and writing was successful.
+                // If it isn't connected then we are obviously waiting for a connection. If not
+                // we should realize that when we try again next time.
+                outQueue.fetch();
+                turag_debugf("call Remote-RPC %d on peer %d", rpc.rpc_id, mail.peer_id);
+            } else {
+                turag_warningf("call Remote-RPC %d on peer %d - FAILED", rpc.rpc_id, mail.peer_id);
+            }
+        } else {
             Mutex::Lock lock(data_provider_mutex);
-            // only attempt to write if we are enabled
-            // otherwise simply clear sendRequest
-            if (peersEnabled[provider.destination].load(std::memory_order_relaxed)) {
-                if (provider.sendRequest.load(std::memory_order_relaxed)) {
-                    int encoded_buffer_size = Base64::encodeLength(provider.buffer_size) + 2;
-                    uint8_t buffer[encoded_buffer_size];
-                    // start byte
-                    buffer[0] = 2;
-                    // ID
-                    provider.buffer[0] = provider.id + 64;
-                    // data
-                    Base64::encode(provider.buffer, provider.buffer_size, buffer + 1);
-                    // end byte
-                    buffer[encoded_buffer_size - 1] = 3;
-                    uint8_t dest = provider.destination;
-                    uint8_t id = provider.id;
-                    lock.unlock();
-                    // write to bluetooth, we unlock the mutex in case the writing takes a bit more time
-                    if (connectionStatus[dest] == Status::connected) {
-                        if (write(dest, buffer, encoded_buffer_size)) {
-                            turag_debugf("DataProvider %d push to %d", id, dest);
-                            provider.sendRequest.store(false, std::memory_order_relaxed);
-                        } else {
-                            turag_warningf("DataProvider %d push to %d - FAILED", id, dest);
-                        }
-                    }
-                }
-            } else if (provider.sendRequest.load(std::memory_order_relaxed)) {
-                provider.sendRequest.store(false, std::memory_order_relaxed);
+
+            ArrayBuffer<DataProvider, BLUETOOTH_NUMBER_OF_DATA_PROVIDERS>::iterator
+                    provider = std::find_if(
+                        data_providers.begin(), data_providers.end(),
+                        [&] (const DataProvider& provider) {
+                return provider.destination == mail.peer_id && provider.id == mail.index;
+            });
+
+            int encoded_buffer_size = Base64::encodeLength(provider->buffer_size) + 2;
+            uint8_t buffer[encoded_buffer_size];
+            // start byte
+            buffer[0] = 2;
+            // ID
+            provider->buffer[0] = provider->id + 64;
+            // data
+            Base64::encode(provider->buffer, provider->buffer_size, buffer + 1);
+            // end byte
+            buffer[encoded_buffer_size - 1] = 3;
+            lock.unlock();
+
+            // write to bluetooth, we unlock the mutex in case the writing takes a bit more time
+            if (write(mail.peer_id, buffer, encoded_buffer_size)) {
+                turag_debugf("DataProvider %d push to %d", mail.index, mail.peer_id);
+                outQueue.fetch();
+            } else {
+                turag_warningf("DataProvider %d push to %d - FAILED", mail.index, mail.peer_id);
+            }
+
+        }
+    }
+}
+
+void BluetoothBase::worker_thread_func(void) {
+    Thread<>::setName("bluetooth-worker");
+
+    turag_info("Bluetooth-Worker thread started");
+
+    while (!bluetooth_worker_thread.shouldTerminate()) {
+        QueueElement_t mail;
+
+        if (!inQueue.fetch(&mail, SystemTime::fromMsec(200))) continue;
+        if (!peersEnabled[mail.peer_id].load(std::memory_order_relaxed)) continue;
+
+        if (mail.isRpc) {
+            Mutex::Lock lock(rpc_mutex);
+            // we don't need to check the ID here. Calls with invalid IDs
+            // are rejected upon reception and not queued.
+            RpcFunction callback = rpc_functions[mail.index];
+            lock.unlock();
+
+            if (callback) {
+                turag_debugf("call RPC %d", mail.index);
+                (*callback)(mail.peer_id, mail.rpcParam);
+            }
+        } else {
+            Mutex::Lock lock(data_sink_mutex);
+
+            // we don't need to check the ID here. Calls with invalid IDs
+            // are rejected upon reception and not queued.
+            DataSinkNotificationHandler handler = data_sinks[mail.index].notificationHandler;
+            lock.unlock();
+
+            if (handler) {
+                turag_debugf("call data sink notifier %d", mail.index);
+                (*handler)(mail.index);
             }
         }
     }
@@ -171,21 +203,38 @@ void BluetoothBase::highlevelParseIncomingData(uint8_t sender, uint8_t* buffer, 
                 } else if (decoded_size != sizeof(RpcData)) {
                     turag_criticalf("RPC %d recv from %d --> package size mismatch (%d)", decode_buffer[0], sender, static_cast<int>(decoded_size));
                 } else {
-                    Rpc_t rpc;
-                    std::memcpy(&rpc.data, decode_buffer, sizeof(RpcData));
-                    rpc.peer_id = sender;
-                    rpc.received = true;
-                    rpc_fifo.post(rpc);
-                    turag_debugf("RPC %d recv from %d --> queued for exec", decode_buffer[0], sender);
+                    RpcData* data = reinterpret_cast<RpcData*>(decode_buffer);
+
+                    QueueElement_t element(data->rpc_id, sender, data->param);
+
+                    if (!inQueue.post(element, SystemTime::fromMsec(10))) {
+                        turag_criticalf("Received rpc %d from peer %d but couldn't enqueue it for execution; inQueue full", data->rpc_id, sender);
+                    } else {
+                        turag_debugf("RPC %d recv from %d --> queued for exec", decode_buffer[0], sender);
+                    }
                 }
             } else {
                 // data for DataSink
                 uint8_t data_sink_id = decode_buffer[0] - 64;
                 if (data_sink_id < BLUETOOTH_NUMBER_OF_DATA_SINKS) {
                     Mutex::Lock lock(data_sink_mutex);
-                    if (data_sinks[data_sink_id].buffer && decoded_size == data_sinks[data_sink_id].buffer_size && decoded_size > 1) {
+                    if (!data_sinks[data_sink_id].buffer) {
+                        turag_warningf("received data for data sink %d but buffer is nullptr", data_sink_id);
+                    } else if (decoded_size != data_sinks[data_sink_id].buffer_size) {
+                        turag_warningf("received data for data sink %d but buffer size doesn't match", data_sink_id);
+                    } else if (decoded_size <= 1) {
+                        turag_warningf("received data for data sink %d without user data", data_sink_id);
+                    } else {
                         turag_debugf("DataSink %d recv data from %d", data_sink_id, sender);
                         std::memcpy(data_sinks[data_sink_id].buffer, &decode_buffer, decoded_size);
+
+                        if (data_sinks[data_sink_id].notificationHandler) {
+                            if (!inQueue.postUnique(QueueElement_t(data_sink_id, sender), SystemTime::fromMsec(10))) {
+                                turag_criticalf("couldn't enqueue execution of notification handler for data sink %d; inQueue full", data_sink_id);
+                            } else {
+                                turag_debugf("enqueued notification handler of data sink %d for execution", data_sink_id);
+                            }
+                        }
                     }
                 } else {
                     turag_criticalf("DataSink %d recv data from %d -> ID invalid!", data_sink_id, sender);
@@ -224,12 +273,7 @@ bool BluetoothBase::callRpc(uint8_t destination, uint8_t rpc_id, uint64_t param)
 		turag_warningf("peer not enabled");
 		return false;
     } else {
-        Rpc_t rpc;
-        rpc.data.rpc_id = rpc_id;
-        rpc.data.param = param;
-        rpc.received = false;
-        rpc.peer_id = destination;
-        if (!rpc_fifo.post(rpc, SystemTime::fromMsec(10))) {
+        if (!outQueue.post(QueueElement_t(rpc_id, destination, param), SystemTime::fromMsec(10))) {
             turag_criticalf("Couldn't call RPC %d on peer %d; Buffer full", rpc_id, destination);
             return false;
         } else {
@@ -238,7 +282,7 @@ bool BluetoothBase::callRpc(uint8_t destination, uint8_t rpc_id, uint64_t param)
     }
 }
 
-bool BluetoothBase::addDataSink(uint8_t data_sink_id, uint8_t* storage_buffer, size_t length) {
+bool BluetoothBase::addDataSink(uint8_t data_sink_id, uint8_t* storage_buffer, size_t length, DataSinkNotificationHandler handler) {
     if (data_sink_id >= BLUETOOTH_NUMBER_OF_DATA_SINKS || !storage_buffer) {
         turag_error("invalid DataSink ID or storage pointer zero");
         return false;
@@ -251,7 +295,7 @@ bool BluetoothBase::addDataSink(uint8_t data_sink_id, uint8_t* storage_buffer, s
             turag_warningf("datasink %d was overwritten", data_sink_id);
         }
         turag_infof("added datasink %d with size %d", (int)data_sink_id, (int)length);
-        data_sinks[data_sink_id] = DataSink(storage_buffer, length);
+        data_sinks[data_sink_id] = DataSink(storage_buffer, length, handler);
         return true;
     }
 }
@@ -302,26 +346,8 @@ bool BluetoothBase::addDataProvider(uint8_t destination, uint8_t data_provider_i
 }
 
 bool BluetoothBase::pushData(uint8_t destination, uint8_t data_provider_id, const uint8_t* data, size_t length) {
-    ArrayBuffer<DataProvider, BLUETOOTH_NUMBER_OF_DATA_PROVIDERS>::iterator provider = std::find_if(data_providers.begin(), data_providers.end(), [&] (const DataProvider& provider) { return provider.destination == destination && provider.id == data_provider_id; });
-    if (provider == data_providers.end()) {
-        turag_error("specified data provider couldn't be found");
-        return false;
-    } else if (!peersEnabled[destination].load(std::memory_order_relaxed)) {
-        return false;
-    } else {
-        Mutex::Lock lock(data_provider_mutex);
-        if (length != provider->buffer_size) {
-            turag_errorf("incorrect data length (pushData dest=%d id=%d)", destination, data_provider_id);
-            return false;
-        }
-        std::memcpy(provider->buffer, data, length);
-        provider->sendRequest.store(true, std::memory_order_relaxed);
-        return true;
-    }
-}
+    Mutex::Lock lock(data_provider_mutex);
 
-
-bool BluetoothBase::pushData(uint8_t destination, uint8_t data_provider_id) {
     ArrayBuffer<DataProvider, BLUETOOTH_NUMBER_OF_DATA_PROVIDERS>::iterator
             provider = std::find_if(
                 data_providers.begin(), data_providers.end(),
@@ -335,8 +361,44 @@ bool BluetoothBase::pushData(uint8_t destination, uint8_t data_provider_id) {
     } else if (!peersEnabled[destination].load(std::memory_order_relaxed)) {
         return false;
     } else {
-        provider->sendRequest.store(true, std::memory_order_relaxed);
-        return true;
+        if (length != provider->buffer_size) {
+            turag_errorf("incorrect data length (pushData dest=%d id=%d)", destination, data_provider_id);
+            return false;
+        }
+        std::memcpy(provider->buffer, data, length);
+
+        if (!outQueue.postUnique(QueueElement_t(data_provider_id, destination), SystemTime::fromMsec(10))) {
+            turag_criticalf("couldn't push data to provider %d, buffer full", data_provider_id);
+            return false;
+        } else {
+            return true;
+        }
+    }
+}
+
+
+bool BluetoothBase::pushData(uint8_t destination, uint8_t data_provider_id) {
+    Mutex::Lock lock(data_provider_mutex);
+
+    ArrayBuffer<DataProvider, BLUETOOTH_NUMBER_OF_DATA_PROVIDERS>::iterator
+            provider = std::find_if(
+                data_providers.begin(), data_providers.end(),
+                [&] (const DataProvider& provider) {
+        return provider.destination == destination && provider.id == data_provider_id;
+    });
+
+    if (provider == data_providers.end()) {
+        turag_error("specified data provider couldn't be found");
+        return false;
+    } else if (!peersEnabled[destination].load(std::memory_order_relaxed)) {
+        return false;
+    } else {
+        if (!outQueue.postUnique(QueueElement_t(data_provider_id, destination), SystemTime::fromMsec(10))) {
+            turag_criticalf("couldn't push data to provider %d, buffer full", data_provider_id);
+            return false;
+        } else {
+            return true;
+        }
     }
 }
 

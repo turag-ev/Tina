@@ -110,7 +110,12 @@ public:
     struct SinkData {
         uint8_t id;     ///< for internal use only.
         T data;         ///< data structure that will contain received data.
-	}; //FIXME is _packed here necessary
+    };
+
+    /*!
+     * \brief Handler-function.
+     */
+    typedef void (*DataSinkNotificationHandler)(uint8_t sink_id);
 
     /*!
      * @brief Wrapper-structure for data providers.
@@ -119,7 +124,7 @@ public:
     struct PushData {
         uint8_t id;     ///< for internal use only.
         T data;         ///< data structure that contains data to send.
-	}; //FIXME is _packed here necessary
+    };
 
 
     /*!
@@ -132,13 +137,19 @@ public:
     };
 
     /*!
-     * \brief %Bluetooth thread.
+     * \brief Returns thread handler to main bluetooth thread
+     * \return handler.
      */
-    // can't be private because simulation needs access
-    Thread<BLUETOOTH_THREAD_STACK_SIZE> bluetooth_main_thread;
-
     inline Thread<BLUETOOTH_THREAD_STACK_SIZE> *getThreadPtr(void) {
         return &bluetooth_main_thread;
+    }
+
+    /*!
+     * \brief Returns thread handler to bluetooth worker thread.
+     * \return handler.
+     */
+    inline Thread<BLUETOOTH_WORKER_THREAD_STACK_SIZE> *getWorkerThreadPtr(void) {
+        return &bluetooth_worker_thread;
     }
 
     /*!
@@ -181,8 +192,8 @@ public:
      * @note Never access the given struct directly. It is used exclusively by
      * the bluetooth-thread.
      */
-    template<typename T> _always_inline bool addDataSink(uint8_t data_sink_id, SinkData<T>* storage_buffer) {
-        return addDataSink(data_sink_id, reinterpret_cast<uint8_t*>(storage_buffer), sizeof(*storage_buffer));
+    template<typename T> _always_inline bool addDataSink(uint8_t data_sink_id, SinkData<T>* storage_buffer, DataSinkNotificationHandler handler = nullptr) {
+        return addDataSink(data_sink_id, reinterpret_cast<uint8_t*>(storage_buffer), sizeof(*storage_buffer), handler);
     }
 
     /**
@@ -365,11 +376,6 @@ private:
         uint64_t param;
     } _packed;
 
-    struct Rpc_t {
-        RpcData data;
-        bool received;
-        uint8_t peer_id;
-    } _packed;
 
     struct InBuffer {
         uint8_t index;
@@ -381,45 +387,66 @@ private:
             waitForStartByte(false) { }
     };
 
+    class QueueElement_t {
+    public:
+        uint64_t rpcParam;
+        bool isRpc;
+        uint8_t index;
+        uint8_t peer_id;
+
+        QueueElement_t() :
+            rpcParam(0), isRpc(false), index(0), peer_id(0) { }
+
+        QueueElement_t(uint8_t index_, uint8_t peer_id_, uint64_t param_) :
+            rpcParam(param_), isRpc(true), index(index_), peer_id(peer_id_) { }
+
+        QueueElement_t(uint8_t index_, uint8_t peer_id_) :
+            isRpc(false), index(index_), peer_id(peer_id_) { }
+
+        bool operator==(const QueueElement_t& other) {
+            return isRpc ? false : (index == other.index && peer_id == other.peer_id);
+        }
+    };
+
     struct DataProvider {
         uint8_t* buffer;
         size_t buffer_size;
-        std::atomic_bool sendRequest;
         uint8_t destination;
         uint8_t id;
 
         DataProvider() :
             buffer(nullptr),
             buffer_size(0),
-            destination(0), id(0) { }
+            destination(0),
+            id(0) { }
 
         DataProvider(uint8_t* buf, size_t buf_size, uint8_t dest, uint8_t id_) :
             buffer(buf),
             buffer_size(buf_size),
-            sendRequest(false),
-            destination(dest), id(id_) { }
-
-        DataProvider(const DataProvider& provider) :
-            buffer(provider.buffer),
-            buffer_size(provider.buffer_size),
-            destination(provider.destination),
-            id(provider.id) {
-            sendRequest.store(provider.sendRequest.load(std::memory_order_relaxed), std::memory_order_relaxed);
-        }
+            destination(dest),
+            id(id_)
+        { }
     };
 
     struct DataSink {
         uint8_t* buffer;
         size_t buffer_size;
+        DataSinkNotificationHandler notificationHandler;
 
         DataSink() :
             buffer(nullptr),
-            buffer_size(0) { }
+            buffer_size(0),
+            notificationHandler(nullptr) { }
 
-        DataSink(uint8_t* buf, size_t buf_size) :
+        DataSink(uint8_t* buf, size_t buf_size, DataSinkNotificationHandler handler) :
             buffer(buf),
-            buffer_size(buf_size) { }
+            buffer_size(buf_size),
+            notificationHandler(handler) { }
     };
+
+
+    Thread<BLUETOOTH_THREAD_STACK_SIZE> bluetooth_main_thread;
+    Thread<BLUETOOTH_WORKER_THREAD_STACK_SIZE> bluetooth_worker_thread;
 
     RpcFunction rpc_functions[BLUETOOTH_NUMBER_OF_RPCS];
     Mutex rpc_mutex;
@@ -433,21 +460,24 @@ private:
     std::array<std::atomic_bool, BLUETOOTH_NUMBER_OF_PEERS> peersEnabled;
     std::array<std::atomic_bool, BLUETOOTH_NUMBER_OF_PEERS> peerConnectionSuccessfulOnce;
 
-    ThreadFifo<Rpc_t, 32> rpc_fifo;
+    ThreadFifo<QueueElement_t, BLUETOOTH_OUTQUEUE_SIZE> outQueue;
+    ThreadFifo<QueueElement_t, BLUETOOTH_INQUEUE_SIZE> inQueue;
 
     InBuffer in_buffer[BLUETOOTH_NUMBER_OF_PEERS];
 
 
-    bool addDataSink(uint8_t data_sink_id, uint8_t* storage_buffer, size_t length);
+    bool addDataSink(uint8_t data_sink_id, uint8_t* storage_buffer, size_t length, DataSinkNotificationHandler handler = nullptr);
     bool getData(uint8_t data_sink_id, uint8_t* buffer, size_t length);
     bool addDataProvider(uint8_t destination, uint8_t data_provider_id, uint8_t* storage_buffer, size_t length);
     bool pushData(uint8_t destination, uint8_t data_provider_id, const uint8_t* data, size_t length);
     bool pushData(uint8_t destination, uint8_t data_provider_id);
 
     void main_thread_func(void);
+    void worker_thread_func(void);
 
     static BluetoothBase* instance_;
     static void thread_entry(void);
+    static void worker_thread_entry(void);
 };
 
 ///@}
