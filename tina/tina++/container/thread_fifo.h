@@ -4,8 +4,24 @@
 #include <tina++/tina.h>
 #include <tina++/thread.h>
 #include <tina++/container/circular_buffer.h>
+//#include <algorithm>
 
 namespace TURAG {
+
+namespace {
+
+// the STL-find gives compiler errors.
+// So we need to define our own.
+template<class InputIterator, class T>
+InputIterator find_ (InputIterator first, InputIterator last, const T& val) {
+    while (first != last) {
+        if (*first == val) return first;
+        ++first;
+    }
+    return last;
+}
+
+}
 	
 /// \brief Thread-sicherer FIFO
 /// \ingroup Container
@@ -50,10 +66,10 @@ public:
      * \brief Fügt ein Element ans Ende des Puffers an.
      * \param[in] mail Anzuhängendes Objekt.
      * \param[in] time Timeout.
-     * \return True wenn das ELement angehängt werden konnte, false falls kein Platz
+     * \return True wenn das Element angehängt werden konnte, false falls kein Platz
      * im Puffer war.
      *
-     * Diese Funktion blockiert den aufrufenden Thread solange,
+     * Diese Funktion blockiert den aufrufenden Thread
      * maximal für die angegebene Zeitspanne oder bis Platz im Puffer ist.
      */
     bool post(const T& mail, SystemTime time) {
@@ -70,6 +86,85 @@ public:
             return false;
         }
     }
+
+
+    /*!
+     * \brief Fügt ein Element ans Ende des Puffers an, wenn es noch nicht
+     * existiert.
+     * \param[in] mail Anzuhängendes Objekt.
+     *
+     * Diese Funktion blockiert den aufrufenden Thread solange,
+     * bis Platz im Puffer ist. Für die Gleicheitsprüfung wird der
+     * ==-Operator verwendet, der für benutzerdefinierte Klassen ggf. überladen
+     * werden muss.
+     */
+    void postUnique(const T& mail) {
+        ConditionVariable::Lock lock(element_removed_);
+
+        // if the element is already part of the list
+        // it doesn't matter whether the buffer is full
+        if (find_(buffer_.begin(), buffer_.end(), mail) != buffer_.end()) {
+            return;
+        }
+
+        while (buffer_.full()) {
+            lock.wait();
+        }
+
+        // after locking the mutex again we can't know whether the element is in the
+        // list now, so check again
+        if (find_(buffer_.begin(), buffer_.end(), mail) != buffer_.end()) {
+            return;
+        }
+
+        buffer_.emplace_back(mail);
+        element_queued_.signal();
+    }
+
+
+    /*!
+     * \brief Fügt ein Element ans Ende des Puffers an, wenn es noch nicht
+     * existiert.
+     * \param[in] mail Anzuhängendes Objekt.
+     * \param[in] time Timeout.
+     * \return True wenn das Element angehängt werden konnte oder es bereits Teil
+     * der Puffers ist, false falls kein Platz
+     * im Puffer war.
+     *
+     * Diese Funktion blockiert den aufrufenden Thread
+     * maximal für die angegebene Zeitspanne oder bis Platz im Puffer ist.
+     * Für die Gleicheitsprüfung wird der
+     * ==-Operator verwendet, der für benutzerdefinierte Klassen ggf. überladen
+     * werden muss.
+     */
+    bool postUnique(const T& mail, SystemTime time) {
+        ConditionVariable::Lock lock(element_removed_);
+
+        // if the element is already part of the list
+        // it doesn't matter whether the buffer is full
+        if (find_(buffer_.begin(), buffer_.end(), mail) != buffer_.end()) {
+            return true;
+        }
+
+        if (buffer_.full()) {
+            lock.waitFor(time);
+
+            // after locking the mutex again we can't know whether the element is in the
+            // list now, so check again
+            if (find_(buffer_.begin(), buffer_.end(), mail) != buffer_.end()) {
+                return true;
+            }
+        }
+        if (!buffer_.full()) {
+            buffer_.emplace_back(mail);
+            element_queued_.signal();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
 
     /*!
      * \brief Entnimmt dem Puffer das älteste Element.
@@ -145,6 +240,7 @@ public:
 
     /*!
      * \brief Wartet auf die Verfügbarkeit eines Elements und gibt dieses zurück.
+     * Das Element verbleibt im Container.
      * \param[out] mail Pointer auf das Zielobjekt.
      * \param[in] time Timeout.
      * \return True wenn ein Element innerhalb des Timeouts verfügbar war, ansonsten false.

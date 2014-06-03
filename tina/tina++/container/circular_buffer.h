@@ -124,7 +124,7 @@ class CircularBuffer {
 
 public:
 #ifndef DOXYGEN
-  // FIXME: create own copy und move constructors for not trivial desctructable types
+  // FIXME: create own copy und move constructors for non-trivial desctructable types
   COPYABLE(CircularBuffer);
   MOVABLE(CircularBuffer);
 #endif
@@ -286,13 +286,11 @@ public:
   void push_back(const T& x) {
     ++last_;
 
-#ifndef NDEBUG
     if (first_ == last_) {
       turag_error("CircularBuffer overflow!");
       --last_;
       return ;
     }
-#endif
 
     bytes_.emplace(last_.n_, x);
   }
@@ -301,13 +299,11 @@ public:
   void emplace_back(Args&&... args) {
     ++last_;
 
-#ifndef NDEBUG
     if (first_.n_ == last_.n_) {
       turag_error("CircularBuffer overflow!");
       --last_;
       return ;
     }
-#endif
 
     bytes_.emplace(last_.n_, std::forward<Args>(args)...);
   }
@@ -316,13 +312,11 @@ public:
     bytes_.emplace(first_.n_,  x);
     --first_;
 
-#ifndef NDEBUG
     if (last_ == first_) {
       turag_error("CircularBuffer overflow!");
       ++first_;
       return ;
     }
-#endif
   }
 
   template< class... Args >
@@ -330,17 +324,15 @@ public:
     bytes_.emplace(first_.n_, std::forward<Args>(args)...);
     --first_;
 
-#ifndef NDEBUG
     if (last_.n_ == first_.n_) {
       turag_error("CircularBuffer overflow!");
       ++first_;
       return ;
     }
-#endif
   }
 
   void clear() {
-// TODO: for not trival destructable types
+// TODO: for non-trival destructable types
 //    for (size_t i = (first_.n_+1)&intern_iterator::mask; i != last_.n_; i = (i+1)&intern_iterator::mask) {
 //      bytes_.erase(i);
 //    }
