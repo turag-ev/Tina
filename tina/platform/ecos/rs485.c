@@ -5,7 +5,7 @@
 
 #include <tina/time.h>
 #include <tina/tina.h>
-#include <tina/debug.h>
+#include <tina/debug/print.h>
 
 static uint32_t rs485_baud_rate;
 static int timeout_symbols;
@@ -13,7 +13,7 @@ static int timeout_symbols;
 
 
 bool turag_rs485_init(uint32_t baud_rate, TuragSystemTime timeout) {
-	info("initRS485\n");
+	turag_info("initRS485\n");
 	
 	rs485_baud_rate = baud_rate;
 
