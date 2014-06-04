@@ -111,11 +111,11 @@ public:
 #ifdef CH_USE_CONDVARS_TIMEOUT
 
 		  _always_inline bool waitFor(SystemTime timeout) {
-		      return condvar_.waitFor(*this, timeout);
+              return condvar_.waitFor(timeout);
 		  }
 
 		  _always_inline bool waitUntil(SystemTime timeout) {
-		      return condvar_.waitUntil(*this, timeout);
+              return condvar_.waitUntil(timeout);
 		  }
 
 #endif
@@ -146,21 +146,9 @@ public:
     return result != RDY_TIMEOUT;
   }
 
-  _always_inline bool waitFor(Lock& lock, SystemTime timeout) {
-	  msg_t result = chCondWaitTimeout(&cond_, timeout.toTicks());
-	  if (result == RDY_TIMEOUT) lock.externUnlocked();
-    return result != RDY_TIMEOUT;
-  }
-
   bool waitUntil(SystemTime timeout) {
 	  msg_t result = chCondWaitTimeout(&cond_, timeout.toTicks() - chTimeNow());
 	  if (result == RDY_TIMEOUT) mutex_->lock();
-	  return result != RDY_TIMEOUT;
-  }
-
-  _always_inline bool waitUntil(Lock& lock, SystemTime timeout) {
-	  msg_t result = chCondWaitTimeout(&cond_, timeout.toTicks() - chTimeNow());
-	  if (result == RDY_TIMEOUT) lock.externUnlocked();
 	  return result != RDY_TIMEOUT;
   }
 

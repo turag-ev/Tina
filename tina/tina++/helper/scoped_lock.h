@@ -55,11 +55,6 @@ public:
 
   Mutex& getMutex() { return m_; }
 
-  // nur benutzen, wenn amn weiß was man tut! Dead-Lock oder Absturz droht!!!
-  _always_inline void externUnlocked() {
-    locked_ = false;
-  }
-
 private:
   Mutex& m_;
   bool locked_;
