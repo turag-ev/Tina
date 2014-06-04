@@ -23,3 +23,24 @@ BOOST_AUTO_TEST_CASE( TURAG_CONTAINER_TEST(copy) ) {
   Dummy::instances = 0;
 }
 
+BOOST_AUTO_TEST_CASE( TURAG_CONTAINER_TEST(std_find) ) {
+  {
+    CONTAINER test1;
+    test1.push_back(1);
+    test1.push_back(2);
+    test1.push_back(3);
+    test1.push_back(4);
+    test1.push_back(5);
+
+    CONTAINER::iterator r1 = std::find(test1.begin(), test1.end(), 3);
+    BOOST_CHECK_EQUAL(*r1, 3);
+    
+    CONTAINER::const_iterator r2 = std::find(test1.cbegin(), test1.cend(), 5);
+    BOOST_CHECK_EQUAL(*r2, 5);
+    
+    CONTAINER::iterator r3 = std::find(test1.begin(), test1.end(), 6);
+    BOOST_CHECK_EQUAL(r1, test1.end());
+  }
+  Dummy::instances = 0;
+}
+

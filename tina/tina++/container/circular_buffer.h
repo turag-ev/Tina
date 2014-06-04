@@ -26,8 +26,8 @@ public:
 
   // ctor
   constexpr
-  CircularBufferIterator(T* queue, size_t pos) :
-    queue_(*queue), pos_(pos)
+  CircularBufferIterator(T& queue, size_t pos) :
+    queue_(queue), pos_(pos)
   { }
 
   // convert from iterator to const_iterator
@@ -97,18 +97,36 @@ public:
 
   constexpr
   bool operator==(const self_type& other) const {
-    return pos_ == other.pos_;
+    return &queue_ == &other.queue_ && pos_ == other.pos_;
   }
 
   constexpr
   bool operator!=(const self_type& other) const {
-    return pos_ != other.pos_;
+    return !(*this == other);
+  }
+
+  constexpr
+  typename T::difference_type index() const {
+      return pos_;
+  }
+
+  constexpr
+  T& container() const {
+      return queue_;
   }
 
 private:
   T& queue_;
   std::size_t pos_;
 };
+
+template<typename T, typename T_nonconst, typename E = typename T::value_type>
+typename T::difference_type operator-(
+        CircularBufferIterator<T, T_nonconst, E> lhs,
+        CircularBufferIterator<T, T_nonconst, E> rhs)
+{
+    return rhs.index() - lhs.index();
+}
 
 #ifndef DOXYGEN
 
@@ -152,17 +170,17 @@ public:
 
   // iterators
   iterator begin() {
-    return iterator(this, 0);
+    return iterator(*this, 0);
   }
 
   constexpr
   const_iterator begin() const {
-    return const_iterator(this, 0);
+    return const_iterator(*this, 0);
   }
 
   constexpr
   const_iterator cbegin() const {
-    return const_iterator(this, 0);
+    return const_iterator(*this, 0);
   }
 
   reverse_iterator rbegin() {
@@ -180,17 +198,17 @@ public:
   }
 
   iterator end() {
-    return iterator(this, size());
+    return iterator(*this, size());
   }
 
   constexpr
   const_iterator end() const {
-    return const_iterator(this, size());
+    return const_iterator(*this, size());
   }
 
   constexpr
   const_iterator cend() const {
-    return const_iterator(this, size());
+    return const_iterator(*this, size());
   }
 
   reverse_iterator rend() {
@@ -388,7 +406,7 @@ private:
       return n_ != other.n_;
     }
 
-    // Number of the maximum events + 1 (must be a power of two)
+    // Number of the maximum elements + 1 (must be a power of two)
     static const std::size_t size = N;
 
     // Bit mask for circular buffer indices
@@ -397,13 +415,13 @@ private:
     std::size_t n_;
   };
 
-  // Index to first event of queue
+  // Index to first element of queue
   intern_iterator first_;
 
-  // Index to last event of queue
+  // Index to last element of queue
   intern_iterator last_;
 
-  // bytes needed to work a round the value ctor at construction
+  // bytes needed to work around the value ctor at construction
   array_storage<T, N> bytes_;
 };
 

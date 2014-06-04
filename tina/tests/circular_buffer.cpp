@@ -10,6 +10,7 @@ BOOST_AUTO_TEST_SUITE(CircularBufferTests)
 
 #include "container_test.inc"
 #include "container_test_push_pop.inc"
+#include "container_test_random_access.inc"
 
 BOOST_AUTO_TEST_SUITE_END()
 
