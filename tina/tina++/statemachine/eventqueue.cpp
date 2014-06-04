@@ -134,7 +134,7 @@ void EventQueue::main(EventHandler handler, TickHandler tick) {
           ConditionVariable::Lock lock(var_);
           if (loadEvent(&event)) break;
           SystemTime wait_time = getTimeToNextEvent();
-          if (wait_time.toTicks() == 0) continue;
+		  if (wait_time.toTicks() == 0) continue;
 
           // warte auf Event
           lock.waitFor(wait_time);

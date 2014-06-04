@@ -320,7 +320,7 @@ public:
   static const EventId event_quit = -1;
 
   /// Number of the maximum time events
-  static const size_t timequeue_size = 16;
+  static const size_t timequeue_size = 32;
 
   /// Maximum time between two calls of tick function
   static constexpr SystemTime max_tick_time = 25_ms;
