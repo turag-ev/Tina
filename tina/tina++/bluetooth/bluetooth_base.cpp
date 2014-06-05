@@ -421,8 +421,15 @@ void BluetoothBase::setPeerEnabled(uint8_t peer_id, bool enabled) {
     setPeerEnabledLowlevel(peer_id, enabled);
 
     if (enabled) {
-        turag_infof("Peer %d enabled -> waiting for successful connection", peer_id);
-        peerConnectionSuccessfulOnce[peer_id].store(false, std::memory_order_relaxed);
+        if (getConnectionStatus(peer_id) != Status::connected) {
+            turag_infof("Peer %d enabled -> waiting for successful connection", peer_id);
+            peerConnectionSuccessfulOnce[peer_id].store(false, std::memory_order_relaxed);
+        }
+        else {
+            turag_infof("Peer %d enabled -> is already connected, avoiding setting connectionOnceSuccessful = false!",
+                        peer_id);
+            peerConnectionSuccessfulOnce[peer_id].store(true, std::memory_order_relaxed);
+        }
     } else {
         turag_infof("Peer %d disabled", peer_id);
     }
