@@ -73,7 +73,10 @@ void BluetoothBase::main_thread_func(void) {
             connectionStatus[i] = newConnectionStatus;
         }
 
-        if (!outQueue.wait(&mail, SystemTime::fromMsec(50))) continue;
+        if (!outQueue.wait(&mail, SystemTime::fromMsec(50))) {
+            turag_warning("outQueue empty - continueing");
+            continue;
+        }
         if (!peersEnabled[mail.peer_id].load(std::memory_order_relaxed)) {
             // Remove element from queue if peer is enabled. This should only
             // happen on the rare occasion that the peer was disabled while some
@@ -89,6 +92,7 @@ void BluetoothBase::main_thread_func(void) {
             // Current implementation will NOT work with more than one peer.
 
             Thread_delay(SystemTime::fromMsec(50));
+            turag_warning("peer not connected, waiting 50 ms, sending nothing");
 
             continue;
         }
@@ -433,12 +437,6 @@ void BluetoothBase::setPeerEnabled(uint8_t peer_id, bool enabled) {
     if (enabled) {
         if (getConnectionStatus(peer_id) != Status::connected) {
             turag_infof("Peer %d enabled -> waiting for successful connection", peer_id);
-            peerConnectionSuccessfulOnce[peer_id].store(false, std::memory_order_relaxed);
-        }
-        else {
-            turag_infof("Peer %d enabled -> is already connected, avoiding setting connectionOnceSuccessful = false!",
-                        peer_id);
-            peerConnectionSuccessfulOnce[peer_id].store(true, std::memory_order_relaxed);
         }
     } else {
         turag_infof("Peer %d disabled", peer_id);
