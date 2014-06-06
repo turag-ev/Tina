@@ -74,7 +74,7 @@ void BluetoothBase::main_thread_func(void) {
         }
 
         if (!outQueue.wait(&mail, SystemTime::fromMsec(50))) {
-            turag_warning("outQueue empty - continueing");
+            turag_debug("outQueue empty - continueing");
             continue;
         }
         if (!peersEnabled[mail.peer_id].load(std::memory_order_relaxed)) {
@@ -92,7 +92,7 @@ void BluetoothBase::main_thread_func(void) {
             // Current implementation will NOT work with more than one peer.
 
             Thread_delay(SystemTime::fromMsec(50));
-            turag_warning("peer not connected, waiting 50 ms, sending nothing");
+            turag_debug("peer not connected, waiting 50 ms, sending nothing");
 
             continue;
         }
