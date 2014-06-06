@@ -274,8 +274,8 @@ bool BluetoothBase::callRpc(uint8_t destination, uint8_t rpc_id, uint64_t param)
 		return false;
     } else {
         turag_debug("trying to post rpc to outQueue...");
-        if (!outQueue.post(QueueElement_t(rpc_id, destination, param), SystemTime::fromMsec(10))) {
-            turag_criticalf("Couldn't call RPC %d on peer %d; Buffer full", rpc_id, destination);
+        if (!outQueue.post(QueueElement_t(rpc_id, destination, param), SystemTime::fromMsec(10), BLUETOOTH_OUTQUEUE_LEAVE_SPACE_WHEN_QUEUING_RPC)) {
+            turag_criticalf("Couldn't call RPC %d on peer %d; outQueue full", rpc_id, destination);
             return false;
         } else {
             return true;
@@ -369,7 +369,7 @@ bool BluetoothBase::pushData(uint8_t destination, uint8_t data_provider_id, cons
         std::memcpy(provider->buffer, data, length);
 
         if (!outQueue.postUnique(QueueElement_t(data_provider_id, destination), SystemTime::fromMsec(10))) {
-            turag_criticalf("couldn't push data to provider %d, buffer full", data_provider_id);
+            turag_criticalf("couldn't push data to provider %d, outQueue full", data_provider_id);
             return false;
         } else {
             return true;
@@ -395,7 +395,7 @@ bool BluetoothBase::pushData(uint8_t destination, uint8_t data_provider_id) {
         return false;
     } else {
         if (!outQueue.postUnique(QueueElement_t(data_provider_id, destination), SystemTime::fromMsec(10))) {
-            turag_criticalf("couldn't push data to provider %d, buffer full", data_provider_id);
+            turag_criticalf("couldn't push data to provider %d, outQueue full", data_provider_id);
             return false;
         } else {
             return true;

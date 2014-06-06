@@ -49,13 +49,15 @@ public:
     /*!
      * \brief Fügt ein Element ans Ende des Puffers an.
      * \param[in] mail Anzuhängendes Objekt.
+     * \param[in] leaveSpace Gibt an, wieviel freie Plätze nach dem Einfügen
+     * von mail mindestens im Puffer verbleiben sollen.
      *
      * Diese Funktion blockiert den aufrufenden Thread solange,
      * bis Platz im Puffer ist.
      */
-    void post(const T& mail) {
+    void post(const T& mail, size_t leaveSpace = 0) {
         ConditionVariable::Lock lock(element_removed_);
-        while (buffer_.full()) {
+        while (buffer_.size() >= buffer_.capacity() - leaveSpace) {
             lock.wait();
         }
         buffer_.emplace_back(mail);
@@ -66,19 +68,21 @@ public:
      * \brief Fügt ein Element ans Ende des Puffers an.
      * \param[in] mail Anzuhängendes Objekt.
      * \param[in] time Timeout.
+     * \param[in] leaveSpace Gibt an, wieviel freie Plätze nach dem Einfügen
+     * von mail mindestens im Puffer verbleiben sollen.
      * \return True wenn das Element angehängt werden konnte, false falls kein Platz
      * im Puffer war.
      *
      * Diese Funktion blockiert den aufrufenden Thread
      * maximal für die angegebene Zeitspanne oder bis Platz im Puffer ist.
      */
-    bool post(const T& mail, SystemTime time) {
+    bool post(const T& mail, SystemTime time, size_t leaveSpace = 0) {
         ConditionVariable::Lock lock(element_removed_);
 
-        if (buffer_.full()) {
+        if (buffer_.size() >= buffer_.capacity() - leaveSpace) {
             lock.waitFor(time);
         }
-        if (!buffer_.full()) {
+        if (buffer_.size() < buffer_.capacity() - leaveSpace) {
             buffer_.emplace_back(mail);
             element_queued_.signal();
             return true;
@@ -92,13 +96,15 @@ public:
      * \brief Fügt ein Element ans Ende des Puffers an, wenn es noch nicht
      * existiert.
      * \param[in] mail Anzuhängendes Objekt.
+     * \param[in] leaveSpace Gibt an, wieviel freie Plätze nach dem Einfügen
+     * von mail mindestens im Puffer verbleiben sollen.
      *
      * Diese Funktion blockiert den aufrufenden Thread solange,
      * bis Platz im Puffer ist. Für die Gleicheitsprüfung wird der
      * ==-Operator verwendet, der für benutzerdefinierte Klassen ggf. überladen
      * werden muss.
      */
-    void postUnique(const T& mail) {
+    void postUnique(const T& mail, size_t leaveSpace = 0) {
         ConditionVariable::Lock lock(element_removed_);
 
         // if the element is already part of the list
@@ -107,7 +113,7 @@ public:
             return;
         }
 
-        while (buffer_.full()) {
+        while (buffer_.size() >= buffer_.capacity() - leaveSpace) {
             lock.wait();
         }
 
@@ -127,6 +133,8 @@ public:
      * existiert.
      * \param[in] mail Anzuhängendes Objekt.
      * \param[in] time Timeout.
+     * \param[in] leaveSpace Gibt an, wieviel freie Plätze nach dem Einfügen
+     * von mail mindestens im Puffer verbleiben sollen.
      * \return True wenn das Element angehängt werden konnte oder es bereits Teil
      * der Puffers ist, false falls kein Platz
      * im Puffer war.
@@ -137,7 +145,7 @@ public:
      * ==-Operator verwendet, der für benutzerdefinierte Klassen ggf. überladen
      * werden muss.
      */
-    bool postUnique(const T& mail, SystemTime time) {
+    bool postUnique(const T& mail, SystemTime time, size_t leaveSpace = 0) {
         ConditionVariable::Lock lock(element_removed_);
 
         // if the element is already part of the list
@@ -146,7 +154,7 @@ public:
             return true;
         }
 
-        if (buffer_.full()) {
+        if (buffer_.size() >= buffer_.capacity() - leaveSpace) {
             lock.waitFor(time);
 
             // after locking the mutex again we can't know whether the element is in the
@@ -155,7 +163,7 @@ public:
                 return true;
             }
         }
-        if (!buffer_.full()) {
+        if (buffer_.size() < buffer_.capacity() - leaveSpace) {
             buffer_.emplace_back(mail);
             element_queued_.signal();
             return true;
