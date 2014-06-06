@@ -81,7 +81,17 @@ void BluetoothBase::main_thread_func(void) {
             outQueue.fetch();
             continue;
         }
-        if (connectionStatus[mail.peer_id] != Status::connected) continue;
+        if (connectionStatus[mail.peer_id] != Status::connected) {
+
+            // TODO:
+            // remove dumb ThreadDelay. Replace outQueue with
+            // some kind of PriorityQueue.
+            // Current implementation will NOT work with more than one peer.
+
+            Thread_delay(SystemTime::fromMsec(50));
+
+            continue;
+        }
 
         if (mail.isRpc) {
             RpcData rpc {mail.index, mail.rpcParam };
