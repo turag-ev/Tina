@@ -71,7 +71,7 @@ private:
 
 /// lets the current thread sleeps for a time of ecos ticks
 _always_inline void Thread_delay(SystemTime ticks) {
-  cyg_thread_delay(ticks.value);
+  cyg_thread_delay(ticks.toTicks());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -121,14 +121,15 @@ private:
 ////////////////////////////////////////////////////////////////////////////////
 // ConditionVariable
 
+template<class TMutex>
 class ConditionVariable {
   NOT_COPYABLE(ConditionVariable);
 
 public:
-		typedef Mutex Mutex;
+		typedef TMutex Mutex;
 		class Lock : public ScopedLock<Mutex> {
 		public:
-				ScopedConditionVariable(ConditionVariable& condvar) :
+				Lock(ConditionVariable& condvar) :
 					  ScopedLock<Mutex>(condvar.getMutex()),
 					  condvar_(condvar)
 				{ }
