@@ -121,12 +121,10 @@ private:
 ////////////////////////////////////////////////////////////////////////////////
 // ConditionVariable
 
-template<class TMutex>
 class ConditionVariable {
   NOT_COPYABLE(ConditionVariable);
 
 public:
-		typedef TMutex Mutex;
 		class Lock : public ScopedLock<Mutex> {
 		public:
 				Lock(ConditionVariable& condvar) :
@@ -151,7 +149,9 @@ public:
 		};
 
 public:
-  _always_inline ConditionVariable(Mutex* mutex) {
+  _always_inline ConditionVariable(Mutex* mutex) :
+		mutex_(mutex) 
+  {
     cyg_cond_init(&cond_, mutex->getNativeHandle());
   }
 
@@ -164,11 +164,11 @@ public:
   }
 
   _always_inline bool waitFor(SystemTime timeout) {
-    return cyg_cond_timed_wait(&cond_, cyg_current_time() + timeout.value);
+    return cyg_cond_timed_wait(&cond_, cyg_current_time() + timeout.toTicks());
   }
   
   _always_inline bool waitUntil(SystemTime timeout) {
-    return cyg_cond_timed_wait(&cond_, timeout.value);
+    return cyg_cond_timed_wait(&cond_, timeout.toTicks());
   }
 
   _always_inline void signal() {
@@ -178,9 +178,15 @@ public:
   _always_inline void broadcast() {
     cyg_cond_broadcast(&cond_);
   }
+  
+  Mutex& getMutex() {
+    return *mutex_;
+  }
+
 
 private:
   cyg_cond_t cond_;
+  Mutex* mutex_;
 };
 
 } // namespace TURAG

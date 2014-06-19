@@ -24,14 +24,6 @@ float tanf(float);
 long int lroundf(float);
 float scalbnf(float,int);
 
-TURAG_INLINE float fmaxf(float x, float y) {
-  return (x > y) ? x : y;
-}
-
-TURAG_INLINE float fminf(float x, float y) {
-  return (x < y) ? x : y;
-}
-
 #ifdef __cplusplus
 } // extern "C"
 #endif
