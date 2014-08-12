@@ -454,19 +454,11 @@ private:
   array_storage<T, N> bytes_;
 
   bool prepare_for_insert(iterator position) {
-#ifdef NDEBUG
-	return _ArrayBufferHelper<T>::prepare_for_insert(position, end());
-#else
 	return _ArrayBufferHelper<T>::prepare_for_insert(position, end(), const_iterator(&bytes_[N]));
-#endif
   }
 
   bool is_full() {
-#ifdef NDEBUG
-	return false;
-#else
 	return _ArrayBufferHelper<T>::is_full(cend(), const_iterator(&bytes_[N]));
-#endif
   }
 
 #ifndef DOXYGEN
@@ -476,13 +468,6 @@ private:
 
 #ifndef DOXYGEN
 
-#ifdef NDEBUG
-template<typename T>
-bool _ArrayBufferHelper<T>::prepare_for_insert(iterator position, iterator end) {
-  std::move_backward(position, end, end + 1);
-  return true;
-}
-#else
 template<typename T>
 bool _ArrayBufferHelper<T>::prepare_for_insert(iterator position, iterator end, const_iterator max_end) {
   if (end == max_end) {
@@ -493,9 +478,7 @@ bool _ArrayBufferHelper<T>::prepare_for_insert(iterator position, iterator end, 
   std::move_backward(position, end, end + 1);
   return true;
 }
-#endif
 
-#ifndef NDEBUG
 template<typename T>
 bool _ArrayBufferHelper<T>::is_full(const_iterator end, const_iterator max_end) {
   if (end == max_end) {
@@ -504,7 +487,6 @@ bool _ArrayBufferHelper<T>::is_full(const_iterator end, const_iterator max_end) 
   }
   return false;
 }
-#endif
 
 template <typename T, size_t N>
 static ArrayBuffer<size_t, N> sort_indexes(const ArrayBuffer<T, N> &v) {
