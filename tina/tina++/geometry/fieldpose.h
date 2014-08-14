@@ -20,6 +20,8 @@ template<typename T>
 _always_inline
 T for_teamcolor(T right, T left);
 
+/// \}
+
 /// \ingroup Geometry
 /// Spielfeldposition
 ///
@@ -127,8 +129,6 @@ _always_inline
 T for_teamcolor(T right, T left) {
     return FieldPose::isRightTeamcolor() ? right : left;
 }
-
-/// \}
 
 } // namespace TURAG
 

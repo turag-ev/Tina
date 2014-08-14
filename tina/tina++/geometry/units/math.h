@@ -134,7 +134,7 @@ power_helper(Units::Quantity<Dim> arg) {
 ///
 /// \code
 /// power<3>(3.f * Units::mm) // entspricht 27 mm^3
-/// power<1,3>(27.f * Units::mm*Units::mm*Units::mm) // entspricht 27 mm^3
+/// power<1,3>(27.f * Units::mm*Units::mm*Units::mm) // entspricht 3 mm
 /// \endcode
 template<std::intmax_t Num, std::intmax_t Denom = 1, typename Dim>
 constexpr _always_inline

@@ -4,25 +4,10 @@
 #include <tina++/tina.h>
 #include <tina++/thread.h>
 #include <tina++/container/circular_buffer.h>
-//#include <algorithm>
+#include <algorithm>
 
 namespace TURAG {
 
-namespace {
-
-// the STL-find gives compiler errors.
-// So we need to define our own.
-template<class InputIterator, class T>
-InputIterator find_ (InputIterator first, InputIterator last, const T& val) {
-    while (first != last) {
-        if (*first == val) return first;
-        ++first;
-    }
-    return last;
-}
-
-}
-	
 /// \brief Thread-sicherer FIFO
 /// \ingroup Container
 ///
@@ -150,7 +135,7 @@ public:
 
         // if the element is already part of the list
         // it doesn't matter whether the buffer is full
-        if (find_(buffer_.begin(), buffer_.end(), mail) != buffer_.end()) {
+        if (std::find(buffer_.begin(), buffer_.end(), mail) != buffer_.end()) {
             return true;
         }
 
@@ -159,7 +144,7 @@ public:
 
             // after locking the mutex again we can't know whether the element is in the
             // list now, so check again
-            if (find_(buffer_.begin(), buffer_.end(), mail) != buffer_.end()) {
+            if (std::find(buffer_.begin(), buffer_.end(), mail) != buffer_.end()) {
                 return true;
             }
         }

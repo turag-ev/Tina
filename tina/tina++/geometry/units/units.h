@@ -40,7 +40,7 @@ constexpr Unit<TimeDimension>  s(FROM_SI_CONVERT_FACTOR_TIME);
 /// Definition für Millisekunden
 constexpr Unit<TimeDimension> ms(FROM_SI_CONVERT_FACTOR_TIME / 1000.f);
 
-#if GCC_VERSION > 40700 && defined(TINA_UNITS_LITERALS)
+#if GCC_VERSION > 40700 && !defined(TINA_UNITS_NO_LITERALS)
 constexpr Length operator"" _mm(long double x) { return x * mm; }
 constexpr Length operator"" _mm(long long unsigned x) { return x * mm; }
 constexpr Length operator"" _cm(long double x) { return x * cm; }

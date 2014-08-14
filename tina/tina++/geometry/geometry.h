@@ -316,12 +316,8 @@ Angle angle_between(const T1& a, const T2& b) {
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
-// Circle
-
 /// Darstellung für Kreis aus Mittelpunkt und Radius
 struct Circle {
-
 	/// Kreis aus kartesischen Punkt und Radius erstellen
 	/// \tparam Typ mit x- und y-Koordinate
 	template<typename P>
@@ -349,38 +345,59 @@ struct Circle {
 	Length r;
 };
 
-// Rectangle
-
-template<typename T>
+/// \brief Rechteck
+/// \tparam P Typ mit 2-dimensionalen kartesischen Koordinaten (x und y)
+///
+template<typename P>
 class Rect {
 public:
-	T a, b;
+    /// Punkt 1
+    P a;
 
-	inline Rect(void) :
+    /// Punkt 2
+    P b;
+
+    /// leeres Rechteck erstellen
+    constexpr Rect() :
 		a(),
 		b()
-	{
-	}
-	inline Rect(T _a, T _b) :
+    { }
+
+    ///
+    /// \brief Rechteck aus zwei Punkten erstellen
+    /// \param _a Punkt 1
+    /// \param _b Punkt 2
+    ///
+    constexpr Rect(P _a, P _b) :
 		a(_a),
 		b(_b)
 	{
 	}
-	inline T getCenter(void) {
-		return T((b.x + a.x)/2, (b.y + a.y)/2);
+
+    /// \brief Mittelpunkt von Rechteck bestimmen
+    P getCenter() {
+        return P((b.x + a.x)/2.f, (b.y + a.y)/2.f);
 	}
 };
 
-template<typename T1>
+
+///
+/// \brief Prüft ob Punkt in Rechteck liegt.
+/// Liegt der Punkt auf dem Rand des Rechtecks, so wird auch \a true zurück gegeben.
+/// \param rect Rechteck
+/// \param point Punkt
+/// \return \a true, wenn Punkt in Rechteck liegt, sonst \a false
+///
+template<typename P>
 constexpr
-bool in_rect_area(const Rect<T1>& r, const T1& b) {
-	return (b.x >= std::min(r.a.x, r.b.x)
-		&& b.x <= std::max(r.a.x, r.b.x)
-		&& b.y >= std::min(r.a.y, r.b.y)
-		&& b.y <= std::max(r.a.y, r.b.y));
+bool located_in(const Rect<P>& rect, const P& point) {
+    return (point.x >= std::min(rect.a.x, rect.b.x)
+        && point.x <= std::max(rect.a.x, rect.b.x)
+        && point.y >= std::min(rect.a.y, rect.b.y)
+        && point.y <= std::max(rect.a.y, rect.b.y));
 }
 
-/// Schnittpunkt zwischen zwei Kreisen zurückgeben
+/// Schnittpunkt zwischen zwei Kreisen zurückgeben.
 /// \param one,two Kreise
 /// \param[out] results Schnittpunkte, wenn Rückgabewert \a true
 ///

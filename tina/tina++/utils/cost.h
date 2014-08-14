@@ -12,9 +12,9 @@ namespace TURAG {
 ///
 /// Klasse zum einfachen rechnen mit Kosten. Kosten könne nur positiv sein, dabei
 /// gibt es zwei spezielle Kosten:
-///  * \ref COST_INFINITY, zur Darstellung von unendlichen hohen Kosten.
+///  * \ref TURAG::COST_INFINITY, zur Darstellung von unendlichen hohen Kosten.
 ///    Wird benutzt, wenn Aktion nicht ausführbar ist.
-///  * \ref COST_MAX, zur Darstellung von sehr hohen endlichen Kosten.
+///  * \ref TURAG::COST_MAX, zur Darstellung von sehr hohen endlichen Kosten.
 ///    Wird benutzt wenn Aktion zwar benutzt werden kann, aber nur wenn nichts
 ///    anderes geht. Sowohl wenn Wert von Kosten nicht mehr von Ganzzahl dargestellt werden kann (Overflow).
 /// \code{.cpp}

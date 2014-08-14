@@ -12,6 +12,8 @@ namespace TURAG {
 /// \addtogroup Utils
 /// \{
 
+#ifndef DOXYGEN
+
 template<typename T>
 #if GCC_VERSION < 40800 && !defined(__clang__)
 struct is_trivially_destructible : public std::has_trivial_destructor<T> { };
@@ -19,14 +21,21 @@ struct is_trivially_destructible : public std::has_trivial_destructor<T> { };
 struct is_trivially_destructible : public std::is_trivially_destructible<T> { };
 #endif
 
+#endif // DOXYGEN
 
-/// construct instance of type in memory pointed by ptr with arguments
+
+/// Erstelle Instanz von Klasse in vorhandenen Speicher mit zugehörigen Argumenten
+/// \param ptr Zeiger auf nicht initalisierten Speicher an dem Instanz erstellt wird
+/// \param args Argumente für Konstuktor
+/// \warning Nur verwenden, wenn C++ Instanz nicht selber verwaltet, weil
+/// zum Beispiel ein Bytepuffer verwendet wird.
 template<typename T, typename ...Args> _always_inline
 void construct(T* ptr, Args&&... args) {
   ::new(ptr) T(std::forward<Args>(args)...);
 }
 
-/// destroy instance by pointer
+#ifndef DOXYGEN
+
 template<typename T, REQUIRES(is_trivially_destructible<T>)> _always_inline
 void destruct(T*) { }
 
@@ -35,7 +44,6 @@ void destruct(T* ptr) {
   ptr->~T();
 }
 
-/// destroy a range of type instances
 template<typename ForwardIterator, REQUIRES(is_trivially_destructible<typename std::iterator_traits<ForwardIterator>::value_type>)> _always_inline
 void destruct(ForwardIterator, ForwardIterator) { }
 
@@ -45,6 +53,25 @@ void destruct(ForwardIterator first, ForwardIterator last) {
     destruct(std::addressof(*first));
   }
 }
+
+#else // DOXYGEN
+
+/// \brief Zerstöre Instanz von Typ
+/// \param instance Zeiger auf Instanz von Typ
+/// \warning Nur verwenden, wenn C++ Instanz nicht selber verwaltet, weil
+/// zum Beispiel ein Bytepuffer verwendet wird.
+template<typename T>
+void destruct(T* instance);
+
+/// \brief Zerstöre mehrere Instanzen von Typ
+/// \param begin Interator für erstes zu zerstörende Instanz
+/// \param end Interator für erstes nicht mehr zu zerstörende Instanz
+/// \warning Nur verwenden, wenn C++ Instanzen nicht selber verwaltet, weil
+/// zum Beispiel ein Bytepuffer verwendet wird.
+template<typename ForwardIterator>
+void destruct(ForwardIterator begin, ForwardIterator end);
+
+#endif // DOXYGEN
 
 /// \}
 
