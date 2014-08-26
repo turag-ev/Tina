@@ -21,6 +21,13 @@ namespace TURAG {
 /// @{
 ///
 /// @defgroup Actions Aktionen [C++]
+/// \brief Aktionen sind Zustandsmaschinen, die auf Events reagieren.
+///
+/// \msc
+/// Sender,Receiver;
+/// Sender->Receiver [label="Command()", URL="\ref Receiver::Command()"];
+/// Sender<-Receiver [label="Ack()", URL="\ref Ack()", ID="1"];
+/// \endmsc
 /// @{
 
 

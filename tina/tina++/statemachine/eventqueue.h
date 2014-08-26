@@ -23,7 +23,49 @@ namespace TURAG {
 /// \addtogroup StateMaschines
 /// \{
 
-/// \defgroup Events Events [C++]
+/// \defgroup Events Ereignisse [C++]
+/// \brief Ereignisseverarbeitung.
+/// Ereignisse
+/// ----------
+/// Ereignisse stellen Zeitpunkte der Veränderung dar auf die reagiert werden kann.
+/// So kann man auf das Ergebnis einer ausgelösten Aktion warten oder zeitversetzt
+/// Aktionen durchführen.
+///
+/// Ein Ereignis kann nur durch eine Ereignisklasse erstellt werden. Die Klasse
+/// ist durch ihre eindeutige Id charaterisiert. Diese Id wird durch die Benutzung von
+/// \ref EventNamespace aus drei ASCII-Zeichen generiert. Zusätzlich kann jeder Klasse
+/// von Ereignissen eine Zeichenkette mit der Beschreibung des Ereignisses mitgegeben werden.
+/// Diese kann für Debuggingzwecke benutzt werden. So wird vor der
+/// Verarbeitung eines Ereignisses in der Ereignisseverarbeitung (\ref TURAG::EventQueue "EventQueue") die Beschreibung
+/// ins Log (\ref Debug) geschrieben. Es ist möglich mehreren Ereignis-Klassen die gleiche
+/// Id zu geben. Dadurch kann man einen Ereignis unterschiedliche Beschreibungen
+/// mitgeben um die Herkunft des Ereignisses besser zu erkennen. Aus einer Ereignisklasse
+/// kann ein Ereignis erstellt werden.
+///
+/// Eine Ereignisklasse wird erstellt durch das Makro \ref DEFINE_EVENT_CLASS oder
+/// \ref DEFINE_EVENT_CLASS_EXTRA. Dessen erstes Argument ist der Bezeichner für
+/// die Klasse, der später darf verwendet werden kann um die Ereignisklasse angeben zu können.
+/// Der zweite Parameter ist die Id der Ereignisklasse. Aus der Id wird die Beschreibung generiert.
+/// Will man eine detailiertere Beschreibung hinzufügen so ist das mit \ref DEFINE_EVENT_CLASS_EXTRA möglich, wo der
+/// dritte Parameter der Beschreibung hinzugefügt wird.
+///
+/// Ereignisseverarbeitung
+/// ----------------------
+///
+/// TODO: TURAG::EventQueue::main
+///
+/// Die ankommenden Ereignisse werden in einer Liste chronologisch gesammelt und
+/// entspricht im Normalfall einer Warteschlange (FIFO). Ereignisse werden über
+/// TURAG::EventQueue::push zur möglichst zeitnahen Verarbeitung hinzugefügt.
+/// Soll ein Event nicht hinten eingefügt werden sondern vor allen anderen, kann
+/// man dies über TURAG::EventQueue::pushToFront machen. Für das Einfügen eines
+/// neuen Ereignissen ist dessen Ereignisklasse nötig, daraus wird das eigentliche
+/// Ereigniss erstellt. Optional kann ein Parameter mit übergeben werden. Dieser
+/// ist entweder ein 32-Bit Integer oder ein anderer Typ der maximal 32-Bit groß ist.
+/// Der Parametertyp und dessen mögliche Werte müssen in der Dokumentation zu der
+/// Ereignisklasse festgelegt werden. Es erfolgt keine Prüfung über die Richtungkeit
+/// des Types des übergebenes Objekts!
+///
 /// Erklärung in Code:
 /// \code{.cpp}
 ///   // in anyaction.h
@@ -46,17 +88,21 @@ namespace TURAG {
 ///   DEFINE_EVENT_CLASS_EXTRA(EventSomethingElseHappend, AnyAction::event_something_else_happend, "Es ist etwas passiert!");
 ///
 ///   // Anwendung mit \ref EventQueue:
-///   // vorher definiert: EventQueue queue;
+///   int main() {
+///     EventQueue queue;
 ///
-///   // Event ohne Argument oder spezielles Callback werfen
-///   queue.push(&EventSomethingHappend);
+///     // Ereignis ohne Argument oder spezielles Callback werfen
+///     queue.push(&EventSomethingHappend);
 ///
-///   // Event mit Argument
-///   queue.push(&EventSomethingElseHappend, 42);
+///     // Ereignis mit Argument
+///     queue.push(&EventSomethingElseHappend, 42);
 ///
-///   // Event von spezieller Funktion behandeln lassen:
-///   queue.push(&EventSomethingHappend, handle_event);
-///   queue.push(&EventSomethingElseHappend, 42, handle_event);
+///     // Ereignis von spezieller Funktion behandeln lassen:
+///     queue.push(&EventSomethingHappend, handle_event);
+///     queue.push(&EventSomethingElseHappend, 42, handle_event);
+///
+///     queue.main();
+///  }
 ///
 ///   void handle_event(EventId id, EventArg data) {
 ///     switch (id) {
@@ -77,20 +123,20 @@ namespace TURAG {
 //     EventClass
 ////////////////////////////////////////////////////////////////////////////////
 
-/// \brief Klasse von Events, definiert durch Event-Id und Name
+/// \brief Ereignisklasse definiert durch Ereignis-Id und Beschreibung
 struct EventClass {
-    /// Eventklasse erstellen
-    /// \param name Beschreibung von Event
-    /// \param id Id von Event
+    /// \brief Eventklasse erstellen
+    /// \param name Beschreibung von Ereignis
+    /// \param id Id von Ereignis
     constexpr
     EventClass(const char* name, EventId id) :
         name(name), id(id)
     { }
 
-    /// Beschreibung von Events dieser Eventklasse (nur als Debuginformation benutzbar)
+    /// \brief Beschreibung von Events dieser Eventklasse (nur als Debuginformation benutzbar)
     const char* const name;
 
-    /// Event-Id von Events dieser Eventklasse (zur Identifikation von Events)
+    /// \brief Ereignis-Id von Events dieser Eventklasse (zur Identifikation von Events)
     const EventId id;
 };
 
@@ -105,9 +151,9 @@ template<EventId id>
 const EventClass UnnamedEventClass<id>::event_class("Unbekannt", id);
 #endif
 
-/// Eventklasse \ref TURAG::EventClass definieren mit Eventname als Debugbeschreibung
+/// Ereignisklasse \ref TURAG::EventClass definieren mit Ereignisname als Debugbeschreibung
 /// \param name Variablenname
-/// \param event Event-Id für Event
+/// \param event Ereignis-Id für Ereignis
 ///
 /// \code{.cpp}
 ///   DEFINE_EVENT_CLASS(EventWon, WinAction::event_won);
@@ -115,10 +161,10 @@ const EventClass UnnamedEventClass<id>::event_class("Unbekannt", id);
 /// \endcode
 #define DEFINE_EVENT_CLASS(name,event) const EventClass name(#event, event)
 
-/// Eventklasse \ref TURAG::EventClass definieren mit Eventname als Debugbeschreibung
+/// Ereignisklasse \ref TURAG::EventClass definieren mit Ereignisname und Zusatzinformation als Debugbeschreibung
 /// \param name Variablenname
-/// \param event Event-Id für Event
-/// \param msg Zusätzliche Debuginformation zu Eventklasse
+/// \param event Ereignis-Id für Ereignis
+/// \param msg Zusätzliche Debuginformation zu Ereignistyp
 ///
 /// \code{.cpp}
 ///   DEFINE_EVENT_CLASS_EXTRA(EventWon, WinAction::event_won, "Wir haben gewonnen!");
@@ -130,34 +176,53 @@ const EventClass UnnamedEventClass<id>::event_class("Unbekannt", id);
 //     Event
 ////////////////////////////////////////////////////////////////////////////////
 
-/// Event
+/// \brief Ereignis
 struct Event {
-  MOVABLE(Event);
-  COPYABLE(Event);
+  const EventClass* event_class; ///< zugehörige Ereignisklasse
+  EventArg          param;       ///< optionaler Parameter
 
-  const EventClass* event_class; ///< event id
-  EventArg          param;       ///< parameters
-  EventMethod       method;      ///< event method for async method calls or \a nullptr
+  /// \brief Callbackfunktion.
+  /// Funktion, die bei Ereignisverarbeitung mit Ereignis aufgerufen werden soll oder
+  /// <code>nullptr</code>, wenn Ereignis in Standard-Ereignisverarbeitungsfunktion übergeben werden soll.
+  EventMethod       method;
 
+  /// \brief Ereignis aus Ereignisklasse erstellen
+  /// \note Ereignis sollte nie selber erstellt werden, sondern die Funktionen der
+  /// \ref TURAG::EventQueue "EventQueue" benutzt werden.
   constexpr
   Event(const EventClass* event_class, EventArg param, EventMethod method) :
     event_class(event_class), param(param), method(method)
   { }
+
+  /// Instanzen von Klasse sind verschiebbar.
+  MOVABLE(Event);
+
+  /// Instanzen von Klasse sind kopierbar.
+  COPYABLE(Event);
 };
 
-/// Event with time information for timedelayed events
+/// \brief zeitverzögertes Ereignis
 struct TimeEvent {
   MOVABLE(TimeEvent);
   COPYABLE(TimeEvent);
 
-  Event     event;     ///< event to process
-  SystemTime time;     ///< time when event is due
+  /// \brief zugehöriges Ereignis was ausgelöst werden soll.
+  Event     event;
 
+  /// \brief absolute Zeit bei der Ereignis ausgeführt werden soll.
+  SystemTime time;
+
+  /// zeitverzögertes Ereignis erstellen
+  /// \note Ereignis sollte nie selber erstellt werden, sondern die Funktionen der
+  /// \ref TURAG::EventQueue "EventQueue" benutzt werden.
   constexpr
   TimeEvent(const Event& event, SystemTime time) :
     event(event), time(time)
   { }
 
+  /// zeitverzögertes Ereignis erstellen
+  /// \note Ereignis sollte nie selber erstellt werden, sondern die Funktionen der
+  /// \ref TURAG::EventQueue "EventQueue" benutzt werden.
   constexpr
   TimeEvent(const EventClass* event_class, EventArg param, EventMethod method, SystemTime time) :
     event(event_class, param, method), time(time)
@@ -167,28 +232,32 @@ struct TimeEvent {
 ////////////////////////////////////////////////////////////////////////////////
 //     EventQueue
 ////////////////////////////////////////////////////////////////////////////////
-/// Event processing queue
+
+/// Ereignisverarbeitung
 class EventQueue {
 public:
+  /// Typ für Funktion zur Verärbeitung von Ereignis
   typedef bool (*EventHandler)(EventId id, EventArg data);
+
+  /// Typ für Tick-Funktion
   typedef void (*TickHandler)();
 
+  /// Ereignisverarbeitung erstellen
   EventQueue();
 
-  /// Start the event processing loop
-  /**
-   * \param handler Wenn keine Funktion in Event expliiz angegeben wurde, dann
-   *                Event von dieser Funktionen verarbeiten lassen.
-   * \param tick Funktion, die jedes mal aufgerufen wird, bevor Event verabeitet
+  /** \brief Ereignisverarbeitung starten und erst zurückkehren, wenn \ref TURAG::EventQueue::quit aufgerufen wurde.
+   * \param handler Wenn keine Funktion in Ereignis explizit angegeben wurde, dann
+   *                Ereignis von dieser Funktionen verarbeiten lassen.
+   * \param tick Funktion, die jedes mal aufgerufen wird, bevor Ereignis verabeitet
    *             wird oder mindestens in \ref max_tick_time Abständen. Bei letztem ist
-   *             der \a id Parameter EventQueue::event_null und der data Parameter 0.
+   *             der \a id Parameter TURAG::EventQueue::event_null und der data Parameter 0.
    */
   void main(EventHandler handler, TickHandler tick);
 
-  /// Event direkt ohne Pufferung verarbeiten
-  /// \param id Event-Id von Event
-  /// \param param Argument von Event, sonst Null
-  /// \param callback explizite Angabe der Eventverarbeitungsfunktion, sonst \a nullptr
+  /// Ereignis direkt ohne Pufferung verarbeiten
+  /// \param id Id von Ereignis
+  /// \param param Argument von Ereignis, sonst Null
+  /// \param callback explizite Angabe der Ereignisverarbeitungsfunktion, sonst <code>nullptr</code>
   bool processEvent(EventId id, EventArg param, EventMethod callback);
 
   /// Push quit event (\a EventQueue::event_quit) to front of event queue.
@@ -310,20 +379,18 @@ public:
   static_assert(!(size & (size-1)), "EventQueue::size must be a power of 2");
 
   enum {
-    event_null = 0, ///< \a EventId for do nothing
-    event_nonamed,  ///< \a EventId for do nothing
-    event_idle,     ///< \a EventId when nothing to do
-    event_watchdog  ///< \a EventId when watchdog get awake
+    event_null = 0, ///< \a Ereignis-Id für nichts. Wird verwendet, um zu Ereignis löschen.
+    event_idle,     ///< \a Ereignis-Id wenn nichts zu machen ist.
   };
 
-  /// \a EventId for quit the event processing loop
+  /// \a Ereignis-Id zum Beenden der Ereignisverarbeitung in ::main.
   static const EventId event_quit = -1;
 
-  /// Number of the maximum time events
+  /// Kapazität an zeitverzögerten Ereignissen
   static const size_t timequeue_size = 32;
 
-  /// Maximum time between two calls of tick function
-  static constexpr SystemTime max_tick_time = 25_ms;
+  /// maximale Zeit zwischen zwei Aufrufen der tick-Funktion
+  static constexpr SystemTime max_tick_time = 100_ms;
 
 private:
   mutable Mutex mutex_;

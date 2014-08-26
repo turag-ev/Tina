@@ -12,25 +12,36 @@
 #define GCC_VERSION (40700)
 #endif
 
+/// \defgroup Compiler Compilerabstraktion [C/C++]
+/// \{
+
 ////////////////////////////////////////////////////////////////////////////////
 // makros for compiler pragmas
 
-/// Declaring a macro
+/// Declaring a compiler pragma
 #define DO_PRAGMA(x) _Pragma (#x)
 
-/// Ignore a warning for the rest of the file
+/// \brief Ignore a warning for the rest of the file
+/// \sa IGNORE_WARNING_BEGIN
 #define IGNORE_WARNING(x) DO_PRAGMA(GCC diagnostic ignored x)
 
 /* Test for GCC >= 4.6.0 */
-#if GCC_VERSION >= 40600
-/// Ignore a warning until a IGNORE_WARNING_END at the same hierarchy
+#if GCC_VERSION >= 40600 || defined(DOXYGEN)
+
+/// \brief Ignore a warning until a ::IGNORE_WARNING_END at the same hierarchy
+/// \pre gcc > 4.6
+/// \sa IGNORE_WARNING_END
 #define IGNORE_WARNING_BEGIN(x) \
   DO_PRAGMA(GCC diagnostic push); \
   IGNORE_WARNING(x)
-/// Stop ignoring the warning given in the IGNORE_WARNING_BEGIN call at the same
+
+/// Stop ignoring the warning given in the ::IGNORE_WARNING_BEGIN call at the same
 /// hierarchy
+/// \pre gcc > 4.6
+/// \sa IGNORE_WARNING_BEGIN
 #define IGNORE_WARNING_END() \
   DO_PRAGMA(GCC diagnostic pop)
+
 #else
 #define IGNORE_WARNING_BEGIN(x) IGNORE_WARNING(x)
 #define IGNORE_WARNING_END()
@@ -41,6 +52,7 @@
 
 #ifndef __cplusplus
 // C Version
+/// \brief function attribute to always inline a function
 #define TURAG_INLINE static __attribute__((always_inline)) inline
 #else
 // C++ Version
@@ -52,6 +64,7 @@
 
 #ifndef __cplusplus
 // C Version
+/// \brief function attribute to define a function a constexpr
 #define _constexpr_func __attribute__((const))
 #else
 // C++ Version
@@ -79,8 +92,10 @@
 /// mark a function, that does not return like \a exit and \a abort
 #define _noreturn __attribute__((noreturn))
 
-/// optimize function with given level, e.x. \code _optimize("O3") \endcode
-#if GCC_VERSION >= 40400
+#if GCC_VERSION >= 40400 || defined(DOXYGEN)
+/// \brief optimize function with given level
+/// e.x. \code _optimize("O3") \endcode
+/// \pre gcc >= 4.4
 # define _optimize(o) __attribute__((optimize(o)))
 #else
 # define _optimize(o)
@@ -111,8 +126,14 @@
 /// place variable in a specific  section
 #define _section(s) __attribute__((section("." s)))
 
-
+/// \brief attribute for a struct to remove any padding in it.
+/// \warning can infulence performance and thread-safty
 #define _packed __attribute__ ((packed))
+
+/// \brief GCC does not produce a warning for this variable.
+/// This attribute, attached to a variable, means that the variable is meant to be possibly unused.
 #define _unsed __attribute__ ((unused))
+
+/// \}
 
 #endif // TINA_HELPER_NORMALIZE_H
