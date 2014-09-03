@@ -24,9 +24,11 @@ namespace TURAG {
 /// \{
 
 /// \defgroup Events Ereignisse [C++]
-/// \brief Ereignisseverarbeitung.
-/// Ereignisse
-/// ----------
+/// \brief Ereignisverarbeitung.
+///
+/// Ereignisse (Event, TimeEvent)
+/// -----------------------------
+///
 /// Ereignisse stellen Zeitpunkte der Veränderung dar auf die reagiert werden kann.
 /// So kann man auf das Ergebnis einer ausgelösten Aktion warten oder zeitversetzt
 /// Aktionen durchführen.
@@ -49,22 +51,54 @@ namespace TURAG {
 /// Will man eine detailiertere Beschreibung hinzufügen so ist das mit \ref DEFINE_EVENT_CLASS_EXTRA möglich, wo der
 /// dritte Parameter der Beschreibung hinzugefügt wird.
 ///
-/// Ereignisseverarbeitung
-/// ----------------------
+/// Ereignisverarbeitung (EventQueue)
+/// ---------------------------------
 ///
-/// TODO: TURAG::EventQueue::main
+/// Die Ereignisverarbeitung wird über die Funktion \ref TURAG::EventQueue::main "main"
+/// gestartet. Diese Funktion wartet auf neue Ereignisse bzw. wartet auf bis zeitversetzte
+/// Ereignisse aufgelöst werden müssen. Die Funktion kehrt erst zurück, wenn das Event
+/// \ref TURAG::EventQueue::event_quit "event_quit" ausgeführt wird, was in einer
+/// Simulationumgebung genutzt werden kann, um die Ereignisverarbeitung zu beenden.
+/// Die Funktion erwartet zwei Funtionszeiger als Parameter. Die erste Funktion
+/// wird aufgerufen, wenn das Ereignis selber nicht explizit über \ref TURAG::Event::method "Event::method"
+/// eine Funktion angibt. In dieser Funktion muss das Ereignis verarbeitet oder
+/// weitergegeben werden. Die zweite Funktion wird aufgerufen bevor eine Event
+/// verarbeitet wird, aber mindestens im Abstand von der Zeit die in \ref TURAG::EventQueue::max_tick_time
+/// "EventQueue::max_tick_time" angegeben ist. So kann auf Variablen oder Zustände geprüft werden,
+/// die bei einer Veränderung kein Ereignis nach sich ziehen.
+///
+/// Eine andere Möglichkeit
+/// in bestimmten Abständen Variablen zu prüfen ist über die Funktion \ref TURAG::EventQueue::pushTimedelayed
+/// "pushTimedelayed" über ein Ereignis regelmäßig eine Funktion aufzurufen. Acht zu geben ist
+/// auf die Funktion \ref TURAG::EventQueue::clear "clear", da sie alle Ereignisse verwirft. Damit
+/// wird auch das wiederholte Aufrufen der Funktion unterbunden.
+///
+/// \code{.cpp}
+///   void handle_event(EventId id, EventArg data) {
+///     // Event verarbeiten oder weiterleiten
+///   }
+///
+///   void tick_event() {
+///     // regelmäßig Prüfung durchführen
+///   }
+///
+///   EventQueue eventqueue;
+///   int main() {
+///     eventqueue.main(handle_event);
+///   }
+/// \endcode
 ///
 /// Die ankommenden Ereignisse werden in einer Liste chronologisch gesammelt und
 /// entspricht im Normalfall einer Warteschlange (FIFO). Ereignisse werden über
-/// TURAG::EventQueue::push zur möglichst zeitnahen Verarbeitung hinzugefügt.
+/// \ref TURAG::EventQueue::push "push" zur möglichst zeitnahen Verarbeitung hinzugefügt.
 /// Soll ein Event nicht hinten eingefügt werden sondern vor allen anderen, kann
-/// man dies über TURAG::EventQueue::pushToFront machen. Für das Einfügen eines
+/// man dies über \ref TURAG::EventQueue::pushToFront "pushToFront" machen. Für das Einfügen eines
 /// neuen Ereignissen ist dessen Ereignisklasse nötig, daraus wird das eigentliche
 /// Ereigniss erstellt. Optional kann ein Parameter mit übergeben werden. Dieser
 /// ist entweder ein 32-Bit Integer oder ein anderer Typ der maximal 32-Bit groß ist.
 /// Der Parametertyp und dessen mögliche Werte müssen in der Dokumentation zu der
 /// Ereignisklasse festgelegt werden. Es erfolgt keine Prüfung über die Richtungkeit
-/// des Types des übergebenes Objekts!
+/// des Types des übergebenes Objekts in der Ereignisverarbeitung!
 ///
 /// Erklärung in Code:
 /// \code{.cpp}
@@ -361,49 +395,75 @@ public:
    */
   void removeCallback(EventMethod method);
 
-  /// Clear event queue.
+  /// \brief alle gespeicherten Ereignisse löschen
+  ///
+  /// Löscht Ereignisse von allen eingegangenen wartenden Ereignissen, die
+  /// über die Funktionen \ref push, \ref pushFront und \ref pushTimedelayed hinzugefügt wurden.
+  ///
+  /// \warning Ereignisse, die zeitverzögert ausgerufen werden um Aufgaben
+  /// einmalig oder wiederkehrend auszuführen werden nicht mehr ausgeführt.
+  /// Nur in wenigen Situationen sinnvoll, wenn alle Vorgänge hart beendet werden sollen.
+  ///
   void clear();
 
-  /// Clear event queue for normal events (not timedelayed events).
+  /// \brief Löscht alle auf die Ausführung wartenden Ereignisse.
+  ///
+  /// Es werden alle Ereignisse gelöscht, die mit den Funktionen \ref push und \ref pushFront
+  /// hinzugefügt wurden, aber noch auf die Ausführung warten.
+  ///
   void discardEvents();
 
 #ifndef NDEBUG
-  /// Print debug information for the event queue.
+  /// \brief Debuginformationen zu zeitversetzten Ereignissen ausgeben
   void printTimeQueue();
+
+  /// \brief Debuginformationen zu auf die Ausführung wartenden Ereignissen ausgeben
   void printQueue();
+
+  /// \brief allgemeine Debuginformationen ausgeben
   void printDebugInfo();
 #endif
 
-  /// Number of the maximum events + 1 (must be a power of two)
-  static const size_t size = 1 << 5; // 32
-  static_assert(!(size & (size-1)), "EventQueue::size must be a power of 2");
+  /// \brief Zahl der maximalen Anzahl an auf die Ausführung wartenden Ereignissen
+  static const size_t size = 31;
 
   enum {
     event_null = 0, ///< \a Ereignis-Id für nichts. Wird verwendet, um zu Ereignis löschen.
     event_idle,     ///< \a Ereignis-Id wenn nichts zu machen ist.
   };
 
-  /// \a Ereignis-Id zum Beenden der Ereignisverarbeitung in ::main.
+  /// \a Ereignis-Id zum Beenden der Ereignisverarbeitung in \ref main.
   static const EventId event_quit = -1;
 
   /// Kapazität an zeitverzögerten Ereignissen
   static const size_t timequeue_size = 32;
 
-  /// maximale Zeit zwischen zwei Aufrufen der tick-Funktion
+  /// maximale Zeit zwischen zwei Aufrufen der tick-Funktion (Parameter von \ref main Funktion)
   static constexpr SystemTime max_tick_time = 100_ms;
 
 private:
+  /// Mutex für thread-sichere Verarbeitung
   mutable Mutex mutex_;
+
+  /// Bedingte Variable für warten auf neues Ereignis
   ConditionVariable var_;
 
-  // Circular buffer for events
+  /// Ringbuffer für eingehene Ereignisse
   CircularBuffer<Event, EventQueue::size> queue_;
 
+  /// Array mit zeitverzögerten Ereignissen
   ArrayBuffer<TimeEvent, EventQueue::timequeue_size> timequeue_;
 
+  /// Funktion, die aufgerufen wird wenn in Ereignis nicht explizit eine Funktion zur Event verarbeitung angegeben ist.
   EventHandler handler_;
 
+  /// nach neuen Ereignis suchen
+  /// \param[out] event Speicherort für mögliches gefundenes Ereignis
+  /// \retval true Ereignis gefunden
+  /// \retval false kein Ereignis gefunden
   bool loadEvent(Event* event);
+
+  /// Zeit zu nächsten aus zu führenden Event
   SystemTime getTimeToNextEvent() const;
 };
 
