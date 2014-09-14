@@ -38,7 +38,7 @@ namespace TURAG {
 /// \ref EventNamespace aus drei ASCII-Zeichen generiert. Zusätzlich kann jeder Klasse
 /// von Ereignissen eine Zeichenkette mit der Beschreibung des Ereignisses mitgegeben werden.
 /// Diese kann für Debuggingzwecke benutzt werden. So wird vor der
-/// Verarbeitung eines Ereignisses in der Ereignisseverarbeitung (\ref TURAG::EventQueue "EventQueue") die Beschreibung
+/// Verarbeitung eines Ereignisses in der Ereignisverarbeitung (\ref TURAG::EventQueue "EventQueue") die Beschreibung
 /// ins Log (\ref Debug) geschrieben. Es ist möglich mehreren Ereignis-Klassen die gleiche
 /// Id zu geben. Dadurch kann man einen Ereignis unterschiedliche Beschreibungen
 /// mitgeben um die Herkunft des Ereignisses besser zu erkennen. Aus einer Ereignisklasse

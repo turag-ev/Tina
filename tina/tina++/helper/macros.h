@@ -4,8 +4,8 @@
 #include "normalize.h"
 #include <tina/helper/macros.h>
 
-/// \defgroup Utils Werkzeuge [C++]
-/// \brief Makros, Funktionen und Klassen, die das Programmieren in C++ unterstützen
+/// \defgroup Utils Werkzeuge [C/C++]
+/// \brief Makros, Funktionen und Klassen, die das Programmieren unterstützen
 /// \{
 
 /// \brief Verbiete kopieren von Klasse (Definition in Klassendefinition)

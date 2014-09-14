@@ -21,7 +21,7 @@
 
 
 /*!
- * \defgroup bluetooth Bluetooth
+ * \defgroup bluetooth Bluetooth [C++]
  * \section bluetoothmodule Bluetooth module
  * This module offers various ways to exchange data via bluetooth between peers in a
  * thread-safe and flexible manner. It is implemented as an abstract base class
@@ -186,6 +186,8 @@ public:
      * @brief Configures a data sink with the given ID.
      * @param[in] data_sink_id ID of data sink to configure.
      * @param[in] storage_buffer Pointer to data that is used to store the received data.
+	 * @param[in] handler Pointer to a function that is called whenever new data was
+	 * received.
      * @return False if index was invalid, true otherwise.
      * @details  You need to supply a pointer to some struct
      * that is used to receive the data in background.

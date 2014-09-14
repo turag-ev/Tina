@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup base64 Base64 encoder/decoder
- * @ingroup utilities
+ * @defgroup base64 Base64 encoder/decoder [C/C++]
+ * @ingroup Utils
  * 
  * Base64 is a group of similar binary-to-text encoding schemes that 
  * represent binary data in an ASCII string format by translating it 

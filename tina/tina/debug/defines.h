@@ -13,6 +13,7 @@
 #include <tina/config.h>
 
 /// \defgroup Debug Debugging [C/C++]
+/// \brief Debugging [C/C++]
 ///
 /// Textausgaben
 /// ------------
