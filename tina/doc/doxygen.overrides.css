@@ -1,0 +1,181 @@
+/* Schrift 'Roboto' importieren */
+@import url(http://fonts.googleapis.com/css?family=Roboto);
+
+/* allgemein */
+body, table, div, p, dl {
+	font: 400 12px Roboto,sans-serif;
+}
+
+/* Überschriften */
+h1, h2, h3, h4, h5, h6 {
+  color: #222;
+  font-size: 1.3em;
+}
+
+/* Title */
+.title {
+	font: 400 14px/28px Roboto,sans-serif;
+  color: #0095C1;
+}
+
+#projectname {
+  font: 32px Roboto,sans-serif;
+  color: #0095C1;
+}
+
+#titlearea {
+  border-bottom: 3px solid #0095C1;
+  box-shadow: 0px 2px 2px #999;
+  position: relative;
+  z-index: 10;
+}
+
+/* Zusammenfassung */
+.mdescLeft, .mdescRight, .memItemLeft, .memItemRight, .memTemplItemLeft,
+.memTemplItemRight, .memTemplParams {
+  background-color: #fff;
+}
+
+/* Abstandhalter */
+.memSeparator {
+  border: none;
+}
+
+/* Memberbescheibung */
+.memitem {
+
+}
+
+/* Gruppertitel */
+h2.groupheader {
+  border-bottom: 1px solid #0095C1;
+}
+
+/* Typendefinition in Zusammenfassung */
+.memItemRight, .memTemlpItemRight {
+  color: #222;
+}
+
+/* Typ in Typendefinition in Zusammenfassung */
+.memItemLeft, .memTemplItemLeft {
+  color: #222;
+}
+
+/* Templateparameter in Zusammenfassung */
+.memTemplParams {
+  color: #666;
+}
+
+/* Membertitle */
+.memproto, dl.reflist dt {
+  background-image: none;
+  background-color: #EBEEF5;
+  box-shadow: none;
+  border-top: 1px solid #eee;
+  border-left: 1px solid #eee;
+  border-right: 1px solid #eee;
+  border: none;
+  border-radius: 5px;
+}
+
+/* Memberdetails */
+.memdoc, dl.reflist dd {
+  background-image: none;
+  background-color: #fff;
+  box-shadow: none;
+  border-bottom: 1px solid #eee;
+  border-left: 1px solid #eee;
+  border-right: 1px solid #eee;
+  border: none;
+  margin-left: 2em;
+  padding-top: 0px;
+  margin-top: 0px;
+}
+
+/* Memberlabel */
+span.mlabel {
+  background-color: #0095C1;
+  border-width: 0;
+  padding: 3px 5px;
+  vertical-align: text-top;
+}
+
+/* Membername */
+.memname {
+  font-weight:normal;
+  font-size:1.1em;
+}
+
+/* linke Seite Membertitel */
+td.mlabels-left {
+  width: 0%;
+}
+
+/* Parameterrichtung [in], [out], ... */
+.params .paramdir {
+  font-family: "Ubuntu Mono", "Droid Sans Mono", Consolas, monospace;
+  vertical-align: middle;
+  color: #666;
+}
+
+/* Parametername in Details */
+.params .paramname {
+  color: #333;
+  font-weight: bold;
+  font-style: normal;
+}
+
+/* Parametername */
+.paramname {
+  color: black;
+  font-style:italic;
+}
+
+/* Parametername in Titel */
+.paramname em {
+  color: #333;
+}
+
+/* inline Codefragment */
+pre.fragment {
+  font-family: "Ubuntu Mono", "Droid Sans Mono", Consolas, monospace;
+}
+
+/* inline Codefragment */
+div.fragment {
+  padding: 5px;
+  margin: 10px;
+  border-radius: 5px;
+  background-color: #fcfcfc;
+  border: 1px solid #ccc;
+}
+
+/* Warnung */
+dl.warning, dl.attention {
+  background-color: orange; 
+  border-radius: 5px;
+}
+
+/* Vorbedingung */
+dl.pre, dl.post, dl.invariant {
+  background-color: #9f9; 
+  border-radius: 5px;
+}
+
+/* inline Code */
+div.line {
+	font-family: "Ubuntu Mono", "Droid Sans Mono", Consolas, monospace;
+	color: #000;
+}
+
+/* Kommentar */
+span.comment {
+  color: #008000;
+}
+/* Schlüsselwort */
+span.keyword {
+  color: #0095C1;
+}
+span.keywordtype {
+  color: #333;
+}
