@@ -1,4 +1,4 @@
-.PHONY: doc
+.PHONY: doc clean
 doc:
 	doxygen doxyfile
 
