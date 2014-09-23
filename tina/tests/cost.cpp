@@ -69,6 +69,13 @@ BOOST_AUTO_TEST_CASE( test_Cost_Max ) {
 	BOOST_CHECK_EQUAL((COST_MAX + COST_MAX).toUnsigned(), COST_MAX.toUnsigned());
   BOOST_CHECK_EQUAL((COST_MAX + Cost(1)).toUnsigned(), COST_MAX.toUnsigned());
 	BOOST_CHECK_EQUAL((Cost(1) + COST_MAX).toUnsigned(), COST_MAX.toUnsigned());
+	
+	
+	c = Cost(std::numeric_limits<unsigned>::max()-2);
+	BOOST_CHECK_EQUAL(c.toUnsigned(), std::numeric_limits<unsigned>::max()-2);
+	
+	c += 1;
+	BOOST_CHECK_EQUAL(c.toUnsigned(), COST_MAX.toUnsigned());
 }
 
 BOOST_AUTO_TEST_CASE( test_Cost_Inf ) {
@@ -94,6 +101,24 @@ BOOST_AUTO_TEST_CASE( test_Cost_Inf ) {
   Cost c3(COST_MAX);
   c3 += COST_INFINITY;
   BOOST_CHECK_EQUAL(c2.toUnsigned(), COST_INFINITY.toUnsigned());
+}
+
+BOOST_AUTO_TEST_CASE( test_Cost_Min ) {
+  Cost c(0);
+  BOOST_CHECK_EQUAL(c.toUnsigned(), 0);
+
+  c -= 500;
+  BOOST_CHECK_EQUAL(c.toUnsigned(), 0);
+
+  c += 100;
+  BOOST_CHECK_EQUAL(c.toUnsigned(), 100);
+  
+  c -= 100;
+  BOOST_CHECK_EQUAL(c.toUnsigned(), 0);
+  
+  c += 100;
+  c -= 1000;
+  BOOST_CHECK_EQUAL(c.toUnsigned(), 0);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

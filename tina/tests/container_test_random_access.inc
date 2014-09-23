@@ -1,7 +1,10 @@
 
 BOOST_AUTO_TEST_CASE( TURAG_CONTAINER_TEST(rai_copy) ) {
   {
-    CONTAINER::iterator test1;
+	  CONTAINER test;
+	  test.push_front(1);
+	  
+    CONTAINER::iterator test1 = test.begin();
     CONTAINER::iterator test2(test1);
     CONTAINER::iterator test3 = test1;
     test1 = test3;    
@@ -12,7 +15,10 @@ BOOST_AUTO_TEST_CASE( TURAG_CONTAINER_TEST(rai_copy) ) {
 
 BOOST_AUTO_TEST_CASE( TURAG_CONTAINER_TEST(rai_comp) ) {
   {
-    CONTAINER::iterator test1;
+	  CONTAINER test;
+	  test.push_front(1);
+	  
+    CONTAINER::iterator test1 = test.begin();
     CONTAINER::iterator test2(test1);
     BOOST_CHECK_EQUAL(test1 == test2, true);
     BOOST_CHECK_EQUAL(test1 != test2, false);
@@ -32,8 +38,11 @@ BOOST_AUTO_TEST_CASE( TURAG_CONTAINER_TEST(rai_deref) ) {
     test.push_front(6);
     test.push_front(7);
     
-    BOOST_CHECK_EQUAL(*test.begin(), 1);
-    BOOST_CHECK_EQUAL(*(test.cbegin()+2), 3);
+    BOOST_CHECK_EQUAL(*test.begin(), 7);
+    BOOST_CHECK_EQUAL(test.front(), 7);
+    BOOST_CHECK_EQUAL(*(test.end()-1), 1);
+    BOOST_CHECK_EQUAL(test.back(), 1);
+    BOOST_CHECK_EQUAL(*(test.cbegin()+2), 5);
     //TODO BOOST_CHECK_EQUAL(test.begin()->dummy, 1);
   }
   BOOST_CHECK_EQUAL(Dummy::instances, 0);
@@ -43,13 +52,13 @@ BOOST_AUTO_TEST_CASE( TURAG_CONTAINER_TEST(rai_deref) ) {
 BOOST_AUTO_TEST_CASE( TURAG_CONTAINER_TEST(rai_inc) ) {
   {
     CONTAINER test;
-    test.push_front(1);
-    test.push_front(2);
-    test.push_front(3);
-    test.push_front(4);
-    test.push_front(5);
-    test.push_front(6);
-    test.push_front(7);
+    test.push_back(1);
+    test.push_back(2);
+    test.push_back(3);
+    test.push_back(4);
+    test.push_back(5);
+    test.push_back(6);
+    test.push_back(7);
     
     CONTAINER::iterator i1 = test.begin();
     BOOST_CHECK_EQUAL(*i1, 1);
@@ -74,13 +83,13 @@ BOOST_AUTO_TEST_CASE( TURAG_CONTAINER_TEST(rai_inc) ) {
 BOOST_AUTO_TEST_CASE( TURAG_CONTAINER_TEST(rai_dec) ) {
   {
     CONTAINER test;
-    test.push_front(1);
-    test.push_front(2);
-    test.push_front(3);
-    test.push_front(4);
-    test.push_front(5);
-    test.push_front(6);
-    test.push_front(7);
+    test.push_back(1);
+    test.push_back(2);
+    test.push_back(3);
+    test.push_back(4);
+    test.push_back(5);
+    test.push_back(6);
+    test.push_back(7);
     
     CONTAINER::iterator i1 = test.begin()+4;
     BOOST_CHECK_EQUAL(*i1, 5);

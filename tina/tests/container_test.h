@@ -17,7 +17,7 @@ namespace TURAG {
 template<typename Container>
 void print_container_content(const Container& c) {
   int i = 0;
-  for (const auto& entry : c) {
+  for (auto&& entry : c) {
     std::cout << i++ << ": " << entry << std::endl;
   }
 }

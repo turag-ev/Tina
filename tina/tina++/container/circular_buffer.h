@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <iterator>
+#include <type_traits>
 
 #include "../tina.h"
 #include "../debug.h"
@@ -10,6 +11,34 @@
 #include "../helper/integer.h"
 
 namespace TURAG {
+
+template<typename... _Cond>
+using Require = typename std::enable_if<std::__and_<_Cond...>::value>::type;
+
+template<typename Container, class Enable = void>
+struct container_traits { };
+
+template<typename Container>
+struct container_traits<Container, typename std::enable_if<!std::is_const<Container>::value>::type> {
+    typedef typename Container::value_type value_type;
+    typedef typename Container::reference reference;
+    typedef typename Container::pointer pointer;
+
+    // iterator
+    typedef typename Container::iterator iterator;
+    typedef typename Container::reverse_iterator reverse_iterator;
+};
+
+template<typename Container>
+struct container_traits<Container, typename std::enable_if<std::is_const<Container>::value>::type> {
+    typedef const typename Container::value_type value_type;
+    typedef typename Container::const_reference reference;
+    typedef typename Container::const_pointer pointer;
+
+    // iterator
+    typedef typename Container::const_iterator iterator;
+    typedef typename Container::const_reverse_iterator reverse_iterator;
+};
 
 /// circular buffer implementation
 ///   -empty-     -2 elements-   -3 elements-
@@ -19,10 +48,16 @@ namespace TURAG {
 ///   ^             ^   ^          ^ ^
 ///  first & last   |   last       | first
 ///                first          last
-template<typename T, typename T_nonconst, typename E = typename T::value_type>
-class CircularBufferIterator : public std::iterator<std::random_access_iterator_tag, typename T::value_type> {
-public:
+template<typename T>
+class CircularBufferIterator : public std::iterator<std::random_access_iterator_tag, typename container_traits<T>::value_type> {
+private:
   typedef CircularBufferIterator self_type;
+  typedef CircularBufferIterator<const T> const_self_type;
+
+  typedef typename container_traits<T>::reference element_ref;
+  typedef typename container_traits<T>::pointer element_pointer;
+
+public:
 
   // ctor
   constexpr
@@ -31,21 +66,29 @@ public:
   { }
 
   // convert from iterator to const_iterator
+  template<typename OtherContainer>
   constexpr
-  CircularBufferIterator(
-    const CircularBufferIterator<
-      T_nonconst, T_nonconst,
-      typename T_nonconst::value_type
-    > &other) :
+  CircularBufferIterator(const CircularBufferIterator<OtherContainer> &other) :
     queue_(other.queue_), pos_(other.pos_)
   { }
 
-  friend class CircularBufferIterator<
-    const T, T, const E
-  >;
+  CircularBufferIterator& operator=(const CircularBufferIterator &other)
+  {
+      queue_ = other.queue_;
+      pos_ = other.pos_;
+      return *this;
+  }
+
+  template<typename OtherContainer>
+  CircularBufferIterator& operator=(const CircularBufferIterator<OtherContainer> &other)
+  {
+      queue_ = other.queue_;
+      pos_ = other.pos_;
+      return *this;
+  }
 
   _always_inline
-  E& operator*() {
+  element_ref operator*() {
     return queue_[pos_];
   }
 
@@ -71,7 +114,7 @@ public:
 
   // function below are using only function above
   _always_inline
-  E* operator->()  {
+  element_pointer operator->()  {
     return &(operator*());
   }
 
@@ -79,7 +122,7 @@ public:
     return (*this += 1);
   }
 
-  const self_type operator++(int) {
+  const_self_type operator++(int) {
     const self_type old = *this;
     ++(*this);
     return old;
@@ -89,7 +132,7 @@ public:
     return (*this -= 1);
   }
 
-  const self_type operator--(int) {
+  const_self_type operator--(int) {
     const self_type old = *this;
     --(*this);
     return old;
@@ -111,19 +154,21 @@ public:
   }
 
   constexpr
-  T& container() const {
+  const T& container() const {
       return queue_;
   }
 
 private:
+  template <class> friend class CircularBufferIterator;
+
   T& queue_;
   std::size_t pos_;
 };
 
-template<typename T, typename T_nonconst, typename E = typename T::value_type>
+template<typename T>
 typename T::difference_type operator-(
-        CircularBufferIterator<T, T_nonconst, E> lhs,
-        CircularBufferIterator<T, T_nonconst, E> rhs)
+         CircularBufferIterator<T> lhs,
+         CircularBufferIterator<T> rhs)
 {
     return rhs.index() - lhs.index();
 }
@@ -157,8 +202,8 @@ public:
   typedef std::ptrdiff_t difference_type;
 
   // iterator
-  typedef CircularBufferIterator<CircularBuffer,CircularBuffer,T> iterator;
-  typedef CircularBufferIterator<const CircularBuffer,CircularBuffer,const T> const_iterator;
+  typedef CircularBufferIterator<CircularBuffer> iterator;
+  typedef CircularBufferIterator<const CircularBuffer> const_iterator;
   typedef std::reverse_iterator<iterator> reverse_iterator;
   typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
@@ -167,6 +212,10 @@ public:
   explicit CircularBuffer() :
     first_(), last_(), bytes_()
   { }
+
+  ~CircularBuffer() {
+      destruct(begin(), end());
+  }
 
   // iterators
   iterator begin() {
@@ -350,10 +399,7 @@ public:
   }
 
   void clear() {
-// TODO: for non-trival destructable types
-//    for (size_t i = (first_.n_+1)&intern_iterator::mask; i != last_.n_; i = (i+1)&intern_iterator::mask) {
-//      bytes_.erase(i);
-//    }
+    destruct(begin(), end());
     first_.n_ = last_.n_ = 0;
   }
 
@@ -422,7 +468,7 @@ private:
   intern_iterator last_;
 
   // bytes needed to work around the value ctor at construction
-  array_storage<T, N> bytes_;
+  ArrayStorage<T, N> bytes_;
 };
 
 #ifndef DOXYGEN

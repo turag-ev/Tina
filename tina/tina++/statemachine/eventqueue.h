@@ -299,9 +299,7 @@ public:
    * When event_quit is processed, EventQueue::main will return.
    * Only useful outside of embedded system.
    */
-  _always_inline void quit() {
-    pushToFront<event_quit>(0);
-  }
+  void quit();
 
   /// Push an new event to the event processing loop
   /**
@@ -317,7 +315,7 @@ public:
     push(event_class, pack<EventArg>(param), method);
   }
 
-  // for compatibility with old code
+/*  // for compatibility with old code
   template<EventId id>
   void push(EventArg param = 0, EventMethod method = nullptr) {
     push(&UnnamedEventClass<id>::event_class, param, method);
@@ -326,7 +324,7 @@ public:
   template<EventId id, typename T, REQUIRES(!std::is_integral<T>)> _always_inline
   void push(T param, EventMethod method = nullptr) {
     push(&UnnamedEventClass<id>::event_class, pack<EventArg>(param), method);
-  }
+  }*/
 
   /// Push an new event to the front of the event processing loop
   /** Paramters the same as in push */
@@ -337,7 +335,7 @@ public:
     pushToFront(event_class, pack<EventArg>(param), method);
   }
 
-  // for compatibility with old code
+/*  // for compatibility with old code
   template<EventId id>
   void pushToFront(EventArg param = 0, EventMethod method = nullptr) {
     pushToFront(&UnnamedEventClass<id>::event_class, param, method);
@@ -347,7 +345,7 @@ public:
   template<EventId id, typename T, REQUIRES(!std::is_integral<T>)> _always_inline
   void pushToFront(T param, EventMethod method = nullptr) {
     pushToFront(&UnnamedEventClass<id>::event_class, pack<EventArg>(param), method);
-  }
+  }*/
 
   /// Process event in a number of kernel ticks
   /**
@@ -365,7 +363,7 @@ public:
     pushTimedelayed(ticks, event_class, pack<EventArg>(param), method);
   }
 
-  // for compatibility with old code
+/*  // for compatibility with old code
   template<EventId id>
   void pushTimedelayed(SystemTime ticks, EventArg param = 0, EventMethod method = nullptr) {
     pushTimedelayed(ticks, &UnnamedEventClass<id>::event_class, param, method);
@@ -375,7 +373,7 @@ public:
   template<EventId id, typename T, REQUIRES(!std::is_integral<T>)> _always_inline
   void pushTimedelayed(SystemTime ticks, T param, EventMethod method = nullptr) {
     pushTimedelayed(ticks, &UnnamedEventClass<id>::event_class, pack<EventArg>(param), method);
-  }
+  }*/
 
   /// Remove all events from timedelayed event queue with that id.
   /**

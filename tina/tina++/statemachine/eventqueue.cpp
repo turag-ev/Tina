@@ -248,6 +248,12 @@ void EventQueue::removeCallback(EventMethod method) {
   remove_if(timequeue_, [&](const TimeEvent& tevent) { return tevent.event.method == method;});
 }
 
+DEFINE_EVENT_CLASS(EventQuit, EventQueue::event_quit);
+
+void EventQueue::quit() {
+  pushToFront(&EventQuit);
+}
+
 #ifndef NDEBUG
 void EventQueue::printTimeQueue() {
     Mutex::Lock lock(mutex_);

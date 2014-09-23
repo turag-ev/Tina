@@ -4,7 +4,7 @@ CXX = g++
 RM = rm
 
 # Compiler flags
-CFLAGS = -Wall -I.. -I. -g -O0 -DTURAG_HEAVY_DEBUG
+CFLAGS = -Wall -I.. -I. -g -O0
 CXXFLAGS = $(CFLAGS) -std=c++0x
 LDFLAGS = -Wall -std=c++0x -g -O0
 

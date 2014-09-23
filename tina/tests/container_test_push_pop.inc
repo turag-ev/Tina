@@ -136,8 +136,8 @@ BOOST_AUTO_TEST_CASE( TURAG_CONTAINER_TEST(add_own_value) ) {
     test.push_front(test[0]);
     BOOST_CHECK(check_container_content(test, {3, 3, 1, 2, 3, 1, 2}));
 
-    BOOST_CHECK_EQUAL(Dummy::instances, 8);
-    Dummy::instances = 8;
+    BOOST_CHECK_EQUAL(Dummy::instances, 7);
+    Dummy::instances = 7;
   }
   BOOST_CHECK_EQUAL(Dummy::instances, 0);
   Dummy::instances = 0;

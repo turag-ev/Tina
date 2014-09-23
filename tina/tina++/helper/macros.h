@@ -46,6 +46,7 @@
 ///   }
 /// \endcode
 #define REQUIRES(...) typename std::enable_if<__VA_ARGS__::value, bool>::type = false
+#define ENABLE_IF(...) typename std::enable_if<__VA_ARGS__::value>::type
 
 /// Helfermakro zur Benutzung mit std::enable_if (ausführlichere Version)
 /// Im Gegensatz zu REQUIRES kann diese Variante genutzt werden um auch

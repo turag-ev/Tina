@@ -26,6 +26,10 @@ namespace TURAG {
 /// x += COST_INIFINTY; // unendliche Kosten
 /// x -= 100; // immer noch unendliche Kosten
 /// \endcode
+///
+/// Die Kosten dürfen nicht den Wert von std::numeric_limits<unsigned>::max() - 2
+/// überschreiten. Wird bei einer Operation (Addieren, ...) der Wert überschritten
+/// werden die Kosten auf \ref COST_MAX gesetzt.
 class Cost {
 public:
 #ifndef DOXYGEN
@@ -60,12 +64,7 @@ public:
     Cost operator+=(Cost other) {
         return *this += other.cost_;
     }
-
-    Cost operator+(Cost other) const {
-        return Cost(*this) += other.cost_;
-    }
-
-    /// \}
+		/// \}
 
     /// \{
     /// \brief Kosten subtrahieren
@@ -80,22 +79,6 @@ public:
         return *this -= arg.toUnsigned();
     }
     Cost operator-=(unsigned arg);
-    /// \}
-
-    /// \{
-    /// \brief Kosten vergleichen
-    constexpr bool operator< (Cost other)     const { return cost_ <  other.cost_; }
-    constexpr bool operator< (unsigned other) const { return cost_ <  other;       }
-    constexpr bool operator> (Cost other)     const { return cost_ >  other.cost_; }
-    constexpr bool operator> (unsigned other) const { return cost_ >  other;       }
-    constexpr bool operator<=(Cost other)     const { return cost_ <= other.cost_; }
-    constexpr bool operator<=(unsigned other) const { return cost_ <= other;       }
-    constexpr bool operator>=(Cost other)     const { return cost_ >= other.cost_; }
-    constexpr bool operator>=(unsigned other) const { return cost_ >= other;       }
-    constexpr bool operator==(Cost other)     const { return cost_ == other.cost_; }
-    constexpr bool operator==(unsigned other) const { return cost_ == other;       }
-    constexpr bool operator!=(Cost other)     const { return cost_ != other.cost_; }
-    constexpr bool operator!=(unsigned other) const { return cost_ != other;       }
     /// \}
 
     /// \{
@@ -114,6 +97,45 @@ public:
 private:
     unsigned cost_;
 };
+
+/// \{
+/// \brief Kosten vergleichen
+constexpr bool operator< (Cost lhs, Cost rhs)     { return lhs.toUnsigned() <  rhs.toUnsigned(); }
+constexpr bool operator> (Cost lhs, Cost rhs)     { return lhs.toUnsigned() >  rhs.toUnsigned(); }
+constexpr bool operator<=(Cost lhs, Cost rhs)     { return lhs.toUnsigned() <= rhs.toUnsigned(); }
+constexpr bool operator>=(Cost lhs, Cost rhs)     { return lhs.toUnsigned() >= rhs.toUnsigned(); }
+constexpr bool operator==(Cost lhs, Cost rhs)     { return lhs.toUnsigned() == rhs.toUnsigned(); }
+constexpr bool operator!=(Cost lhs, Cost rhs)     { return lhs.toUnsigned() != rhs.toUnsigned(); }
+/// \}
+
+/// \{
+/// \brief Kosten vergleichen
+/// \bug unsigned-Wert darf nicht die Größe von <code>std::numeric_limits<unsigned>::max() - 2</code> überschreiten
+constexpr bool operator< (Cost lhs, unsigned rhs) { return lhs.toUnsigned() <  rhs;              }
+constexpr bool operator< (unsigned lhs, Cost rhs) { return              lhs <  rhs.toUnsigned(); }
+
+constexpr bool operator> (Cost lhs, unsigned rhs) { return lhs.toUnsigned() >  rhs;              }
+constexpr bool operator> (unsigned lhs, Cost rhs) { return              lhs >  rhs.toUnsigned(); }
+
+constexpr bool operator<=(Cost lhs, unsigned rhs) { return lhs.toUnsigned() <= rhs;              }
+constexpr bool operator<=(unsigned lhs, Cost rhs) { return              lhs <= rhs.toUnsigned(); }
+
+constexpr bool operator>=(Cost lhs, unsigned rhs) { return lhs.toUnsigned() >= rhs;              }
+constexpr bool operator>=(unsigned lhs, Cost rhs) { return              lhs >= rhs.toUnsigned(); }
+
+constexpr bool operator==(Cost lhs, unsigned rhs) { return lhs.toUnsigned() == rhs;              }
+constexpr bool operator==(unsigned lhs, Cost rhs) { return              lhs == rhs.toUnsigned(); }
+
+constexpr bool operator!=(Cost lhs, unsigned rhs) { return lhs.toUnsigned() != rhs;              }
+constexpr bool operator!=(unsigned lhs, Cost rhs) { return              lhs != rhs.toUnsigned(); }
+/// \}
+
+/// \{
+/// \brief Kosten addieren
+inline Cost operator+ (Cost lhs, Cost rhs)     { return Cost(lhs) += rhs.toUnsigned(); }
+inline Cost operator+ (Cost lhs, unsigned rhs) { return Cost(lhs) += rhs;              }
+inline Cost operator+ (unsigned lhs, Cost rhs) { return Cost(rhs) += lhs;              }
+/// \}
 
 /// unendlich große Kosten (Weg nicht benutzbar)
 static constexpr Cost COST_INFINITY = Cost(Cost::INFINITY_);

@@ -94,7 +94,7 @@ public:
 
         // if the element is already part of the list
         // it doesn't matter whether the buffer is full
-        if (find_(buffer_.begin(), buffer_.end(), mail) != buffer_.end()) {
+        if (std::find(buffer_.begin(), buffer_.end(), mail) != buffer_.end()) {
             return;
         }
 
@@ -104,7 +104,7 @@ public:
 
         // after locking the mutex again we can't know whether the element is in the
         // list now, so check again
-        if (find_(buffer_.begin(), buffer_.end(), mail) != buffer_.end()) {
+        if (std::find(buffer_.begin(), buffer_.end(), mail) != buffer_.end()) {
             return;
         }
 

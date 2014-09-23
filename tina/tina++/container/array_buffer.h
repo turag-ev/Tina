@@ -451,7 +451,7 @@ private:
   std::size_t length_;
 
   // bytes for array
-  array_storage<T, N> bytes_;
+  ArrayStorage<T, N> bytes_;
 
   bool prepare_for_insert(iterator position) {
 	return _ArrayBufferHelper<T>::prepare_for_insert(position, end(), const_iterator(&bytes_[N]));

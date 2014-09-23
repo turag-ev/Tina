@@ -11,27 +11,31 @@ namespace TURAG {
 
 /// \cond INCLUDE_HELPER
 
-/// \brief Stellt Speicher für Klasse bereit, der entsprechend des Types ausgerichtet ist.
+/// \brief Stellt Speicher für Klasse bereit, der entsprechend des Typs ausgerichtet ist.
 /// \ingroup Utils
-/// Wird verwendet in \a ArrayBuffer und \a CircularBuffer
+/// Wird verwendet in \ref TURAG::ArrayStorage
 template<typename T>
-struct storage {
-  typedef typename std::aligned_storage<sizeof(T), std::alignment_of<T>::value>::type type;
-};
+using TypeStorage = typename std::aligned_storage<sizeof(T), std::alignment_of<T>::value>::type;
+
+/// \brief tellt Speicher für Union bereit, der entsprechend der inhaltenen Typen ausgerichtet ist.
+/// \ingroup Utils
+/// Wird verwendet in \ref TURAG::VariantClass
+//template<typename... Types>
+//using UnionStorage = typename std::aligned_union<0, Types...>::type;
 
 /// \brief Klasse die Speicher für Arrays bereitstellt
-/// \ingroup Helferklassen Container
+/// \ingroup Utils
 /// Es wird kein Konstruktor beim Erstellen von \a array_storage aufgerufen
 ///
 /// Es wird auch keine Information gespeichert welche Elemente initalisiert sind.
 /// Dafür ist der Benutzer der Klasse verantwortlich.
 ///
-/// Wird verwendet in \a ArrayBuffer und \a CircularBuffer
+/// Wird verwendet in \ref TURAG::ArrayBuffer und \ref TURAG::CircularBuffer
 template<typename T, size_t N>
-struct array_storage {
+struct ArrayStorage {
 public:
-  COPYABLE(array_storage);
-  MOVABLE(array_storage);
+  COPYABLE(ArrayStorage);
+  MOVABLE(ArrayStorage);
 
   // types
   typedef T value_type;
@@ -48,13 +52,13 @@ public:
   typedef std::reverse_iterator<iterator> reverse_iterator;
   typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
-  typedef typename storage<T>::type element_type;
+  typedef TypeStorage<T> element_type;
 
   constexpr _always_inline
-  array_storage() :
+  ArrayStorage() :
     data_()
 #ifdef TURAG_HEAVY_DEBUG
-    , ref(*reinterpret_cast<T(*)[N]>(data_))
+    , ref(reinterpret_cast<T(*)[N]>(data_))
 #endif
   {}
 
@@ -104,12 +108,12 @@ public:
 
 private:
   // propertly aligned uninitialized storage for N T's
-  typename storage<T>::type data_[N];
+  TypeStorage<T> data_[N];
 
 #ifdef TURAG_HEAVY_DEBUG
   // just for better debugging
   // a reference to data_ only with type
-  T (& ref)[N];
+  T (* ref)[N];
 #endif
 };
 
