@@ -131,7 +131,7 @@ std::size_t length(const Container& container) {
 /// \param array Array
 /// \returns Länge von Array
 template <typename T, std::size_t N>
-constexpr std::size_t length(const T (&)[N]) {
+constexpr std::size_t length(_unused const T (&array)[N]) {
   return N;
 }
 
