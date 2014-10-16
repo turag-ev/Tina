@@ -27,7 +27,7 @@ public:
 };
 
 /// macro for easier use for initializer class
-#define INIT_VAR(v,x) static initializer TURAG_CONCAT(_initializer_,__COUNTER__) ((v), (x))
+#define INIT_VAR(v,x) static initializer TURAG_CONCAT(_turag_initializer_,__COUNTER__) ((v), (x))
 
 /// Call function at initialization
 /// outside of function or method blocks the function is called before main function is called (called when all ctors of static classes are called).
@@ -42,7 +42,7 @@ public:
 };
 
 /// macro for call a function initialization
-#define INIT_CALL(v, ...) static initializer_call TURAG_CONCAT(_initializer_,__COUNTER__) (v, ## __VA_ARGS__)
+#define INIT_CALL(v, ...) static initializer_call TURAG_CONCAT(_turag_initializer_,__COUNTER__) (v, ## __VA_ARGS__)
 
 /// \}
 

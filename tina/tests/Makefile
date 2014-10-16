@@ -42,5 +42,9 @@ $(PROGRAM): $(OBJECTS)
 
 clean:
 	$(RM) -rf *.o *.o.d $(PROGRAM)
+
+test: $(PROGRAM)
+	@bash -c "echo -e '\e[32m--- RUN TESTS ---\e[0m'"
+	@./$(PROGRAM)
 	
 -include $(wildcard *.o.d)
