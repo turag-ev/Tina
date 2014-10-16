@@ -42,6 +42,7 @@ div.contents > *:first-child {
 /* Tabelle */
 table.directory {
   border-collapse: collapse;
+	width: 100%;
 }
 
 .directory td.entry {
@@ -54,6 +55,7 @@ table.directory {
 .directory td.desc {
   width: unset;
 	vertical-align: middle;
+	width: 60%;
 }
 
 .directory tr {
