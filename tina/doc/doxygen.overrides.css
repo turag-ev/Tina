@@ -12,6 +12,58 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 1.3em;
 }
 
+/* maximale Breite beschränken */
+div.contents hr {
+  max-width: 100%;
+}
+
+div.contents, div.header {
+  max-width: 750px;
+	border-right: 1px solid #eee;
+	padding-right: 10px;
+	padding-left: 10px;
+	margin: 0;
+}
+
+div.contents {
+  border-bottom: 1px solid #EEE;
+	padding-bottom: 10px;
+}
+
+div.header {
+  padding-top: 3px;
+}
+
+div.contents > *:first-child {
+  margin-top: 0;
+	padding-top: 10px;
+}
+
+/* Tabelle */
+table.directory {
+  border-collapse: collapse;
+}
+
+.directory td.entry {
+  white-space: normal;
+	padding: 5px 5px 5px 30px;
+	vertical-align: middle;
+	text-indent: -20px;
+}
+
+.directory td.desc {
+  width: unset;
+	vertical-align: middle;
+}
+
+.directory tr {
+  background-color: unset;
+}
+
+/*.directory tr.even {
+  background-color: unset;
+}*/
+
 /* Title */
 .title {
 	font: 400 14px/28px Roboto,sans-serif;
@@ -30,6 +82,22 @@ h1, h2, h3, h4, h5, h6 {
   z-index: 10;
 }
 
+/* Seperator */
+div.ui-resizable-e {
+  background-image: none;
+	background-color: #0095C1;
+}
+
+/* Suche */
+#MSearchSelectWindow, #MSearchResultsWindow {
+  z-index: 20;
+}
+
+/* Schnelllinks */
+div.summary {
+  width: 85%;
+}
+
 /* Zusammenfassung */
 .mdescLeft, .mdescRight, .memItemLeft, .memItemRight, .memTemplItemLeft,
 .memTemplItemRight, .memTemplParams {
@@ -46,7 +114,7 @@ h1, h2, h3, h4, h5, h6 {
 
 }
 
-/* Gruppertitel */
+/* Gruppentitel */
 h2.groupheader {
   border-bottom: 1px solid #0095C1;
 }
@@ -178,4 +246,27 @@ span.keyword {
 }
 span.keywordtype {
   color: #333;
+}
+
+/* Footer */
+.navpath ul {
+  background-image: none;
+	border-top: 1px solid #0095C1;
+	background-color: #EBEEF5;
+	height: unset;
+}
+
+/* Brotkrumen */
+.navpath li.navelem a {
+  color: #0095C1;
+}
+
+/* Erstellungsinfo */
+.navpath li.footer {
+  color: #666;
+}
+
+/* doxygen */
+img.footer {
+  height: 20px;
 }
