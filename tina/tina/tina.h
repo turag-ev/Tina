@@ -30,12 +30,26 @@
  * 
  */
 
-
-#ifndef TURAG_STD_CONFIG
-# include <tina/config.h>
-#else
-# include "helper/std_config.h"
+#ifdef TURAG_STD_CONFIG
+# warning TURAG_STD_CONFIG is deprecated. Use TURAG_NO_PROJECT_CONFIG and TURAG_NO_PLATFORM_CONFIG instead.
 #endif
+
+// include custom project configuration unless
+// this is deactivated
+#ifndef TURAG_NO_PROJECT_CONFIG
+# include <config_tina.h>
+#endif
+
+
+// include platform configuration unless
+// this is deactivated
+#ifndef TURAG_NO_PLATFORM_CONFIG
+# include <tina/config_tina_platform.h>
+#endif
+
+// always include default configuration
+#include "helper/config_tina_default.h"
+
 
 #include "helper/normalize.h"
 #include "helper/types.h"

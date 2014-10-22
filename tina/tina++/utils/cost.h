@@ -32,7 +32,7 @@ namespace TURAG {
 /// werden die Kosten auf \ref COST_MAX gesetzt.
 class Cost {
 public:
-#ifndef DOXYGEN
+#ifndef __DOXYGEN__
     static constexpr unsigned INFINITY_ = std::numeric_limits<unsigned>::max();
     static constexpr unsigned MAX_ = INFINITY_ - 1;
 #endif

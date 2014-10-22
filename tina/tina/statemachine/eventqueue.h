@@ -42,7 +42,7 @@ typedef struct {
   TuragSystemTime time;      ///< time when event is due
 } TuragTimeEvent;
 
-#ifndef DOXYGEN
+#ifndef __DOXYGEN__
 struct _TuragEventQueue;
 #endif
 

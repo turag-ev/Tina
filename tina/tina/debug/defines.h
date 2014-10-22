@@ -10,7 +10,7 @@
 #ifndef TINA_DEBUG_DEFINES_H
 #define TINA_DEBUG_DEFINES_H
 
-#include <tina/config.h>
+#include <tina/tina.h>
 
 /// \defgroup Debug Debugging [C/C++]
 /// \brief Debugging [C/C++]

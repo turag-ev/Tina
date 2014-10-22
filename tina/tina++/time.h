@@ -134,7 +134,7 @@ constexpr bool operator <  (SystemTime lhs, SystemTime rhs) { return lhs.toTicks
 constexpr bool operator >  (SystemTime lhs, SystemTime rhs) { return lhs.toTicks() >  rhs.toTicks();  }
 /// \}
 
-#if GCC_VERSION >= 40700 || defined(DOXYGEN)
+#if GCC_VERSION >= 40700 || defined(__DOXYGEN__)
 
 /// \{
 /// Systemzeit aus Sekundenangabe erstellen

@@ -26,7 +26,7 @@
 #define IGNORE_WARNING(x) DO_PRAGMA(GCC diagnostic ignored x)
 
 /* Test for GCC >= 4.6.0 */
-#if GCC_VERSION >= 40600 || defined(DOXYGEN)
+#if GCC_VERSION >= 40600 || defined(__DOXYGEN__)
 
 /// \brief Ignore a warning until a ::IGNORE_WARNING_END at the same hierarchy
 /// \pre gcc > 4.6
@@ -92,7 +92,7 @@
 /// mark a function, that does not return like \a exit and \a abort
 #define _noreturn __attribute__((noreturn))
 
-#if GCC_VERSION >= 40400 || defined(DOXYGEN)
+#if GCC_VERSION >= 40400 || defined(__DOXYGEN__)
 /// \brief optimize function with given level
 /// e.x. \code _optimize("O3") \endcode
 /// \pre gcc >= 4.4

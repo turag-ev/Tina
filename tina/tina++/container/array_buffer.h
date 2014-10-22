@@ -12,7 +12,7 @@
 
 namespace TURAG {
 
-#ifndef DOXYGEN
+#ifndef __DOXYGEN__
 template<typename T>
 struct _ArrayBufferHelper {
   // types
@@ -38,7 +38,7 @@ struct _ArrayBufferHelper {
   static bool is_full(const_iterator end, const_iterator max_end);
 #endif
 };
-#endif // DOXYGEN
+#endif // __DOXYGEN__
 
 /** \brief Array mit variabler Länge und festgelegter Kapazität.
  * \ingroup Container
@@ -99,7 +99,7 @@ public:
 	bytes_.erase(begin(), end());
   }
 
-#ifndef DOXYGEN
+#ifndef __DOXYGEN__
   // FIXME: create own copy und move constructors for not trivial desctructable types
   COPYABLE(ArrayBuffer);
   MOVABLE(ArrayBuffer);
@@ -461,12 +461,12 @@ private:
 	return _ArrayBufferHelper<T>::is_full(cend(), const_iterator(&bytes_[N]));
   }
 
-#ifndef DOXYGEN
+#ifndef __DOXYGEN__
   friend struct _ArrayBufferHelper<T>;
-#endif // DOXYGEN
+#endif // __DOXYGEN__
 };
 
-#ifndef DOXYGEN
+#ifndef __DOXYGEN__
 
 template<typename T>
 bool _ArrayBufferHelper<T>::prepare_for_insert(iterator position, iterator end, const_iterator max_end) {
@@ -503,7 +503,7 @@ static ArrayBuffer<size_t, N> sort_indexes(const ArrayBuffer<T, N> &v) {
 }
 
 
-#endif // DOXYGEN
+#endif // __DOXYGEN__
 
 } // namespace TURAG
 

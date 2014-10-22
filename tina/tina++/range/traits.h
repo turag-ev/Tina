@@ -5,7 +5,7 @@
 
 namespace TURAG {
 
-#ifndef DOXYGEN
+#ifndef __DOXYGEN__
 namespace range_traits_detail {
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -83,7 +83,7 @@ struct range_size< T[sz] >
 };
 
 } // namespace range_traits_detail
-#endif DOXYGEN
+#endif __DOXYGEN__
 
 ////////////////////////////////////////////////////////////////////////////////
 // range_traits

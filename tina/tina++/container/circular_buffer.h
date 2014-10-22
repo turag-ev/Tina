@@ -173,7 +173,7 @@ typename T::difference_type operator-(
     return rhs.index() - lhs.index();
 }
 
-#ifndef DOXYGEN
+#ifndef __DOXYGEN__
 
 namespace detail {
 
@@ -186,7 +186,7 @@ class CircularBuffer {
   static_assert(!(N & (N-1)), "detail::CircularBuffer capacity must be a power of 2");
 
 public:
-#ifndef DOXYGEN
+#ifndef __DOXYGEN__
   // FIXME: create own copy und move constructors for non-trivial desctructable types
   COPYABLE(CircularBuffer);
   MOVABLE(CircularBuffer);
@@ -471,7 +471,7 @@ private:
   ArrayStorage<T, N> bytes_;
 };
 
-#ifndef DOXYGEN
+#ifndef __DOXYGEN__
 
 } // namespace detail
 

@@ -9,7 +9,7 @@
 /// \defgroup Macros Makrohelfer [C/C++]
 /// \{
 
-#ifndef DOXYGEN
+#ifndef __DOXYGEN__
 
 // Interna
 
@@ -58,7 +58,7 @@
 
 #define _TURAG_STRINGIFY(x) #x
          
-#else // DOXYGEN
+#else // __DOXYGEN__
 
 ///  \brief Nummer der Argumente zurückgeben
 ///
@@ -84,7 +84,7 @@
 /// \bug Aufruf ohne Argumente compiliert nicht
 #define __NARG__(...)
 
-#endif // DOXYGEN
+#endif // __DOXYGEN__
 
 /// \brief Funktion abhängig von Anzahl von Argumenten aufrufen
 ///

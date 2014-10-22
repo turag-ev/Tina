@@ -31,7 +31,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // nullptr
 
-#if GCC_VERSION < 40600 && !defined(DOXYGEN)
+#if GCC_VERSION < 40600 && !defined(__DOXYGEN__)
 
 namespace std {
 

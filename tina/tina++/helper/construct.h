@@ -12,7 +12,7 @@ namespace TURAG {
 /// \addtogroup Utils
 /// \{
 
-#ifndef DOXYGEN
+#ifndef __DOXYGEN__
 
 template<typename T>
 #if GCC_VERSION < 40800 && !defined(__clang__)
@@ -21,7 +21,7 @@ struct is_trivially_destructible : public std::has_trivial_destructor<T> { };
 struct is_trivially_destructible : public std::is_trivially_destructible<T> { };
 #endif
 
-#endif // DOXYGEN
+#endif // __DOXYGEN__
 
 
 /// Erstelle Instanz von Klasse in vorhandenen Speicher mit zugehörigen Argumenten
@@ -34,7 +34,7 @@ void construct(T* ptr, Args&&... args) {
   ::new(ptr) T(std::forward<Args>(args)...);
 }
 
-#ifndef DOXYGEN
+#ifndef __DOXYGEN__
 
 template<typename T, REQUIRES(is_trivially_destructible<T>)> _always_inline
 void destruct(T*) { }
@@ -54,7 +54,7 @@ void destruct(ForwardIterator first, ForwardIterator last) {
   }
 }
 
-#else // DOXYGEN
+#else // __DOXYGEN__
 
 /// \brief Zerstöre Instanz von Typ
 /// \param instance Zeiger auf Instanz von Typ
@@ -71,7 +71,7 @@ void destruct(T* instance);
 template<typename ForwardIterator>
 void destruct(ForwardIterator begin, ForwardIterator end);
 
-#endif // DOXYGEN
+#endif // __DOXYGEN__
 
 /// \}
 

@@ -55,7 +55,7 @@ sqrt(Units::Quantity<Dim> arg) {
             (std::sqrt(arg.value));
 }
 
-#ifndef DOXYGEN
+#ifndef __DOXYGEN__
 
 namespace detail {
 
@@ -125,7 +125,7 @@ power_helper(Units::Quantity<Dim> arg) {
 
 } // detail
 
-#endif // DOXYGEN
+#endif // __DOXYGEN__
 
 /// Potenz bilden
 /// \tparam Num Zähler von Potenz
