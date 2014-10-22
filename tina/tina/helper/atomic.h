@@ -17,6 +17,8 @@
 #ifndef __TINA_HELPERS_ATOMIC__
 #define __TINA_HELPERS_ATOMIC__
 
+#warning DONT USE THIS FILE. ITS NAME IS WRONG AND CONFUSING.
+
 #include <tina/tina.h>
 #include <tina/thread.h>
 
@@ -111,7 +113,7 @@ typedef sig_atomic_t turag_sig_atomic_t;
     turag_mutex_unlock(&(name).mutex);       \
     }while(0)
 
-#ifndef DOXYGEN
+#ifndef __DOXYGEN__
 typedef turag_atomic(bool) turag_atomic_bool_t;
 typedef turag_atomic(float) turag_atomic_float_t;
 typedef turag_atomic(double) turag_atomic_double_t;
@@ -156,7 +158,7 @@ typedef turag_atomic_uint16 turag_atomic_uint16_t;
 typedef turag_atomic_int8 turag_atomic_int8_t;
 /// \brief Atomic type containg an uint8_t.
 typedef turag_atomic_uint8 turag_atomic_uint8_t;
-#endif
+#endif // __DOXYGEN__
 
 #ifdef __cplusplus
 } // extern "C"
