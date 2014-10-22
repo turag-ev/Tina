@@ -15,7 +15,7 @@ namespace Units {
 /// \addtogroup Units
 /// \{
 
-#ifndef DOXYGEN
+#ifndef __DOXYGEN__
 
 typedef std::ratio<0> RationalNull;
 typedef std::ratio<1> RationalOne;
@@ -123,7 +123,7 @@ constexpr struct null_t {
 } null = {};
 
 // roundToInt
-#ifndef DOXYGEN
+#ifndef __DOXYGEN__
 namespace detail {
   template<typename T, REQUIRES(std::is_floating_point<T>)> math_constexpr _always_inline
   int roundToInt(T value) {

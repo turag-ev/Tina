@@ -174,7 +174,7 @@ struct EventClass {
     const EventId id;
 };
 
-#ifndef DOXYGEN
+#ifndef __DOXYGEN__
 // for compatibility with old code
 template<EventId id>
 struct UnnamedEventClass {

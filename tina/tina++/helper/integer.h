@@ -37,13 +37,13 @@ constexpr unsigned least_bytes_needed(unsigned n) {
 template<std::size_t Bytes>
 struct unsigned_integer_bytes { };
 
-#ifndef DOXYGEN
+#ifndef __DOXYGEN__
 template<> struct unsigned_integer_bytes<0> { typedef  void type; };
 template<> struct unsigned_integer_bytes<1> { typedef  uint8_t type; };
 template<> struct unsigned_integer_bytes<2> { typedef uint16_t type; };
 template<> struct unsigned_integer_bytes<4> { typedef uint32_t type; };
 template<> struct unsigned_integer_bytes<8> { typedef uint64_t type; };
-#endif // DOXYGEN
+#endif // __DOXYGEN__
 
 /// Typ für vorzeichenlose Ganzzahlen
 /// \tparam Bits Anzahl der Mindestanzahl an Bits des Ganzzahltypes (nur 0-64 erlaubt)

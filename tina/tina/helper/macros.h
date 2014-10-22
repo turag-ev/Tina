@@ -9,14 +9,14 @@
 /// \defgroup Macros Makrohelfer [C/C++]
 /// \{
 
-#ifndef DOXYGEN
+#ifndef __DOXYGEN__
 
 // Interna
 #define TURAG_CONCAT_(x,y) x##y
 #define TURAG_CONCAT3_(a,b,c) a##b##c
 #define TURAG_CONCAT4_(a,b,c,d) a##b##c##d
 
-#endif // DOXYGEN
+#endif // __DOXYGEN__
 
 /// Concat two symbols
 /// \code CONCAT(A, BC) will give ABC \endcode
@@ -31,7 +31,7 @@
 #define TURAG_CONCAT4(a,b,c,d) TURAG_CONCAT4_(a,b,c,d)
 
 
-#ifndef DOXYGEN
+#ifndef __DOXYGEN__
 
 #define __NARG__(...) \
          __NARG_I_(__VA_ARGS__,__RSEQ_N())
@@ -54,14 +54,14 @@
          19,18,17,16,15,14,13,12,11,10, \
          9,8,7,6,5,4,3,2,1,0
          
-#else // DOXYGEN
+#else // __DOXYGEN__
 
 ///  \brief Get number of arguments in a macro function
 ///
 /// from here: https://groups.google.com/group/comp.std.c/browse_thread/thread/77ee8c8f92e4a3fb/346fc464319b1ee5?pli=1
 #define __NARG__(...)
 
-#endif // DOXYGEN
+#endif // __DOXYGEN__
 
 ////////////////////////////////////////////////////////////////////////////////
 // Compiler utils

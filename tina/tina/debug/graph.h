@@ -32,21 +32,21 @@ extern "C" {
 /// \return Index of the newly created diagram.
 unsigned turag_graph_create(const char* name);
 
-#ifdef DOXYGEN
+#ifdef __DOXYGEN__
 
 /// \brief Add channels to a diagram and name them.
 /// \param index Index of the diagram to add the channels to.
 /// \param title Title of the channel.
 void turag_graph_add_channel(unsigned index, const char* title);
 
-#else // DOXYGEN
+#else // __DOXYGEN__
 
 # define turag_graph_add_channel(index, title) \
     turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_GRAPH_CHANNEL TURAG_DEBUG_GRAPH_PREFIX "%d 0 %s" TURAG_DEBUG_NEWLINE, index, title)
 
-#endif // DOXYGEN
+#endif // __DOXYGEN__
 
-#ifdef DOXYGEN
+#ifdef __DOXYGEN__
 
 /// \brief Add channels to a diagram and name them.
 /// \param index Index of the diagram to add the channels to.
@@ -54,14 +54,14 @@ void turag_graph_add_channel(unsigned index, const char* title);
 /// \param time Length of the visible part of the x-axis.
 void turag_graph_add_channel_fixed_time(unsigned index, const char* title, unsigned time);
 
-#else // DOXYGEN
+#else // __DOXYGEN__
 
 # define turag_graph_add_channel_fixed_time(index, title, time) \
     turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_GRAPH_CHANNEL TURAG_DEBUG_GRAPH_PREFIX "%d %d %s" TURAG_DEBUG_NEWLINE, index, time, title)
 
-#endif // DOXYGEN
+#endif // __DOXYGEN__
 
-#ifdef DOXYGEN
+#ifdef __DOXYGEN__
 
 /// \brief Add channels with fixed axes to a diagram and name them.
 /// \param index Index of the diagram to add the channels to.
@@ -72,13 +72,13 @@ void turag_graph_add_channel_fixed_time(unsigned index, const char* title, unsig
 /// \param height Height of the y-axis.
 void turag_graph_add_channel_fixed_xy(unsigned index, const char* title, int x_left, int y_bottom, unsigned width, unsigned height);
 
-#else // DOXYGEN
+#else // __DOXYGEN__
 
 # define turag_graph_add_channel_fixed_xy(index, title, x_left, y_bottom, width, height) \
     turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_GRAPH_CHANNEL_FIXED TURAG_DEBUG_GRAPH_PREFIX "%d %d %d %d %d %s" TURAG_DEBUG_NEWLINE, \
     		index, x_left, y_bottom, width, height, title)
 
-#endif // DOXYGEN
+#endif // __DOXYGEN__
 
 /// \brief Add data to a diagram.
 /// \param index Index of the diagram to add data to.

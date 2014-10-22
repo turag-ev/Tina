@@ -32,7 +32,7 @@
 extern TuragSystemTime turag_debug_print_gametime_gamestarttime;
 extern int turag_debug_print_gametime_auto_output_enabled;
 
-#ifdef DOXYGEN
+#ifdef __DOXYGEN__
 
 /// \brief Gibt die aktuelle Spielzeit aus.
 ///
@@ -40,7 +40,7 @@ extern int turag_debug_print_gametime_auto_output_enabled;
 /// \param gametime Aktuelle Spielzeit
 void turag_print_gametime(TuragSystemTime gametime);
 
-#else // DOXYGEN
+#else // __DOXYGEN__
 
 #if TURAG_DEBUG_LEVEL > 0
 # define turag_print_gametime(gametime) \
@@ -49,10 +49,10 @@ void turag_print_gametime(TuragSystemTime gametime);
 # define turag_print_gametime(gametime) while(0)
 #endif
 
-#endif // DOXYGEN
+#endif // __DOXYGEN__
 
 
-#ifdef DOXYGEN
+#ifdef __DOXYGEN__
 
 /// \brief Gibt die aktuelle Spielzeit aus.
 ///
@@ -60,7 +60,7 @@ void turag_print_gametime(TuragSystemTime gametime);
 /// \param gametime Aktuelle Spielzeit in Millisekunden.
 void turag_print_gametime_ms(unsigned gametime);
 
-#else // DOXYGEN
+#else // __DOXYGEN__
 
 #if TURAG_DEBUG_LEVEL > 0
 # define turag_print_gametime_ms(gametime) \
@@ -69,10 +69,10 @@ void turag_print_gametime_ms(unsigned gametime);
 # define turag_print_gametime_ms(gametime) while(0)
 #endif
 
-#endif // DOXYGEN
+#endif // __DOXYGEN__
 
 
-#ifdef DOXYGEN
+#ifdef __DOXYGEN__
 
 /// \brief Gibt die aktuelle Spielzeit aus.
 ///
@@ -81,7 +81,7 @@ void turag_print_gametime_ms(unsigned gametime);
 /// turag_print_system_gametime_reset() zurückgesetzt wurde.
 void turag_print_system_gametime();
 
-#else // DOXYGEN
+#else // __DOXYGEN__
 
 #if TURAG_DEBUG_LEVEL > 0
 # define turag_print_system_gametime() \
@@ -90,15 +90,15 @@ void turag_print_system_gametime();
 # define turag_print_system_gametime() while(0)
 #endif
 
-#endif // DOXYGEN
+#endif // __DOXYGEN__
 
 
-#ifdef DOXYGEN
+#ifdef __DOXYGEN__
 
 /// \brief Setzt die von turag_print_system_gametime() verwendete Spielzeit auf 0 zurück.
 void turag_print_system_gametime_reset(void);
 
-#else // DOXYGEN
+#else // __DOXYGEN__
 
 # if TURAG_DEBUG_LEVEL > 0
 #  define turag_print_system_gametime_reset() \
@@ -107,17 +107,17 @@ void turag_print_system_gametime_reset(void);
 #  define turag_print_system_gametime_reset() while(0)
 # endif
 
-#endif // DOXYGEN
+#endif // __DOXYGEN__
 
 
-#ifdef DOXYGEN
+#ifdef __DOXYGEN__
 
 /// \brief Aktiviert die automatische Ausagbe der System-Spielzeit mit jeder Debugausgabe.
 ///
 /// Diese Funktion hat nur einen Effekt, wenn TURAG_PRINT_GAMETIME_AUTOMATIC auf 1 definiert wurde.
 void turag_print_gametime_automatic_enable();
 
-#else // DOXYGEN
+#else // __DOXYGEN__
 
 #if TURAG_DEBUG_LEVEL > 0 && TURAG_PRINT_GAMETIME_AUTOMATIC == 1
 # define turag_print_gametime_automatic_enable() \
@@ -126,17 +126,17 @@ void turag_print_gametime_automatic_enable();
 # define turag_print_gametime_automatic_enable() while(0)
 #endif
 
-#endif // DOXYGEN
+#endif // __DOXYGEN__
 
 
-#ifdef DOXYGEN
+#ifdef __DOXYGEN__
 
 /// \brief Deaktiviert die automatische Ausagbe der System-Spielzeit mit jeder Debugausgabe.
 ///
 /// Diese Funktion hat nur einen Effekt, wenn TURAG_PRINT_GAMETIME_AUTOMATIC auf 1 definiert wurde.
 void turag_print_gametime_automatic_disable();
 
-#else // DOXYGEN
+#else // __DOXYGEN__
 
 #if TURAG_DEBUG_LEVEL > 0 && TURAG_PRINT_GAMETIME_AUTOMATIC == 1
 # define turag_print_gametime_automatic_disable() \
@@ -145,13 +145,13 @@ void turag_print_gametime_automatic_disable();
 # define turag_print_gametime_automatic_disable() while(0)
 #endif
 
-#endif // DOXYGEN
+#endif // __DOXYGEN__
 
 
 
 
 
-#ifdef DOXYGEN
+#ifdef __DOXYGEN__
 
 /// \brief Gibt Systemmeldungen formatiert aus.
 ///
@@ -168,7 +168,7 @@ void turag_system_printf(const char* format, ...);
 /// \param msg Zeichenkette, die ausgeben werden soll
 void turag_system_print(const char* msg);
 
-#else // DOXYGEN
+#else // __DOXYGEN__
 
 #if TURAG_DEBUG_LEVEL > 0
 # if TURAG_PRINT_GAMETIME_AUTOMATIC == 1
@@ -193,9 +193,9 @@ void turag_system_print(const char* msg);
 # define turag_system_print(msg) while(0)
 #endif
 
-#endif // DOXYGEN
+#endif // __DOXYGEN__
 
-#ifdef DOXYGEN
+#ifdef __DOXYGEN__
 
 /// \brief Gibt Fehlermeldungen formatiert aus.
 ///
@@ -212,7 +212,7 @@ void turag_errorf(const char* format, ...);
 /// \param msg Zeichenkette, die ausgeben werden soll
 void turag_error(const char* msg);
 
-#else // DOXYGEN
+#else // __DOXYGEN__
 
 #if TURAG_DEBUG_LEVEL > 0
 # if TURAG_PRINT_GAMETIME_AUTOMATIC == 1
@@ -237,9 +237,9 @@ void turag_error(const char* msg);
 # define turag_error(msg) while(0)
 #endif
 
-#endif // DOXYGEN
+#endif // __DOXYGEN__
 
-#ifdef DOXYGEN
+#ifdef __DOXYGEN__
 
 /// \brief Gibt Meldungen über kritischen Zustand formatiert aus.
 ///
@@ -256,7 +256,7 @@ void turag_criticalf(const char* format, ...);
 /// \param msg Zeichenkette, die ausgeben werden soll
 void turag_critical(const char* msg);
 
-#else // DOXYGEN
+#else // __DOXYGEN__
 
 #if TURAG_DEBUG_LEVEL > 1
 # if TURAG_PRINT_GAMETIME_AUTOMATIC == 1
@@ -281,9 +281,9 @@ void turag_critical(const char* msg);
 # define turag_critical(msg) while(0)
 #endif
 
-#endif // DOXYGEN
+#endif // __DOXYGEN__
 
-#ifdef DOXYGEN
+#ifdef __DOXYGEN__
 
 /// \brief Gibt Warningsmeldungen formatiert aus.
 ///
@@ -300,7 +300,7 @@ void turag_warningf(const char* format, ...);
 /// \param msg Zeichenkette, die ausgeben werden soll
 void turag_warning(const char* msg);
 
-#else // DOXYGEN
+#else // __DOXYGEN__
 
 #if TURAG_DEBUG_LEVEL > 2
 # if TURAG_PRINT_GAMETIME_AUTOMATIC == 1
@@ -325,9 +325,9 @@ void turag_warning(const char* msg);
 # define turag_warning(msg) while(0)
 #endif
 
-#endif // DOXYGEN
+#endif // __DOXYGEN__
 
-#ifdef DOXYGEN
+#ifdef __DOXYGEN__
 
 /// \brief Gibt informative Meldungen formatiert aus.
 ///
@@ -344,7 +344,7 @@ void turag_infof(const char* format, ...);
 /// \param msg Zeichenkette, die ausgeben werden soll
 void turag_info(const char* msg);
 
-#else // DOXYGEN
+#else // __DOXYGEN__
 
 #if TURAG_DEBUG_LEVEL > 3
 # if TURAG_PRINT_GAMETIME_AUTOMATIC == 1
@@ -369,9 +369,9 @@ void turag_info(const char* msg);
 # define turag_info(msg) while(0)
 #endif
 
-#endif // DOXYGEN
+#endif // __DOXYGEN__
 
-#ifdef DOXYGEN
+#ifdef __DOXYGEN__
 
 /// \brief Gibt Warningsmeldungen formatiert aus.
 ///
@@ -396,7 +396,7 @@ void turag_debugf(const char* format, ...);
 /// \param msg Zeichenkette, die ausgeben werden soll
 void turag_debug(const char* msg);
 
-#else // DOXYGEN
+#else // __DOXYGEN__
 
 #if TURAG_DEBUG_LEVEL > 4
 # if TURAG_PRINT_GAMETIME_AUTOMATIC == 1
@@ -421,7 +421,7 @@ void turag_debug(const char* msg);
 # define turag_debug(msg) while(0)
 #endif
 
-#endif // DOXYGEN
+#endif // __DOXYGEN__
 
 /// Gibt Zeichenketten entsprechend in englischer Sprache für Boolean zurück.
 /// \param boolean Boolean-Wert

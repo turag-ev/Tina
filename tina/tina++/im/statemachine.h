@@ -355,11 +355,11 @@ private:
  * execution for a specific amount of time.
  * The length of the delay is specified in the constructor.
  */
-#ifndef DOXYGEN
+#ifndef __DOXYGEN__
 class DelayState final : public State {
 #else
 class DelayState final : private State {
-#endif // DOXYGEN
+#endif // __DOXYGEN__
 
 public:
     /*!
@@ -404,11 +404,11 @@ private:
  * execution until the statemachine received en external signal (the argument of
  * the received signal is ignored).
  */
-#ifndef DOXYGEN
+#ifndef __DOXYGEN__
 class WaitForSignalState final : public State {
 #else
 class WaitForSignalState final : private State {
-#endif // DOXYGEN
+#endif // __DOXYGEN__
 
 public:
     /*!
@@ -678,7 +678,7 @@ private:
 
 
 
-#ifndef DOXYGEN
+#ifndef __DOXYGEN__
 class RedoState final : public State {
 public:
     RedoState() : State("Error") {}

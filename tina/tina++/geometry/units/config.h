@@ -97,7 +97,7 @@ typedef TURAG_UNITS_VALUE_TYPE Value;
 /// Typ mit dem Einheitenumwandlungsfaktoren gespeichert werden sollen.
 typedef Real UnitFactor;
 
-#ifndef DOXYGEN
+#ifndef __DOXYGEN__
 constexpr UnitFactor FROM_SI_CONVERT_FACTOR_LENGTH = TURAG_UNITS_FACTOR_TO_METER; // mm
 constexpr UnitFactor FROM_SI_CONVERT_FACTOR_ANGLE  = TURAG_UNITS_FACTOR_TO_RADIAN; // rad
 constexpr UnitFactor FROM_SI_CONVERT_FACTOR_TIME   = TURAG_UNITS_FACTOR_TO_SECOND; // s

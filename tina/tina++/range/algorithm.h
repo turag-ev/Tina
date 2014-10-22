@@ -13,7 +13,7 @@ namespace TURAG {
 ////////////////////////////////////////////////////////////////////////////////
 // predicates for std algorithm e.x. std::find, ...
 
-#ifndef DOXYGEN
+#ifndef __DOXYGEN__
 /// Prädikat zum Vergleichen auf Gleichheit
 template<typename T>
 struct is_equal_predicate {
@@ -32,7 +32,7 @@ struct is_equal_predicate {
 
   T value;
 };
-#endif
+#endif // __DOXYGEN__
 
 /// Prädikat, um zu prüfen ob Objekt einem anderem gleicht.
 /// \param t zu vergleichendes Objekt
