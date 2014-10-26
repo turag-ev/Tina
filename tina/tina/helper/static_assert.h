@@ -29,7 +29,8 @@
  * 
  * Dieses Makro stellt unabhängig vom gewählten C-Standard 
  * und Compiler-Version einen statischen Assert bereit, der garantiert
- * zur Compilezeit ausgewertet wird.
+ * zur Compilezeit ausgewertet wird und benutzt wenn möglich eine vom 
+ * Compiler unterstützte Version.
  * 
  * @param R Zu prüfender Ausdruck, der constant sein muss.
  * @param DIAGNOSTIC String, der ausgegeben wird, wenn R zu false evaluiert.

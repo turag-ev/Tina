@@ -2,8 +2,9 @@
 #define TINA_H
 
 /**
- * \mainpage Introduction
+ * \mainpage ReadMe
  * 
+ * \section Allgemein
  * TinA ist eine Sammlung wiederverwenbare und modularisierter C- und C++-
  * Quellcodes, die vor allem zur Roboterentwicklung in der %TURAG
  * entstanden sind und gepflegt werden. 
@@ -20,8 +21,19 @@
  * - [C/C++] - Interface für C und C++ vorhanden. Das ist allerdings keine 
  * Garantie für identische Funktionalität beider Interfaces.
  * 
+ * Die primäre Dokumentationssprache für die Doxygen-formatierten Kommentare ist deutsch. 
+ * Quelltext und sonstige Kommentare, die die Implementierung erklären, sollten
+ * englisch sein.
  * 
+ * Weiterführende Informationen zu doxygen finden sich auf der enstprechenden
+ * [Wiki-Seite](https://www.turag.de/wiki/doku.php/id,04_software;doxygen).
  * 
+ * \section Einschränkungen
+ * Bei der Entwicklung und Benutzung von TinA gelten einige Vereinbarungen:
+ * - Der verwendete Compiler ist der gcc in einer aktuellen Version (>= 4.7)
+ * - je nach Plattform ist die C++-Laufzeitunterstützung eingeschränkt --> der Grad an 
+ * erforderlicher Laufzeitunterstützung ist noch zu definieren!
+ * - es ist empfohlen mit -Wundef zu compilieren!
  * 
  * 
  * 
