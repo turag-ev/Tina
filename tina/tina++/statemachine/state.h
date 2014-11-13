@@ -23,6 +23,66 @@ namespace TURAG {
 /// @defgroup Actions Aktionen [C++]
 /// \brief Aktionen sind Zustandsmaschinen, die auf Events reagieren.
 ///
+/// ## Aktion definieren
+///
+/// Aufbau von Aktion erläutern, Singleton, ...
+///
+/// ## Zustände definieren
+///
+/// in ACTION_STATES
+///
+/// ## Aktion starten
+///
+/// start() erklären
+///
+/// ## Zustand wechseln
+///
+/// nextState() erklären
+///
+/// ## Aktion beenden
+///
+/// exit() vs. cancel() erklären
+///
+/// event_cancel erklären
+///
+/// ## Kindaktionen
+///
+/// setChildAction
+///
+/// Aktionshierachie aus SC erklären
+///
+/// killAllChildren()
+///
+/// ## Ereignisse
+///
+/// ### Ereignisse zuführen
+/// Hauptaktion zuführen
+///
+/// Mehrere Hauptaktionen: Ereignisse filter (TODO: Link) und an andere Hauptaktion weiterleiten
+///
+/// ### Ereignissverarbeitung
+///
+/// Ereignisse werden erst in Kindaktion bearbeitet
+///
+/// Bedeutung von return true/false
+///
+/// Bedeutung für allgemeine Verarbeitung (nur verarbeiten was man kann/muss/will)
+///
+/// ### Spezielle Ereignisse
+///
+/// Action::event_*
+///
+/// event_cancel in Hierachie
+///
+/// ## Richtlinien/Verwendung
+///
+/// execute-Funktionen
+///
+/// Beispiele,Beispiele, Beispiele
+///
+/// minimal Beispiel
+///
+///
 /// \msc
 /// Sender,Receiver;
 /// Sender->Receiver [label="Command()", URL="\ref Receiver::Command()"];

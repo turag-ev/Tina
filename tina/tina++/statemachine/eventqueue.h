@@ -100,6 +100,55 @@ namespace TURAG {
 /// Ereignisklasse festgelegt werden. Es erfolgt keine Prüfung über die Richtungkeit
 /// des Types des übergebenes Objekts in der Ereignisverarbeitung!
 ///
+/// Ereignis-Filterung
+/// -----------------
+///
+/// ### globale Filterung
+///
+/// \code
+///  void EventEntry(EventId id, EventData data) {
+///   // filter über spezielle Id
+///   if (first_byte(id) == '!') {
+///     special_world.func(id, data);
+///   }
+///   else
+///   {
+///     main_action.func(id, data);
+///   }
+/// }
+/// \endcode
+///
+/// Vorteile:
+///  * wenig Fehleranfällig (alle Ereignisklasse muss nur spezielle Eigenschaften aufweisen)
+///    auch für Ereignisse, die aus Quellen kommen, bei denen man Callback für Ereignis nicht einstellen kann
+///  * extrem flexible Filterregeln und Änderungsregeln möglich
+///
+/// Nachteile:
+///  * Overhead, weil jedes Ereignis überprüft werden muss (Deep Packet Inspection)
+///  * Spezielle Eigenschaft muss reserviert werden (z.B. Byte von Ereignisnamensraum, evtl. Fehleranfällig bei fehlerender Absprache)
+///  * starke Kopplung
+///
+/// ### aufgabenorientierte Filterung
+///
+/// Callback bei jeder Action angeben (Beispiel Pfadplannung in SC, leitet
+/// Events von MC an eigene Funktion weiter). Für Weiterleitung an Aktionen
+/// muss Ereignis neu zu EventQueue hinzugefügt werden.
+/// \code
+///
+/// drive.driveRelative(-100_mm, null, mySpecialWorld);
+///
+/// void mySpecialWorld(EventId id, EventData data) {
+///   special_world.func(id, data);
+/// }
+/// \endcode
+///
+/// Nachteile:
+///  * entsprechendes Callback muss immer angeben werden, wenn es vergessen wird, landet Ereignis in der falschen Aktionshierachie (Fehleranfällig)
+///  * nur für Ereignisse anwendbar bei denen sich Callback bestimmen lässt
+/// Vorteil:
+///  * wenig Overhead (1 Funktionsaufruf + Stack)
+///  * unabhängig vom Rest programmierbar (keine Kopplung zu anderen Aktionen)
+///
 /// Erklärung in Code:
 /// \code{.cpp}
 ///   // in anyaction.h
