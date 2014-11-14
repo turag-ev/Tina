@@ -22,6 +22,7 @@ namespace TURAG {
 // aktiv               | !nullptr      | undef.   | undef.   | false
 // wartet auf Beenden  | !nullptr      | undef.   | !nullptr | true
 // wird beendet        | !nullptr      | undef.   | nullptr  | true
+// nicht aktiv         |  nullptr      | nullptr  | nullptr  | false
 
 bool Action::exit(EventId eid) {
   if (isActive() && !about_to_close_) {
@@ -44,14 +45,22 @@ bool Action::exit(EventId eid) {
 
     if (parent_) {
       parent_->child_ = nullptr;
+      parent_ = nullptr;
+      about_to_close_ = false;
+
       if (parent_->about_to_close_) {
+        // Elternaktion wartet auf Beenden dieser Funktion
         parent_->cancel();
       } else {
+        // Elternaktion über Beenden dieser Aktion informieren
         bool handled = parent_->func(Action::event_return, eid);
         if (!handled) {
-          turag_criticalf("Exit of Action %s is not handled", name_);
+          turag_warningf("Exit of Action %s is not handled", name_);
         }
       }
+    } else {
+      parent_ = nullptr;
+      about_to_close_ = false;
     }
     return true;
 
@@ -61,7 +70,14 @@ bool Action::exit(EventId eid) {
       turag_criticalf("Tried to exit an nonactive action %s (with unclosed action %s)", name_, child_->name_);
       return false;
     } else {
-      turag_criticalf("Tried to exit an nonactive action %s", name_);
+      if (about_to_close_) {
+        // Diese Aktion wird verzögert beendet
+        cancel();
+      }
+      else
+      {
+        turag_criticalf("Tried to exit an nonactive action %s", name_);
+      }
       return true;
     }
   }

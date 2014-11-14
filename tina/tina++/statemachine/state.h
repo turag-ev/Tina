@@ -88,6 +88,8 @@ namespace TURAG {
 /// Sender->Receiver [label="Command()", URL="\ref Receiver::Command()"];
 /// Sender<-Receiver [label="Ack()", URL="\ref Ack()", ID="1"];
 /// \endmsc
+///
+/// \todo verzögertes Beenden noch benötigt? sonst entfernen, weil noch sehr buggy.
 /// @{
 
 
@@ -96,38 +98,75 @@ namespace TURAG {
 
 class Action;
 
-/// Every state is a static function
-/// \param id id of the event to be processed
-/// \param data extra information for the event
-/// \returns true, if the event was handled by the function
+/// \brief Typ von Zustand(-sfunktion)
+/// \param id ID von Ereignis, was verarbeitet werden soll.
+/// \param data zusätzliche Information zu Ereignis
+/// \retval true Wenn Ereignis von dieser Funktion verarbeitet wurde.
+/// \retval false Wenn Ereignis nicht verarbeitet wurde.
 typedef bool (*State)(EventId id, EventArg data);
 
-/// Action class
+/// Aktionszustandsmaschine
 class Action {
 public:
+  /// \brief Ereignis-IDs von Ereignissen von Aktion.
+  ///
+  /// Diese speziellen Ereignisse bieten die Möglichkeiten auf Ereignisse
+  /// innerhalb der Aktion und dessen Zustände zu reagieren.
   enum {
-    /// Event id when state is started
-    event_start = EventNamespace('A', 'c', 't') + 0,
+    /// \brief Aktion hat neuen Zustand
+    ///
+    /// Der zustätzliche Datenparameter hat den Wert, des bei \ref start oder
+    /// \ref setChildAction übergebenen zweiten Paramters.
+    event_start = EventNamespace('A', 'c', 't'),
 
-    /// Event id when action is about to be closed from outside of the action
-    /// with the \a Action::cancel function.
-    /// If state function returns true: Action must be exited as soon as possible
-    /// with \a exit function. If state function returns false: action is closed
-    /// immediately after state function returns
+    /// \brief Aktion wird von außerhalb abgebrochen.
+    ///
+    /// Dieses Ereigniss tritt auf, wenn Aktion über die Funktion \ref cancel
+    /// abgebrochen wird.
+    ///
+    /// Gibt der aktuelle Zustand dieser Aktion als Reaktion in der Zustandsfunktion
+    /// \c true zurück, dann wird die Aktion noch nicht beendet, sondern bekommt die
+    /// besondere Wird-Beendet-Eigenschaft. Mit dieser Eigenschaft dürfen
+    /// folgende Funktionen nicht aufgerufen werden: \ref cancel, \ref nextState,
+    /// \ref start und \ref setChildAction. Darauf sollte so schnell wie möglich
+    /// die Aktion entgültig über \ref cancel oder \ref exit beendet werden.
+    ///
+    /// Wird vom aktuellen Zustand \c false zurückgegeben, wird die Aktion sofort beendet.
     event_cancel,
 
-    /// Event id when child action exited. exit code is passed in data parameter
+    /// \brief Kindaktion hat sich beendet.
+    ///
+    /// Dieses Ereigniss tritt auf, wenn eine durch die Funktion \ref setChildAction
+    /// hinzugefügte Kindaktion durch die Funktion \ref exit beendet wurde.
+    /// Dieses Ereignis tritt nicht auf, wenn diese Aktion durch die \ref cancel
+    /// beendet wird, aber auch nicht wenn die Aktion nach dem \ref event_cancel Ereignis
+    /// durch \ref exit beendet wird.
+    ///
+    /// Der zweite Argument, welcher der Zustandsfunktion bei diesem Event übergeben wird, ist
+    /// der Parameter der der \ref exit Funktion übergeben wird, z.B. \ref event_success
+    /// oder \ref event_failure.
     event_return = EventNamespace('A', 'c', 't') + 100,
-    /// Exit code for successfully executed action
+  };
+
+  /// \brief spezielle Rückgabewerte von Aktionen.
+  ///
+  /// Diese Rückgabewerte können beim Aufruf der \ref exit Funktion verwendet werden.
+  enum {
+    /// \brief Rückgabewert, wenn Aktion erfolgreich ausgeführt wurde.
     event_success,
-    /// Exit code for failure in executed action
+
+    /// \brief Rückgabewert, wenn Aktion nicht erfolgreich ausgeführt wurde.
     event_failure
   };
 
-  /// Create Action.
-  /// ACTION_CLASS or STATIC_ACTION_CLASS should be used for creating actions.
-  /// \param startstate initial condition by start of action
-  /// \param name       name of action for debugging
+  /// \brief Aktion erstellen.
+  ///
+  /// \warning
+  /// \ref ACTION_CLASS oder \ref STATIC_ACTION_CLASS sollten für das Erstellen
+  /// von Aktionen verwendet werden.
+  ///
+  /// \param startstate Initalzustand von Aktion.
+  /// \param name       Name der Aktion (wird nur für Debuggingzwecke verwendet).
   constexpr
   Action(State startstate, const char* name) :
     parent_(nullptr),
@@ -139,202 +178,343 @@ public:
     can_be_added_to_blacklist_(true)
   { }
 
-  /// Start action
-  void start(Action* parent, EventArg data = 0);
+  /// \brief Hauptaktion starten
+  ///
+  /// Die Hauptaktion wird mit dieser Funktion gestartet. Jede weitere Unteraktion
+  /// kann mit \ref setChildAction hinzugefügt werden.
+  ///
+  /// Wird die Aktion gestartet wird der aktuelle Zustand der Aktion auf den
+  /// Initalisierungszustand gesetzt (zweiter Parameter in)
+  ///
+  /// \pre Aktion ist nicht schon aktiv oder wird gerade beendet.
+  /// \param data zusätzliche beliebige Informationen, die bei \ref event_start
+  ///             als zweiter Parameter beim Starten des ersten Zustands übergeben werden.
+  void start(EventArg data = 0) {
+    start(nullptr, data);
+  }
 
-  /// Process event by active state of action
+  /// \brief Ereignis von Aktion verarbeiten
+  ///
+  /// Wird in der Regel nur benötigt, um Ereignisse der Ereignisschlange (\ref TURAG::EventQueue)
+  /// der Hauptaktion zuzuführen.
+  ///
+  /// \param id Ereignis-ID von Ereignis.
+  /// \param data Datenparameter zu Ereignis.
+  /// \retval true Ereignis wurde von Aktion verarbeitet.
+  /// \retval false Ereignis wurde nicht von Aktion verarbeitet.
   bool func(EventId id, EventArg data);
 
-  /// Return whether action is active.
-  // Achtung: Kann sein, das Aktion nicht mehr aktiv ist, aber Kinderaktionen sind gerade beim Beenden.
-  //          Dann liefert isActive() false, aber event_return wurde noch nicht gesendet.
+  /// \brief Aktion ist aktiv.
   constexpr _always_inline
   bool isActive() const {
     return currentstate_ != nullptr;
   }
 
-
+  /// \brief aktuellen Zustand von Aktion zurückgeben
+  /// \return aktueller Zustand von Aktion oder \c nullptr, wenn Aktion nicht
+  ///         aktiv (\ref isActive liefert \c false).
   constexpr _always_inline
   State getState() const {
     return currentstate_;
   }  
 
-  /// Cancel action and child action (when existing)
-  /// \returns false, if action cannot be closed immediately.
-  ///          state function is called with Action::event_return of action is closed
-  ///          if action itself cannot be closed immediately, then isActive() returns true
-  ///          if a child action of the action cannot be closed immediately, then isActive() returns false
+  /// \brief Bricht Verarbeitung von Aktion und allen Unteraktionen ab.
+  ///
+  /// Hat diese Aktion Unteraktionen, so werden erst alle Unteraktionen
+  /// abgebrochen, bevor diese Aktion abgeborchen wird.
+  ///
+  /// Wenn die Aktion abgebrochen wird, wird das Ereignis \ref event_cancel
+  /// an die Aktion übergeben. Gibt die aktuelle Zustandsfunktion \c true
+  /// zurück, so wird die Aktion von sich selber verzögert beendet, was möglichst
+  /// schnell gesehen nachdem das Ereignis eingetroffen ist. Wird \c false zurückgegeben,
+  /// so wird die Aktion sofort beendet.
+  ///
+  /// Kann die Aktion nicht sofort beendet werden, so gibt \ref isActive \c false
+  /// zurück.
+  ///
+  /// \todo Wann Benachrichtigtung, dass Aktion beendet wurde???
+  ///
+  /// \return \c true, falls Aktion sofort abgebrochen werden konnte, sonst \c false.
+  ///
+  /// \sa exit
   bool cancel();
 
-  /// Set child action.
-  /** NOTE: Only one child action per action can be active.
-   *  NOTE: Do not this function, if \a event_cancel was called to the state function
-   * \param child child action to start
-   * \param data  parameter for extra data passed with Action::event_start event
-   *              when first state of child action is called.
-   */
+  /// \brief Unteraktion hinzufügen.
+  ///
+  /// Jede Aktion kann bis zu eine Unteraktion aufweisen.
+  /// Durch diese Funktion wird der Aktion eine Unteraktion hinzugefügt, wenn
+  /// noch keine vorhanden ist. Die Unteraktion wird durch diese Funktion
+  /// sofort gestartet, siehe \ref start.
+  ///
+  /// Wird die Unteraktion beendet, wird das Ereignis \ref event_return dem
+  /// aktuellen Zustand dieser Aktion übergeben. Im Datenparameter ist der Rückgabewert der
+  /// Aktion enthalten.
+  ///
+  /// Wird der Zustand dieser Aktion gewechselt bzw. diese Aktion beendet oder
+  /// abgebrochen, so wird die Unteraktion abgebrochen.
+  ///
+  /// \pre Aktion hat keine Unteraktion.
+  ///
+  /// \param child Unteraktion, die hinzugefügt und gestartet werden soll.
+  /// \param data Parameter mit extra Daten, der mit dem \ref event_start Ereignis,
+  ///              dem Startzustand als Datenparameter übergeben wird.
+  ///
+  /// \sa start(EventArg)
+  ///
   void setChildAction(Action* child, EventArg data = 0);
 
-  /// Return pointer to the child action or nullptr when no exists.
-  constexpr _always_inline
+  /// \brief Gibt eine evtl. vorhandene Unteraktion zurück.
+  ///
+  /// \return vorhandene Unteraktion oder \c nullptr, wenn keine vorhanden.
+  ///
+  /// \sa setChildAction
+  _always_inline
   const Action* getConstChildAction() const {
     return child_;
   }
 
-  /// get name of Action
+  /// \brief Name der Aktion zurückgeben
+  ///
+  /// Der Name ist für Debuggingzwecke gedacht. Es ist möglich, dass zwei
+  /// Aktionen über die gleichen Namen verfügen.
+  ///
+  /// \return Zeichenkette mit Name der Aktion
   const char* getName() const {
     return name_;
   }
 
-  /** define if Action can be added to the Troubleshooter's blacklist
-   * this is useful for actions with dynamic entry points.
-   */
+  /// \brief Aktion kann zur Blacklist hinzugefügt werden
+  ///
+  /// Sagt aus, ob es erlaubt ist die Aktion in die Blacklist des SystemControl
+  /// Troubleshooter's hinzu zu fügen. Dies ist nützlich für Aktionen mit
+  /// dynamischen Einstiegspunkten.
   constexpr _always_inline
-  bool canBeAddedToBlacklist(void) {
+  bool canBeAddedToBlacklist() {
     return can_be_added_to_blacklist_;
   }
 
 protected:
 
-  /// Call active state of parent action
-  /**
-   * \param id event id passed to state of parent action
-   * \param data paramter for extra data passed to state of parent action
-   */
+  /// \brief Hauptaktion starten
+  ///
+  /// Die Hauptaktion wird mit dieser Funktion gestartet. Jede weitere Unteraktion
+  /// kann mit \ref setChildAction hinzugefügt werden.
+  ///
+  /// Wird die Aktion gestartet wird der aktuelle Zustand der Aktion auf den
+  /// Initalisierungszustand gesetzt (zweiter Parameter in)
+  ///
+  /// \pre Aktion ist nicht schon aktiv oder wird gerade beendet.
+  /// \param parent Elternaktion oder \c nullptr
+  /// \param data zusätzliche beliebige Informationen, die bei \ref event_start
+  ///             als zweiter Parameter beim Starten des ersten Zustands übergeben werden.
+  void start(Action* parent, EventArg data = 0);
+
+  /// \brief Übergibt übergeordneter Aktion Ereignis
+  /// \param id Ereignis-ID zu Ereignis
+  /// \param data Datenparamter zu Ereignis
   _always_inline
   bool callParent(EventId id, EventArg data) const {
-    return parent_->func(id , data);
+    return (parent_) ? (parent_->func(id , data)) : (false);
   }
 
-  /// Start the next state of action
-  /** Sets next active state and calls next state with a Action::event_start event.
-   *  NOTE: child action should be cancelable with cancel() == true or should not exist
-   * \param next next state
-   * \param data parameter for extra data passed to next state in Action::event_start
-   */
+  /// \brief Setzt Zustand von Aktion.
+  ///
+  /// Durch das Setzen des neuen Zustand werden alle Ereignisse, die dieser
+  /// Aktion übergeben werden an den neuen Zustand weitergeleitet. Während
+  /// diese Funktion aufgerufen wird, wird das Ereignis \ref event_start
+  /// mit dem Parameter \a data an den neuen Zustand übergeben.
+  ///
+  /// Der Parameter \a next muss eine Methode dieser Aktion sein.
+  ///
+  /// Evtl. vorhandene Unteraktionen werden abgebrochen.
+  ///
+  /// \param next zu setzten der Zustand dieser Aktion
+  /// \param data optionaler Datenparameter, der mit \ref event_start Ereignis
+  ///             bei neuem Zustand übergeben wird.
+  ///
+  /// \bug Ist eine Unteraktion vorhanden, die verzögert beendet werden muss,
+  ///      wird diese trotzdem sofort abgebrochen.
   void nextState(State next, EventArg data = 0);
 
-  /// Exit action and return to parent with a return code
-  /**
-   * \param eid Return code for parent.
-   *            Is passed to parent in \a Action::event_return as data parameter.
-   * \returns false, if action cannot be closed immediately.
-   *          state function is called with Action::event_return of action is closed
-   *          if action itself cannot be closed immediately, then isActive() returns true
-   *          if a child action of the action cannot be closed immediately, then isActive() returns false
-   *
-   * Usage example in state of parent action:
-   * \code{.cpp}
-   * switch (id) {
-   * case Action::event_return:
-   *   return_code = unpack<EventId>(data);
-   *   break;
-   * }
-   * \endcode
-   */
+  /// \brief Beendet Aktion.
+  ///
+  /// Durch diese Funktion wird die Aktion beendet und evtl. vorhandene Unteraktionen
+  /// abgebrochen.
+  ///
+  /// \param eid Rückgabewert dieser Aktion, z.B. \ref event_success oder \ref event_failure
+  /// \return Es wird \c false zurückgegeben, falls die
   bool exit(EventId eid);
 
-  /// Check whether \a current is the active state of the action.
+  /// \brief Prüft, ob ein Zustand ausgeführt wird
+  ///
+  /// \return Es wird \c true zurückgegeben, falls \a current die aktuell
+  /// von dieser Altion ausgeführte Zustand ist.
   constexpr _always_inline
   bool checkState(State current) const {
     return currentstate_ == current;
   }
 
+  /// \brief Gibt eine evtl. vorhandene Unteraktion zurück.
+  ///
+  /// \return vorhandene Unteraktion oder \c nullptr, wenn keine vorhanden.
+  ///
+  /// \sa setChildAction getConstChildAction
   constexpr _always_inline
   Action* getChildAction() {
     return child_;
   }
 
-  /// exit all child actions (use with caution!). Call getChildAction->cancel to
-  /// cancel a child action correct.
+  /// \brief Unteraktion abwürgen.
+  ///
+  /// Die Unteraktion und evtl. weitere in der Hierachie darunter folgende Unteraktionen
+  /// werden ohne, dass die einzelnen Unteraktionen mit dem Ereignis \ref event_cancel
+  /// benachrichtigt werden, abgebrochen.
+  ///
+  /// Diese Funktion mit Vorsicht benutzen, da die Unteraktionen nicht ordnungsgemäß
+  /// beendet werden und evtl. gestartete Aufgaben nicht durch die Unteraktionen
+  /// abgebrochen werden können.
+  ///
+  /// Für das ordnungsgemäße Beenden von der eigenen Aktion \ref exit benutzen und
+  /// andere Aktionen mit \ref cancel beenden.
+  ///
+  /// \sa cancel, exit
   void killChildActions();
 
-  /// set to false to avoid being put into the Troubleshooter blacklist
+  /// \brief Aktion nicht erlauben auf die Blacklist des SystemControl Troubleshooter's
+  ///        gesetzt zu werden.
+  /// \param val Bei \c true, kann Aktion Auf Blacklist gesetzt werden, sonst nicht.
+  ///
+  /// \sa canBeAddedToBlacklist
   _always_inline
   void setCanBeAddedToBlacklist(bool val) {
       can_be_added_to_blacklist_ = val;
   }
 
 private:
+  /// übergeordnete Aktion oder \c nullptr, wenn Aktion nicht aktiv oder keine
+  /// übergeordnete Aktion ist vorhanden.
   Action* parent_;
+
+  /// aktueller Zustand von \c nullptr, wenn Aktion nicht aktiv
   State currentstate_;
+
+  /// Startzustand von Aktion
   const State startstate_;
+
+  /// Name von Aktion
   const char* const name_;
+
+  /// Unteraktion oder \c nullptr, wenn keine vorhanden oder Aktion nicht aktiv
   Action* child_;
+
+  /// Aktion ist noch aktiv wird aber bald beendet
   bool about_to_close_;
+
+  /// Aktion kann auf Blacklist gesetzt werden
   bool can_be_added_to_blacklist_;
 };
 
-////////////////////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////////////
 //     StaticAction
 
+/// \brief Singleton für Aktion
+///
+/// Durch diese Klasse wird aus Aktion ein Singleton und die nicht-statischen Methoden der
+/// Aktionsklasse stehen auch in statischen Methoden (z.B. Zustandsfunktionen) zur
+/// Verfügung.
+///
+/// Diese Klasse sollte nicht direkt verwendet werden. Diese Klasse kann
+/// mit \ref ACTION_CLASS erstellt und die Zustandsfunktionen mit \ref ACTION_STATES
+/// definiert werden.
+///
+/// \tparam A Von Aktion abgeleitete Klasse
+///
+/// \sa ACTION_CLASS, ACTION_STATES, SIMPLE_ACTION_CLASS
 template<typename A>
 class StaticAction: public Action {
 public:
+  /// \brief Aktions-Singleton erstellen
+  ///
+  /// Wird in \ref ACTION_STATES aufgerufen.
   constexpr
   StaticAction(State start_state, const char* name) :
     Action(start_state, name)
   { }
 
+  /// \brief Referenz zu Instanz von Aktion bekommen
   static _always_inline A& get() {
     return *getPointer();
   }
 
+  /// \brief Zeiger zu Instanz von Aktion bekommen
   static _always_inline A* getPointer() {
     return &instance;
   }
 
+  /// \copydoc Action::isActive
   static _always_inline bool isActive() {
     return instance.Action::isActive();
   }
 
+  /// \copydoc Action::cancel
   static _always_inline bool cancel() {
     return instance.Action::cancel();
   }
 
+  /// \copydoc Action::func
   static _always_inline bool func(EventId id, EventArg data) {
     return instance.Action::func(id, data);
   }
 
-  static _always_inline void start(Action* parent, EventArg data) {
-    instance.Action::start(parent, data);
+  /// \copydoc Action::start(EventArg)
+  static _always_inline void start(EventArg data) {
+    instance.Action::start(nullptr, data);
   }
 
+  /// \copydoc Action::canBeAddedToBlacklist
   constexpr _always_inline bool canBeAddedToBlacklist(void) {
     return instance.Action::canBeAddedToBlacklist();
   }
 
 protected:
+  /// \copydoc Action::exit
   static _always_inline bool exit(EventId eid) {
     return instance.Action::exit(eid);
   }
 
+  /// \copydoc Action::nextState
   static _always_inline void nextState(State next, EventArg data = 0) {
     instance.Action::nextState(next, data);
   }
 
+  /// \copydoc Action::callParent
   static _always_inline bool callParent(EventId id, EventArg data) {
     return instance.Action::callParent(id, data);
   }
 
+  /// \copydoc Action::checkState
   constexpr
   static _always_inline bool checkState(State current) {
     return instance.Action::checkState(current);
   }
 
+  /// \copydoc Action::setChildAction
   static _always_inline void setChildAction(Action* child, EventArg data = 0) {
     instance.Action::setChildAction(child, data);
   }
 
+  /// \copydoc Action::getChildAction
   static _always_inline Action* getChildAction() {
     return instance.Action::getChildAction();
   }
 
+  /// \copydoc Action::setCanBeAddedToBlacklist
   static _always_inline void setCanBeAddedToBlacklist(bool val) {
     instance.Action::setCanBeAddedToBlacklist(val);
   }
 
 private:
+  /// Singleton Instanz von Aktion
   static A instance;
 };
 

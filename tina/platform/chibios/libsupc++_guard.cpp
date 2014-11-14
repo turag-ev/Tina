@@ -1,21 +1,20 @@
 /**
- * \file tina++/c++/libsupc++_guard.cpp
  * \author Martin Oemus <martin@oemus.net>
  * \date Oktober 2014
  *
  * \brief C++ runtime-support.
- * 
+ *
  * Diese Datei stellt C++-Laufzeitunterstützung für die Verwendung
  * thread-sicherer funktions-statischer Klasseninstanzen bereit.
- * 
+ *
  * Dies ermöglicht zum Beispiel die Implementierung von Singletons
  * ohne die Benutzung globaler Instanzen, wenn new nicht verfügbar ist.
- * 
+ *
  * \note Die vorliegende Implementierung wurde aus der zur gcc 4.7
  * gehörenden libsupc++-Bibliothek entnommen und etwas vereinfacht.
- * Dadurch kann diese Version ausschließlich auf der ARM-Platform 
+ * Dadurch kann diese Version ausschließlich auf der ARM-Platform
  * (ab armv6) mit ChibiOS als Betriebssystem benutzt werden.
- * Die Futex-Syscalls wurden durch die Benutzung einer Semaphore 
+ * Die Futex-Syscalls wurden durch die Benutzung einer Semaphore
  * ersetzt. Da der Quellcode ansonsten kaum verändert wurde,
  * sollten die Anpassungen leicht nachvollziehbar sein.
  */
@@ -30,7 +29,7 @@
 
 // Copyright (C) 2002, 2004, 2006, 2008, 2009, 2010, 2011, 2012, 2014
 // Free Software Foundation, Inc.
-//  
+//
 // This file is part of GCC.
 //
 // GCC is free software; you can redistribute it and/or modify
@@ -72,7 +71,7 @@ extern "C" {
 
   // We also want the element size in array cookies.
 #define _GLIBCXX_ELTSIZE_IN_COOKIE 1
-    
+
 }
 } // namespace __cxxabiv1
 
@@ -157,7 +156,7 @@ static inline int __guard_test_bit (const int __byte, const int __val) {
 	__u.__c[__byte] = __val;
 	return __u.__i;
 }
-	
+
 // static initialization of our semaphore
 SEMAPHORE_DECL(semaphore, 0);
 
@@ -188,17 +187,17 @@ int __cxa_guard_acquire (__guard *g) {
 			// This thread should do the initialization.
 			return 1;
 		}
-			
+
 		if (expected == guard_bit) {
 			// Already initialized.
-			return 0;	
+			return 0;
 		}
 
 		if (expected == pending_bit) {
 			// Use acquire here.
 			int newv = expected | waiting_bit;
 			if (!__atomic_compare_exchange_n(gi, &expected, newv, false,
-							__ATOMIC_ACQ_REL, 
+							__ATOMIC_ACQ_REL,
 							__ATOMIC_ACQUIRE)) {
 				if (expected == guard_bit) {
 					// Make a thread that failed to set the
@@ -207,12 +206,12 @@ int __cxa_guard_acquire (__guard *g) {
 					// successfully finished initialising.
 					return 0;
 				}
-				
+
 				if (expected == 0) {
 					continue;
 				}
 			}
-			
+
 			expected = newv;
 		}
 
@@ -224,7 +223,7 @@ int __cxa_guard_acquire (__guard *g) {
 
 extern "C"
 void __cxa_guard_abort (__guard *) {
-	// This function is called if the initialization terminates by throwing an exception. 
+	// This function is called if the initialization terminates by throwing an exception.
 	// We don't support exceptions, hence we don't need it.
 }
 
@@ -240,7 +239,7 @@ void __cxa_guard_release (__guard *g) {
 		chSemReset(&semaphore, 0);
 	}
 }
-  
+
 } // namespace __cxxabiv1
 
 

@@ -445,7 +445,7 @@ public:
   /// \brief alle gespeicherten Ereignisse löschen
   ///
   /// Löscht Ereignisse von allen eingegangenen wartenden Ereignissen, die
-  /// über die Funktionen \ref push, \ref pushFront und \ref pushTimedelayed hinzugefügt wurden.
+  /// über die Funktionen \ref push, \ref pushToFront und \ref pushTimedelayed hinzugefügt wurden.
   ///
   /// \warning Ereignisse, die zeitverzögert ausgerufen werden um Aufgaben
   /// einmalig oder wiederkehrend auszuführen werden nicht mehr ausgeführt.
@@ -455,7 +455,7 @@ public:
 
   /// \brief Löscht alle auf die Ausführung wartenden Ereignisse.
   ///
-  /// Es werden alle Ereignisse gelöscht, die mit den Funktionen \ref push und \ref pushFront
+  /// Es werden alle Ereignisse gelöscht, die mit den Funktionen \ref push und \ref pushToFront
   /// hinzugefügt wurden, aber noch auf die Ausführung warten.
   ///
   void discardEvents();

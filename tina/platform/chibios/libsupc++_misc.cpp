@@ -1,5 +1,4 @@
 /**
- * \file tina++/c++/libsupc++_misc.cpp
  * \author Martin Oemus <martin@oemus.net>
  * \date April 2014
  *
@@ -18,17 +17,17 @@
 #include <tina/debug/print.h>
 
 
-namespace __cxxabiv1 
+namespace __cxxabiv1
 {
-	
+
 extern "C" void __cxa_pure_virtual(void) __attribute__ ((__noreturn__));
 
-extern "C" void __cxa_pure_virtual() { 
+extern "C" void __cxa_pure_virtual() {
 	while (1) {
 		turag_error("C++ ERROR: __cxa_pure_virtual() called");
 	}
-} 	
-	
+}
+
 } // namespace __cxxabiv1
 
 
