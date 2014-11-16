@@ -12,7 +12,16 @@ LDFLAGS = -Wall -std=c++0x -g -O0
 PROGRAM = tests
 
 # Input files
-SRCFILES = $(wildcard *.cpp) ../tina++/utils/cost.cpp
+SRCFILES = $(wildcard *.cpp) $(wildcard tina/*.c) \
+  ../tina++/utils/cost.cpp  ../tina++/statemachine/state.cpp
+  
+# make everything public :P
+CXXFLAGS += -Dprivate=public -Dprotected=public
+
+# no config
+CXXFLAGS += -DTURAG_NO_PROJECT_CONFIG -DTURAG_NO_PLATFORM_CONFIG
+CFLAGS += -DTURAG_NO_PROJECT_CONFIG -DTURAG_NO_PLATFORM_CONFIG
+  
 LIBS = -lboost_unit_test_framework
 
 ################################################################################

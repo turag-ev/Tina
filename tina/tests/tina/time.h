@@ -60,14 +60,7 @@ unsigned turag_ticks_to_us(TuragSystemTime time) {
 #define TURAG_TIME_INFINITE_TICKS UINT64_MAX
 #define TURAG_TIME_INFINITE _turag_ticks_to_time(UINT64_MAX)
 
-/// Get number of sys ticks since system start
-/**
- * \return sys ticks
- */
-static _always_inline
-TuragSystemTime turag_get_current_tick(void) { // [tick]
-  return turag_ms_to_ticks(0);
-}
+TuragSystemTime turag_get_current_tick(void);
 
 #ifdef __cplusplus
 } // extern "C"

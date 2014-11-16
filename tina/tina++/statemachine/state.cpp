@@ -16,205 +16,156 @@
 
 namespace TURAG {
 
-// Mögliche Zustände für Aktionen:
-//                     | currentstate_ | parent_  | child_   | about_to_close_
-// --------------------+---------------+----------+----------+------------------
-// aktiv               | !nullptr      | undef.   | undef.   | false
-// wartet auf Beenden  | !nullptr      | undef.   | !nullptr | true
-// wird beendet        | !nullptr      | undef.   | nullptr  | true
-// nicht aktiv         |  nullptr      | nullptr  | nullptr  | false
+void Action::exit(EventId eid) {
+	if (isActive()) {
+		turag_infof("##### EXIT %s", name_);
 
-bool Action::exit(EventId eid) {
-  if (isActive() && !about_to_close_) {
-    turag_infof("#####-##### EXIT %s #####-#####", name_);
+		// Aktion inaktiv setzen
+		currentstate_ = nullptr;
 
-    currentstate_ = nullptr;
-    if (child_) {
-      bool nondelayed_close = child_->cancel();
-      if (!nondelayed_close) {
-        // Aktion befindet sich in semi-aktiven Zustand
-        // Aktion wird beendet, wenn sich Kindaktion beendet
-        about_to_close_ = true;
-        return false;
+		// Kindaktion abbrechen, wenn vorhanden
+		if (child_) {
+			child_->cancel();
+			child_ = nullptr;
+		}
 
-      } else {
-        child_ = nullptr;
-      }
-    }
-    // alle Kinder beendet
+		if (parent_) {
+			// Verbindung von Elternelement entfernen
+			parent_->child_ = nullptr;
 
-    if (parent_) {
-      parent_->child_ = nullptr;
-      parent_ = nullptr;
-      about_to_close_ = false;
+			// Elternaktion über Beenden dieser Aktion informieren
+			bool handled = parent_->func(Action::event_return, eid);
+			if (!handled) {
+				turag_warningf("Beenden von Aktion %s wurde nicht behandelt.",
+							   name_);
+			}
 
-      if (parent_->about_to_close_) {
-        // Elternaktion wartet auf Beenden dieser Funktion
-        parent_->cancel();
-      } else {
-        // Elternaktion über Beenden dieser Aktion informieren
-        bool handled = parent_->func(Action::event_return, eid);
-        if (!handled) {
-          turag_warningf("Exit of Action %s is not handled", name_);
-        }
-      }
-    } else {
-      parent_ = nullptr;
-      about_to_close_ = false;
-    }
-    return true;
+			// Verbindung zu Elternelement entfernen
+			parent_ = nullptr;
+		}
 
-  } else {
-    if (child_) {
-      // Aktion beendet, aber eines der Kinderaktionen noch nicht
-      turag_criticalf("Tried to exit an nonactive action %s (with unclosed action %s)", name_, child_->name_);
-      return false;
-    } else {
-      if (about_to_close_) {
-        // Diese Aktion wird verzögert beendet
-        cancel();
-      }
-      else
-      {
-        turag_criticalf("Tried to exit an nonactive action %s", name_);
-      }
-      return true;
-    }
-  }
+	} else {
+		turag_criticalf("Inaktive Aktion %s kann nicht beendet werden.", name_);
+	}
 }
 
-bool Action::cancel() {
-  if (isActive() && !about_to_close_) {
-    turag_infof("#####-##### CANCEL %s #####-#####", name_);
-    if (child_) {
-      bool nondelayed_close = child_->cancel();
-      if (nondelayed_close) {
-        child_ = nullptr;
-      } else {
-        // Aktion befindet sich in semi-aktiven Zustand
-        // Aktion wird beendet, wenn sich Kindaktion beendet
-        currentstate_ = nullptr;
-        about_to_close_ = true;
-        return false;
-      }
-    }
-    // ab jetzt alle Kinderaktionen beendet
+void Action::cancel() {
+	if (isActive()) {
+		turag_infof("##### CANCEL %s", name_);
 
-    bool delayed_close = currentstate_(Action::event_cancel, 0);
-    if (!delayed_close) {
-      // Aktion wird sofort geschlossen
-      currentstate_ = nullptr;
-      if (parent_) {
-        if (parent_->about_to_close_) {
-          parent_->cancel();
-        } else {
-          parent_->child_ = nullptr;
-          parent_ = nullptr;
-        }
-      }
-    } else {
-      about_to_close_ = true;
-    }
-    return !delayed_close;
+		// Aktion inaktiv setzen
+		State last_state = currentstate_;
+		currentstate_ = nullptr;
 
-  } else {
-    if (!child_) {
-      turag_criticalf("Tried to cancel an nonactive action %s", name_);
-      return true;
-    } else {
-      // Wenn man auf das Beenden einer Kindaktion wartet
-      return false;
-    }
-  }
+		// Kindaktion abbrechen, wenn vorhanden
+		if (child_) {
+			child_->cancel();
+			child_ = nullptr;
+		}
+
+		// Aktion benachrichtigen
+		last_state(event_cancel, 0);
+
+		if (parent_) {
+			// Verbindung zu und von Elternelement entfernen
+			parent_->child_ = nullptr;
+			parent_ = nullptr;
+		}
+
+	} else {
+		turag_criticalf("Inaktive Aktion %s kann nicht abgebrochen werden.",
+						name_);
+	}
 }
 
 void Action::nextState(State next, EventArg data) {
-  if (isActive() && !about_to_close_) {
-    if (child_) {
-      if (!child_->cancel()) {
-        turag_errorf("called nextState in action %s with not trivial cancelable child action %s", name_, child_->name_);
-        // TODO: Zustand zulassen
+	if (isActive()) {
+		// Kindaktion abbrechen, wenn vorhanden
+		if (child_) {
+			child_->cancel();
+			child_ = nullptr;
+		}
 
-        // Sollte nicht passieren: siehe Hinweis
-        child_->parent_ = nullptr;
-        child_ = nullptr;
-      }
-    }
+		// nächsten Zustand einnehmen
+		currentstate_ = next;
 
-    currentstate_ = next;
-    //printf("Action::nextState -> currentstate_ = %p\n", currentstate_);
-    currentstate_(Action::event_start, data);
+		// Zustand starten
+		currentstate_(Action::event_start, data);
 
-  } else {
-    turag_criticalf("Tried to change state of nonactive action %s", name_);
-  }
+	} else {
+		turag_criticalf("Zustand der inaktiven Aktion %s kann nicht verändert werden.",
+						name_);
+	}
 }
 
 void Action::start(Action *parent, EventArg data) {
-  if (!isActive() && !about_to_close_) {
-    turag_infof("#####-##### START %s #####-#####", name_);
-    parent_ = parent;
-    child_ = nullptr;
-    currentstate_ = startstate_;
-    //printf("Action::start -> currentstate_ = %p\n", currentstate_);
-    currentstate_(Action::event_start, data);
+	if (!isActive()) {
+		turag_infof("##### START %s", name_);
 
-  } else {
-    turag_criticalf("Tried to start an active action %s", name_);
-  }
+		// übergeordnete Aktion setzen
+		parent_ = parent;
+
+		// Ausgangszustand setzen
+		child_ = nullptr;
+
+		// Startzustand setzen
+		currentstate_ = startstate_;
+
+		// Zustand starten
+		currentstate_(Action::event_start, data);
+
+	} else {
+		turag_criticalf("Aktive Aktion %s kann nicht gestartet werden.", name_);
+	}
 }
 
 _hot
 bool Action::func(EventId id, EventArg data) {
-  if (isActive()) {
-    if (child_) {
-      State state_by_event = currentstate_;
-      bool handled = child_->func(id, data);
-      if (!handled && state_by_event == currentstate_ && !about_to_close_) {
-        return currentstate_(id, data);
-      } else {
-        return true;
-      }
+	if (isActive()) {
 
-    } else {
-      return currentstate_(id, data);
-    }
+		// Ereignis an untergeordnete Aktion weiterreichen
+		if (child_) {
+			State state_by_event = currentstate_;
+			bool handled = child_->func(id, data); // TODO: Rekursion auflösen
 
-  } else {
-    turag_criticalf("Tried to call an nonactive action %s", name_);
-    return false;
-  }
+			// Wenn nicht behandelt, dann in dieser Aktion von aktuellen
+			// Zustand behandeln.
+			// Wenn sich Zustand dieser Aktion verändert hat, zählt
+			// dies auch als behandelt.
+			if (!handled && state_by_event == currentstate_) {
+				return currentstate_(id, data);
+			}
+
+			return true;
+		}
+
+		// Ereignis in aktuellen Zustand verarbeiten
+		return currentstate_(id, data);
+
+	} else {
+		turag_criticalf("Inaktive Aktion %s kann keine Ereignisse verarbeiten.",
+						name_);
+		return false;
+	}
 }
 
-void Action::setChildAction(Action* child, EventArg data) {
-  if (isActive() && !about_to_close_) {
-    if (child_ == nullptr) {
-      child_ = child;
-      child->start(this, data);
+void Action::setChild(Action* child, EventArg data) {
+	if (isActive()) {
+		if (child_ == nullptr) {
+			// untergeordnete Aktion hinzufügen
+			child_ = child;
 
-    } else {
-      turag_criticalf("Tried to set child of action %s, that has already a active child action: %s.", name_, child_->name_);
-    }
-  } else {
-    turag_criticalf("Tried to set child of non-active action %s to %s", name_, child->name_);
-  }
-}
+			// untergeordnete Aktion starten
+			child->start(this, data);
 
-void Action::killChildActions() {
-  if (isActive()) {
-    Action* next = child_;
-
-    while (next) {
-      Action* current = next;
-      next = next->child_;
-
-      current->child_ = nullptr;
-      current->currentstate_ = nullptr;
-      current->parent_ = nullptr;
-      current->about_to_close_ = false;
-    }
-    child_ = nullptr;
-  }
+		} else {
+			turag_criticalf("Action %s kann keine weitere Kindaktion %s hinzugefügt werden.",
+							name_, child_->name_);
+		}
+	} else {
+		turag_criticalf("Inaktiver Action %s kann keine Kindaktion %s hinzugefügt werden.",
+						name_, child->name_);
+	}
 }
 
 } // namespace TURAG

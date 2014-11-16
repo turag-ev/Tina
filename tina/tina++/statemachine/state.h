@@ -156,7 +156,10 @@ public:
     event_success,
 
     /// \brief Rückgabewert, wenn Aktion nicht erfolgreich ausgeführt wurde.
-    event_failure
+	event_failure,
+
+	/// \brief Rückgabewert, wenn Aktion über \ref cancel abgebrochen wurde.
+	event_canceled
   };
 
   /// \brief Aktion erstellen.
@@ -174,7 +177,6 @@ public:
     startstate_(startstate),
     name_(name),
     child_(0),
-    about_to_close_(false),
     can_be_added_to_blacklist_(true)
   { }
 
@@ -214,7 +216,7 @@ public:
   /// \return aktueller Zustand von Aktion oder \c nullptr, wenn Aktion nicht
   ///         aktiv (\ref isActive liefert \c false).
   constexpr _always_inline
-  State getState() const {
+  const State getState() const {
     return currentstate_;
   }  
 
@@ -237,7 +239,7 @@ public:
   /// \return \c true, falls Aktion sofort abgebrochen werden konnte, sonst \c false.
   ///
   /// \sa exit
-  bool cancel();
+  void cancel();
 
   /// \brief Unteraktion hinzufügen.
   ///
@@ -253,7 +255,8 @@ public:
   /// Wird der Zustand dieser Aktion gewechselt bzw. diese Aktion beendet oder
   /// abgebrochen, so wird die Unteraktion abgebrochen.
   ///
-  /// \pre Aktion hat keine Unteraktion.
+  /// \pre Aktion hat keine Unteraktion: `getConstChildAction() == nullptr`
+  /// \pre Parameter \a child ist nicht \c nullptr: `child != nullptr`
   ///
   /// \param child Unteraktion, die hinzugefügt und gestartet werden soll.
   /// \param data Parameter mit extra Daten, der mit dem \ref event_start Ereignis,
@@ -261,16 +264,26 @@ public:
   ///
   /// \sa start(EventArg)
   ///
-  void setChildAction(Action* child, EventArg data = 0);
+  void setChild(Action* child, EventArg data = 0);
 
   /// \brief Gibt eine evtl. vorhandene Unteraktion zurück.
   ///
   /// \return vorhandene Unteraktion oder \c nullptr, wenn keine vorhanden.
   ///
-  /// \sa setChildAction
+  /// \sa setChild, getParent
   _always_inline
-  const Action* getConstChildAction() const {
+  const Action* getChild() const {
     return child_;
+  }
+
+  /// \brief Gibt eine evtl. übergeordnete Unteraktion zurück.
+  ///
+  /// \return übergeordnete Unteraktion oder \c nullptr, wenn keine vorhanden.
+  ///
+  /// \sa setChild, getChild
+  _always_inline
+  const Action* getParent() const {
+	return parent_;
   }
 
   /// \brief Name der Aktion zurückgeben
@@ -291,6 +304,15 @@ public:
   constexpr _always_inline
   bool canBeAddedToBlacklist() {
     return can_be_added_to_blacklist_;
+  }
+
+  /// \brief Prüft, ob ein Zustand ausgeführt wird
+  ///
+  /// \return Es wird \c true zurückgegeben, falls \a current die aktuell
+  /// von dieser Altion ausgeführte Zustand ist.
+  constexpr _always_inline
+  bool checkState(State current) const {
+	return currentstate_ == current;
   }
 
 protected:
@@ -343,42 +365,17 @@ protected:
   ///
   /// \param eid Rückgabewert dieser Aktion, z.B. \ref event_success oder \ref event_failure
   /// \return Es wird \c false zurückgegeben, falls die
-  bool exit(EventId eid);
-
-  /// \brief Prüft, ob ein Zustand ausgeführt wird
-  ///
-  /// \return Es wird \c true zurückgegeben, falls \a current die aktuell
-  /// von dieser Altion ausgeführte Zustand ist.
-  constexpr _always_inline
-  bool checkState(State current) const {
-    return currentstate_ == current;
-  }
+  void exit(EventId eid);
 
   /// \brief Gibt eine evtl. vorhandene Unteraktion zurück.
   ///
   /// \return vorhandene Unteraktion oder \c nullptr, wenn keine vorhanden.
   ///
-  /// \sa setChildAction getConstChildAction
-  constexpr _always_inline
-  Action* getChildAction() {
+  /// \sa setChild getConstChild
+  _always_inline
+  Action* getChild() {
     return child_;
   }
-
-  /// \brief Unteraktion abwürgen.
-  ///
-  /// Die Unteraktion und evtl. weitere in der Hierachie darunter folgende Unteraktionen
-  /// werden ohne, dass die einzelnen Unteraktionen mit dem Ereignis \ref event_cancel
-  /// benachrichtigt werden, abgebrochen.
-  ///
-  /// Diese Funktion mit Vorsicht benutzen, da die Unteraktionen nicht ordnungsgemäß
-  /// beendet werden und evtl. gestartete Aufgaben nicht durch die Unteraktionen
-  /// abgebrochen werden können.
-  ///
-  /// Für das ordnungsgemäße Beenden von der eigenen Aktion \ref exit benutzen und
-  /// andere Aktionen mit \ref cancel beenden.
-  ///
-  /// \sa cancel, exit
-  void killChildActions();
 
   /// \brief Aktion nicht erlauben auf die Blacklist des SystemControl Troubleshooter's
   ///        gesetzt zu werden.
@@ -406,9 +403,6 @@ private:
 
   /// Unteraktion oder \c nullptr, wenn keine vorhanden oder Aktion nicht aktiv
   Action* child_;
-
-  /// Aktion ist noch aktiv wird aber bald beendet
-  bool about_to_close_;
 
   /// Aktion kann auf Blacklist gesetzt werden
   bool can_be_added_to_blacklist_;
@@ -457,8 +451,8 @@ public:
   }
 
   /// \copydoc Action::cancel
-  static _always_inline bool cancel() {
-    return instance.Action::cancel();
+  static _always_inline void cancel() {
+	instance.Action::cancel();
   }
 
   /// \copydoc Action::func
@@ -476,10 +470,20 @@ public:
     return instance.Action::canBeAddedToBlacklist();
   }
 
+  /// \copydoc Action::getChild
+  static _always_inline const Action* getChild() {
+	return instance.Action::getChild();
+  }
+
+  /// \copydoc Action::getParent
+  static _always_inline const Action* getParent() {
+	return instance.Action::getParent();
+  }
+
 protected:
   /// \copydoc Action::exit
-  static _always_inline bool exit(EventId eid) {
-    return instance.Action::exit(eid);
+  static _always_inline void exit(EventId eid) {
+	instance.Action::exit(eid);
   }
 
   /// \copydoc Action::nextState
@@ -493,19 +497,18 @@ protected:
   }
 
   /// \copydoc Action::checkState
-  constexpr
   static _always_inline bool checkState(State current) {
     return instance.Action::checkState(current);
   }
 
-  /// \copydoc Action::setChildAction
-  static _always_inline void setChildAction(Action* child, EventArg data = 0) {
-    instance.Action::setChildAction(child, data);
+  /// \copydoc Action::getState
+  static _always_inline const State getState() {
+	return instance.Action::getState();
   }
 
-  /// \copydoc Action::getChildAction
-  static _always_inline Action* getChildAction() {
-    return instance.Action::getChildAction();
+  /// \copydoc Action::setChild
+  static _always_inline void setChild(Action* child, EventArg data = 0) {
+	instance.Action::setChild(child, data);
   }
 
   /// \copydoc Action::setCanBeAddedToBlacklist

@@ -13,6 +13,7 @@
 #include <type_traits>
 
 #include <tina++/thread.h>
+#include <tina++/time.h>
 #include <tina++/helper/packed.h>
 #include <tina++/container/circular_buffer.h>
 #include <tina++/container/array_buffer.h>
