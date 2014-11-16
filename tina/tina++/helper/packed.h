@@ -57,7 +57,7 @@ namespace TURAG {
 /// Speicherplatz benötigt als der Zieltyp \a Packed: `sizeof(Unpacked) <= sizeof(Packed)`
 ///
 /// \tparam Packed Typ in den Variable gepackt werden soll.
-/// \tparam[in] Unpacked Typ von Variable in Grundzustand (muss nicht angegeben werden)
+/// \tparam Unpacked Typ von Variable in Grundzustand (muss nicht angegeben werden)
 /// \param src Variable, die in anderen Typ gepackt werden soll
 /// \sa TURAG::unpack
 template<typename Packed, typename Unpacked>
@@ -88,7 +88,7 @@ inline Unpacked unpack(Packed src) {
 /// \brief Wie TURAG::unpack, aber gibt Referenz zurück.
 ///
 /// Will man bei \ref TURAG::unpack vermeiden, dass in eine neue Variable
-/// kopiert wird, kann man \ref TURAG::reinterpret_reference:
+/// kopiert wird, kann man diese Funktion benutzen:
 /// \code
 /// // für Beispiel von TURAG::pack:
 /// void callback_struct(void* data) {

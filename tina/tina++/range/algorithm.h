@@ -4,6 +4,7 @@
 #include <algorithm>
 
 #include "../tina.h"
+#include "../helper/static_const.h"
 
 namespace TURAG {
 
@@ -118,22 +119,90 @@ bool none_of(const Range& range, Pred pred) {
   return std::none_of(std::begin(range), std::end(range), pred);
 }
 
+// TURAG::length mit Erweiterungspunkt:
+// http://ericniebler.com/2014/10/21/customization-point-design-in-c11-and-beyond/
+namespace _detail
+{
+  // Länge von Array
+  template<class T, size_t N>
+  constexpr std::size_t length(T (&a)[N] _unused) noexcept
+  {
+	return N;
+  }
 
-/// Länge von Container zurückgeben
+  // Länge von Container
+  template<class Container>
+  constexpr std::size_t length(Container&& container)
+  {
+	return std::forward<Container>(container).size();
+  }
+
+  // Erweiterungspunkt
+  struct _length_fn
+  {
+	template<class Container>
+	constexpr std::size_t operator()(Container&& container) const
+	{
+	  return length(std::forward<Container>(container));
+	}
+  };
+}
+
+#ifndef __DOXYGEN__
+namespace
+{
+  // globales Funktionsobjekt
+  constexpr auto const & length = _detail::static_const<_detail::_length_fn>::value;
+}
+#else
+
+/// \brief Länge von Container zurückgeben
+///
+/// Gibt standardmäßig die Länge von Arrays und Containern (benutzt \c size Methode) zurück:
+/// \code
+/// int array[200];
+/// std::size_t size = length(array); // size = 200
+///
+/// // for-Schleife:
+/// for (std::size_t i = 0; i < length(array); i++) {
+///   // mach was mit array[i]
+/// }
+///
+/// // für Container
+/// ArrayBuffer<100> array_buffer;
+/// size = length(array_buffer); // benutzt array_buffer.size()
+/// \endcode
+///
+/// Diese Funktion kann für andere Typen erweitert werden:
+/// \code
+/// namespace MyNamespace {
+///
+/// // nicht veränderbarer Container
+/// struct MyContainer {
+///   ArrayBuffer<100> buffer;
+/// }
+///
+/// // Erweiterungsmethode
+/// std::size_t length(MyContainer&& my_container) {
+///   return std::forward<MyContainer>(my_container).buffer.size();
+/// }
+///
+/// } // namespace MyNamespace
+///
+/// // Benutzung:
+/// MyNamespace::MyContainer container;
+/// auto size = TURAG::length(container);
+///
+/// \endcode
+///
+/// Als Inspiration diente dieser Artikel: http://ericniebler.com/2014/10/21/customization-point-design-in-c11-and-beyond/
+///
 /// \param container Container
 /// \returns Länge von Container
-template <typename Container>
-std::size_t length(const Container& container) {
-  return container.size();
-}
+template<class Container>
+constexpr std::size_t length(Container&& container);
 
-/// Länge von Array zurückgeben
-/// \param array Array
-/// \returns Länge von Array
-template <typename T, std::size_t N>
-constexpr std::size_t length(const T (&array)[N] _unused) {
-  return N;
-}
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // iterator extentions
