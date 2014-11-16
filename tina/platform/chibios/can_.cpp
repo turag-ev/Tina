@@ -24,9 +24,9 @@ uint64_t call(Id remote_id, FuncId func_id, uint64_t param, ErrorCode* error_res
     // with unconnected CAN bus this does spam-a-lot
     if (error != -CASA_ENOERR) {
         if (errorcnt++ <= 4) {
-            errorf("CASA RPC (Id: %d / Func: %d) failed with error code: %d (0x%.8x)", remote_id, func_id, error, error);
+            turag_errorf("CASA RPC (Id: %d / Func: %d) failed with error code: %d (0x%.8x)", remote_id, func_id, error, error);
             if (errorcnt == 5)
-                errorf("(omitting the following 500 CASARPC messages)");
+                turag_errorf("(omitting the following 500 CASARPC messages)");
         } else if (errorcnt == 500) {
             errorcnt = 0;
         }
