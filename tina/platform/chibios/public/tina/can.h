@@ -10,6 +10,9 @@
 extern "C" {
 #endif
 
+// PENIS
+#define TINA_DEBUG
+
 // C Interface
 
 #define TURAG_CASA_ENOERR (-CASA_ENOERR)
