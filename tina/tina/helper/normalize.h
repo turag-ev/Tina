@@ -132,7 +132,7 @@
 
 /// \brief GCC does not produce a warning for this variable.
 /// This attribute, attached to a variable, means that the variable is meant to be possibly unused.
-#define _unsed __attribute__ ((unused))
+#define _unused __attribute__ ((unused))
 
 /// \}
 

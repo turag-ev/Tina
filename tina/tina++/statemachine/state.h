@@ -467,7 +467,7 @@ public:
   }
 
   /// \copydoc Action::start(EventArg)
-  static _always_inline void start(EventArg data) {
+  static _always_inline void start(EventArg data = 0) {
     instance.Action::start(nullptr, data);
   }
 

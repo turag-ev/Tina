@@ -9,13 +9,13 @@ namespace TURAG {
 
 /// \ingroup Misc
 /// \brief Bitflags
-template<typename Enum, std::size_t Bits>
+template<typename Enum, std::size_t Bits = sizeof(Enum)*8>
 class Flags {
 public:
   typedef Enum enum_type;
   static constexpr std::size_t bits = Bits;
 
-  static const Flags NOTHING;
+  static constexpr Flags NOTHING{};
 
   static constexpr _always_inline int bit(Enum b) {
     return 1 << static_cast<int>(b);
@@ -237,9 +237,6 @@ private:
   operator|(flags::enum_type f1, Flags<flags::enum_type, flags::bits> f2) { \
     return f2 | f1; \
   }
-
-template<typename Enum, std::size_t Bits>
-const Flags<Enum, Bits> Flags<Enum, Bits>::NOTHING;
 
 } // namespace TURAG
 
