@@ -34,7 +34,7 @@ void Action::exit(EventId eid) {
 			parent_->child_ = nullptr;
 
 			// Elternaktion über Beenden dieser Aktion informieren
-			bool handled = parent_->func(Action::event_return, eid);
+			bool handled = parent_->currentstate_(Action::event_return, eid);
 			if (!handled) {
 				turag_warningf("Beenden von Aktion %s wurde nicht behandelt.",
 							   name_);
@@ -99,73 +99,95 @@ void Action::nextState(State next, EventArg data) {
 }
 
 void Action::start(Action *parent, EventArg data) {
-	if (!isActive()) {
-		turag_infof("##### START %s", name_);
+	turag_infof("##### START %s", name_);
+
+	if (isActive()) {
+		turag_criticalf("Aktive Aktion %s kann nicht gestartet werden.", name_);
+		return;
+	}
+
+	if (parent) {
+		if (!parent->isActive()) {
+			turag_criticalf("Inaktiver Aktion %s kann keine Kindaktion %s hinzugefügt werden.",
+							parent->name_, name_);
+			return;
+		}
+
+		if (parent->getChildAction() != nullptr) {
+			turag_criticalf("Aktion %s kann keine weitere Kindaktion %s hinzugefügt werden.",
+							parent->name_, name_);
+			return;
+		}
 
 		// übergeordnete Aktion setzen
 		parent_ = parent;
-
-		// Ausgangszustand setzen
-		child_ = nullptr;
-
-		// Startzustand setzen
-		currentstate_ = startstate_;
-
-		// Zustand starten
-		currentstate_(Action::event_start, data);
-
-	} else {
-		turag_criticalf("Aktive Aktion %s kann nicht gestartet werden.", name_);
+		parent_->child_ = this;
 	}
+
+	// Ausgangszustand setzen
+	child_ = nullptr;
+
+	// Startzustand setzen
+	currentstate_ = startstate_;
+
+	// Zustand starten
+	currentstate_(Action::event_start, data);
 }
 
-_hot
 bool Action::func(EventId id, EventArg data) {
-	if (isActive()) {
-
-		// Ereignis an untergeordnete Aktion weiterreichen
-		if (child_) {
-			State state_by_event = currentstate_;
-			bool handled = child_->func(id, data); // TODO: Rekursion auflösen
-
-			// Wenn nicht behandelt, dann in dieser Aktion von aktuellen
-			// Zustand behandeln.
-			// Wenn sich Zustand dieser Aktion verändert hat, zählt
-			// dies auch als behandelt.
-			if (!handled && state_by_event == currentstate_) {
-				return currentstate_(id, data);
-			}
-
-			return true;
-		}
-
-		// Ereignis in aktuellen Zustand verarbeiten
-		return currentstate_(id, data);
-
-	} else {
+	if (!isActive()) {
 		turag_criticalf("Inaktive Aktion %s kann keine Ereignisse verarbeiten.",
 						name_);
 		return false;
 	}
+
+#if 0
+	// TODO: Implementation verbessern
+	Action* current = getInnermostChild();
+	do {
+		bool handled = current->currentstate_(id, data);
+		if (handled) {
+			return true;
+		}
+
+		if (current->currentstate_ == nullptr) {
+			// FIXME: Aktion hat sich beendet, Event wird nicht weitergereicht
+			return true;
+		}
+
+		current = current->parent_;
+	} while (current);
+
+	return false;
+#else
+	// Ereignis an untergeordnete Aktion weiterreichen
+	if (child_) {
+		State state_by_event = currentstate_;
+		bool handled = child_->func(id, data); // TODO: Rekursion auflösen
+		// Wenn nicht behandelt, dann in dieser Aktion von aktuellen
+		// Zustand behandeln.
+		// Wenn sich Zustand dieser Aktion verändert hat, zählt
+		// dies auch als behandelt.
+		if (!handled && state_by_event == currentstate_) {
+			return currentstate_(id, data);
+		}
+		return true;
+	}
+	// Ereignis in aktuellen Zustand verarbeiten
+	return currentstate_(id, data);
+#endif
 }
 
-void Action::setChild(Action* child, EventArg data) {
-	if (isActive()) {
-		if (child_ == nullptr) {
-			// untergeordnete Aktion hinzufügen
-			child_ = child;
+Action* Action::getInnermostChild() {
+	Action* next = child_;
+	Action* current = this;
 
-			// untergeordnete Aktion starten
-			child->start(this, data);
+	while (next) {
+		current = next;
+		next = current->getChild();
+	};
 
-		} else {
-			turag_criticalf("Action %s kann keine weitere Kindaktion %s hinzugefügt werden.",
-							name_, child_->name_);
-		}
-	} else {
-		turag_criticalf("Inaktiver Action %s kann keine Kindaktion %s hinzugefügt werden.",
-						name_, child->name_);
-	}
+	return current;
 }
 
 } // namespace TURAG

@@ -98,16 +98,16 @@ namespace TURAG {
 
 class Action;
 
-/// \brief Typ von Zustand(-sfunktion)
-/// \param id ID von Ereignis, was verarbeitet werden soll.
-/// \param data zusätzliche Information zu Ereignis
-/// \retval true Wenn Ereignis von dieser Funktion verarbeitet wurde.
-/// \retval false Wenn Ereignis nicht verarbeitet wurde.
-typedef bool (*State)(EventId id, EventArg data);
-
 /// Aktionszustandsmaschine
 class Action {
 public:
+	/// \brief Typ von Zustand(-sfunktion)
+	/// \param id ID von Ereignis, was verarbeitet werden soll.
+	/// \param data zusätzliche Information zu Ereignis
+	/// \retval true Wenn Ereignis von dieser Funktion verarbeitet wurde.
+	/// \retval false Wenn Ereignis nicht verarbeitet wurde.
+	typedef bool (*State)(EventId id, EventArg data);
+
   /// \brief Ereignis-IDs von Ereignissen von Aktion.
   ///
   /// Diese speziellen Ereignisse bieten die Möglichkeiten auf Ereignisse
@@ -117,55 +117,56 @@ public:
     ///
     /// Der zustätzliche Datenparameter hat den Wert, des bei \ref start oder
     /// \ref setChildAction übergebenen zweiten Paramters.
+	///
+	/// Der Rückgabewert der Zustandsfunktion wird ignoriert.
+	/// \sa start
     event_start = EventNamespace('A', 'c', 't'),
 
     /// \brief Aktion wird von außerhalb abgebrochen.
     ///
     /// Dieses Ereigniss tritt auf, wenn Aktion über die Funktion \ref cancel
-    /// abgebrochen wird.
+	/// abgebrochen wird. Das gibt die Möglichkeit abschließende Arbeiten
+	/// durchzuführen.
     ///
-    /// Gibt der aktuelle Zustand dieser Aktion als Reaktion in der Zustandsfunktion
-    /// \c true zurück, dann wird die Aktion noch nicht beendet, sondern bekommt die
-    /// besondere Wird-Beendet-Eigenschaft. Mit dieser Eigenschaft dürfen
-    /// folgende Funktionen nicht aufgerufen werden: \ref cancel, \ref nextState,
-    /// \ref start und \ref setChildAction. Darauf sollte so schnell wie möglich
-    /// die Aktion entgültig über \ref cancel oder \ref exit beendet werden.
-    ///
-    /// Wird vom aktuellen Zustand \c false zurückgegeben, wird die Aktion sofort beendet.
+	/// Der Rückgabewert der Zustandsfunktion wird ignoriert.
+	/// \sa cancel
     event_cancel,
 
     /// \brief Kindaktion hat sich beendet.
     ///
     /// Dieses Ereigniss tritt auf, wenn eine durch die Funktion \ref setChildAction
     /// hinzugefügte Kindaktion durch die Funktion \ref exit beendet wurde.
-    /// Dieses Ereignis tritt nicht auf, wenn diese Aktion durch die \ref cancel
-    /// beendet wird, aber auch nicht wenn die Aktion nach dem \ref event_cancel Ereignis
-    /// durch \ref exit beendet wird.
+	/// Dieses Ereignis tritt nicht auf, wenn diese Aktion durch \ref cancel
+	/// beendet wird.
     ///
-    /// Der zweite Argument, welcher der Zustandsfunktion bei diesem Event übergeben wird, ist
-    /// der Parameter der der \ref exit Funktion übergeben wird, z.B. \ref event_success
+	/// Das zweite Argument, welches der Zustandsfunktion bei diesem Event übergeben wird, ist
+	/// der Parameter, der der \ref exit Funktion übergeben wird, z.B. \ref event_success
     /// oder \ref event_failure.
+	///
+	/// Ist der Rückgabewert der Zustandsfunktion \c false, wird eine Warnung
+	/// ausgegeben.
+ /// \sa exit
     event_return = EventNamespace('A', 'c', 't') + 100,
   };
 
   /// \brief spezielle Rückgabewerte von Aktionen.
   ///
   /// Diese Rückgabewerte können beim Aufruf der \ref exit Funktion verwendet werden.
+  /// \sa exit
   enum {
     /// \brief Rückgabewert, wenn Aktion erfolgreich ausgeführt wurde.
+	/// \sa exit
     event_success,
 
     /// \brief Rückgabewert, wenn Aktion nicht erfolgreich ausgeführt wurde.
-	event_failure,
-
-	/// \brief Rückgabewert, wenn Aktion über \ref cancel abgebrochen wurde.
-	event_canceled
+	/// \sa exit
+	event_failure
   };
 
   /// \brief Aktion erstellen.
   ///
   /// \warning
-  /// \ref ACTION_CLASS oder \ref STATIC_ACTION_CLASS sollten für das Erstellen
+  /// \ref ACTION_CLASS oder \ref SIMPLE_ACTION_CLASS sollten für das Erstellen
   /// von Aktionen verwendet werden.
   ///
   /// \param startstate Initalzustand von Aktion.
@@ -182,32 +183,44 @@ public:
 
   /// \brief Hauptaktion starten
   ///
-  /// Die Hauptaktion wird mit dieser Funktion gestartet. Jede weitere Unteraktion
+  /// Die Hauptaktion wird mit dieser Funktion gestartet. Eine Unteraktion
   /// kann mit \ref setChildAction hinzugefügt werden.
   ///
-  /// Wird die Aktion gestartet wird der aktuelle Zustand der Aktion auf den
-  /// Initalisierungszustand gesetzt (zweiter Parameter in)
+  /// Beim Starten der Aktion wird der Startzustand als aktueller Zustand
+  /// gesetzt und dieser direkt mit dem \ref event_start Ereigniss aufgerufen.
+  /// Der zugehörige Datenparameter entspricht \a data.
   ///
-  /// \pre Aktion ist nicht schon aktiv oder wird gerade beendet.
+  /// \pre Aktion ist nicht aktiv: `isActive() == false`
   /// \param data zusätzliche beliebige Informationen, die bei \ref event_start
-  ///             als zweiter Parameter beim Starten des ersten Zustands übergeben werden.
+  ///             als zweiter Parameter beim Starten des ersten Zustands übergeben wird.
+  /// \sa setChildAction
   void start(EventArg data = 0) {
     start(nullptr, data);
   }
 
-  /// \brief Ereignis von Aktion verarbeiten
+  /// \brief Ereignis von Aktion und Unteraktione verarbeiten lassen.
   ///
   /// Wird in der Regel nur benötigt, um Ereignisse der Ereignisschlange (\ref TURAG::EventQueue)
   /// der Hauptaktion zuzuführen.
   ///
+  /// Das Ereignis wird zuerst an das am weitesten verschachelte Kindaktion
+  /// übergeben. Gibt die aktuelle Zustandsfunktion dieser Aktion \c true
+  /// zurück gilt des Ereignis als behandelt und diese Funktion gibt auch den
+  /// Wert \c true zurück. Gibt die aktuelle Zustandsfunktion \c false zurück,
+  /// wird das Ereignis an die nächsthöhere Aktion weitergegeben und wieder
+  /// geprüft, ob das Ereignis behandelt wurde. Wurde das Ereignis auch auf höhere
+  /// Ebene nicht behandelt, gibt diese Funktion \c false zurück.
+  ///
+  /// \pre Aktion ist aktiv: `isActive() == true`
   /// \param id Ereignis-ID von Ereignis.
   /// \param data Datenparameter zu Ereignis.
-  /// \retval true Ereignis wurde von Aktion verarbeitet.
-  /// \retval false Ereignis wurde nicht von Aktion verarbeitet.
+  /// \return Es wird \c true zurückgegeben, falls das Ereignis verarbeitet wurde, sonst \a false.
+  /// \sa getState
   bool func(EventId id, EventArg data);
 
   /// \brief Aktion ist aktiv.
-  constexpr _always_inline
+  /// \sa getState, checkState
+  _always_inline
   bool isActive() const {
     return currentstate_ != nullptr;
   }
@@ -215,7 +228,8 @@ public:
   /// \brief aktuellen Zustand von Aktion zurückgeben
   /// \return aktueller Zustand von Aktion oder \c nullptr, wenn Aktion nicht
   ///         aktiv (\ref isActive liefert \c false).
-  constexpr _always_inline
+  /// \sa checkState, isActive
+  _always_inline
   const State getState() const {
     return currentstate_;
   }  
@@ -223,20 +237,19 @@ public:
   /// \brief Bricht Verarbeitung von Aktion und allen Unteraktionen ab.
   ///
   /// Hat diese Aktion Unteraktionen, so werden erst alle Unteraktionen
-  /// abgebrochen, bevor diese Aktion abgeborchen wird.
-  ///
+  /// abgebrochen, bevor diese Aktion abgebrochen wird.
   /// Wenn die Aktion abgebrochen wird, wird das Ereignis \ref event_cancel
-  /// an die Aktion übergeben. Gibt die aktuelle Zustandsfunktion \c true
-  /// zurück, so wird die Aktion von sich selber verzögert beendet, was möglichst
-  /// schnell gesehen nachdem das Ereignis eingetroffen ist. Wird \c false zurückgegeben,
-  /// so wird die Aktion sofort beendet.
+  /// direkt an den aktuellen Zustand der betreffenden Aktion weitergegeben.
+  /// Damit wird der Aktion die Möglichkeit gegeben abschließende Arbeiten
+  /// zu tätigen.
   ///
-  /// Kann die Aktion nicht sofort beendet werden, so gibt \ref isActive \c false
-  /// zurück.
+  /// Im Gegensatz zu \ref exit, wird nicht das Ereignis \ref event_return
+  /// an die nächst höhere Aktion übergeben.
   ///
-  /// \todo Wann Benachrichtigtung, dass Aktion beendet wurde???
-  ///
-  /// \return \c true, falls Aktion sofort abgebrochen werden konnte, sonst \c false.
+  /// \pre Aktion ist aktiv: `isActive() == true`
+  /// \post Aktion ist nicht mehr aktiv: `isActive() == false`
+  /// \post Aktion hat keine Kindaktionen: `getChildAction() == nullptr`
+  /// \post Aktion hat keine übergeordnete Aktion: `getParentAction() == nullptr`
   ///
   /// \sa exit
   void cancel();
@@ -246,33 +259,31 @@ public:
   /// Jede Aktion kann bis zu eine Unteraktion aufweisen.
   /// Durch diese Funktion wird der Aktion eine Unteraktion hinzugefügt, wenn
   /// noch keine vorhanden ist. Die Unteraktion wird durch diese Funktion
-  /// sofort gestartet, siehe \ref start.
+  /// gestartet, siehe \ref start. Dadurch wird der aktuelle Zustand der
+  /// neuen Kindaktion mit dem Ereignis \ref event_start und \a data als Datenparameter
+  /// aufgerufen.
   ///
-  /// Wird die Unteraktion beendet, wird das Ereignis \ref event_return dem
-  /// aktuellen Zustand dieser Aktion übergeben. Im Datenparameter ist der Rückgabewert der
-  /// Aktion enthalten.
-  ///
-  /// Wird der Zustand dieser Aktion gewechselt bzw. diese Aktion beendet oder
-  /// abgebrochen, so wird die Unteraktion abgebrochen.
-  ///
-  /// \pre Aktion hat keine Unteraktion: `getConstChildAction() == nullptr`
+  /// \pre Aktion ist aktiv: `isActive() == true`
+  /// \pre Aktion hat keine Unteraktion: `getChildAction() == nullptr`
   /// \pre Parameter \a child ist nicht \c nullptr: `child != nullptr`
   ///
   /// \param child Unteraktion, die hinzugefügt und gestartet werden soll.
   /// \param data Parameter mit extra Daten, der mit dem \ref event_start Ereignis,
   ///              dem Startzustand als Datenparameter übergeben wird.
   ///
-  /// \sa start(EventArg)
+  /// \sa start(EventArg), getChildAction() const
   ///
-  void setChild(Action* child, EventArg data = 0);
+  void setChildAction(Action* child, EventArg data = 0) {
+	  child->start(this, data);
+  }
 
   /// \brief Gibt eine evtl. vorhandene Unteraktion zurück.
   ///
   /// \return vorhandene Unteraktion oder \c nullptr, wenn keine vorhanden.
   ///
-  /// \sa setChild, getParent
+  /// \sa setChildAction, getParentAction
   _always_inline
-  const Action* getChild() const {
+  const Action* getChildAction() const {
     return child_;
   }
 
@@ -280,9 +291,9 @@ public:
   ///
   /// \return übergeordnete Unteraktion oder \c nullptr, wenn keine vorhanden.
   ///
-  /// \sa setChild, getChild
+  /// \sa callParentAction, setChildAction
   _always_inline
-  const Action* getParent() const {
+  const Action* getParentAction() const {
 	return parent_;
   }
 
@@ -292,6 +303,7 @@ public:
   /// Aktionen über die gleichen Namen verfügen.
   ///
   /// \return Zeichenkette mit Name der Aktion
+  /// \sa ACTION_CLASS, SIMPLE_ACTION_CLASS
   const char* getName() const {
     return name_;
   }
@@ -301,61 +313,69 @@ public:
   /// Sagt aus, ob es erlaubt ist die Aktion in die Blacklist des SystemControl
   /// Troubleshooter's hinzu zu fügen. Dies ist nützlich für Aktionen mit
   /// dynamischen Einstiegspunkten.
+  /// \sa setCanBeAddedToBlacklist
   constexpr _always_inline
-  bool canBeAddedToBlacklist() {
+  bool canBeAddedToBlacklist() const {
     return can_be_added_to_blacklist_;
   }
 
   /// \brief Prüft, ob ein Zustand ausgeführt wird
   ///
-  /// \return Es wird \c true zurückgegeben, falls \a current die aktuell
-  /// von dieser Altion ausgeführte Zustand ist.
-  constexpr _always_inline
+  /// \return Es wird \c true zurückgegeben, falls \a current der aktuell
+  /// von dieser Aktion ausgeführte Zustand ist.
+  /// \sa getState
+  _always_inline
   bool checkState(State current) const {
 	return currentstate_ == current;
   }
 
 protected:
 
-  /// \brief Hauptaktion starten
+  /// \brief Aktion starten
   ///
-  /// Die Hauptaktion wird mit dieser Funktion gestartet. Jede weitere Unteraktion
-  /// kann mit \ref setChildAction hinzugefügt werden.
+  /// Beim Starten der Aktion wird der Startzustand als aktueller Zustand
+  /// gesetzt und dieser direkt mit dem \ref event_start Ereigniss aufgerufen.
+  /// Der zugehörige Datenparameter entspricht \a data.
   ///
-  /// Wird die Aktion gestartet wird der aktuelle Zustand der Aktion auf den
-  /// Initalisierungszustand gesetzt (zweiter Parameter in)
-  ///
-  /// \pre Aktion ist nicht schon aktiv oder wird gerade beendet.
-  /// \param parent Elternaktion oder \c nullptr
+  /// \pre Aktion ist nicht aktiv: `isActive() == false`
+  /// \pre Elternaktion ist aktiv und hat keine Kindaktion:
+  ///      `parent == nullptr || (parent->isActive() && parent->getChildAction() == nullptr)`
+  /// \param parent Elternaktion oder \c nullptr, wenn diese Aktion die Hauptaktion ist.
   /// \param data zusätzliche beliebige Informationen, die bei \ref event_start
   ///             als zweiter Parameter beim Starten des ersten Zustands übergeben werden.
+  /// \sa setChildAction, start(EventArg)
   void start(Action* parent, EventArg data = 0);
 
   /// \brief Übergibt übergeordneter Aktion Ereignis
+  ///
+  /// \pre Aktion ist aktiv: `isActive() == true`
+  /// \pre Aktion hat übergeordnete Aktion: `getParentAction() != nullptr`
+  ///
   /// \param id Ereignis-ID zu Ereignis
   /// \param data Datenparamter zu Ereignis
+  /// \return Ereignis wurde von übergeordneter Aktion verarbeitet oder \a false,
+  ///         falls keine übergeordnete Aktion vorhanden ist.
+  /// \sa getParentAction, setChildAction
   _always_inline
-  bool callParent(EventId id, EventArg data) const {
+  bool callParentAction(EventId id, EventArg data) const {
     return (parent_) ? (parent_->func(id , data)) : (false);
   }
 
   /// \brief Setzt Zustand von Aktion.
   ///
-  /// Durch das Setzen des neuen Zustand werden alle Ereignisse, die dieser
-  /// Aktion übergeben werden an den neuen Zustand weitergeleitet. Während
-  /// diese Funktion aufgerufen wird, wird das Ereignis \ref event_start
-  /// mit dem Parameter \a data an den neuen Zustand übergeben.
+  /// Diese Funktion setzt einen neuen Zustand für diese Aktion, der ab jetzt
+  /// alle Ereignisse verarbeitet. Der neue Zustand wird mit dem
+  /// Ereignis \ref event_start und dem Parameter \a data aufgerufen.
   ///
-  /// Der Parameter \a next muss eine Methode dieser Aktion sein.
+  /// Der neue Zustand \a next sollte eine statische Methode dieser Aktion sein.
   ///
-  /// Evtl. vorhandene Unteraktionen werden abgebrochen.
+  /// Evtl. vorhandene Unteraktionen werden vor dem Setzen des neuen Zustands abgebrochen.
+  ///
+  /// \pre Aktion ist aktiv: `isActive() == true`
   ///
   /// \param next zu setzten der Zustand dieser Aktion
   /// \param data optionaler Datenparameter, der mit \ref event_start Ereignis
   ///             bei neuem Zustand übergeben wird.
-  ///
-  /// \bug Ist eine Unteraktion vorhanden, die verzögert beendet werden muss,
-  ///      wird diese trotzdem sofort abgebrochen.
   void nextState(State next, EventArg data = 0);
 
   /// \brief Beendet Aktion.
@@ -363,17 +383,24 @@ protected:
   /// Durch diese Funktion wird die Aktion beendet und evtl. vorhandene Unteraktionen
   /// abgebrochen.
   ///
-  /// \param eid Rückgabewert dieser Aktion, z.B. \ref event_success oder \ref event_failure
-  /// \return Es wird \c false zurückgegeben, falls die
+  /// Wenn eine übergeordnete Aktion vorhanden ist, wird der aktuelle Zustand
+  /// diese Aktion mit dem Ereignis \ref event_return und dem Datenparameter
+  /// \a eid aufgerufen. Als Datenparameter wird \ref event_success vorgeschlagen,
+  /// wenn die Aktion erfolgreich ausgeführt wurde, und \ref event_failure, falls
+  /// dies nicht das Fall war.
+  ///
+  /// \pre Aktion ist aktiv: `isActive() == true`
+  /// \post Aktion ist nicht mehr aktiv: `isActive() == false`
+  /// \post Aktion hat keine Kindaktionen: `getChildAction() == nullptr`
+  /// \post Aktion hat keine übergeordnete Aktion: `getParentAction() == nullptr`
+  ///
+  /// \param eid Rückgabewert dieser Aktion, z.B. \ref event_success oder \ref event_failure.
+  /// \sa cancel
   void exit(EventId eid);
 
-  /// \brief Gibt eine evtl. vorhandene Unteraktion zurück.
-  ///
-  /// \return vorhandene Unteraktion oder \c nullptr, wenn keine vorhanden.
-  ///
-  /// \sa setChild getConstChild
+  /// \copydoc getChildAction() const
   _always_inline
-  Action* getChild() {
+  Action* getChildAction() {
     return child_;
   }
 
@@ -406,6 +433,9 @@ private:
 
   /// Aktion kann auf Blacklist gesetzt werden
   bool can_be_added_to_blacklist_;
+
+  /// Das am weitesten untergeordnete Kindaktion zurückgeben
+  Action* getInnermostChild();
 };
 
 // /////////////////////////////////////////////////////////////////////////////
@@ -421,9 +451,9 @@ private:
 /// mit \ref ACTION_CLASS erstellt und die Zustandsfunktionen mit \ref ACTION_STATES
 /// definiert werden.
 ///
-/// \tparam A Von Aktion abgeleitete Klasse
+/// \tparam A zuerstellende Aktionsklasse
 ///
-/// \sa ACTION_CLASS, ACTION_STATES, SIMPLE_ACTION_CLASS
+/// \sa Action, ACTION_CLASS, ACTION_STATES, SIMPLE_ACTION_CLASS
 template<typename A>
 class StaticAction: public Action {
 public:
@@ -470,14 +500,14 @@ public:
     return instance.Action::canBeAddedToBlacklist();
   }
 
-  /// \copydoc Action::getChild
-  static _always_inline const Action* getChild() {
-	return instance.Action::getChild();
+  /// \copydoc Action::getChildAction
+  static _always_inline const Action* getChildAction() {
+	return instance.Action::getChildAction();
   }
 
-  /// \copydoc Action::getParent
-  static _always_inline const Action* getParent() {
-	return instance.Action::getParent();
+  /// \copydoc Action::getParentAction
+  static _always_inline const Action* getParentAction() {
+	return instance.Action::getParentAction();
   }
 
 protected:
@@ -491,9 +521,9 @@ protected:
     instance.Action::nextState(next, data);
   }
 
-  /// \copydoc Action::callParent
-  static _always_inline bool callParent(EventId id, EventArg data) {
-    return instance.Action::callParent(id, data);
+  /// \copydoc Action::callParentAction
+  static _always_inline bool callParentAction(EventId id, EventArg data) {
+	return instance.Action::callParentAction(id, data);
   }
 
   /// \copydoc Action::checkState
@@ -506,9 +536,9 @@ protected:
 	return instance.Action::getState();
   }
 
-  /// \copydoc Action::setChild
-  static _always_inline void setChild(Action* child, EventArg data = 0) {
-	instance.Action::setChild(child, data);
+  /// \copydoc Action::setChildAction
+  static _always_inline void setChildAction(Action* child, EventArg data = 0) {
+	instance.Action::setChildAction(child, data);
   }
 
   /// \copydoc Action::setCanBeAddedToBlacklist
@@ -529,16 +559,93 @@ A StaticAction<A>::instance;
 #ifdef __DOXYGEN__
 
 /// \brief Aktionsklasse definieren
-#define ACTION_CLASS(name)
+///
+/// Über dieses Makro wird eine Klasse definiert, die von der Klasse
+/// \ref StaticAction erbt und ist equivalent zu `class name : public StaticAction<name>`.
+/// Um den Konstruktor und die nötigen Zustandsfunktionen zu definieren
+/// benötigt man \ref ACTION_STATES :
+/// \code
+/// ACTION_CLASS(MyAction) {
+///   ACTION_STATES(MyAction, start_state, one_more_state, end_state)
+/// };
+///
+/// // Initialzustand
+/// bool MyAction::start_state(EventId id, EventArg data) {
+///   // Ereignisse verarbeiten ...
+/// }
+///
+/// // weiterer Zustand
+/// bool MyAction::one_more_state(EventId id, EventArg data) {
+///   // Ereignisse verarbeiten ...
+/// }
+///
+/// // ein weiterer Zustand
+/// bool MyAction::end_state(EventId id, EventArg data) {
+///   // Ereignisse verarbeiten ...
+/// }
+/// \endcode
+///
+/// \param name Klassenname, der zuerstellenden Aktionsklasse
+/// \sa Action, StaticAction, ACTION_STATES, SIMPLE_ACTION_CLASS
+#define ACTION_CLASS(name) class name : public StaticAction<name>
 
 /// \brief Zustände für Aktion definieren
+///
+/// \code
+/// ACTION_CLASS(MyAction) {
+///   ACTION_STATES(MyAction, start_state, one_more_state, end_state)
+/// };
+///
+/// // Initialzustand
+/// bool MyAction::start_state(EventId id, EventArg data) {
+///   // Ereignisse verarbeiten ...
+///   return false;
+/// }
+///
+/// // weiterer Zustand
+/// bool MyAction::one_more_state(EventId id, EventArg data) {
+///   // Ereignisse verarbeiten ...
+/// }
+///
+/// // ein weiterer Zustand
+/// bool MyAction::end_state(EventId id, EventArg data) {
+///   // Ereignisse verarbeiten ...
+/// }
+/// \endcode
+///
+/// \param name Klassenname, der zuerstellenden Aktionsklasse
+/// \param s1 Name von zu erstellender Initialzustandsfunktion
+/// \param ... optional weitere Namen von zu erstellenden Zustandsfunktionen
+/// \sa Action, StaticAction, ACTION_CLASS, SIMPLE_ACTION_CLASS
 #define ACTION_STATES(name, s1, ...)
 
 /// \brief einfache Aktionsklasse mit einem Makro
-#define SIMPLE_ACTION_CLASS(name, ...) \
-  ACTION_CLASS(name) { \
-    ACTION_STATES(name, __VA_ARGS__) \
-  }
+///
+/// Äquivalent zu dem Beispiel in \ref ACTION_CLASS und \ref ACTION_STATES
+/// \code
+/// SIMPLE_ACTION_CLASS(MyAction, start_state, one_more_state, end_state);
+///
+/// // Initialzustand
+/// bool MyAction::start_state(EventId id, EventArg data) {
+///   // Ereignisse verarbeiten ...
+/// }
+///
+/// // weiterer Zustand
+/// bool MyAction::one_more_state(EventId id, EventArg data) {
+///   // Ereignisse verarbeiten ...
+/// }
+///
+/// // ein weiterer Zustand
+/// bool MyAction::end_state(EventId id, EventArg data) {
+///   // Ereignisse verarbeiten ...
+/// }
+/// \endcode
+///
+/// \param name Klassenname, der zuerstellenden Aktionsklasse
+/// \param s1 Name von zu erstellender Initialzustandsfunktion
+/// \param ... optional weitere Namen von zu erstellenden Zustandsfunktionen
+/// \sa Action, StaticAction, ACTION_CLASS, ACTION_STATES
+#define SIMPLE_ACTION_CLASS(name, s1, ...)
 
 #else // __DOXYGEN__
 

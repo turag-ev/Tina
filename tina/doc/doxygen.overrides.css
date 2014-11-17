@@ -248,7 +248,7 @@ td.mlabels-left {
 }
 
 /* Parametername in Details */
-.params .paramname {
+.params .paramname, .retval .paramname {
   color: #333;
   font-weight: normal;
   font-style: normal;
@@ -258,7 +258,7 @@ td.mlabels-left {
 
 /* Parametername */
 .paramname {
-  color: #666;
+  color: #333;
   font-style: italic;
 }
 
