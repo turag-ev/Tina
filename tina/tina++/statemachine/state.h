@@ -230,7 +230,7 @@ public:
   ///         aktiv (\ref isActive liefert \c false).
   /// \sa checkState, isActive
   _always_inline
-  const State getState() const {
+  State getState() const {
     return currentstate_;
   }  
 
@@ -251,8 +251,27 @@ public:
   /// \post Aktion hat keine Kindaktionen: `getChildAction() == nullptr`
   /// \post Aktion hat keine übergeordnete Aktion: `getParentAction() == nullptr`
   ///
-  /// \sa exit
+  /// \sa exit, kill
   void cancel();
+
+  /// \brief Würgt Verarbeitung von Aktion ab.
+  ///
+  /// Hat diese Aktion Unteraktionen, so werden diese auch abgewürgt.
+  ///
+  /// Im Gegensatz zu \ref exit, wird nicht das Ereignis \ref event_return
+  /// an die nächst höhere Aktion übergeben und im Gegensatz zu \ref cancel, wird
+  /// keine Ereignis \ref event_cancel in der Aktion ausgeführt.
+  ///
+  /// \warning Durch das harte Beenden kann die Aktion evtl. Hintergundaktionen
+  ///          nicht ordnungsgemäß beenden.
+  ///
+  /// \pre Aktion ist aktiv: `isActive() == true`
+  /// \post Aktion ist nicht mehr aktiv: `isActive() == false`
+  /// \post Aktion hat keine Kindaktionen: `getChildAction() == nullptr`
+  /// \post Aktion hat keine übergeordnete Aktion: `getParentAction() == nullptr`
+  ///
+  /// \sa cancel, exit
+  void kill();
 
   /// \brief Unteraktion hinzufügen.
   ///
@@ -281,10 +300,17 @@ public:
   ///
   /// \return vorhandene Unteraktion oder \c nullptr, wenn keine vorhanden.
   ///
-  /// \sa setChildAction, getParentAction
+  /// \sa setChildAction, hasChildAction, getParentAction
   _always_inline
   const Action* getChildAction() const {
     return child_;
+  }
+
+  /// \brief Gibt zurück, ob eine Unteraktion vorhandenen ist.
+  /// \sa setChildAction, getParentAction
+  _always_inline
+  bool hasChildAction() const {
+	return child_ != nullptr;
   }
 
   /// \brief Gibt eine evtl. übergeordnete Unteraktion zurück.
@@ -500,9 +526,9 @@ public:
     return instance.Action::canBeAddedToBlacklist();
   }
 
-  /// \copydoc Action::getChildAction
-  static _always_inline const Action* getChildAction() {
-	return instance.Action::getChildAction();
+  /// \copydoc Action::hasChildAction
+  static _always_inline bool hasChildAction() {
+	return instance.Action::hasChildAction();
   }
 
   /// \copydoc Action::getParentAction
@@ -532,8 +558,13 @@ protected:
   }
 
   /// \copydoc Action::getState
-  static _always_inline const State getState() {
+  static _always_inline State getState() {
 	return instance.Action::getState();
+  }
+
+  /// \copydoc Action::getChildAction
+  static _always_inline Action* getChildAction() {
+	return instance.Action::getChildAction();
   }
 
   /// \copydoc Action::setChildAction

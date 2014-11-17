@@ -78,6 +78,25 @@ void Action::cancel() {
 	}
 }
 
+void Action::kill()
+{
+	if (isActive()) {
+		// Verbindung von übergeordneter Aktion lösen
+		if (parent_)
+			parent_->child_ = nullptr;
+
+		Action* next = this;
+		do {
+			Action* current = next;
+			next = next->child_;
+
+			current->child_ = nullptr;
+			current->currentstate_ = nullptr;
+			current->parent_ = nullptr;
+		} while (next);
+	}
+}
+
 void Action::nextState(State next, EventArg data) {
 	if (isActive()) {
 		// Kindaktion abbrechen, wenn vorhanden
@@ -184,7 +203,7 @@ Action* Action::getInnermostChild() {
 
 	while (next) {
 		current = next;
-		next = current->getChild();
+		next = current->getChildAction();
 	};
 
 	return current;
