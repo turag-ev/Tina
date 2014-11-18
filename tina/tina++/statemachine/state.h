@@ -23,35 +23,227 @@ namespace TURAG {
 /// @defgroup Actions Aktionen [C++]
 /// \brief Aktionen sind Zustandsmaschinen, die auf Events reagieren.
 ///
+/// \code
+/// #include <tina/statemachine/state.h>
+/// \endcode
+///
+/// # Aktionen
+///
+/// Eine Aktion (\ref Action) ist modular aufgebaut. Damit hat eine Aktion einen bestimmten
+/// Zweck. In der SystemControl wird zwischen Hauptaktion (MainAction),
+/// Spielstrategieaktion (GameAction, mit wechselner Strategie) und den
+/// Spielaktionen unterschieden. Aktionen können andere Aktionen aufrufen und
+/// damit eine Hierachie bilden.
+///
+/// Jede Aktion besteht besteht, wie jede Zustandsmaschine, aus mindestens einem Zustand.
+/// Jeder Zustand wird durch eine Zustandsfunktion (\ref Action::State) dargestellt.
+/// Diese Zustände verarbeiten Ereignisse (\ref Event), verändern den
+/// Zustand der Aktion, beenden die Aktion und rufen eine weitere Aktion auf.
+///
 /// ## Aktion definieren
 ///
-/// Aufbau von Aktion erläutern, Singleton, ...
+/// Definiert wird eine Aktion über das Makro \ref ACTION_CLASS, welches als
+/// Parameter den Namen der Aktionsklasse verlangt.
+/// Mit dem Makro \ref ACTION_STATES werden die Zustände und der Konstruktor definiert.
+/// Die Klasse kann wie jede andere C++-Klasse verwendet werden.
+/// Jede Aktion hat genau eine Instanz (Singleton-Entwurfsmuster) auf die über \ref StaticAction::get und
+/// \ref StaticAction::getPointer zugegriffen werden kann - die Instanz wird durch die Klasse
+/// \ref StaticAction bereit gestellt:
+/// \code
+/// // Klasse definieren
+/// ACTION_CLASS(ExampleAction) {
+///   // Konstruktor plus Zustände definieren
+///   ACTION_STATES(ExampleAction, zustand1, zustand2, zustand3)
+///
+/// public:
+///   // öffentliche Variable
+///   int var;
+///
+///   // öffentliche Methode
+///   void incVar() { var++; }
+/// };
+///
+/// ExampleAction::get().var = 42;
+/// ExampleAction::getPointer()->incVar(); // var = 43
+/// \endcode
 ///
 /// ## Zustände definieren
 ///
-/// in ACTION_STATES
+/// In einer Aktion ist immer nur ein Zustand aktiv. Startet die Aktion ist der
+/// Initialzustand als Zustand gesetzt. Dieser ist der erste Zustand, der nach
+/// dem Namen der Aktionsklasse, als Argument zum Makro \ref ACTION_STATES
+/// angegeben wird. In dem Beispiel ist es \c zustand1 .
 ///
-/// ## Aktion starten
+/// Die Signatur einer Zustandsfunktion ist folgende:
+/// \code
+/// bool AKTIONSKLASSE::ZUSTAND (EventId id, EventArg data);
+/// \endcode
 ///
-/// start() erklären
+/// Ereignisse werden in der Zustandsfunktion über ihre Ereignis-Id identifiziert,
+/// welche über die ersten Parameter übergeben wird.
+/// Jedes Ereignis hat eine einzigartige Id, die über die Funktion \ref EventNamespace
+/// erzeugt wird. Der zweite Parameter \a data kann abhängig vom Ereignis noch
+/// weitere Informationen enthalten. Der Rückgabewert gibt an, ob das Ereignis
+/// von der Zustandsfunktion verarbeitet wurde.
 ///
-/// ## Zustand wechseln
+/// Eine Zustandsfunktion sieht dann folgendermaßen aus:
+/// \code
+/// bool ExampleAction::zustand1(EventId id, EventArg data) {
+///   switch (id) {
+///   case event_start:
+///     get().var = 0;
+///     return true;
 ///
-/// nextState() erklären
+///   case EventGenerator::event_42:
+///     get().var = data;
+///     return true;
+///   }
+///   return false;
+/// }
+/// \endcode
 ///
-/// ## Aktion beenden
+/// Wird ein Zustand gestartet, wird das Ereignis \ref Action::event_start
+/// der neuen Zustandsfunktion übergeben.
+/// Der Rückgabewert der Funktion wird dabei ignoriert. Dieses Ereignis ist
+/// speziell, da es nicht wie andere Ereignisse, wenn es nicht verarbeitet wird,
+/// an die übergeordnete Aktion weitergeleitet wird. Gleiches gilt für die anderen
+/// Ereignisse von Action: \ref Action::event_cancel, \ref Action::event_return.
 ///
-/// exit() vs. cancel() erklären
+/// In der Zustandsfunktion kann wieder über `get()` oder `getPointer()` auf
+/// die Instanz der Aktion zugegriffen. Aber es kann auch auf die nicht-statischen
+/// Methoden von \ref Action zugegriffen werden - Interna: wieder hilft \ref StaticAction,
+/// dort sind die statischen Methoden definiert. Beispiel folgt sofort.
 ///
-/// event_cancel erklären
+/// Der Zustand in der Aktion kann über die Funktion \ref Action::nextState
+/// (bzw. \ref StaticAction::nextState) verändert werden. Dabei wird der neue
+/// Zustand über die entsprechende Zustandsfunktion angegeben. Ein zusätzlicher
+/// Datenparameter kann genutzt werden, um den nächsten Zustand Information
+/// zu übergeben.
 ///
-/// ## Kindaktionen
+/// Eine Aktion kann über die Funktion \ref Action::exit (bzw. \ref StaticAction::exit)
+/// beendet werden. In einem Parameter kann angegeben, ob die Aktion
+/// erfolgreich ausgeführt wurde (\ref Action::event_success) oder nicht (\ref Action::event_failure).
 ///
-/// setChildAction
+/// Im Folgenden wird ein Beispiel aus der SystemControl benutzt, wobei
+/// der Roboter zum Spielfeldmittelpunkt (0/1000) fahren soll.
+/// \code
+/// bool ExampleAction::zustand1(EventId id, EventArg data) {
+///   switch (id) {
+///   // Zustand startet
+///   case event_start:
+///      // Fahrbefehl: Fahre zu Spielfeldmittelpunkt (0/1000)
+/// 	drive.driveTo(
+///       Pose(0*Units::mm, 1000*Units::mm, Drive::ANGLE_DONT_CARE),
+///       SPEED_INDEX_MEDIUM);
+/// 	return true;
 ///
-/// Aktionshierachie aus SC erklären
+///   // Roboter ist angekommen
+///   case Drive::event_arrived:
+/// 	// zu nächsten Zustand gehen:
+/// 	nextState(zustand2);
+/// 	return true;
 ///
-/// killAllChildren()
+///   // Roboter hat Collision
+///   case Drive::event_collision:
+/// 	// Aktion beenden
+/// 	exit(event_failure);
+/// 	return true;
+///   }
+///   return false;
+/// }
+/// \endcode
+///
+/// Wird die Aktion von außerhalb der Aktion beendet (\ref Action::cancel),
+/// dann wird der Zustand mit dem Ereignis \ref Action::event_cancel aufgerufen.
+/// Damit können abschließende Aktionen durchgeführt werden. Der Rückgabewert
+/// der Zustandsfunktion, wird dabei ignoriert:
+/// \code
+/// bool ExampleAction::zustand1(EventId id, EventArg data) {
+///   switch (id) {
+///
+///   // ...
+///
+///   // Aktion wurde abgebrochen
+///   case event_cancel:
+///     drive.stop();
+///     return true;
+///   }
+///   return false;
+/// }
+/// \endcode
+/// In der SystemControl wird \ref Action::event_cancel meistens nicht
+/// verarbeitet, da nachdem eine Aktion abgebrochen wird, der Routinecheck
+/// des Troubleshooters alles selbst beendet.
+///
+/// ## Unteraktionen (Kindaktionen)
+///
+/// Ein Zustand kann eine weitere Aktion ausführen. Die Kindaktion
+/// wird über die Funktion \ref Action::setChildAction hinzugefügt.
+/// Mit dem Ereignis \ref Action::event_return wird die Aktion benachrichtigt,
+/// wenn die Unteraktion sich beendet hat.
+/// Im Parameter \a data steht der Rückgabewert der Aktion
+/// (z.B. Action::event_success, Action::event_failure).
+/// Der Rückgabewert beim Action::event_return-Event wird ignoriert.
+/// \code
+/// bool ExampleAction::zustand2(EventId id, EventArg data) {
+///    switch (id) {
+///    case event_start:
+/// 	 // Aktion ExampleAction2 starten:
+/// 	 setChildAction(ExampleAction2::getPointer());
+/// 	 return true;
+///
+///   case event_return:
+/// 	// Aktion ist fertig -> Rückgabewert auswerten
+/// 	if (data == event_success) {
+/// 	  // Aktion hat geklappt
+/// 	  nextState(zustand3);
+///       return true;
+///     } else {
+/// 	  // Aktion fehlgeschlagen
+/// 	  exit(event_failure);
+/// 	  return true;
+/// 	}
+///   }
+///   return false;
+/// }
+/// \endcode
+///
+/// Ereignisse werden immer erstmal an die untersten Kindaktion ausgeführt.
+/// Wenn die Unteraktion das Ereignis nicht verarbeitet (Zustandsfunktion gibt \c false zurück),
+/// wird das Ereignis in der nächst höheren Aktion ausgeführt.
+/// So müssen nicht alle Ereignisse in einem Zustand verarbeitet werden,
+/// wenn die übergeordnete Aktion das Ereignisse verarbeitet.
+///
+/// In unserem Beispiel würde z.B. ExampleAction2 `Drive::event_collision` nicht
+/// verarbeiten müssen, wenn in der übergeordneten Aktion verarbeitet wird:
+/// \code
+/// bool ExampleAction::zustand2(EventId id, EventArg data) {
+///    switch (id) {
+///    case event_start:
+/// 	 // Aktion ExampleAction2 starten:
+/// 	 setChildAction(ExampleAction2::getPointer());
+/// 	 return true;
+///
+///   case event_return:
+/// 	// ...
+///
+///   case Drive::event_collision:
+/// 	// Aktion und damit Unteraktion beenden
+/// 	exit(event_failure);
+/// 	return true;
+///   }
+///   return false;
+/// }
+/// \endcode
+///
+/// Wird Action::nextState, Action::exit oder Action::cancel aufgerufen, wird
+/// automatisch die zugehörige Kindaktion abgebrochen.
+///
+/// \todo kill() erklären
+///
+/// ## Klassenhierachie in der SystemControl
+///
+/// So gibt es eine Hauptaktion, die der Ereignisschlange übergeben wird. Diese Hauptaktion steht in der Hierarchie ganz oben.
 ///
 /// ## Ereignisse
 ///
@@ -72,8 +264,6 @@ namespace TURAG {
 ///
 /// Action::event_*
 ///
-/// event_cancel in Hierachie
-///
 /// ## Richtlinien/Verwendung
 ///
 /// execute-Funktionen
@@ -83,22 +273,19 @@ namespace TURAG {
 /// minimal Beispiel
 ///
 ///
-/// \msc
-/// Sender,Receiver;
-/// Sender->Receiver [label="Command()", URL="\ref Receiver::Command()"];
-/// Sender<-Receiver [label="Ack()", URL="\ref Ack()", ID="1"];
-/// \endmsc
-///
-/// \todo verzögertes Beenden noch benötigt? sonst entfernen, weil noch sehr buggy.
 /// @{
+// \msc
+// Sender,Receiver;
+// Sender->Receiver [label="Command()", URL="\ref Receiver::Command()"];
+// Sender<-Receiver [label="Ack()", URL="\ref Ack()", ID="1"];
+// \endmsc
 
 
 ////////////////////////////////////////////////////////////////////////////////
 //     Action State Model
 
-class Action;
-
-/// Aktionszustandsmaschine
+/// \brief Aktionszustandsmaschine
+/// \copydetails Actions
 class Action {
 public:
 	/// \brief Typ von Zustand(-sfunktion)

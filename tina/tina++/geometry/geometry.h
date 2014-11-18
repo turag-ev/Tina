@@ -14,12 +14,12 @@ namespace TURAG {
 
 /// \brief Typ für Variablen, die Winkel darstellen.
 ///
-/// Benutzt \ref TURAG::Unit für einheitenrichtiges Rechnen und Konvertieren.
+/// Benutzt \ref Units::Unit für einheitenrichtiges Rechnen und Konvertieren.
 typedef Units::Angle Angle;
 
 /// \brief Typ für Variablen, die Längen darstellen.
 ///
-/// Benutzt \ref TURAG::Unit für einheitenrichtiges Rechnen und Konvertieren.
+/// Benutzt \ref Units::Unit für einheitenrichtiges Rechnen und Konvertieren.
 typedef Units::Length Length;
 
 /// Normiert einen Winkel auf das Intervall \f$ [\pi, -\pi) \f$

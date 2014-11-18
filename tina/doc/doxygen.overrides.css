@@ -287,14 +287,41 @@ div.fragment {
 
 /* Warnung */
 dl.warning, dl.attention {
-  background-color: orange; 
+  background-color: hsl(39, 100%, 90%); 
   border-radius: 5px;
+	margin: 5px 0 5px -5px;
+	border: none;
+	padding: 5px;
+}
+
+/* Fehler */
+dl.bug {
+	background-color: hsl(319, 100%, 90%);
+	border-radius: 5px;
+	margin: 5px 0 5px -5px;
+	border: none;
+	padding: 5px;
+}
+
+dl.bug a.el {
+  font-weight: bold;
+	color: black;
+}
+
+/* Aufgabe */
+dl.todo {
+  background-color: hsl(228, 100%, 90%);
+	border-radius: 5px;
+	margin: 5px 0 5px -5px;
+	border: none;
+	padding: 5px;
 }
 
 /* Vorbedingung */
 dl.pre, dl.post, dl.invariant {
-  background-color: #9f9; 
-  border-radius: 5px;
+	padding-left: 0;
+	margin-left: 0;
+	border: none;
 }
 
 /* inline Code */
