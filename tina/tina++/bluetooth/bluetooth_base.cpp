@@ -49,7 +49,7 @@ void BluetoothBase::init(void) {
 }
 
 void BluetoothBase::main_thread_func(void) {
-    Thread<>::setName("bluetooth-high");
+	CurrentThread::setName("bluetooth-high");
 
     turag_info("Bluetooth-High-Level thread started");
 
@@ -153,7 +153,7 @@ void BluetoothBase::main_thread_func(void) {
 }
 
 void BluetoothBase::worker_thread_func(void) {
-    Thread<>::setName("bluetooth-worker");
+	CurrentThread::setName("bluetooth-worker");
 
     turag_info("Bluetooth-Worker thread started");
 

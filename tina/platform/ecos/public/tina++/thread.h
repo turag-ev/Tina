@@ -50,13 +50,6 @@ public:
     return 0;
 #endif
   }
-
-  /// lets the current thread sleeps for a time of ecos ticks
-  static _always_inline void delay(SystemTime ticks) {
-    cyg_thread_delay(ticks.value);
-  }
-
-  static _always_inline void setName(const char *) { }
   
   _always_inline
   bool shouldTerminate() {
@@ -67,6 +60,20 @@ private:
   cyg_thread thread_;
   cyg_handle_t thread_handle_;
   char stack_[size] __attribute__((aligned(4)));
+};
+
+struct CurrentThread {
+private:
+  // von dieser Klasse gibt es keine Instanz
+  CurrentThread();
+  
+public:
+  /// lets the current thread sleeps for a time of ecos ticks
+  static _always_inline void delay(SystemTime ticks) {
+    cyg_thread_delay(ticks.toTicks());
+  }
+  
+  static _always_inline void setName(const char *name) { }
 };
 
 /// lets the current thread sleeps for a time of ecos ticks

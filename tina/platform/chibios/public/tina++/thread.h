@@ -3,6 +3,7 @@
 
 #include <ch.h>
 #include <cstddef>
+#include <os_turag.h>
 
 #include <tina++/tina.h>
 #include <tina++/time.h>
@@ -10,6 +11,9 @@
 
 /// when definied, than getStackUsage will give real values. But thread creating time will increase.
 #define THREADS_STACK_MEASUREMENT
+
+#undef TURAG_ATTR_SECTION_CCMDATA
+#define TURAG_ATTR_SECTION_CCMDATA
 
 namespace TURAG {
 
@@ -35,6 +39,9 @@ class thread_detail {
   NOT_COPYABLE(thread_detail);
 
 public:
+  // returns size of stack
+  static constexpr std::size_t StackSize = size;
+
   _always_inline thread_detail() :
     thread_(nullptr)
   { }
@@ -48,24 +55,12 @@ public:
   }
 
   /// returns maximal used stack size in bytes
-  _always_inline unsigned getStackUsage() const {
+  _always_inline std::size_t getStackUsage() const {
 #ifdef CH_DBG_FILL_THREADS
     return thread_get_stack_usage(reinterpret_cast<const char*>(&working_area_), sizeof(working_area_));
 #else
     return 0;
 #endif
-  }
-
-  // returns size of stack
-  static constexpr unsigned getStackSize() { return size; }
-
-  /// lets the current thread sleeps for a time of ecos ticks
-  static _always_inline void delay(SystemTime ticks) {
-    chThdSleep(ticks.toTicks());
-  }
-
-  static _always_inline void setName(const char *name) {
-    chRegSetThreadName(name);
   }
 
   _always_inline
@@ -79,6 +74,22 @@ private:
 };
 
 } // namespace detail
+
+struct CurrentThread {
+private:
+  // von dieser Klasse gibt es keine Instanz
+  CurrentThread();
+  
+public:
+  /// lets the current thread sleeps for a time of ecos ticks
+  static _always_inline void delay(SystemTime ticks) {
+    chThdSleep(ticks.toTicks());
+  }
+  
+  static _always_inline void setName(const char *name) {
+    chRegSetThreadName(name);
+  }
+};
 
 /// lets the current thread sleeps for a time of ecos ticks
 _always_inline void Thread_delay(SystemTime ticks) {

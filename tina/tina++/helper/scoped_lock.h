@@ -16,7 +16,6 @@ namespace TURAG {
 template<class Mutex>
 class ScopedLock {
   NOT_COPYABLE(ScopedLock);
-  NOT_MOVABLE(ScopedLock);
 
 public:
   /// ScopedLock erstellen und Lock holen.
@@ -24,6 +23,22 @@ public:
     m_(m), locked_(true)
   {
     m_.lock();
+  }
+
+  /// Lock verschieben
+  _always_inline explicit ScopedLock(ScopedLock&& other) :
+	m_(other.m_), locked_(other.locked_)
+  {
+	other.locked_ = false;
+  }
+
+  /// Lock verschieben
+  ScopedLock& operator = (ScopedLock&& other) {
+	  unlock();
+
+	  m_ = other.m_;
+	  locked_ = other.locked_;
+	  other.locked_ = false;
   }
 
   /// Lock u.U. freigeben und zerstören.
