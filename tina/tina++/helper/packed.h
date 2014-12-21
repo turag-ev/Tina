@@ -85,37 +85,6 @@ inline Unpacked unpack(Packed src) {
   return helper.dest;
 }
 
-/// \brief Wie TURAG::unpack, aber gibt Referenz zurück.
-///
-/// Will man bei \ref TURAG::unpack vermeiden, dass in eine neue Variable
-/// kopiert wird, kann man diese Funktion benutzen:
-/// \code
-/// // für Beispiel von TURAG::pack:
-/// void callback_struct(void* data) {
-///   struct_t& parameter = reinterpret_reference<struct_t>(data);
-///   // ...
-/// }
-///
-/// // entspricht (nur mit Zeigern):
-/// void callback_struct(void* data) {
-///   struct_t* parameter = reinterpret_cast<struct_t*>(&data);
-///   // ...
-/// }
-/// \endcode
-/// \sa TURAG::unpack
-template<typename Unpacked, typename Packed>
-inline Unpacked& reinterpret_reference(Packed& src) {
-  return *reinterpret_cast<Unpacked*>(&src);
-}
-
-/// \copydoc TURAG::reinterpret_reference(Packed&)
-template<typename Unpacked, typename Packed>
-inline const Unpacked& reinterpret_reference(const Packed& src) {
-  return *reinterpret_cast<const Unpacked*>(&src);
-}
-
-/// \}
-
 } // namespace TURAG
 
 #endif // TINAPP_HELPER_PACKED_H

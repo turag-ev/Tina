@@ -166,7 +166,7 @@ struct Pose {
 	}
 
 	/// zugehörigen Punkt zurück geben
-	Point toPoint() const {
+	constexpr Point toPoint() const {
 		return Point(x, y);
 	}
 
@@ -192,7 +192,7 @@ struct Pose {
 
 	/// neue Pose mit zusätzlichen Winkel erstellen
 	Pose getTurnedPose(Angle a) const {
-		return Pose(*this).turn(a);
+		return Pose(x, y, norm_angle(phi + a));
 	}
 
 	/// neuen in Blickrichtung verschobenen Punkt erstellen
@@ -210,14 +210,16 @@ struct Pose {
 
 	/// neuen, in Blickrichtung verschobenen Punkt erstellen
 	/// \param trans Länge, um den die Position in Winkelrichtung verschoben ist.
-	Pose getRelativePose(Length trans) const {
-		return Pose(*this).translate(trans);
+	constexpr Pose getRelativePose(Length trans) const {
+		return Pose(x + trans * cos(phi), y + trans * sin(phi), phi);
 	}
 
 	/// neuen, in Blickrichtung verschobene Punkt erstellen
 	/// \param other Vektor, um den die Position in Winkelrichtung verschoben ist.
-	Pose getRelativePose(const Point& other) const {
-		return Pose(*this).translate(other);
+	constexpr Pose getRelativePose(const Point& other) const {
+		return Pose(x + other.x * cos(phi) - other.y * sin(phi),
+					y + other.x * sin(phi) + other.y * cos(phi),
+					phi);
 	}
 
 	/// neue in Blickrichtung verschobene Punkt erstellen
@@ -326,7 +328,7 @@ struct Circle {
 		m(t.x, t.y), r(r)
 	{ }
 
-	/// unintialisieren Kreis erstellen (Radius ist negativ)
+	/// unintialisierten Kreis erstellen (Radius ist negativ)
 	constexpr explicit
 	Circle() :
 		m(), r(-1.f*Units::mm)
@@ -375,7 +377,7 @@ public:
 	}
 
     /// \brief Mittelpunkt von Rechteck bestimmen
-    P getCenter() {
+	constexpr P getCenter() const {
         return P((b.x + a.x)/2.f, (b.y + a.y)/2.f);
 	}
 };
@@ -397,7 +399,7 @@ bool located_in(const Rect<P>& rect, const P& point) {
         && point.y <= std::max(rect.a.y, rect.b.y));
 }
 
-/// Schnittpunkt zwischen zwei Kreisen zurückgeben.
+/// Schnittpunkte zwischen zwei Kreisen zurückgeben.
 /// \param one,two Kreise
 /// \param[out] results Schnittpunkte, wenn Rückgabewert \a true
 ///

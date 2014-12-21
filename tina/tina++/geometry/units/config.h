@@ -55,7 +55,7 @@ namespace Units {
 #endif
 
 #ifndef TURAG_UNITS_FACTOR_TO_METER
-/// Faktor zwischen internem zu speichernden Wert in Meter
+/// Faktor zwischen internem zu speichernden Wert und Meter
 ///
 /// \par Standardwert
 ///   1000.f
@@ -63,7 +63,7 @@ namespace Units {
 #endif
 
 #ifndef TURAG_UNITS_FACTOR_TO_RADIAN
-/// Faktor zwischen internem zu speichernden Wert in Radian
+/// Faktor zwischen internem zu speichernden Wert und Radian
 ///
 /// \par Standardwert
 ///   1.f
@@ -71,7 +71,7 @@ namespace Units {
 #endif
 
 #ifndef TURAG_UNITS_FACTOR_TO_SECOND
-/// Faktor zwischen internem zu speichernden Wert in Sekunden
+/// Faktor zwischen internem zu speichernden Wert und Sekunden
 ///
 /// \par Standardwert
 ///   1.f
@@ -98,9 +98,9 @@ typedef TURAG_UNITS_VALUE_TYPE Value;
 typedef Real UnitFactor;
 
 #ifndef __DOXYGEN__
-constexpr UnitFactor FROM_SI_CONVERT_FACTOR_LENGTH = TURAG_UNITS_FACTOR_TO_METER; // mm
-constexpr UnitFactor FROM_SI_CONVERT_FACTOR_ANGLE  = TURAG_UNITS_FACTOR_TO_RADIAN; // rad
-constexpr UnitFactor FROM_SI_CONVERT_FACTOR_TIME   = TURAG_UNITS_FACTOR_TO_SECOND; // s
+constexpr UnitFactor FROM_SI_CONVERT_FACTOR_LENGTH = TURAG_UNITS_FACTOR_TO_METER;
+constexpr UnitFactor FROM_SI_CONVERT_FACTOR_ANGLE  = TURAG_UNITS_FACTOR_TO_RADIAN;
+constexpr UnitFactor FROM_SI_CONVERT_FACTOR_TIME   = TURAG_UNITS_FACTOR_TO_SECOND;
 #endif
 
 /// \} \}
