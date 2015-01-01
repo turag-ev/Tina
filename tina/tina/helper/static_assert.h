@@ -22,7 +22,7 @@
 #ifndef _GL_VERIFY_H
 #define _GL_VERIFY_H
 
-#if defined DOXYGEN
+#if defined __DOXYGEN__
 
 /**
  * Static assert für C.

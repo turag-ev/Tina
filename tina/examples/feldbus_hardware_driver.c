@@ -8,17 +8,21 @@
 
 
 //! [Definitions]
-#define RTS_PIN					(2)
-#define RTS_PORT				(PORTD)
-#define RTS_DDR					(DDRD)
+#define RTS_PIN				(2)
+#define RTS_PORT			(PORTD)
+#define RTS_DDR				(DDRD)
 
-#define F_CPU 					8000000
-#define BAUD_RATE				500000
+#define LED_PIN				3
+#define LED_PORT			PORTD
+#define LED_DDR				DDRD
+
+#define F_CPU 				8000000
+#define BAUD_RATE			500000
 //! [Definitions]
 
 //! [Helper macros]
-#define RTS_ON()				{ RTS_PORT |= (1<<RTS_PIN); }
-#define RTS_OFF()				{ RTS_PORT &= ~(1<<RTS_PIN); }
+#define RTS_ON()			{ RTS_PORT |= (1<<RTS_PIN); }
+#define RTS_OFF()			{ RTS_PORT &= ~(1<<RTS_PIN); }
 
 
 
@@ -43,6 +47,10 @@ void turag_feldbus_hardware_init() {
 
 	OCR2A = ((F_CPU * 15 + 8/2)/ 8 + BAUD_RATE/2) / BAUD_RATE;
 	TIMSK2 = (1 << OCIE2A);
+	
+	LED_DDR |= (1<<LED_PIN);
+	TIMSK0 |= (1<<TOIE0);
+	TCCR0B |= (1<<CS02) | (1<<CS00);
 }
 
 void turag_feldbus_slave_rts_off(void) {
@@ -81,6 +89,15 @@ void turag_feldbus_slave_start_receive_timeout (void) {
 void turag_feldbus_slave_transmit_byte (uint8_t byte) {
 	UDR0 = byte;
 }
+void turag_feldbus_slave_begin_interrupt_protect(void) {
+	cli();
+}
+void turag_feldbus_slave_end_interrupt_protect(void) {
+	sei();
+}
+void turag_feldbus_slave_toggle_led(void) {
+	LED_PORT ^= (1<<LED_PIN);
+}
 //! [Required hardware functions]
 
 //! [Interrupts]
@@ -96,5 +113,8 @@ ISR(USART_TX_vect) {
 ISR(TIMER2_COMPA_vect) {
 	TCCR2B = 0;
 	turag_feldbus_slave_receive_timeout_occured();
+}
+ISR(TIMER0_OVF_vect) {
+	turag_feldbus_slave_increase_uptime_counter();
 }
 //! [Interrupts]

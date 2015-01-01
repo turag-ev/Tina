@@ -40,10 +40,12 @@ bool turag_rs485_init(uint32_t baud_rate, TuragSystemTime timeout) {
 }
 
 
-bool turag_rs485_transceive(uint8_t* input, int input_length, uint8_t* output, int output_length) {
+bool turag_rs485_transceive(uint8_t* input, int* input_length, uint8_t* output, int* output_length) {
 #warning THIS FUNCTION IS NOT THREADSAFE ALLTHOUGH IT IS SUPPOSED TO BE.
-    
-	if (!input || input_length == 0) return false;
+
+#error This implementation is out-dated.
+	
+/*	if (!input || input_length == 0) return false;
 
 	// SENDE-TEIL
 	int i = 0;
@@ -112,6 +114,6 @@ bool turag_rs485_transceive(uint8_t* input, int input_length, uint8_t* output, i
 		return true;
 	} else {
 		return false;
-	}
+	}*/
 }
 

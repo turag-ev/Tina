@@ -1,5 +1,5 @@
 /**
- * \file tina++/c++/libsupc++_misc.cpp
+ * \file platform/chibios/libsupc++_misc.cpp
  * \author Martin Oemus <martin@oemus.net>
  * \date April 2014
  *
