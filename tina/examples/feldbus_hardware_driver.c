@@ -55,10 +55,8 @@ void turag_feldbus_hardware_init() {
 
 void turag_feldbus_slave_rts_off(void) {
 	RTS_OFF();
-	UCSR0B |= (1 << RXEN0);
 }
 void turag_feldbus_slave_rts_on(void) {
-	UCSR0B &= ~(1<<RXEN0);
 	RTS_ON();
 }
 void turag_feldbus_slave_activate_dre_interrupt(void) {
@@ -69,10 +67,12 @@ void turag_feldbus_slave_deactivate_dre_interrupt(void) {
 	UCSR0A &= ~(1<<UDRE0);
 }
 void turag_feldbus_slave_activate_rx_interrupt(void) {
+	UCSR0B |= (1 << RXEN0);
 	UCSR0B |= (1<<RXCIE0);
 }
 void turag_feldbus_slave_deactivate_rx_interrupt(void) {
 	UCSR0B &= ~(1<<RXCIE0);
+	UCSR0B &= ~(1<<RXEN0);
 }
 void turag_feldbus_slave_activate_tx_interrupt(void) {
 	UCSR0B |= (1<<TXCIE0);
