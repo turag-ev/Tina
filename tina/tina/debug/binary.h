@@ -94,19 +94,17 @@ extern "C" {
 
 #ifndef __DOXYGEN__
 
-void _turag_binary_send(const char* header, const void* object, size_t size);
+void _turag_binary_send(char source, char object_id, const void* object, size_t size);
 
 #endif // __DOXYGEN__
 
 /// \brief Debugobjektdaten senden
 ///
-/// \param object_id ein Zeichen als Zeichenkette als zuordnenbare Objekt-ID von Objekt aus Logquelle
+/// \param object_id ein Zeichen als zuordnenbare Objekt-ID von Objekt aus Logquelle
 /// \param object Objektinstanz
 # define turag_binary_send(object_id, object) \
 	_turag_binary_send( \
-	  TURAG_DEBUG_LINE_PREFIX \
-	  TURAG_DEBUG_LOG_SOURCE \
-	  TURAG_DEBUG_BINARY_PREFIX \
+	  TURAG_DEBUG_LOG_SOURCE[0], \
 	  object_id, \
 	  &object, sizeof(object))
 
