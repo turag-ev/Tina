@@ -45,16 +45,6 @@ constexpr size_t encodeLength(const T& data) {
 }
 
 /**
- * @brief Calculates length of base64 encoded data.
- * @tparam T data type that is to be encoded
- * @return length of base64 encoded data
- */
-template<typename T> _always_inline
-constexpr size_t encodeLength() {
-	return (sizeof(T) * 4 + 2) / 3;
-}
-
-/**
  * @brief Encodes data to base64 encoded data.
  * @param[in] data data to encode
  * @param[in] len length of data
