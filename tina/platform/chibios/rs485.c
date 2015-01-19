@@ -1,9 +1,12 @@
 #define TURAG_DEBUG_LOG_SOURCE "H"
 
+#include <tina/tina.h>
+
+#if TURAG_USE_TURAG_FELDBUS_HOST
+
 #include <ch.h>
 #include <hal.h>
 #include <tina/debug.h>
-#include <tina/tina.h>
 #include <tina/time.h>
 #include <platform/chibios/backplane.h>
 
@@ -119,3 +122,5 @@ void turag_rs485_buffer_clear(void) {
 
     while (sdGetTimeout(&RS485SD, TIME_IMMEDIATE) != Q_TIMEOUT);
 }
+
+#endif

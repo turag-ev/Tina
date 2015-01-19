@@ -3,8 +3,11 @@
 #include <cyg/io/io.h>
 #include <cyg/hal/hal_io.h>
 
-#include <tina/time.h>
 #include <tina/tina.h>
+
+#if TURAG_USE_TURAG_FELDBUS_HOST
+
+#include <tina/time.h>
 #include <tina/debug/print.h>
 
 static uint32_t rs485_baud_rate;
@@ -116,4 +119,6 @@ bool turag_rs485_transceive(uint8_t* input, int* input_length, uint8_t* output, 
 		return false;
 	}*/
 }
+
+#endif
 
