@@ -6,6 +6,17 @@
 
 #include "../tina.h"
 #include "../helper/construct.h"
+#include "../helper/traits_algorithms.h"
+
+#if GCC_VERSION < 0x50000
+namespace std {
+template<std::size_t Len, typename... Types>
+struct aligned_union {
+	using type =
+		std::aligned_storage<Len, TURAG::max_integral_constant<std::alignment_of<Types>...>::value>;
+};
+}
+#endif
 
 namespace TURAG {
 
@@ -20,8 +31,8 @@ using TypeStorage = typename std::aligned_storage<sizeof(T), std::alignment_of<T
 /// \brief tellt Speicher für Union bereit, der entsprechend der inhaltenen Typen ausgerichtet ist.
 /// \ingroup Utils
 /// Wird verwendet in \ref TURAG::VariantClass
-//template<typename... Types>
-//using UnionStorage = typename std::aligned_union<0, Types...>::type;
+template<typename... Types>
+using UnionStorage = typename std::aligned_union<max_value(sizeof(Types)...), Types...>::type;
 
 /// \brief Klasse die Speicher für Arrays bereitstellt
 /// \ingroup Utils

@@ -488,6 +488,22 @@ bool _ArrayBufferHelper<T>::is_full(const_iterator end, const_iterator max_end) 
   return false;
 }
 
+/*
+template<typename T>
+void ArrayBufferBase<T>::copy(const ArrayBufferBase<T>& other) {
+	if (this == other) return;
+
+	std::size_t new_size = other.size();
+	if (new_size > max_size()) {
+		turag_error("ArrayBuffer overflow!");
+		new_size = max_size();
+	}
+
+	length_ = new_size;
+	std::copy(other.begin(), other.begin() + new_size, begin());
+}*/
+
+
 template <typename T, size_t N>
 static ArrayBuffer<size_t, N> sort_indexes(const ArrayBuffer<T, N> &v) {
 

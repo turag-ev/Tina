@@ -12,8 +12,12 @@ LDFLAGS = -Wall -std=c++0x -g -O0
 PROGRAM = tests
 
 # Input files
-SRCFILES = $(wildcard *.cpp) $(wildcard tina/*.c) \
-  ../tina++/utils/cost.cpp  ../tina++/statemachine/state.cpp
+SRCFILES = \
+	$(wildcard *.cpp) \
+	$(wildcard tina/*.c) \
+	$(wildcard helper/*.cpp) \
+	../tina++/utils/cost.cpp \
+	../tina++/statemachine/state.cpp
   
 # make everything public :P
 CXXFLAGS += -Dprivate=public -Dprotected=public

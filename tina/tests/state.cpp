@@ -81,8 +81,8 @@ bool TestMainAction::start_state(EventId id, EventArg data) {
   switch (id) {
   case event_start:
     BOOST_CHECK_EQUAL(data, 34569);
-    BOOST_CHECK(getChild() == nullptr);
-    BOOST_CHECK(getParent() == nullptr);
+    BOOST_CHECK(getChildAction() == nullptr);
+    BOOST_CHECK(getParentAction() == nullptr);
     BOOST_CHECK(getState() == &TestMainAction::start_state);
     BOOST_CHECK(checkState(&TestMainAction::start_state));
     BOOST_CHECK(get().start_called == false);
@@ -114,15 +114,15 @@ bool TestMainAction::middle(EventId id, EventArg data) {
   switch (id) {
   case event_start:
     BOOST_CHECK_EQUAL(data, 45678);
-    BOOST_CHECK(getChild() == nullptr);
-    BOOST_CHECK(getParent() == nullptr);
+    BOOST_CHECK(getChildAction() == nullptr);
+    BOOST_CHECK(getParentAction() == nullptr);
     BOOST_CHECK(getState() == &TestMainAction::middle);
     BOOST_CHECK(checkState(&TestMainAction::middle));
     BOOST_CHECK(get().nextState_called == false);
     get().nextState_called = true;
     
-    setChild(TestChildAction::getPointer(), 12345);
-    BOOST_CHECK(getChild() == TestChildAction::getPointer());
+    setChildAction(TestChildAction::getPointer(), 12345);
+    BOOST_CHECK(getChildAction() == TestChildAction::getPointer());
     BOOST_CHECK(TestChildAction::get().start_called == true);
     BOOST_CHECK(checkState(&TestMainAction::middle));
     return true;
@@ -130,12 +130,13 @@ bool TestMainAction::middle(EventId id, EventArg data) {
   case event_return:
     switch (data) {
     case event_success:
-      BOOST_CHECK(getChild() == nullptr);
+      BOOST_CHECK(getChildAction() == nullptr);
       nextState(end, 354657);
       return true;
       
     default:
       BOOST_ERROR("sollte hier nicht landen");
+      return true;
     };
     
   case event_test4:
@@ -165,20 +166,20 @@ bool TestMainAction::middle(EventId id, EventArg data) {
 bool TestMainAction::end(EventId id, EventArg data) {
   switch (id) {
   case event_start:
-    BOOST_CHECK(getChild() == nullptr);
-    BOOST_CHECK(getParent() == nullptr);
+    BOOST_CHECK(getChildAction() == nullptr);
+    BOOST_CHECK(getParentAction() == nullptr);
     BOOST_CHECK(getState() == &TestMainAction::end);
     BOOST_CHECK(checkState(&TestMainAction::end));
     BOOST_CHECK_EQUAL(data, 354657);
     
-    setChild(TestChildAction::getPointer(), 12345);
-    BOOST_CHECK(getChild() == TestChildAction::getPointer());
+    setChildAction(TestChildAction::getPointer(), 12345);
+    BOOST_CHECK(getChildAction() == TestChildAction::getPointer());
     return true;
     
   case event_return:
     switch (data) {
     case event_failure:
-      BOOST_CHECK(getChild() == nullptr);
+      BOOST_CHECK(getChildAction() == nullptr);
       exit(event_success);
       return true;
       
