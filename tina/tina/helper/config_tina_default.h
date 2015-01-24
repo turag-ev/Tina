@@ -41,11 +41,6 @@
 # define TURAG_USE_TINA_CPP_RUNTIME_SUPPORT		1
 #endif
 
-/// Legt fest, ob Host-Support für den TURAG-Feldbus verfügbar ist.
-#if !defined(TURAG_USE_TURAG_FELDBUS_HOST) || defined(__DOXYGEN__)
-# define TURAG_USE_TURAG_FELDBUS_HOST		0
-#endif
-
 /**
  * @}
  */
@@ -91,6 +86,11 @@
  *  
  * @{
  */
+
+/// Legt fest, ob Host-Support für den TURAG-Feldbus verfügbar ist.
+#if !defined(TURAG_USE_TURAG_FELDBUS_HOST) || defined(__DOXYGEN__)
+# define TURAG_USE_TURAG_FELDBUS_HOST		0
+#endif
 
 /// enables some features in feldbus classes that 
 /// require dynamic memory
