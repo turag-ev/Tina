@@ -3,8 +3,11 @@
 #include <cyg/io/io.h>
 #include <cyg/hal/hal_io.h>
 
-#include <tina/time.h>
 #include <tina/tina.h>
+
+#if TURAG_USE_TURAG_FELDBUS_HOST
+
+#include <tina/time.h>
 #include <tina/debug/print.h>
 
 static uint32_t rs485_baud_rate;
@@ -40,10 +43,12 @@ bool turag_rs485_init(uint32_t baud_rate, TuragSystemTime timeout) {
 }
 
 
-bool turag_rs485_transceive(uint8_t* input, int input_length, uint8_t* output, int output_length) {
+bool turag_rs485_transceive(uint8_t* input, int* input_length, uint8_t* output, int* output_length) {
 #warning THIS FUNCTION IS NOT THREADSAFE ALLTHOUGH IT IS SUPPOSED TO BE.
-    
-	if (!input || input_length == 0) return false;
+
+#error This implementation is out-dated.
+	
+/*	if (!input || input_length == 0) return false;
 
 	// SENDE-TEIL
 	int i = 0;
@@ -112,6 +117,8 @@ bool turag_rs485_transceive(uint8_t* input, int input_length, uint8_t* output, i
 		return true;
 	} else {
 		return false;
-	}
+	}*/
 }
+
+#endif
 

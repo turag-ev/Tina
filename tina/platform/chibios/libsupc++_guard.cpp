@@ -1,4 +1,5 @@
 /**
+ * \file platform/chibios/libsupc++_guard.cpp
  * \author Martin Oemus <martin@oemus.net>
  * \date Oktober 2014
  *

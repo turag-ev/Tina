@@ -82,8 +82,8 @@
 
 // TYPES
 
-typedef cyg_int32   __int32_t;
-typedef cyg_uint32  __uint32_t;
+// typedef cyg_int32   __int32_t;
+// typedef cyg_uint32  __uint32_t;
 typedef Cyg_libm_ieee_double_shape_type ieee_double_shape_type;
 typedef Cyg_libm_ieee_float_shape_type ieee_float_shape_type;
 
@@ -303,7 +303,7 @@ externC float __kernel_standard_float( float, float, int );
 externC float __kernel_sinf (float,float,int);
 externC float __kernel_cosf (float,float);
 externC float __kernel_tanf (float,float,int);
-externC int   __kernel_rem_pio2f (float*,float*,int,int,int,const cyg_int32*);
+externC int   __kernel_rem_pio2f (float*,float*,int,int,int,const __int32_t*);
 
 #endif // ifdef CYGPKG_LIBM     
 

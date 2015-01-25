@@ -1,9 +1,12 @@
 #define TURAG_DEBUG_LOG_SOURCE "H"
 
+#include <tina/tina.h>
+
+#if TURAG_USE_TURAG_FELDBUS_HOST
+
 #include <ch.h>
 #include <hal.h>
 #include <tina/debug.h>
-#include <tina/tina.h>
 #include <tina/time.h>
 #include <platform/chibios/backplane.h>
 
@@ -37,11 +40,11 @@ bool turag_rs485_init(uint32_t baud_rate, TuragSystemTime timeout) {
     sdStart(&RS485SD, &serial_cfg_rs485);       // CtrlM-specific
     rs485_timeout = timeout;
 
-    // setup RTS output
+    // setup RTS receive
     palSetPadMode(GPIOD, BPD_SC_RTS, PAL_MODE_OUTPUT_PUSHPULL);
     palClearPad(GPIOD, BPD_SC_RTS);
 
-    // flush input queue
+    // flush transmit queue
     sdReadTimeout(&RS485SD, buf, 1, TIME_IMMEDIATE);
     sdWriteTimeout(&RS485SD, buf, 1, TIME_IMMEDIATE);
 
@@ -62,7 +65,7 @@ bool turag_rs485_ready(void) {
     return (RS485SD.state == SD_READY);
 }
 
-bool turag_rs485_transceive(uint8_t *input, int input_length, uint8_t *output, int output_length) {
+bool turag_rs485_transceive(uint8_t *transmit, int* transmit_length, uint8_t *receive, int* receive_length) {
     while (!turag_rs485_ready()) {
         chThdSleepMilliseconds(10);
     }
@@ -71,22 +74,40 @@ bool turag_rs485_transceive(uint8_t *input, int input_length, uint8_t *output, i
 
     chBSemWait(&_RS485_Sem);
 
-    if (input && input_length > 0) {
-        // activate RS485 driver for sending
-        palSetPad(GPIOD, BPD_SC_RTS);
-        int ok = sdWriteTimeout(&RS485SD, input, input_length, MS2ST(5));
-        // TC interrupt handler sets the RTS pin after transmission is completed
+    if (transmit && transmit_length) {
+		int transmit_length_copy = *transmit_length;
+		
+		if (transmit_length_copy > 0) {
+			// activate RS485 driver for sending
+			palSetPad(GPIOD, BPD_SC_RTS);
+			int ok = sdWriteTimeout(&RS485SD, transmit, transmit_length_copy, MS2ST(5));
+			// TC interrupt handler sets the RTS pin after transmission is completed
 
-        send_ok = (ok == input_length);
-        debugf("turag_rs485_transceive: sending %d bytes, %d bytes written ok, driver state %d, OK: %d", input_length, ok, RS485SD.state, send_ok);
+			send_ok = (transmit_length_copy == ok);
+			*transmit_length = ok;
+			debugf("turag_rs485_transceive: sending %d bytes, %d bytes written ok, driver state %d, OK: %d", transmit_length_copy, ok, RS485SD.state, send_ok);
+		}
+    }
+    
+    if (!send_ok) {
+		if (receive_length) {
+			*receive_length = 0;
+		}
+		chBSemSignal(&_RS485_Sem);
+		return false;
     }
 
-    if (output && output_length > 0) {
-        // read answer, timeout in systemticks!
-        int ok = sdReadTimeout(&RS485SD, output, output_length, rs485_timeout.value);
+    if (receive && receive_length) {
+		int receive_length_copy = *receive_length;
+		
+		if (receive_length_copy > 0) {
+			// read answer, timeout in systemticks!
+			int ok = sdReadTimeout(&RS485SD, receive, receive_length_copy, rs485_timeout.value);
 
-        recv_ok = (ok == output_length);
-        debugf("turag_rs485_transceive: receiving %d bytes, retval %d, driver state %d, OK: %d", output_length, ok, RS485SD.state, recv_ok);
+			recv_ok = (ok == receive_length_copy);
+			*receive_length = ok;
+			debugf("turag_rs485_transceive: receiving %d bytes, retval %d, driver state %d, OK: %d", receive_length_copy, ok, RS485SD.state, recv_ok);
+		}
     }
 
     chBSemSignal(&_RS485_Sem);
@@ -101,3 +122,5 @@ void turag_rs485_buffer_clear(void) {
 
     while (sdGetTimeout(&RS485SD, TIME_IMMEDIATE) != Q_TIMEOUT);
 }
+
+#endif
