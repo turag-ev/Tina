@@ -39,10 +39,16 @@ size_t turag_thread_get_stack_usage(const TuragThread* thread);
 # define turag_thread_get_stack_usage(x) (0)
 #endif
 
-/// lets the current thread sleeps for a time of ecos ticks
+/// lets the current thread sleeps for a time of chibios ticks
 TURAG_INLINE
 void turag_thread_delay(TuragSystemTime ticks) {
   chThdSleep(ticks.value);
+}
+
+/// lets the current thread sleeps until a certain tick
+TURAG_INLINE
+void turag_thread_sleep_until(TuragSystemTime ticks) {
+  chThdSleepUntil(ticks.value);
 }
 
 /// sets the name of the current thread (only for chibios)
