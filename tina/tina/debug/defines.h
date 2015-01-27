@@ -20,16 +20,19 @@
 ///
 /// Zum Abschicken von Debugausgaben stehen Funktionen zur Verfügung, die sich ähnlich wie ''printf'' verhalten:
 /// \code{.cpp}
-/// // freigeschaltet bei TURAG_DEBUG_LEVEL > 3
+/// // freigeschaltet bei TURAG_DEBUG_LEVEL >= 5
+/// turag_debugf("formatierte Ausgabe %s", "von internen Debuginformationen");
+///
+/// // freigeschaltet bei TURAG_DEBUG_LEVEL >= 4
 /// turag_infof("formatierte Ausgabe %s", "von einfachen Informationen");
 ///
-/// // freigeschaltet bei TURAG_DEBUG_LEVEL > 2
+/// // freigeschaltet bei TURAG_DEBUG_LEVEL >= 3
 /// turag_warningf("formatierte Ausgabe %s", "von Warnungen");
 ///
-/// // freigeschaltet bei TURAG_DEBUG_LEVEL > 1
+/// // freigeschaltet bei TURAG_DEBUG_LEVEL >= 2
 /// turag_criticalf("formatierte Ausgabe %s", "von kritischen Fehlern");
 ///
-/// // freigeschaltet bei TURAG_DEBUG_LEVEL > 0
+/// // freigeschaltet bei TURAG_DEBUG_LEVEL >= 1
 /// turag_errorf("formatierte Ausgabe %s", "von fatalen Fehlern");
 /// \endcode
 /// Ein Zeilenumbruch am Ende der Zeile ist nicht zulässig!. Die TURAG-Console
@@ -162,12 +165,23 @@
 # endif
 #endif
 
+#if !defined(TURAG_DEBUG_ENABLE_BINARY)
+# if TURAG_DEBUG_LEVEL > 3
+/// \brief Wenn definiert werden Debugbinärobjekte gesendet.
+///
+/// Kann über Makefile oder in Zeilen vor erstem Include definiert werden.
+/// Wird standardmäßig bei TURAG_DEBUG_LEVEL größer 3 definiert.
+#  define TURAG_DEBUG_ENABLE_BINARY
+# endif
+#endif
+
 // log source
 #ifndef TURAG_DEBUG_LOG_SOURCE
 /// \brief Debugquelle
 ///
 /// Sollte über Makefile oder in Zeilen vor erstem Include umdefiniert werden.
 # define TURAG_DEBUG_LOG_SOURCE "_"
+# warning Makro TURAG_DEBUG_LOG_SOURCE nicht definiert!
 #endif
 
 #if !defined(NDEBUG) && TURAG_DEBUG_LEVEL < 1
