@@ -13,7 +13,5 @@
 #include <tina/debug/print.h>
 #include <tina/debug/graph.h>
 
-
-
 #endif // TINA_DEBUG_H
 

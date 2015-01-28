@@ -2,6 +2,7 @@
 #define TINAPP_DEBUG_BINARY_H
 
 #include <type_traits>
+#include <utility>
 
 #include <tina++/tina.h>
 #include <tina/debug/binary.h>
@@ -11,6 +12,11 @@ namespace TURAG {
 template<typename T, class Enable = void>
 struct DebugObject {
 	enum : unsigned char { Version = T::Version };
+
+	template<typename...Args>
+	DebugObject(Args&&...args) :
+		data(std::forward<Args>(args)...)
+	{ }
 
 	unsigned char version;
 	T data;
