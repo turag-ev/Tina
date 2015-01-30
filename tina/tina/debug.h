@@ -13,6 +13,12 @@
 #include <tina/debug/print.h>
 #include <tina/debug/graph.h>
 
+/*
+ * COMPATABILITY LAYER FOR OLD-STYLE DEBUG-MACROS
+ * 
+ * These macros should be removed once they are not needed anymore.
+ */
+
 #if TURAG_DEBUG_LEVEL > 0
 # define system_printf(format, args...) \
     turag_debug_printf(TURAG_DEBUG_LINE_PREFIX ";;" format TURAG_DEBUG_NEWLINE, ##args)
