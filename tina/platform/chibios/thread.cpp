@@ -1,3 +1,4 @@
+#define TURAG_DEBUG_LOG_SOURCE "_"
 #include "public/tina++/thread.h"
 #include "public/tina/thread.h"
 #include <tina/debug.h>

@@ -1,3 +1,5 @@
+#define TURAG_DEBUG_LOG_SOURCE "_"
+
 #include "image.h"
 #include "print.h"
 #include <tina/utils/base64.h>

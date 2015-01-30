@@ -28,6 +28,14 @@
 /// Prefix für Spielzeitausgaben
 #define TURAG_DEBUG_GAMETIME_PREFIX "T"
 
+// log source
+#ifndef TURAG_DEBUG_LOG_SOURCE
+/// \brief Debugquelle
+///
+/// Sollte über Makefile oder in Zeilen vor erstem Include umdefiniert werden.
+# define TURAG_DEBUG_LOG_SOURCE "_"
+# warning Makro TURAG_DEBUG_LOG_SOURCE nicht definiert!
+#endif
 
 extern TuragSystemTime turag_debug_print_gametime_gamestarttime;
 extern int turag_debug_print_gametime_auto_output_enabled;

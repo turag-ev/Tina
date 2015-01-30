@@ -9,11 +9,11 @@
  * abstrakter Klassenfunktionen bereit.
  *
  */
-
+ 
+#define TURAG_DEBUG_LOG_SOURCE "_"
 #include <tina/tina.h>
 
 #if TURAG_USE_TINA_CPP_RUNTIME_SUPPORT
-
 
 #include <tina/debug/print.h>
 
