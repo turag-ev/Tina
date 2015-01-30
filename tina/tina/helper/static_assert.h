@@ -277,6 +277,10 @@ template <int w>
    accordingly.  R should not have side-effects; it may or may not be
    evaluated.  Behavior is undefined if R is false.  */
 
+#ifndef _MSC_VER
+# define _MSC_VER 0
+#endif
+
 #if (__has_builtin (__builtin_unreachable) \
      || 4 < __GNUC__ + (5 <= __GNUC_MINOR__))
 # define assume(R) ((R) ? (void) 0 : __builtin_unreachable ())
