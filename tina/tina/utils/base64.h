@@ -43,7 +43,7 @@ extern "C" {
  * @param[in] len Length of data that is to be encoded
  * @return length of base64 encoded data
  */
-size_t turag_base64_encode_len(size_t len);
+#define turag_base64_encode_len(len) (((len) * 4 + 2) / 3)
 
 /**
  * @brief Encodes data to base64 encoded data.
@@ -60,7 +60,7 @@ int turag_base64_encode(const uint8_t *data, size_t len, uint8_t *encoded);
  * @param[in] len length of base64 encoded data
  * @return length of decoded data
  */
-size_t turag_base64_decode_len(size_t len);
+#define turag_base64_decode_len(len) ((len) * 3 / 4)
 
 /**
  * @brief Decodes base64 encoded data.
