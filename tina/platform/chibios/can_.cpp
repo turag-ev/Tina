@@ -48,9 +48,9 @@ ErrorCode read_blackboard(const Blackboard *object, pointer dest) {
 
     if (error != -CASA_ENOERR) {
         if (errorcnt++ <= 4) {
-            errorf("CASA BlackBoard read failed with error code: %d (0x%.8x)", error, error);
+            turag_errorf("CASA BlackBoard read failed with error code: %d (0x%.8x)", error, error);
             if (errorcnt == 5)
-                errorf("(omitting the following 5k CASABB messages)");
+                turag_errorf("(omitting the following 5k CASABB messages)");
         } else if (errorcnt == 5000) {
             errorcnt = 0;
         }

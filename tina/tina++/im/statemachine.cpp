@@ -76,13 +76,13 @@ void Statemachine::start(EventQueue* eventqueue, int32_t argument) {
     eventqueue_ = eventqueue;
 
     if (getStatusInternal() == Status::waiting_for_activation) {
-        infof("%s: not added: already in activation queue", name);
+        turag_infof("%s: not added: already in activation queue", name);
     } else if (getStatusInternal() == Status::running_and_waiting_for_deactivation) {
-        criticalf("%s: not added: waiting to be deactivated", name);
+        turag_criticalf("%s: not added: waiting to be deactivated", name);
     } else if (getStatusInternal() == Status::running) {
-        infof("%s: not added: already running", name);
+        turag_infof("%s: not added: already running", name);
     } else if(getStatusInternal() == Status::running_and_initialized) {
-        infof("%s: not added: already running", name);
+        turag_infof("%s: not added: already running", name);
         // send initialized event but only if we are already initialized
         emitEvent(myEventOnSuccessfulInitialization);
     } else {
@@ -103,15 +103,15 @@ void Statemachine::stop(void) {
     Mutex::Lock lock(interface_mutex);
 
     if (getStatusInternal() == Status::running_and_waiting_for_deactivation) {
-        infof("%s: not added: already in deactivation queue", name);
+        turag_infof("%s: not added: already in deactivation queue", name);
     } else if (getStatusInternal() == Status::waiting_for_activation) {
-        criticalf("%s: not stopped: already in activation queue", name);
+        turag_criticalf("%s: not stopped: already in activation queue", name);
     } else if (getStatusInternal() == Status::running_and_initialized || getStatusInternal() == Status::running) {
         next_to_be_stopped =  Statemachine::first_to_be_stopped_statemachine;
         Statemachine::first_to_be_stopped_statemachine = this;
         status_ = Status::running_and_waiting_for_deactivation;
     } else {
-        infof("%s: not stopped: wasn't running", name);
+        turag_infof("%s: not stopped: wasn't running", name);
         // send shutdown event nonetheless
         emitEvent(myEventOnSuccessfulInitialization);
     }
@@ -177,12 +177,12 @@ void Statemachine::doStatemachineProcessing(void) {
                 sm->next_active->last_active = sm;
             Statemachine::first_active_statemachine = sm;
 
-            infof("%s activated", sm->name);
+            turag_infof("%s activated", sm->name);
         } else {
             sm->status_ = Status::stopped_on_error;
             sm->emitEvent(sm->myEventOnErrorShutdown);
 
-            criticalf("%s: couldn't be activated", sm->name);
+            turag_criticalf("%s: couldn't be activated", sm->name);
         }
         sm = sm->next_to_be_activated;
     }
@@ -198,7 +198,7 @@ void Statemachine::doStatemachineProcessing(void) {
                 sm->status_ = Status::stopped_on_error;
                 sm->emitEvent(sm->myEventOnErrorShutdown);
 
-                infof("%s: couldn't enter abortstate -> cancelled", sm->name);
+                turag_infof("%s: couldn't enter abortstate -> cancelled", sm->name);
             }
         }
         sm = sm->next_to_be_stopped;
@@ -231,15 +231,15 @@ void Statemachine::doStatemachineProcessing(void) {
             sm->status_ = Status::stopped_on_error;
             sm->emitEvent(sm->myEventOnErrorShutdown);
 
-            infof("%s cancelled on error", sm->name);
+            turag_infof("%s cancelled on error", sm->name);
         } else if (state == Statemachine::finished) {
             sm->removeFromActiveList();
             sm->status_ = Status::stopped_gracefully;
             sm->emitEvent(sm->myEventOnGracefulShutdown);
 
-            infof("%s finished", sm->name);
+            turag_infof("%s finished", sm->name);
         } else if (state == Statemachine::restartState) {
-            warningf("%s: Do Statefunc again", sm->name);
+            turag_warningf("%s: Do Statefunc again", sm->name);
             lock.unlock();
             bool success = sm->pcurrent_state->state_function();
             lock.lock();
@@ -248,14 +248,14 @@ void Statemachine::doStatemachineProcessing(void) {
                 sm->removeFromActiveList();
                 sm->status_ = Status::stopped_on_error;
                 sm->emitEvent(sm->myEventOnErrorShutdown);
-                infof("%s cancelled on error", sm->name);
+                turag_infof("%s cancelled on error", sm->name);
             }
         } else if (state != sm->pcurrent_state) {
             if (!sm->change_state(state, &lock)) {
                 sm->removeFromActiveList();
                 sm->status_ = Status::stopped_on_error;
                 sm->emitEvent(sm->myEventOnErrorShutdown);
-                infof("%s cancelled on error", sm->name);
+                turag_infof("%s cancelled on error", sm->name);
             }
 
         }
@@ -288,9 +288,9 @@ bool Statemachine::change_state(State* next_state, ScopedLock<Mutex> *lock) {
 
 		if (success) {
             if (pcurrent_state) {
-                infof("%s: %s --> %s", name, pcurrent_state->name, next_state->name);
+                turag_infof("%s: %s --> %s", name, pcurrent_state->name, next_state->name);
             } else {
-                infof("%s: entered initial state: %s", name, next_state->name);
+                turag_infof("%s: entered initial state: %s", name, next_state->name);
             }
 
             if (next_state == initializedState && status_ == Status::running) {
@@ -301,7 +301,7 @@ bool Statemachine::change_state(State* next_state, ScopedLock<Mutex> *lock) {
             pcurrent_state = next_state;
             return true;
 		} else {
-			criticalf("%s: statechange failed", name);
+			turag_criticalf("%s: statechange failed", name);
 			return false;
 		}
 	}

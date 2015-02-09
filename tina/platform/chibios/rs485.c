@@ -52,10 +52,10 @@ bool turag_rs485_init(uint32_t baud_rate, TuragSystemTime timeout) {
     chThdSleepMilliseconds(500);
     chBSemSignal(&_RS485_Sem);
 
-    infof("RS485 init: %u baud, timeout %u ms -> status %d\n", (unsigned int)baud_rate, (unsigned int)timeout.value, RS485SD.state);
+    turag_infof("RS485 init: %u baud, timeout %u ms -> status %d\n", (unsigned int)baud_rate, (unsigned int)timeout.value, RS485SD.state);
 
     if (RS485SD.state != SD_READY) {
-        error("RS485 init FAILED!");
+        turag_error("RS485 init FAILED!");
     }
 
     return (RS485SD.state == SD_READY);
