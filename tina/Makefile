@@ -1,4 +1,4 @@
-.PHONY: doc clean
+.PHONY: doc clean qtdoc
 doc:
 	doxygen doxyfile > /dev/null
 

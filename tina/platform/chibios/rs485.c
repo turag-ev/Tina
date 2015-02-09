@@ -85,7 +85,7 @@ bool turag_rs485_transceive(uint8_t *transmit, int* transmit_length, uint8_t *re
 
 			send_ok = (transmit_length_copy == ok);
 			*transmit_length = ok;
-			debugf("turag_rs485_transceive: sending %d bytes, %d bytes written ok, driver state %d, OK: %d", transmit_length_copy, ok, RS485SD.state, send_ok);
+			turag_debugf("turag_rs485_transceive: sending %d bytes, %d bytes written ok, driver state %d, OK: %d", transmit_length_copy, ok, RS485SD.state, send_ok);
 		}
     }
     
@@ -106,7 +106,7 @@ bool turag_rs485_transceive(uint8_t *transmit, int* transmit_length, uint8_t *re
 
 			recv_ok = (ok == receive_length_copy);
 			*receive_length = ok;
-			debugf("turag_rs485_transceive: receiving %d bytes, retval %d, driver state %d, OK: %d", receive_length_copy, ok, RS485SD.state, recv_ok);
+			turag_debugf("turag_rs485_transceive: receiving %d bytes, retval %d, driver state %d, OK: %d", receive_length_copy, ok, RS485SD.state, recv_ok);
 		}
     }
 
