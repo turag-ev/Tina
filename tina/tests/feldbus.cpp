@@ -1,0 +1,35 @@
+#define BOOST_TEST_DYN_LINK
+#include <boost/test/unit_test.hpp>
+
+#include <tina++/feldbus/host/device.h>
+
+using namespace TURAG;
+
+BOOST_AUTO_TEST_SUITE(FeldbusTests)
+
+BOOST_AUTO_TEST_CASE( test_size ) {
+  Feldbus::Broadcast<> broadcast;
+  BOOST_CHECK_EQUAL(sizeof(broadcast), sizeof(uint8_t) * 3);
+  
+  Feldbus::Request<> request;
+  BOOST_CHECK_EQUAL(sizeof(request), sizeof(uint8_t) * 2);
+  
+  Feldbus::Response<> responce;
+  BOOST_CHECK_EQUAL(sizeof(responce), sizeof(uint8_t) * 2);
+  
+  Feldbus::Request<uint8_t> request2;
+  BOOST_CHECK_EQUAL(sizeof(request2), sizeof(uint8_t) * 3);
+  
+  struct R {
+    uint8_t a;
+    uint16_t b;
+    uint8_t c;
+    uint16_t d;
+  } _packed;
+  Feldbus::Request<R> request3;
+  BOOST_CHECK_EQUAL(sizeof(request3), sizeof(uint8_t) * (2 + 6));
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+//____________________________________________________________________________//

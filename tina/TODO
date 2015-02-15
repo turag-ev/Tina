@@ -1,0 +1,20 @@
+# TODO
+
+## notwendig Änderungen
+
+- ScopedLock wieder als Standard nehmen (LockGuard bringt keinen Vorteil)
+- mehrere Eventqueues ermöglichen
+- Action: aus statische Funktionen als Zustände Methoden verwenden
+- init.h und final.h auflösen
+- normialize ergänzen um cross-c-c++ Makros:
+    - constexpr in C ersetzen
+    - _always_inline für c anpassen
+
+    -> C/C++ kompatiblen Header erstellen für:
+       - plattform/utils/time.h
+       - math.h
+- Quelle für REQUIRES angeben
+
+## BUGS
+
+
