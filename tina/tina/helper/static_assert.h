@@ -55,10 +55,10 @@
      && !defined __cplusplus)
 # define _GL_HAVE__STATIC_ASSERT 1
 #endif
-/* The condition (99 < __GNUC__) is temporary, until we know about the
-   first G++ release that supports static_assert.  */
-#if (99 < __GNUC__) && defined __cplusplus
+/* static_assert available in g++ since 4.3  */
+#if (4 < __GNUC__ + (3 <= __GNUC_MINOR__)) && defined __cplusplus
 # define _GL_HAVE_STATIC_ASSERT 1
+#define _Static_assert static_assert
 #endif
 
 /* FreeBSD 9.1 <sys/cdefs.h>, included by <stddef.h> and lots of other
