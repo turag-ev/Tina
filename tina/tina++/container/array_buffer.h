@@ -7,7 +7,7 @@
 #include <algorithm>
 
 #include "../tina.h"
-#include "../debug.h"
+#include <tina/debug/internal-debug.h>
 #include "array_storage.h"
 
 namespace TURAG {
@@ -471,7 +471,7 @@ private:
 template<typename T>
 bool _ArrayBufferHelper<T>::prepare_for_insert(iterator position, iterator end, const_iterator max_end) {
   if (end == max_end) {
-	turag_error("ArrayBuffer overflow!");
+	turag_internal_error("ArrayBuffer overflow!");
 	return false;
   }
 
@@ -482,7 +482,7 @@ bool _ArrayBufferHelper<T>::prepare_for_insert(iterator position, iterator end, 
 template<typename T>
 bool _ArrayBufferHelper<T>::is_full(const_iterator end, const_iterator max_end) {
   if (end == max_end) {
-	turag_error("ArrayBuffer overflow!");
+	turag_internal_error("ArrayBuffer overflow!");
 	return true;
   }
   return false;

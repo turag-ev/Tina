@@ -4,38 +4,12 @@
 #include <tina/debugprint.h>
 #include <tina/time.h>
 #include "defines.h"
+#include "log-source.h"
 
 /// \addtogroup Debug
 /// \{
 /// \defgroup Debugprint Meldungsausgabe
 /// \{
-
-/// Prefix für Fehlermeldung
-#define TURAG_DEBUG_ERROR_PREFIX    "!"
-
-/// Prefix für kritische Debugmeldungen
-#define TURAG_DEBUG_CRITICAL_PREFIX "?"
-
-/// Prefix für Warnungen
-#define TURAG_DEBUG_WARN_PREFIX     "#"
-
-/// Prefix für informative Meldungen
-#define TURAG_DEBUG_INFO_PREFIX     "-"
-
-/// Prefix für Debugmeldungen
-#define TURAG_DEBUG_DEBUG_PREFIX    "_"
-
-/// Prefix für Spielzeitausgaben
-#define TURAG_DEBUG_GAMETIME_PREFIX "T"
-
-// log source
-#ifndef TURAG_DEBUG_LOG_SOURCE
-/// \brief Debugquelle
-///
-/// Sollte über Makefile oder in Zeilen vor erstem Include umdefiniert werden.
-# define TURAG_DEBUG_LOG_SOURCE "_"
-# warning Makro TURAG_DEBUG_LOG_SOURCE nicht definiert!
-#endif
 
 extern TuragSystemTime turag_debug_print_gametime_gamestarttime;
 extern int turag_debug_print_gametime_auto_output_enabled;

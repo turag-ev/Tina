@@ -6,9 +6,10 @@
 #include <type_traits>
 
 #include "../tina.h"
-#include "../debug.h"
 #include "array_storage.h"
 #include "../helper/integer.h"
+
+#include <tina/debug/internal-debug.h>
 
 namespace TURAG {
 
@@ -354,7 +355,7 @@ public:
     ++last_;
 
     if (first_ == last_) {
-      turag_error("CircularBuffer overflow!");
+	  turag_internal_error("CircularBuffer overflow!");
       --last_;
       return ;
     }
@@ -367,7 +368,7 @@ public:
     ++last_;
 
     if (first_.n_ == last_.n_) {
-      turag_error("CircularBuffer overflow!");
+	  turag_internal_error("CircularBuffer overflow!");
       --last_;
       return ;
     }
@@ -380,7 +381,7 @@ public:
     --first_;
 
     if (last_ == first_) {
-      turag_error("CircularBuffer overflow!");
+	  turag_internal_error("CircularBuffer overflow!");
       ++first_;
       return ;
     }
@@ -392,7 +393,7 @@ public:
     --first_;
 
     if (last_.n_ == first_.n_) {
-      turag_error("CircularBuffer overflow!");
+	  turag_internal_error("CircularBuffer overflow!");
       ++first_;
       return ;
     }

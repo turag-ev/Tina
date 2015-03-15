@@ -191,6 +191,24 @@
 # define TURAG_PRINT_GAMETIME_AUTOMATIC 0
 #endif
 
+/// Prefix für Fehlermeldung
+#define TURAG_DEBUG_ERROR_PREFIX    "!"
+
+/// Prefix für kritische Debugmeldungen
+#define TURAG_DEBUG_CRITICAL_PREFIX "?"
+
+/// Prefix für Warnungen
+#define TURAG_DEBUG_WARN_PREFIX     "#"
+
+/// Prefix für informative Meldungen
+#define TURAG_DEBUG_INFO_PREFIX     "-"
+
+/// Prefix für Debugmeldungen
+#define TURAG_DEBUG_DEBUG_PREFIX    "_"
+
+/// Prefix für Spielzeitausgaben
+#define TURAG_DEBUG_GAMETIME_PREFIX "T"
+
 /// \}
 
 #endif // TINA_DEBUG_DEFINES_H

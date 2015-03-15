@@ -3,6 +3,7 @@
 
 #include <tina/debugprint.h>
 #include "defines.h"
+#include "log-source.h"
 
 #ifdef __cplusplus
 extern "C" {
