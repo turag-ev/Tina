@@ -7,7 +7,6 @@
 
 #define TURAG_DEBUG_LOG_SOURCE "E"
 //#define DEBUG_LEVEL 3
-#define __STDC_FORMAT_MACROS
 
 #include "../debug.h"
 

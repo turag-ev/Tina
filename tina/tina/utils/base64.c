@@ -58,21 +58,21 @@ static const char basis_64[] =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 int turag_base64_encode(const uint8_t *data, size_t len, uint8_t *encoded) {
-    size_t i;
+	size_t i;
     uint8_t *p;
 
     p = encoded;
-    for (i = 0; i < len - 2; i += 3) {
+	for (i = 0; i + 2 < len; i += 3) {
+		*p++ = basis_64[(data[i] >> 2) & 0x3F];
+		*p++ = basis_64[((data[i] & 0x3) << 4) |
+			   ((int) (data[i + 1] & 0xF0) >> 4)];
+		*p++ = basis_64[((data[i + 1] & 0xF) << 2) |
+				((int) (data[i + 2] & 0xC0) >> 6)];
+		*p++ = basis_64[data[i + 2] & 0x3F];
+	}
+	if (i < len) {
         *p++ = basis_64[(data[i] >> 2) & 0x3F];
-        *p++ = basis_64[((data[i] & 0x3) << 4) |
-                        ((int) (data[i + 1] & 0xF0) >> 4)];
-        *p++ = basis_64[((data[i + 1] & 0xF) << 2) |
-                        ((int) (data[i + 2] & 0xC0) >> 6)];
-        *p++ = basis_64[data[i + 2] & 0x3F];
-    }
-    if (i < len) {
-        *p++ = basis_64[(data[i] >> 2) & 0x3F];
-        if (i == (len - 1)) {
+		if (i + 1 == len) {
             *p++ = basis_64[((data[i] & 0x3) << 4)];
         } else {
             *p++ = basis_64[((data[i] & 0x3) << 4) |

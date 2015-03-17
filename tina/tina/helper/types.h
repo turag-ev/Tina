@@ -10,8 +10,17 @@
 #ifndef TINA_HELPER_TYPES_H
 #define TINA_HELPER_TYPES_H
 
-#include <stddef.h>
-#include <stdint.h>
+#define __STDC_FORMAT_MACROS
+
+#ifdef __cplusplus
+# include <cstddef>
+# include <cstdint>
+# include <cinttypes>
+#else
+# include <stddef.h>
+# include <stdint.h>
+# include <inttypes.h>
+#endif
 
 #ifndef ECOS
 # include <stdbool.h>
@@ -22,9 +31,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-////////////////////////////////////////////////////////////////////////////////
-// integral types
 
 /// unsigned integer type
 typedef unsigned int  uint;
