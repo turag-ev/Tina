@@ -95,7 +95,7 @@ extern "C" {
 
 #ifndef __DOXYGEN__
 
-void _turag_binary_send(char source, char object_id, const void* object, size_t size);
+void _turag_binary_send(const char* header, const void* object, size_t size);
 
 #endif // __DOXYGEN__
 
