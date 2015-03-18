@@ -2,6 +2,8 @@
 
 #include "binary.h"
 
+#ifdef TURAG_DEBUG_ENABLE_BINARY
+
 #include <cstddef>
 #include <cstdint>
 #include <cstddef>
@@ -39,3 +41,5 @@ void _turag_binary_send(char source, char object_id, const void* object, size_t 
 
 	turag_debug_puts((const char*)paket);
 }
+
+#endif
