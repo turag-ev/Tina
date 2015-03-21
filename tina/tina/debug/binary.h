@@ -1,7 +1,10 @@
 #ifndef TINA_DEBUG_BINARY_H
 #define TINA_DEBUG_BINARY_H
 
+#ifndef TURAG_DEBUG_LOG_SOURCE
 #define TURAG_DEBUG_LOG_SOURCE "_"
+#endif
+
 #include <tina/debugprint.h>
 #include "defines.h"
 #include "log-source.h"

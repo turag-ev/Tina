@@ -7,7 +7,9 @@
 
 #include <inttypes.h>
 
-// fix this for chibios:
+#ifndef SIM
+#define __WORDSIZE 32
+#endif
 
 # if __WORDSIZE == 64
 #  define __PRI64_PREFIX	"l"
