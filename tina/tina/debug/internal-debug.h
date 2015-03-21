@@ -2,6 +2,7 @@
 #define TINA_DEBUG_INTERNALDEBUG_H
 
 #include <tina/debugprint.h>
+#include <tina/debug/print.h>
 #include "defines.h"
 
 #ifndef __DOXYGEN__
