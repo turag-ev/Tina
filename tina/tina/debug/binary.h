@@ -107,7 +107,7 @@ void _turag_binary_send(char source, char object_id, const void* object, size_t 
 ///
 /// \param object_id ein Zeichen als zuordnenbare Objekt-ID von Objekt aus Logquelle
 /// \param object Objektinstanz
-# define turag_binary_send(object_id, object) \
+#define turag_binary_send(object_id, object) \
 	_turag_binary_send( \
 	  TURAG_DEBUG_LOG_SOURCE[0], \
 	  object_id, \
@@ -115,7 +115,7 @@ void _turag_binary_send(char source, char object_id, const void* object, size_t 
 
 #else // TURAG_DEBUG_ENABLE_BINARY
 
-# define turag_binary_send(object_id, object) while(0)
+#define turag_binary_send(object_id, object) while(0)
 
 #endif // TURAG_DEBUG_ENABLE_BINARY
 
