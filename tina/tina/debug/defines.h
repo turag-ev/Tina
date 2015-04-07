@@ -170,8 +170,8 @@
 /// \brief Wenn definiert werden Debugbinärobjekte gesendet.
 ///
 /// Kann über Makefile oder in Zeilen vor erstem Include definiert werden.
-/// Wird standardmäßig bei TURAG_DEBUG_LEVEL größer 3 definiert.
-#  define TURAG_DEBUG_ENABLE_BINARY
+/// Wird standardmäßig nicht definiert.
+//#  define TURAG_DEBUG_ENABLE_BINARY
 # endif
 #endif
 
