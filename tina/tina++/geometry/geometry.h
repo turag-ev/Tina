@@ -362,40 +362,69 @@ struct Circle {
 };
 
 /// \brief Rechteck
-/// \tparam P Typ mit 2-dimensionalen kartesischen Koordinaten (x und y)
 ///
-template<typename P>
 class Rect {
 public:
-    /// Punkt 1
-    P a;
-
-    /// Punkt 2
-    P b;
-
     /// leeres Rechteck erstellen
     constexpr Rect() :
-		a(),
-		b()
+		lb_(), rt_()
     { }
 
-    ///
     /// \brief Rechteck aus zwei Punkten erstellen
-    /// \param _a Punkt 1
-    /// \param _b Punkt 2
-    ///
-    constexpr Rect(P _a, P _b) :
-		a(_a),
-		b(_b)
-	{
-	}
+	/// \param a Punkt 1
+	/// \param b Punkt 2
+	constexpr Rect(Point a, Point b) :
+		lb_(min(a.x, b.x), min(a.y, b.y)),
+		rt_(max(a.x, b.x), max(a.y, b.y))
+	{ }
+
+	/// \brief Rechteck aus Ursprungspunkt und Größe erstellen
+	/// \param o Ursprungspunkt
+	/// \param width Breite
+	/// \param height Höhe
+	constexpr Rect(Point o, Length width, Length height) :
+		Rect(o, Point(o.x + width, o.y + height))
+	{ }
 
     /// \brief Mittelpunkt von Rechteck bestimmen
-	constexpr P getCenter() const {
-        return P((b.x + a.x)/2.f, (b.y + a.y)/2.f);
+	constexpr Point getCenter() const {
+		return Point((lb_.x + rt_.x)/2.f, (lb_.y + rt_.y)/2.f);
 	}
-};
 
+	constexpr Length getLeft() const { return lb_.x; }
+	constexpr Length getBottom() const { return lb_.y; }
+	constexpr Length getRight() const { return rt_.x; }
+	constexpr Length getTop() const { return rt_.y; }
+
+	constexpr Point getLeftBottom() const { return lb_; }
+	constexpr Point getRightTop() const { return rt_; }
+	constexpr Point getLeftTop() const { return Point(getLeft(), getTop()); }
+	constexpr Point getRightBottom() const { return Point(getRight(), getBottom()); }
+
+	constexpr Length getWidth() const { return rt_.x - lb_.x; }
+	constexpr Length getHeight() const { return rt_.y - lb_.y; }
+
+	void inflate(Length dx, Length dy) {
+		lb_.x -= dx/2;
+		lb_.y -= dy/2;
+		rt_.x += dx/2;
+		rt_.y += dy/2;
+	}
+
+	void inflate(Length left, Length bottom, Length right, Length top) {
+		lb_.x -= left;
+		lb_.y -= bottom;
+		rt_.x += right;
+		rt_.y += top;
+	}
+
+private:
+	/// Punkt links unten (kleinster x und y Wert)
+	Point lb_;
+
+	/// Punkt rechts oben (größter x und y Wert)
+	Point rt_;
+};
 
 ///
 /// \brief Prüft ob Punkt in Rechteck liegt.
@@ -404,64 +433,22 @@ public:
 /// \param point Punkt
 /// \return \a true, wenn Punkt in Rechteck liegt, sonst \a false
 ///
-template<typename P>
-constexpr
-bool located_in(const Rect<P>& rect, const P& point) {
-    return (point.x >= std::min(rect.a.x, rect.b.x)
-        && point.x <= std::max(rect.a.x, rect.b.x)
-        && point.y >= std::min(rect.a.y, rect.b.y)
-        && point.y <= std::max(rect.a.y, rect.b.y));
-}
+bool located_in(const Rect& rect, const Point& point);
 
-
-///
-/// \brief Prüft ob ein Kreis und ein Rechteck sich schneiden
-/// Berührt der Kreis den Rand des Rechtecks, so wird auch \a true zurück gegeben.
-/// \param circle Kreis
+/// \brief Prüft ob ein Rechteck sich in der Nähe von Punkt befindet
+/// Berührt der Kreis aus Punkt und Radius \a r den Rand des Rechtecks, so wird auch \a true zurück gegeben.
+/// \param pos Position
 /// \param rect Rechteck
-/// \return \a true, wenn Kreis Rechteck schneidet, sonst \a false
-template<typename P>
-bool intersect(const Circle& circle, const Rect<P>& rect) {
-    //if the center of the circle is in the rectangle
-    if(located_in(rect, circle.m))
-        return true;
-    Point a = rect.a;
-    Point b = Point(rect.b.x, rect.a.y);
-    Point c = rect.b;
-    Point d = Point(rect.a.x, rect.b.y);
-    struct {
-        Point start;
-        Vector<Length> dir;
-    } edges[] = {
-      { a, b-a },
-      { b, c-b },
-      { c, d-c },
-      { d, a-d }
-    };
-    //calculate foot of perpendicular for each edge and check if its in range and between the endpoints
-    for(const auto& e: edges) {
-        //foot = start + dir*t
-        float t = ((e.dir.x * (circle.m.x - e.start.x)) + (e.dir.y * (circle.m.y - e.start.y))) / (sqr(e.dir.x) + sqr(e.dir.y));
-        if(t < 0.0f) {
-            //foot is outside of edge (t<0), check corresponding endpoint (start)
-            Length d = distance(e.start, circle.m);
-            if(d <= circle.r)
-                return true;
-        } else if(t > 1.0f) {
-            //foot is outside of edge (t>1), check corresponding endpoint (end = start+dir)
-            Length d = distance(e.start + e.dir, circle.m);
-            if(d <= circle.r) {
-                return true;
-            }
-        } else {
-            //foot is between the endpoints (t between 0 and 1), check distance
-            Length d = distance(e.start + e.dir*t, circle.m);
-            if(d <= circle.r) {
-                return true;
-            }
-        }
-    }
-    return false;
+/// \return \a true, wenn Kreis aus Punkt \a pos und Radius \a r das Rechteck \a rect schneidet, sonst \a false
+bool in_range(const Point& pos, const Rect& rect, Length r);
+
+/// \brief Prüft ob ein Rechteck sich in der Nähe von Punkt befindet
+/// Berührt der Kreis aus Punkt \a pos und Radius \a r den Rand des Rechtecks, so wird auch \a true zurück gegeben.
+/// \param pos Position
+/// \param rect Rechteck
+/// \return \a true, wenn Kreis aus Punkt \a pos und Radius \a r das Rechteck \a rect schneidet, sonst \a false
+inline bool in_range(const Pose& pos, const Rect& rect, Length r) {
+	return in_range(pos.toPoint(), rect, r);
 }
 
 /// Schnittpunkte zwischen zwei Kreisen zurückgeben.

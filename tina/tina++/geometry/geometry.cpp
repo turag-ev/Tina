@@ -93,4 +93,64 @@ Pose& Pose::translate(const Pose& other) {
   return *this;
 }
 
+bool located_in(const Rect& rect, const Point& point) {
+	return (point.x >= rect.getLeft()
+			&& point.x <= rect.getRight()
+			&& point.y >= rect.getBottom()
+			&& point.y <= rect.getTop());
+}
+
+bool in_range(const Point& pos, const Rect& rect, Length r) {
+	return (pos.x >= rect.getLeft() - r
+			&& pos.x <= rect.getRight() + r
+			&& pos.y >= rect.getBottom() - r
+			&& pos.y <= rect.getTop() + r);
+}
+
+#if 0
+bool intersect(const Circle& circle, const Rect& rect) {
+	//if the center of the circle is in the rectangle
+	if(located_in(rect, circle.m))
+		return true;
+
+	Point a = rect.a;
+	Point b = Point(rect.b.x, rect.a.y);
+	Point c = rect.b;
+	Point d = Point(rect.a.x, rect.b.y);
+	struct {
+		Point start;
+		Vector<Length> dir;
+	} edges[] = {
+	  { a, b-a },
+	  { b, c-b },
+	  { c, d-c },
+	  { d, a-d }
+	};
+	//calculate foot of perpendicular for each edge and check if its in range and between the endpoints
+	for(const auto& e: edges) {
+		//foot = start + dir*t
+		float t = ((e.dir.x * (circle.m.x - e.start.x)) + (e.dir.y * (circle.m.y - e.start.y))) / (sqr(e.dir.x) + sqr(e.dir.y));
+		if(t < 0.0f) {
+			//foot is outside of edge (t<0), check corresponding endpoint (start)
+			Length d = distance(e.start, circle.m);
+			if(d <= circle.r)
+				return true;
+		} else if(t > 1.0f) {
+			//foot is outside of edge (t>1), check corresponding endpoint (end = start+dir)
+			Length d = distance(e.start + e.dir, circle.m);
+			if(d <= circle.r) {
+				return true;
+			}
+		} else {
+			//foot is between the endpoints (t between 0 and 1), check distance
+			Length d = distance(e.start + e.dir*t, circle.m);
+			if(d <= circle.r) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+#endif
+
 } // namespace TURAG
