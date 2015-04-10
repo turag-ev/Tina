@@ -43,11 +43,19 @@ struct Vector {
 		x(x), y(y)
 	{ }
 
+    /// Vektor skalieren
+    /// \param Faktor
+    constexpr
+    Vector operator*(float rhs) {
+        return Vector<U>(x*rhs, y*rhs);
+    }
+
 	/// \{
 	/// Kopieroperator
 	Vector(const Vector& p) = default;
 	Vector() = default;
 	/// \}
+    ///
 };
 
 /// zweidimensionaler kartesischer Punkt
@@ -79,6 +87,11 @@ struct Point {
 	Vector<Length> operator+(const Point& other) {
 		return Vector<Length>(x + other.x, y + other.y);
 	}
+    /// Punkt und Vektor addieren (nur Punkt+Vektor, nicht Vektor+Punkt)
+    constexpr
+    Point operator+(const Vector<Length>& rhs) {
+        return Point(x + rhs.x, y + rhs.y);
+    }
 
 	/// relativer Vektor zwischen zwei Punkte erhalten
 	constexpr
@@ -301,6 +314,7 @@ math_constexpr inline Length distance(Point a, Pose  b) { return hypot(b.x - a.x
 /// einfachen Abstand zwischen zwei kartesischen Punkten zubestimmen.
 math_constexpr inline Length distance(Pose  a, Pose  b) { return hypot(b.x - a.x, b.y - a.y); }
 
+
 /// Schauen ob Punkt \a a in einem maximalen Radius \a r zu Punkt \a b liegt.
 /// \returns \f$ (x_a - x_b)^2 + (y_a - y_b)^2 \leq r^2 \f$
 template<typename T1, typename T2>
@@ -397,6 +411,57 @@ bool located_in(const Rect<P>& rect, const P& point) {
         && point.x <= std::max(rect.a.x, rect.b.x)
         && point.y >= std::min(rect.a.y, rect.b.y)
         && point.y <= std::max(rect.a.y, rect.b.y));
+}
+
+
+///
+/// \brief Prüft ob ein Kreis und ein Rechteck sich schneiden
+/// Berührt der Kreis den Rand des Rechtecks, so wird auch \a true zurück gegeben.
+/// \param circle Kreis
+/// \param rect Rechteck
+/// \return \a true, wenn Kreis Rechteck schneidet, sonst \a false
+template<typename P>
+bool intersect(const Circle& circle, const Rect<P>& rect) {
+    //if the center of the circle is in the rectangle
+    if(located_in(rect, circle.m))
+        return true;
+    Point a = rect.a;
+    Point b = Point(rect.b.x, rect.a.y);
+    Point c = rect.b;
+    Point d = Point(rect.a.x, rect.b.y);
+    struct {
+        Point start;
+        Vector<Length> dir;
+    } edges[] = {
+      { a, b-a },
+      { b, c-b },
+      { c, d-c },
+      { d, a-d }
+    };
+    //calculate foot of perpendicular for each edge and check if its in range and between the endpoints
+    for(const auto& e: edges) {
+        //foot = start + dir*t
+        float t = ((e.dir.x * (circle.m.x - e.start.x)) + (e.dir.y * (circle.m.y - e.start.y))) / (sqr(e.dir.x) + sqr(e.dir.y));
+        if(t < 0.0f) {
+            //foot is outside of edge (t<0), check corresponding endpoint (start)
+            Length d = distance(e.start, circle.m);
+            if(d <= circle.r)
+                return true;
+        } else if(t > 1.0f) {
+            //foot is outside of edge (t>1), check corresponding endpoint (end = start+dir)
+            Length d = distance(e.start + e.dir, circle.m);
+            if(d <= circle.r) {
+                return true;
+            }
+        } else {
+            //foot is between the endpoints (t between 0 and 1), check distance
+            Length d = distance(e.start + e.dir*t, circle.m);
+            if(d <= circle.r) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 /// Schnittpunkte zwischen zwei Kreisen zurückgeben.
