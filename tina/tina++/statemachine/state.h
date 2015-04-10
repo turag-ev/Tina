@@ -447,7 +447,7 @@ public:
   ///
   /// Im Gegensatz zu \ref exit, wird nicht das Ereignis \ref event_return
   /// an die nächst höhere Aktion übergeben und im Gegensatz zu \ref cancel, wird
-  /// keine Ereignis \ref event_cancel in der Aktion ausgeführt.
+  /// kein Ereignis \ref event_cancel in der Aktion ausgeführt.
   ///
   /// \warning Durch das harte Beenden kann die Aktion evtl. Hintergundaktionen
   ///          nicht ordnungsgemäß beenden.
