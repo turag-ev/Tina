@@ -185,7 +185,22 @@ template<typename Dim>
 constexpr _always_inline
 Units::Quantity<Dim>
 max(Units::Quantity<Dim> a, Units::Quantity<Dim> b) {
-	return Units::Quantity<Dim>(std::max(a.value, b.value));
+    return Units::Quantity<Dim>((a.value>b.value)?a.value:b.value);
+}
+
+/// Den kleineren Wert zurückgeben
+/// \param a Wert 1
+/// \param b Wert 2
+/// \returns \f$ min(a, b) \f$
+///
+/// \code
+/// min(-4.f * Units::mm, 6.f * Units::mm) // entspricht -4 mm
+/// \endcode
+template<typename Dim>
+constexpr _always_inline
+Units::Quantity<Dim>
+min(Units::Quantity<Dim> a, Units::Quantity<Dim> b) {
+    return Units::Quantity<Dim>((a.value<b.value)?a.value:b.value);
 }
 
 /// Den größeren Wert zurückgeben
@@ -201,23 +216,10 @@ template<typename Dim>
 constexpr _always_inline
 Units::Quantity<Dim>
 saturate(Units::Quantity<Dim> val, Units::Quantity<Dim> min, Units::Quantity<Dim> max) {
-    return Units::Quantity<Dim>(std::min(std::max(val.value, min.value), max.value));
+    return Units::Quantity<Dim>(TURAG::min(TURAG::max(val, min), max));
 }
 
-/// Den kleineren Wert zurückgeben
-/// \param a Wert 1
-/// \param b Wert 2
-/// \returns \f$ min(a, b) \f$
-///
-/// \code
-/// min(-4.f * Units::mm, 6.f * Units::mm) // entspricht -4 mm
-/// \endcode
-template<typename Dim>
-constexpr _always_inline
-Units::Quantity<Dim>
-min(Units::Quantity<Dim> a, Units::Quantity<Dim> b) {
-	return Units::Quantity<Dim>(std::min(a.value, b.value));
-}
+
 
 /// Sinus berechnen
 /// \param arg Variable mit Einheit
