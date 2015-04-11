@@ -33,9 +33,11 @@ BOOST_AUTO_TEST_CASE( TURAG_CONTAINER_TEST(std_find) ) {
     test1.push_back(5);
 
     CONTAINER::iterator r1 = std::find(test1.begin(), test1.end(), 3);
+	BOOST_CHECK_EQUAL(2, r1 - test1.begin());
     BOOST_CHECK_EQUAL(*r1, 3);
     
     CONTAINER::const_iterator r2 = std::find(test1.cbegin(), test1.cend(), 5);
+	BOOST_CHECK(r2 == test1.begin() + 4);
     BOOST_CHECK_EQUAL(*r2, 5);
     
     CONTAINER::iterator r3 = std::find(test1.begin(), test1.end(), 6);

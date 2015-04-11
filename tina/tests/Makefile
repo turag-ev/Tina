@@ -17,7 +17,8 @@ SRCFILES = \
 	$(wildcard tina/*.c) \
 	$(wildcard helper/*.cpp) \
 	../tina++/utils/cost.cpp \
-	../tina++/statemachine/state.cpp
+	../tina++/statemachine/state.cpp \
+	../tina++/geometry/geometry.cpp
   
 # make everything public :P
 CXXFLAGS += -Dprivate=public -Dprotected=public

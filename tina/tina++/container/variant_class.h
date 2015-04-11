@@ -89,6 +89,7 @@ public:
 		erase();
 		construct(reinterpret_cast<T*>(&data_), std::forward<Args>(args)...);
 		active_ = static_cast<Abstract*>(reinterpret_cast<T*>(&data_));
+		assert(active_ != nullptr);
 	}
 
 private:

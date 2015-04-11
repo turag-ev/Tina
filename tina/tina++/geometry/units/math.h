@@ -188,6 +188,22 @@ max(Units::Quantity<Dim> a, Units::Quantity<Dim> b) {
 	return Units::Quantity<Dim>(std::max(a.value, b.value));
 }
 
+/// Den größeren Wert zurückgeben
+/// \param val Wert
+/// \param min minimaler Wert
+/// \param man maximaler Wert
+/// \returns \f$ sat(a, b) \f$
+///
+/// \code
+/// saturate(-4.f * Units::mm, -1.f * Units::mm, 6.f * Units::mm) // entspricht -1 mm
+/// \endcode
+template<typename Dim>
+constexpr _always_inline
+Units::Quantity<Dim>
+saturate(Units::Quantity<Dim> val, Units::Quantity<Dim> min, Units::Quantity<Dim> max) {
+    return Units::Quantity<Dim>(std::min(std::max(val.value, min.value), max.value));
+}
+
 /// Den kleineren Wert zurückgeben
 /// \param a Wert 1
 /// \param b Wert 2

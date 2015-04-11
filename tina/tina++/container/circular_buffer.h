@@ -171,7 +171,7 @@ typename T::difference_type operator-(
          CircularBufferIterator<T> lhs,
          CircularBufferIterator<T> rhs)
 {
-    return rhs.index() - lhs.index();
+    return lhs.index() - rhs.index();
 }
 
 #ifndef __DOXYGEN__
@@ -213,6 +213,23 @@ public:
   explicit CircularBuffer() :
     first_(), last_(), bytes_()
   { }
+
+/*
+  CircularBuffer(const CircularBuffer& other) :
+    first_(), last_(), bytes_()
+  { 
+    resize(other.size());
+    std::copy(other.begin(), other.end(), begin());
+  }
+
+  CircularBuffer& operator=(const CircularBuffer& other)
+  { 
+    clear();
+    resize(other.size());
+    std::copy(other.begin(), other.end(), begin());
+    return *this;
+  }
+*/
 
   ~CircularBuffer() {
       destruct(begin(), end());

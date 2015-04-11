@@ -403,6 +403,7 @@ public:
 
 	constexpr Length getWidth() const { return rt_.x - lb_.x; }
 	constexpr Length getHeight() const { return rt_.y - lb_.y; }
+	constexpr Vector<Length> getSize() const { return Vector<Length>(getWidth(), getHeight()); }
 
 	void inflate(Length dx, Length dy) {
 		lb_.x -= dx/2;

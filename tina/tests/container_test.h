@@ -24,7 +24,9 @@ void print_container_content(const Container& c) {
 
 class Dummy {
 public:
-  Dummy() {
+  Dummy() :
+    i_(0)
+  {
     ++instances;
   }
 
@@ -42,11 +44,16 @@ public:
     i_(other.i_)
   { ++instances; }
 
-  Dummy(const Dummy&& other) :
+  Dummy(Dummy&& other) :
     i_(other.i_)
   { ++instances; }
 
-  Dummy& operator = (const Dummy&& other) {
+  Dummy& operator = (const Dummy& other) {
+    i_ = other.i_;
+    return *this;
+  }
+
+  Dummy& operator = (Dummy&& other) {
     i_ = other.i_;
     return *this;
   }
