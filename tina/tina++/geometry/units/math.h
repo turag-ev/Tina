@@ -1,6 +1,8 @@
 #ifndef TINAPP_UNITS_MATH_H
 #define TINAPP_UNITS_MATH_H
 
+#include <algorithm>
+
 #include "../../math.h"
 #include "units.h"
 
@@ -185,7 +187,7 @@ template<typename Dim>
 constexpr _always_inline
 Units::Quantity<Dim>
 max(Units::Quantity<Dim> a, Units::Quantity<Dim> b) {
-    return Units::Quantity<Dim>((a.value>b.value)?a.value:b.value);
+    return Units::Quantity<Dim>(std::max(a.value, b.value));
 }
 
 /// Den kleineren Wert zurückgeben
@@ -200,7 +202,7 @@ template<typename Dim>
 constexpr _always_inline
 Units::Quantity<Dim>
 min(Units::Quantity<Dim> a, Units::Quantity<Dim> b) {
-    return Units::Quantity<Dim>((a.value<b.value)?a.value:b.value);
+    return Units::Quantity<Dim>(std::min(a.value, b.value));
 }
 
 /// Den größeren Wert zurückgeben
@@ -215,8 +217,8 @@ min(Units::Quantity<Dim> a, Units::Quantity<Dim> b) {
 template<typename Dim>
 constexpr _always_inline
 Units::Quantity<Dim>
-saturate(Units::Quantity<Dim> val, Units::Quantity<Dim> min, Units::Quantity<Dim> max) {
-    return Units::Quantity<Dim>(TURAG::min(TURAG::max(val, min), max));
+saturate(Units::Quantity<Dim> val, Units::Quantity<Dim> min_val, Units::Quantity<Dim> max_val) {
+    return Units::Quantity<Dim>(min(max(val, min_val), max_val));
 }
 
 
