@@ -2,7 +2,6 @@
 #define TINAPP_HELPER_INTEGER_H
 
 #include <tina/tina.h>
-#include <cmath>
 
 namespace TURAG {
 

@@ -20,11 +20,13 @@
 # include <stddef.h>
 # include <stdint.h>
 # include <inttypes.h>
+#
+# ifndef ECOS
+#  include <stdbool.h>
+# endif
 #endif
 
-#ifndef ECOS
-# include <stdbool.h>
-#else
+#ifdef ECOS
 # include <cyg/infra/cyg_type.h>
 #endif
 

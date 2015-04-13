@@ -3,7 +3,6 @@
 
 #include <limits>
 #include <tina++/tina.h>
-#include <cstdio>
 
 namespace TURAG {
 

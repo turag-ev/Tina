@@ -193,6 +193,7 @@
 #include <tina++/debug.h>
 #include <tina++/statemachine.h>
 #include <tina++/helper/scoped_lock.h>
+#include <tina++/helper/packed.h>
 
 namespace TURAG {
 

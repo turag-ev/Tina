@@ -1,8 +1,6 @@
 #ifndef TINAPP_UNITS_MATH_H
 #define TINAPP_UNITS_MATH_H
 
-#include <algorithm>
-
 #include "../../math.h"
 #include "units.h"
 
@@ -187,7 +185,7 @@ template<typename Dim>
 constexpr _always_inline
 Units::Quantity<Dim>
 max(Units::Quantity<Dim> a, Units::Quantity<Dim> b) {
-    return Units::Quantity<Dim>(std::max(a.value, b.value));
+	return Units::Quantity<Dim>((a.value > b.value) ? a.value : b.value);
 }
 
 /// Den kleineren Wert zurückgeben
@@ -202,14 +200,14 @@ template<typename Dim>
 constexpr _always_inline
 Units::Quantity<Dim>
 min(Units::Quantity<Dim> a, Units::Quantity<Dim> b) {
-    return Units::Quantity<Dim>(std::min(a.value, b.value));
+	return Units::Quantity<Dim>((a.value < b.value) ? a.value : b.value);
 }
 
 /// Den größeren Wert zurückgeben
 /// \param val Wert
 /// \param min minimaler Wert
 /// \param man maximaler Wert
-/// \returns \f$ sat(a, b) \f$
+/// \returns \f$ min(max(val, min_val), max_val) \f$
 ///
 /// \code
 /// saturate(-4.f * Units::mm, -1.f * Units::mm, 6.f * Units::mm) // entspricht -1 mm
@@ -218,10 +216,25 @@ template<typename Dim>
 constexpr _always_inline
 Units::Quantity<Dim>
 saturate(Units::Quantity<Dim> val, Units::Quantity<Dim> min_val, Units::Quantity<Dim> max_val) {
-    return Units::Quantity<Dim>(min(max(val, min_val), max_val));
+	return min(max(val, min_val), max_val);
 }
 
-
+/// \brief \c sgn Funktion
+/// \param x Wert
+/// \retval 1 \f$ x > 0 \f$
+/// \retval 0 \f$ x = 0 \f$
+/// \retval -1 \f$ x < 0 \f$
+///
+/// \code
+/// sgn(-4.f * Units::mm) // entspricht -1
+/// \endcode
+template<typename Dim>
+constexpr _always_inline
+Units::Dimensionless
+sgn(Units::Quantity<Dim> x) {
+	using namespace Units;
+  return (x > null) ? Dimensionless(1.0) : ((x == null) ? Dimensionless(0.) : Dimensionless(-1.0));
+}
 
 /// Sinus berechnen
 /// \param arg Variable mit Einheit

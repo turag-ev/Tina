@@ -1,7 +1,6 @@
 #ifndef TINA_ARRAY_H
 #define TINA_ARRAY_H
 
-#include <cstddef>
 #include <iterator>
 #include <cassert>
 #include <algorithm>
