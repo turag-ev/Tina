@@ -16,108 +16,111 @@
 
 namespace TURAG {
 
-void Action::exit(EventId eid) {
-	if (isActive()) {
-		turag_infof("##### EXIT %s", name_);
-
-		// Aktion inaktiv setzen
-		currentstate_ = nullptr;
-
-		// Kindaktion abbrechen, wenn vorhanden
-		if (child_) {
-			child_->cancel();
-			child_ = nullptr;
-		}
-
-		if (parent_) {
-			// Verbindung von Elternelement entfernen
-			parent_->child_ = nullptr;
-
-			// Elternaktion über Beenden dieser Aktion informieren
-			bool handled = parent_->currentstate_(Action::event_return, eid);
-			if (!handled) {
-				turag_warningf("Beenden von Aktion %s wurde nicht behandelt.",
-							   name_);
-			}
-
-			// Verbindung zu Elternelement entfernen
-			parent_ = nullptr;
-		}
-
-	} else {
+void Action::exit(EventId eid)
+{
+	if (!isActive()) {
 		turag_criticalf("Inaktive Aktion %s kann nicht beendet werden.", name_);
+		return;
+	}
+
+	turag_infof("##### EXIT %s", name_);
+
+	// Aktion inaktiv setzen
+	currentstate_ = nullptr;
+
+	// Kindaktion abbrechen, wenn vorhanden
+	if (child_) {
+		child_->cancel();
+		child_ = nullptr;
+	}
+
+	if (parent_) {
+		// Verbindung von Elternelement entfernen
+		parent_->child_ = nullptr;
+
+		// Verbindung zu Elternelement entfernen
+		Action* parent = parent_;
+		parent_ = nullptr;
+
+		// Elternaktion über Beenden dieser Aktion informieren
+		bool handled = parent->currentstate_(Action::event_return, eid);
+		if (!handled) {
+			turag_warningf("Beenden von Aktion %s wurde nicht behandelt.",
+						   name_);
+		}
 	}
 }
 
-void Action::cancel() {
-	if (isActive()) {
-		turag_infof("##### CANCEL %s", name_);
-
-		// Aktion inaktiv setzen
-		State last_state = currentstate_;
-		currentstate_ = nullptr;
-
-		// Kindaktion abbrechen, wenn vorhanden
-		if (child_) {
-			child_->cancel();
-			child_ = nullptr;
-		}
-
-		// Aktion benachrichtigen
-		last_state(event_cancel, 0);
-
-		if (parent_) {
-			// Verbindung zu und von Elternelement entfernen
-			parent_->child_ = nullptr;
-			parent_ = nullptr;
-		}
-
-	} else {
+void Action::cancel()
+{
+	if (!isActive()) {
 		turag_criticalf("Inaktive Aktion %s kann nicht abgebrochen werden.",
 						name_);
+	}
+
+	turag_infof("##### CANCEL %s", name_);
+
+	// Aktion inaktiv setzen
+	State last_state = currentstate_;
+	currentstate_ = nullptr;
+
+	// Kindaktion abbrechen, wenn vorhanden
+	if (child_) {
+		child_->cancel();
+		child_ = nullptr;
+	}
+
+	// Aktion benachrichtigen
+	last_state(event_cancel, 0);
+
+	if (parent_) {
+		// Verbindung zu und von Elternelement entfernen
+		parent_->child_ = nullptr;
+		parent_ = nullptr;
 	}
 }
 
 void Action::kill()
 {
-	if (isActive()) {
-		// Verbindung von übergeordneter Aktion lösen
-		if (parent_)
-			parent_->child_ = nullptr;
+	if (!isActive()) return;
 
-		Action* next = this;
-		do {
-			Action* current = next;
-			next = next->child_;
+	// Verbindung von übergeordneter Aktion lösen
+	if (parent_)
+		parent_->child_ = nullptr;
 
-			current->child_ = nullptr;
-			current->currentstate_ = nullptr;
-			current->parent_ = nullptr;
-		} while (next);
-	}
+	Action* next = this;
+	do {
+		Action* current = next;
+		next = next->child_;
+
+		current->child_ = nullptr;
+		current->currentstate_ = nullptr;
+		current->parent_ = nullptr;
+	} while (next);
 }
 
-void Action::nextState(State next, EventArg data) {
-	if (isActive()) {
-		// Kindaktion abbrechen, wenn vorhanden
-		if (child_) {
-			child_->cancel();
-			child_ = nullptr;
-		}
-
-		// nächsten Zustand einnehmen
-		currentstate_ = next;
-
-		// Zustand starten
-		currentstate_(Action::event_start, data);
-
-	} else {
+void Action::nextState(State next, EventArg data)
+{
+	if (!isActive()) {
 		turag_criticalf("Zustand der inaktiven Aktion %s kann nicht verändert werden.",
 						name_);
 	}
+
+	// Kindaktion abbrechen, wenn vorhanden
+	if (child_) {
+		child_->cancel();
+		child_ = nullptr;
+	}
+
+	// nächsten Zustand einnehmen
+	currentstate_ = next;
+
+	// Zustand starten
+	currentstate_(Action::event_start, data);
 }
 
-void Action::start(Action *parent, EventArg data) {
+void Action::start(Action *parent, EventArg data)
+{
 	turag_infof("##### START %s", name_);
 
 	if (isActive()) {
@@ -153,7 +156,8 @@ void Action::start(Action *parent, EventArg data) {
 	currentstate_(Action::event_start, data);
 }
 
-bool Action::func(EventId id, EventArg data) {
+bool Action::func(EventId id, EventArg data)
+{
 	if (!isActive()) {
 		turag_criticalf("Inaktive Aktion %s kann keine Ereignisse verarbeiten.",
 						name_);
@@ -197,7 +201,8 @@ bool Action::func(EventId id, EventArg data) {
 #endif
 }
 
-Action* Action::getInnermostChild() {
+Action* Action::getInnermostChild()
+{
 	Action* next = child_;
 	Action* current = this;
 
