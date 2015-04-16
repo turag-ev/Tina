@@ -44,11 +44,17 @@ ErrorCode read_blackboard(const Blackboard *object, pointer dest) {
     static unsigned errorcnt = 0;
     uint64_t timestamp;
 
+    if (!object) {
+        turag_critical("read_blackboard called with nullptr!");
+        return -1;
+    }
+
     ErrorCode error = Casa_BBRead((Casa_BBObject_t*)object, dest, (systime_t*)&timestamp);
 
     if (error != -CASA_ENOERR) {
         if (errorcnt++ <= 4) {
-            turag_errorf("CASA BlackBoard read failed with error code: %d (0x%.8x)", error, error);
+            turag_errorf("CASA BlackBoard read failed with error code: objId %d, objOwner 0x%x, err %d (0x%.8x)",
+                object->id, object->owner, error, error);
             if (errorcnt == 5)
                 turag_errorf("(omitting the following 5k CASABB messages)");
         } else if (errorcnt == 5000) {
