@@ -137,10 +137,10 @@ inline Cost operator+ (unsigned lhs, Cost rhs) { return Cost(rhs) += lhs;       
 /// \}
 
 /// unendlich große Kosten (Weg nicht benutzbar)
-static constexpr Cost COST_INFINITY = Cost(Cost::INFINITY_);
+constexpr Cost COST_INFINITY = Cost(Cost::INFINITY_);
 
 /// größte Kosten ohne ausgeschlossen zu werden
-static constexpr Cost COST_MAX = Cost(Cost::MAX_);
+constexpr Cost COST_MAX = Cost(Cost::MAX_);
 
 } // namespace TURAG
 
