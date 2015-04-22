@@ -95,7 +95,7 @@ extern "C" {
 /// \brief Prefix für Binärobjekte
 #define TURAG_DEBUG_BINARY_PREFIX    		"x"
 
-#ifdef TURAG_DEBUG_ENABLE_BINARY || defined(__DOXYGEN__)
+#if defined(TURAG_DEBUG_ENABLE_BINARY) || defined(__DOXYGEN__)
 
 #ifndef __DOXYGEN__
 
