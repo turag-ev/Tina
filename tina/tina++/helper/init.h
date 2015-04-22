@@ -7,7 +7,6 @@
 #include "normalize.h"
 
 namespace TURAG {
-
 /// \addtogroup Utils
 /// \{
 
