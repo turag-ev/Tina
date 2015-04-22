@@ -44,7 +44,7 @@ struct Vector {
 	{ }
 
     /// Vektor skalieren
-    /// \param Faktor
+    /// \param rhs Faktor
     constexpr
     Vector operator*(float rhs) {
         return Vector<U>(x*rhs, y*rhs);

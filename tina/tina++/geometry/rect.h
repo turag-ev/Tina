@@ -84,6 +84,8 @@ bool located_in(const Rect& rect, const Point& point);
 /// Berührt der Kreis aus Punkt und Radius \a r den Rand des Rechtecks, so wird auch \a true zurück gegeben.
 /// \param pos Position
 /// \param rect Rechteck
+/// \param r Radius des Kreises, der den maximal zulässigen Abstand zum Rechteck angibt, für den noch true zurück
+/// gegeben wird.
 /// \return \a true, wenn Kreis aus Punkt \a pos und Radius \a r das Rechteck \a rect schneidet, sonst \a false
 bool in_range(const Point& pos, const Rect& rect, Length r);
 
@@ -91,6 +93,8 @@ bool in_range(const Point& pos, const Rect& rect, Length r);
 /// Berührt der Kreis aus Punkt \a pos und Radius \a r den Rand des Rechtecks, so wird auch \a true zurück gegeben.
 /// \param pos Position
 /// \param rect Rechteck
+/// \param r Radius des Kreises, der den maximal zulässigen Abstand zum Rechteck angibt, für den noch true zurück
+/// gegeben wird.
 /// \return \a true, wenn Kreis aus Punkt \a pos und Radius \a r das Rechteck \a rect schneidet, sonst \a false
 inline bool in_range(const Pose& pos, const Rect& rect, Length r) {
 	return in_range(pos.toPoint(), rect, r);

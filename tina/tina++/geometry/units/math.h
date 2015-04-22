@@ -205,8 +205,8 @@ min(Units::Quantity<Dim> a, Units::Quantity<Dim> b) {
 
 /// Den größeren Wert zurückgeben
 /// \param val Wert
-/// \param min minimaler Wert
-/// \param man maximaler Wert
+/// \param min_val minimaler Wert
+/// \param max_val maximaler Wert
 /// \returns \f$ min(max(val, min_val), max_val) \f$
 ///
 /// \code

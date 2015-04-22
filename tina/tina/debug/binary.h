@@ -29,7 +29,7 @@ extern "C" {
 /// Benutzung
 /// ---------
 ///
-/// Objekte werden über das Makro \ref turag_binary_send versendet. Die Objektstruktur
+/// Objekte werden über das Makro \ref turag_binary_send() versendet. Die Objektstruktur
 /// sollte in einem globalen Header definiert sein. Es ist empfehlenswert, dass der
 /// erste Eintrag in dieser Struktur, die verwendete Objektstrukturversion beinhaltet:
 /// \code
@@ -60,7 +60,7 @@ extern "C" {
 ///
 /// Da es dem Compiler freisteht zwischen den Einträgen in der Objektstruktur
 /// Leerräume zu erstellen (um z.B. die Performance zu steigern), sollte der
-/// Compiler angewiesen werden, auf diese Leerräume zuverzichten (\ref _packed).
+/// Compiler angewiesen werden, auf diese Leerräume zu verzichten (\ref _packed).
 /// Wird dies vergessen, kann es vorkommen, dass unter unterschiedlichen Compilern
 /// die Struktur eine andere Größe hat und damit die Binärdaten von der Endstelle nicht
 /// interpretiert werden können.
@@ -68,7 +68,7 @@ extern "C" {
 /// Implementierung
 /// ---------------
 ///
-/// Der Binärobjektstrom implementiert das Tina-Debug-Protokoll.
+/// Der Binärobjektstrom implementiert das Tina-Debug-Protokoll:
 /// \code
 /// [SOF][Log source][Log level][Payload][EOL]
 ///
@@ -79,10 +79,10 @@ extern "C" {
 /// EOL - Ende von Paketrahmen: TURAG_DEBUG_NEWLINE
 /// \endcode
 ///
-/// Die Binärobjectinformationen enthalt eine Objekt-ID ähnlich der Logquelle (z.B. TURAG_DEBUG_LOG_SOURCE)
+/// Die Binärobjectinformationen enthält eine Objekt-ID ähnlich der Logquelle (z.B. TURAG_DEBUG_LOG_SOURCE)
 /// damit können unterschiedliche Objekte von der gleiche Quelle unterschieden werden. So muss
 /// jedes Objekt, was einen anderen Typ hat, auch einen andere Objekt-ID aufweisen. Die Objekt-ID darf
-/// nicht Binär 2 ('\x02') entsprechen.
+/// nicht Binär 2 ('\\x02') entsprechen.
 /// \code
 /// [Objekt ID][Objekt Bytes (base64)]
 ///
@@ -95,7 +95,7 @@ extern "C" {
 /// \brief Prefix für Binärobjekte
 #define TURAG_DEBUG_BINARY_PREFIX    		"x"
 
-#ifdef TURAG_DEBUG_ENABLE_BINARY
+#ifdef TURAG_DEBUG_ENABLE_BINARY || defined(__DOXYGEN__)
 
 #ifndef __DOXYGEN__
 
