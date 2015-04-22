@@ -445,6 +445,18 @@ public:
 	length_ = new_end - begin();
   }
 
+  //remove all instances of a given value from the array
+  bool remove_value(const value_type& v) {
+      bool found_one = false;
+      for(auto it = begin(); it != end(); it++) {
+          if(*it == v) {
+              erase(it);
+              found_one = true;
+          }
+      }
+      return found_one;
+  }
+
 private:
   // number of elements in array
   std::size_t length_;
