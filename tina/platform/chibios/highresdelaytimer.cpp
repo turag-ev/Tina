@@ -2,6 +2,10 @@
 #define TURAG_DEBUG_LOG_SOURCE "~"
 
 #include <tina++/tina.h>
+
+
+#if TURAG_USE_TINA_HIGH_RES_DELAY_TIMER
+
 #include <tina++/utils/highresdelaytimer.h>
 #include <tina++/debug.h>
 #include <tina++/thread.h>
@@ -14,7 +18,6 @@
 #include <atomic>
 
 
-#if TURAG_USE_TINA_HIGH_RES_DELAY_TIMER
 
 #ifndef TURAG_HIGHRESDELAY_TIMER1_FREQUENCY
 #define TURAG_HIGHRESDELAY_TIMER1_FREQUENCY 0
