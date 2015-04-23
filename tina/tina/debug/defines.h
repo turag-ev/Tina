@@ -209,6 +209,30 @@
 /// Prefix für Spielzeitausgaben
 #define TURAG_DEBUG_GAMETIME_PREFIX "T"
 
+# if __WORDSIZE == 64
+#  define TURAG_32_PREFIX
+#  define TURAG_64_PREFIX	"l"
+#  define TURAG_PTR_PREFIX	"l"
+# else
+#  define TURAG_32_PREFIX
+#  define TURAG_64_PREFIX	"ll"
+#  define TURAG_PTR_PREFIX
+# endif
+
+# define TURAG_dPTR	TURAG_PTR_PREFIX "d"
+# define TURAG_iPTR	TURAG_PTR_PREFIX "i"
+# define TURAG_oPTR	TURAG_PTR_PREFIX "o"
+# define TURAG_uPTR	TURAG_PTR_PREFIX "u"
+# define TURAG_xPTR	TURAG_PTR_PREFIX "x"
+# define TURAG_XPTR	TURAG_PTR_PREFIX "X"
+
+# define TURAG_d32	TURAG_32_PREFIX "d"
+# define TURAG_i32	TURAG_32_PREFIX "i"
+# define TURAG_o32	TURAG_32_PREFIX "o"
+# define TURAG_u32	TURAG_32_PREFIX "u"
+# define TURAG_x32	TURAG_32_PREFIX "x"
+# define TURAG_X32	TURAG_32_PREFIX "X"
+
 /// \}
 
 #endif // TINA_DEBUG_DEFINES_H

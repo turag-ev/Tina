@@ -48,19 +48,19 @@ void print_debug_info(const Event& e) {
       // erstes Zeichen ist Null -> nicht loggen
       if ((id >> 24) == 0) return;
 
-      turag_infof("Event: %s (id: %c%c%c%u param: %" PRIu32 " method: 0x%" PRIxPTR ")",
+	  turag_infof("Event: %s (id: %c%c%c%u param: %" TURAG_d32 " method: 0x%" TURAG_xPTR ")",
           name,
           static_cast<char>(id >> 24),
           static_cast<char>(id >> 16),
           static_cast<char>(id >> 8),
           static_cast<unsigned>(id & 0xFF),
-          e.param,
+		  (int)e.param,
           reinterpret_cast<std::size_t>(e.method));
   } else {
-    turag_infof("Event: %s (id: %u param: %" PRIu32 " method: 0x%" PRIxPTR ")",
+	turag_infof("Event: %s (id: %u param: %" TURAG_d32 " method: 0x%" TURAG_xPTR ")",
           name,
           static_cast<unsigned>(id),
-          e.param,
+		  (int)e.param,
           reinterpret_cast<std::size_t>(e.method));
   }
 #endif
@@ -265,7 +265,7 @@ void EventQueue::printTimeQueue() {
             if (tevent.event.event_class) {
                 EventId id = tevent.event.event_class->id;
 
-                turag_infof("  @%u ms %c%c%c%u %" PRIxPTR "\n",
+				turag_infof("  @%u ms %c%c%c%u %" TURAG_xPTR "\n",
                             tevent.time.toMsec(),
                             static_cast<char>(id >> 24),
                             static_cast<char>(id >> 16),
@@ -300,9 +300,9 @@ EventQueue::printDebugInfo() {
   printQueue();
 
   turag_info ("Stack:\n");
-  turag_infof("  size of EventQueue: %" PRIuPTR " bytes\n", sizeof(EventQueue));
-  turag_infof("  number of queue elements: %" PRIuPTR "\n", size);
-  turag_infof("  number of timed queue elements: %" PRIuPTR "\n", timequeue_size);
+  turag_infof("  size of EventQueue: %" TURAG_uPTR " bytes\n", sizeof(EventQueue));
+  turag_infof("  number of queue elements: %" TURAG_uPTR "\n", size);
+  turag_infof("  number of timed queue elements: %" TURAG_uPTR "\n", timequeue_size);
 }
 #endif // NDEBUG
 
