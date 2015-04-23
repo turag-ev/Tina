@@ -10,7 +10,7 @@
 #include <tina/time.h>
 #include <platform/chibios/backplane.h>
 #include <tina/feldbus/host/rs485.h>
-#include <tina++/utils/highresdelaytimer.h>
+//#include <tina++/utils/highresdelaytimer.h>
 
 #ifdef EUROBOT_2013
 # warning "using EB13!"
@@ -33,8 +33,8 @@ static TuragSystemTime rs485_timeout;
 static BinarySemaphore _RS485_Sem;
 
 
-static TURAG::HighResDelayTimer delay;
-static uint16_t bus_delay;
+// static TURAG::HighResDelayTimer delay;
+// static uint16_t bus_delay;
 
 extern "C" bool turag_rs485_init(uint32_t baud_rate, TuragSystemTime timeout) {
     uint8_t buf[1] = { 0 };
@@ -48,7 +48,7 @@ extern "C" bool turag_rs485_init(uint32_t baud_rate, TuragSystemTime timeout) {
 	// calculate bus delay required for 15 frames distance of
 	// TURAG feldbus [us]
 	// we always round up, unless our result is even.
-	bus_delay = (15 * 1000000 - 1) / baud_rate + 1;
+	//bus_delay = (15 * 1000000 - 1) / baud_rate + 1;
 	
     // setup RTS receive
     palSetPadMode(GPIOD, BPD_SC_RTS, PAL_MODE_OUTPUT_PUSHPULL);
@@ -85,9 +85,10 @@ extern "C" bool turag_rs485_transceive(uint8_t *transmit, int* transmit_length, 
     chBSemWait(&_RS485_Sem);
 	
 	// insert bus delay
-	if (delayTransmission) {
-		delay.wait(bus_delay);
-	}
+	(void)delayTransmission;
+// 	if (delayTransmission) {
+// 		delay.wait(bus_delay);
+// 	}
 
     if (transmit && transmit_length) {
 		int transmit_length_copy = *transmit_length;
