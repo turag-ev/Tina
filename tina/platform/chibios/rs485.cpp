@@ -9,6 +9,8 @@
 #include <tina/debug.h>
 #include <tina/time.h>
 #include <platform/chibios/backplane.h>
+#include <tina/feldbus/host/rs485.h>
+#include <tina++/utils/highresdelaytimer.h>
 
 #ifdef EUROBOT_2013
 # warning "using EB13!"
@@ -31,7 +33,10 @@ static TuragSystemTime rs485_timeout;
 static BinarySemaphore _RS485_Sem;
 
 
-bool turag_rs485_init(uint32_t baud_rate, TuragSystemTime timeout) {
+static TURAG::HighResDelayTimer delay;
+static uint16_t bus_delay;
+
+extern "C" bool turag_rs485_init(uint32_t baud_rate, TuragSystemTime timeout) {
     uint8_t buf[1] = { 0 };
 
     chBSemInit(&_RS485_Sem, TRUE);
@@ -39,7 +44,12 @@ bool turag_rs485_init(uint32_t baud_rate, TuragSystemTime timeout) {
     serial_cfg_rs485.speed = baud_rate;
     sdStart(&RS485SD, &serial_cfg_rs485);       // CtrlM-specific
     rs485_timeout = timeout;
-
+	
+	// calculate bus delay required for 15 frames distance of
+	// TURAG feldbus [us]
+	// we always round up, unless our result is even.
+	bus_delay = (15 * 1000000 - 1) / baud_rate + 1;
+	
     // setup RTS receive
     palSetPadMode(GPIOD, BPD_SC_RTS, PAL_MODE_OUTPUT_PUSHPULL);
     palClearPad(GPIOD, BPD_SC_RTS);
@@ -61,11 +71,11 @@ bool turag_rs485_init(uint32_t baud_rate, TuragSystemTime timeout) {
     return (RS485SD.state == SD_READY);
 }
 
-bool turag_rs485_ready(void) {
+extern "C" bool turag_rs485_ready(void) {
     return (RS485SD.state == SD_READY);
 }
 
-bool turag_rs485_transceive(uint8_t *transmit, int* transmit_length, uint8_t *receive, int* receive_length) {
+extern "C" bool turag_rs485_transceive(uint8_t *transmit, int* transmit_length, uint8_t *receive, int* receive_length, bool delayTransmission) {
     while (!turag_rs485_ready()) {
         chThdSleepMilliseconds(10);
     }
@@ -73,6 +83,11 @@ bool turag_rs485_transceive(uint8_t *transmit, int* transmit_length, uint8_t *re
     bool send_ok = true, recv_ok = true;
 
     chBSemWait(&_RS485_Sem);
+	
+	// insert bus delay
+	if (delayTransmission) {
+		delay.wait(bus_delay);
+	}
 
     if (transmit && transmit_length) {
 		int transmit_length_copy = *transmit_length;
@@ -115,7 +130,7 @@ bool turag_rs485_transceive(uint8_t *transmit, int* transmit_length, uint8_t *re
     return (send_ok && recv_ok);
 }
 
-void turag_rs485_buffer_clear(void) {
+extern "C" void turag_rs485_buffer_clear(void) {
     while (!turag_rs485_ready()) {
         chThdSleepMilliseconds(10);
     }

@@ -41,6 +41,12 @@
 # define TURAG_USE_TINA_CPP_RUNTIME_SUPPORT		1
 #endif
 
+/// Aktiviert TinA HighResDelay-Timer.
+#if !defined(TURAG_USE_TINA_HIGH_RES_DELAY_TIMER) || defined(__DOXYGEN__)
+# define TURAG_USE_TINA_HIGH_RES_DELAY_TIMER		0
+#endif
+
+
 /**
  * @}
  */
