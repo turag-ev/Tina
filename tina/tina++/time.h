@@ -38,6 +38,12 @@ public:
         return TuragSystemTime{value};
     }
 
+    /// Systemzeit aus \p us Mikrosekunden erstellen
+    constexpr
+    static SystemTime fromUsec(unsigned us) {
+        return turag_us_to_ticks(us);
+    }
+
     /// Systemzeit aus \p ms Millisekunden erstellen
     constexpr
     static SystemTime fromMsec(unsigned ms) {
@@ -50,6 +56,11 @@ public:
         return turag_s_to_ticks(s);
     }
 
+    /// gespeicherte Systemzeit auf \p us Mikrosekunden setzen
+    void assignFromUsec(unsigned us) {
+        *this = turag_us_to_ticks(us);
+    }
+
     /// gespeicherte Systemzeit auf \p ms Millisekunden setzen
     void assignFromMsec(unsigned ms) {
         *this = turag_ms_to_ticks(ms);
@@ -60,6 +71,12 @@ public:
         *this = turag_s_to_ticks(s);
     }
 
+    /// gespeicherte Systemzeit in Mikrosekunden
+    constexpr
+    unsigned toUsec() const {
+        return turag_ticks_to_us(TuragSystemTime{value});
+    }
+    
     /// gespeicherte Systemzeit in Millisekunden
     constexpr
     unsigned toMsec() const {
