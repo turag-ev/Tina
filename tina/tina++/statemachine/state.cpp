@@ -124,8 +124,9 @@ void Action::start(Action *parent, EventArg data)
 	turag_infof("##### START %s", name_);
 
 	if (isActive()) {
-		turag_criticalf("Aktive Aktion %s kann nicht gestartet werden.", name_);
-		return;
+		cancel();
+		turag_criticalf("Aktive Aktion %s wird gestartet.", name_);
+		//return;
 	}
 
 	if (parent) {
