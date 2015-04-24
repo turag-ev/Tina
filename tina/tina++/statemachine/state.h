@@ -779,7 +779,7 @@ A StaticAction<A>::instance;
 /// \brief Aktionsklasse definieren
 ///
 /// Über dieses Makro wird eine Klasse definiert, die von der Klasse
-/// \ref StaticAction erbt und ist equivalent zu `class name : public StaticAction<name>`.
+/// \ref TURAG::StaticAction erbt und ist equivalent zu `class name : public StaticAction<name>`.
 /// Um den Konstruktor und die nötigen Zustandsfunktionen zu definieren
 /// benötigt man \ref ACTION_STATES :
 /// \code
