@@ -82,11 +82,11 @@ public:
 class Spline
 {
 public:
-    virtual bool calculate(Pose *poses, unsigned pose_index, unsigned pose_count, int direction);
-    virtual bool getMaxVelocity();
-    virtual Pose getPoseStep(float t);
-    virtual float getBendingStep(float t);
-    virtual constexpr unsigned getOrder();
+    virtual bool calculate(Pose *poses, unsigned pose_index, unsigned pose_count, int direction) = 0;
+    virtual bool getMaxVelocity() = 0;
+    virtual Pose getPoseStep(float t) = 0;
+    virtual float getBendingStep(float t) = 0;
+    virtual constexpr unsigned getOrder() = 0;
 
 protected:
     static constexpr Length spline_iteration_distance = 50 * Units::mm;
@@ -102,7 +102,7 @@ class SplineOrder :
         public Spline
 {
 public:
-    bool calculate(Pose *poses, unsigned pose_index, unsigned pose_count, int direction) {
+    inline bool calculate(Pose *poses, unsigned pose_index, unsigned pose_count, int direction) {
         drive_direction = direction;
 
         if (order == 3) {
@@ -116,15 +116,15 @@ public:
         return false;
     }
 
-    bool getMaxVelocity() {
+    inline bool getMaxVelocity() {
         return order*2;
     }
 
-    constexpr unsigned getOrder() const {
+    inline constexpr unsigned getOrder() const {
         return order;
     }
 
-    Pose getPoseStep(float t)
+    inline Pose getPoseStep(float t)
     {
         Pose p;
 
@@ -146,7 +146,7 @@ public:
         return p;
     }
 
-    float getBendingStep(float t)
+    inline float getBendingStep(float t)
     {
         float dx = c.x.val(t, 1);
         float dy = c.y.val(t, 1);
@@ -172,7 +172,7 @@ private:
         return (fabs(a.to(Units::rad) - (float)mc_no_angle) < 0.001);
     }
 
-    bool calc_spline_catmullrom(Pose *poses, unsigned pose_index)
+    inline bool calc_spline_catmullrom(Pose *poses, unsigned pose_index)
     {
         //static_assert(order == 3, "wrong spline order for this call");
 
@@ -230,7 +230,7 @@ private:
         return ok;
     }
 
-    bool calc_spline_hermite(Pose *poses, unsigned pose_index)
+    inline bool calc_spline_hermite(Pose *poses, unsigned pose_index)
     {
         //static_assert(order == 5, "wrong spline order for this call");
 
@@ -248,9 +248,9 @@ private:
         float k = spline_form_factor * d12;
 
         float vx[4] = { p[i].x.to(Units::mm),
-                        k * sinfRad(p[i].phi + aoff),
+                        k * cosfRad(p[i].phi + aoff),
                         p[i + 1].x.to(Units::mm),
-                        k * sinfRad(p[i + 1].phi + aoff) };
+                        k * cosfRad(p[i + 1].phi + aoff) };
         float vy[4] = { p[i].y.to(Units::mm),
                         k * sinfRad(p[i].phi + aoff),
                         p[i + 1].y.to(Units::mm),
@@ -284,7 +284,7 @@ private:
         return ok;
     }
 
-    bool calculate_parameters(void)
+    inline bool calculate_parameters(void)
     {
         static_assert(order == 3 || order == 5, "wrong spline order for this call");
 
@@ -367,8 +367,9 @@ private:
     }
 
     static constexpr std::size_t Order = order;
-
+public:
     Polynomial2D<order> c;
+private:
     Length direct_dist;
     Length length;
     float kappa_max;
