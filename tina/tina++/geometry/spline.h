@@ -356,9 +356,9 @@ private:
 
         if ((i+1) < pn && isAngleDontCare(p[i+1].phi)) {
             if (i < pn-2){
-                p[i].phi = angle_between(p[i], p[i+2]);
+                p[i+1].phi = angle_between(p[i], p[i+2]);
             } else {
-                p[i].phi = angle_between(p[i], p[i+1]);
+                p[i+1].phi = angle_between(p[i], p[i+1]);
             }
 
             if (dir == -1) {
