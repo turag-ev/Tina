@@ -5,63 +5,6 @@
 
 namespace TURAG {
 
-#if 0
-/*
- * scale angle between -pi and pi
- */
-inline float scale_angle(float angle) {
-    while (angle > M_PIf)
-        angle -= 2.0f * M_PIf;
-
-    while (angle <= -M_PIf)
-        angle += 2.0f * M_PIf;
-
-    return angle;
-}
-
-/*
- * calculate the angle of splinepoint
- */
-/*
-TODO: calc correct and symmetric
-why not computing each segment 1 to pn-2 central and the 0 and pn-1 forward and backward?
-*/
-inline void calc_spline_angle(Pose *p, unsigned i, unsigned pn, int dir) {
-    if (isPsiDontCare(p[i].psi)) {
-        if (i > 0) {
-            if (dir) {
-                p[i].psi = atan2f(p[i+1].y - p[i-1].y, p[i+1].x - p[i-1].x);
-            } else {
-                p[i].psi = atan2f(p[i-1].y - p[i+1].y, p[i-1].x - p[i+1].x); // turn angle for drive backwards
-            }
-        } else {
-            if (dir) {
-                p[i].psi = atan2f(p[i+1].y - p[i].y, p[i+1].x - p[i].x);
-            } else {
-                p[i].psi = atan2f(p[i].y - p[i+1].y, p[i].x - p[i+1].x);	// turn angle for drive backwards
-            }
-        }
-    }
-
-    if (isPsiDontCare(p[i+1].psi)) {
-        if (i < pn-2){
-            if (dir) {
-                p[i+1].psi = atan2f(p[i+2].y - p[i].y, p[i+2].x - p[i].x);
-            } else {
-                p[i+1].psi = atan2f(p[i].y - p[i+2].y, p[i].x - p[i+2].x);	// turn angle for drive backwards
-            }
-        } else {
-            if (dir) {
-                p[i+1].psi = atan2f(p[i+1].y - p[i].y, p[i+1].x - p[i].x);
-            } else {
-                p[i+1].psi = atan2f(p[i].y - p[i+1].y, p[i].x - p[i+1].x);	// turn angle for drive backwards
-            }
-        }
-    }
-}
-
-#endif
-
 /**
  * @brief Polynomial of a given order that can be used to calculate its own and its derivations' steps.
  */
@@ -134,12 +77,12 @@ public:
 };
 
 /**
- * @brief Spline virtual base class for all spline types (Catmull-Rom, Hermite, Bezier, ...)
+ * @brief Spline interface for all types of splines (Catmull-Rom, Hermite, Bezier, ...)
  */
 class Spline
 {
 public:
-    virtual bool calculate(Pose *poses, unsigned pose_index, unsigned pose_count);
+    virtual bool calculate(Pose *poses, unsigned pose_index, unsigned pose_count, int direction);
     virtual bool getMaxVelocity();
     virtual Pose getPoseStep(float t);
     virtual float getBendingStep(float t);
@@ -148,6 +91,7 @@ public:
 protected:
     static constexpr Length spline_iteration_distance = 50 * Units::mm;
     static constexpr float spline_form_factor = 1.0f;
+    static constexpr float mc_no_angle = 4.f;
 };
 
 /**
@@ -158,12 +102,14 @@ class SplineOrder :
         public Spline
 {
 public:
-    bool calculate(Pose *poses, unsigned pose_index, unsigned pose_count) {
+    bool calculate(Pose *poses, unsigned pose_index, unsigned pose_count, int direction) {
+        drive_direction = direction;
+
         if (order == 3) {
-            //calc_spline_angle(p, i, pn, dir);
+            calc_spline_angle(poses, pose_index, pose_count, direction);
             return calc_spline_catmullrom(poses, pose_index);
         } else if (order == 5) {
-            //calc_spline_angle(p, i, pn, dir);
+            calc_spline_angle(poses, pose_index, pose_count, direction);
             return calc_spline_hermite(poses, pose_index);
         }
 
@@ -191,6 +137,12 @@ public:
 
         p.phi = atan2f(dy, dx) * Units::rad;
 
+        // for backwards driven splines the angles phi correspond to the robot's angle
+        // but to get the desired spline form without curls we need to pretend it's driven forward
+        if (drive_direction == -1) {
+            p.turn(180 * Units::deg);
+        }
+
         return p;
     }
 
@@ -215,6 +167,10 @@ private:
     {
         return sinf(a.to(Units::rad));
     }
+    static inline bool isAngleDontCare(Units::Angle a)
+    {
+        return (fabs(a.to(Units::rad) - (float)mc_no_angle) < 0.001);
+    }
 
     bool calc_spline_catmullrom(Pose *poses, unsigned pose_index)
     {
@@ -223,16 +179,22 @@ private:
         Pose *p = poses;
         unsigned i = pose_index;
 
+        // see getPoseStep()
+        Angle aoff = 0 * Units::deg;
+        if (drive_direction == -1) {
+            aoff = 180 * Units::deg;
+        }
+
         // spline form depends from distance between p[i] and p[i+1]
         float d12 = distance(p[i], p[i+1]).to(Units::mm);
         float k = spline_form_factor * d12;
 
-        float vx[4] = { k * cosfRad(p[i].phi),
-                        k * cosfRad(p[i + 1].phi),
+        float vx[4] = { k * cosfRad(p[i].phi + aoff),
+                        k * cosfRad(p[i + 1].phi + aoff),
                         p[i].x.to(Units::mm),
                         p[i + 1].x.to(Units::mm) };
-        float vy[4] = { k * sinfRad(p[i].phi),
-                        k * sinfRad(p[i + 1].phi),
+        float vy[4] = { k * sinfRad(p[i].phi + aoff),
+                        k * sinfRad(p[i + 1].phi + aoff),
                         p[i].y.to(Units::mm),
                         p[i + 1].y.to(Units::mm) };
 
@@ -275,18 +237,24 @@ private:
         Pose *p = poses;
         unsigned i = pose_index;
 
+        // see getPoseStep()
+        Angle aoff = 0 * Units::deg;
+        if (drive_direction == -1) {
+            aoff = 180 * Units::deg;
+        }
+
         // spline form depends from distance between p[i] and p[i+1]
         float d12 = distance(p[i], p[i+1]).to(Units::mm);
         float k = spline_form_factor * d12;
 
         float vx[4] = { p[i].x.to(Units::mm),
-                        k * sinfRad(p[i].phi),
+                        k * sinfRad(p[i].phi + aoff),
                         p[i + 1].x.to(Units::mm),
-                        k * sinfRad(p[i + 1].phi) };
+                        k * sinfRad(p[i + 1].phi + aoff) };
         float vy[4] = { p[i].y.to(Units::mm),
-                        k * sinfRad(p[i].phi),
+                        k * sinfRad(p[i].phi + aoff),
                         p[i + 1].y.to(Units::mm),
-                        k * sinfRad(p[i + 1].phi) };
+                        k * sinfRad(p[i + 1].phi + aoff) };
 
         int m[3][4] =  {{ -6,-3,  6,-3},
                         { 15, 8,-15, 7},
@@ -369,6 +337,34 @@ private:
         return true;
     }
 
+    /**
+     * @brief calc_spline_angle calculate missing angle of spline point
+     */
+    inline void calc_spline_angle(Pose *p, unsigned i, unsigned pn, int dir) {
+        if (i < pn && isAngleDontCare(p[i].phi)) {
+            if (i > 0) {
+                p[i].phi = angle_between(p[i-1], p[i+1]);
+            } else {
+                p[i].phi = angle_between(p[i], p[i+1]);
+            }
+
+            if (dir == -1) {
+                p[i].turn(180 * Units::deg); // turn angle for drive backwards
+            }
+        }
+
+        if ((i+1) < pn && isAngleDontCare(p[i+1].phi)) {
+            if (i < pn-2){
+                p[i].phi = angle_between(p[i], p[i+2]);
+            } else {
+                p[i].phi = angle_between(p[i], p[i+1]);
+            }
+
+            if (dir == -1) {
+                p[i+1].turn(180 * Units::deg); // turn angle for drive backwards
+            }
+        }
+    }
 
     static constexpr std::size_t Order = order;
 
@@ -376,6 +372,7 @@ private:
     Length direct_dist;
     Length length;
     float kappa_max;
+    int drive_direction;
 };
 
 using Spline5 = SplineOrder<5>;
