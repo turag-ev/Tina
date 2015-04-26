@@ -31,10 +31,10 @@ extern "C" {
 #define TURAG_DEBUG_GRAPH_DATA2D      		"D"
 #define TURAG_DEBUG_GRAPH_VERTICAL_MARKER  	"m"
 #define TURAG_DEBUG_GRAPH_CHANNELGROUP  	"g"
-#endif // __DEOXYGEN__
+#endif // __DOXYGEN__
 
 
-#ifdef TURAG_DEBUG_ENABLE_GRAPH
+#if defined(TURAG_DEBUG_ENABLE_GRAPH) || defined(__DOXYGEN__)
 
 ///
 /// \brief Legt ein neues Diagramm an.
