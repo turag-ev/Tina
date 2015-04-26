@@ -293,11 +293,10 @@ private:
     {
         static_assert(order == 3 || order == 5, "wrong spline order for this call");
 
-        float t, x, y, dx, dy, ddx, ddy;
+        float t, dx, dy, ddx, ddy;
 
-        float delta_t = spline_iteration_distance.to(Units::mm) / direct_dist.to(Units::mm);
-        float x_old = c.x.getNode(order);
-        float y_old = c.y.getNode(order);
+        float delta_t = spline_iteration_distance / direct_dist;
+        Point p_old = {c.x.getNode(order) * Units::mm, c.y.getNode(order) * Units::mm};
 
         // max Krümmung
         kappa_max = 0.f;
@@ -308,16 +307,13 @@ private:
         // Abtastung des Polynoms
         for (t = delta_t; t <= 1.0f + delta_t; t = t + delta_t) {
             // Wert an Stelle t
-            x = c.x.val(t);
-            y = c.y.val(t);
+            Point p = {c.x.val(t) * Units::mm, c.y.val(t) * Units::mm};
 
             // Gesamtlänge += Abschnittslänge
-            float l_mm = length.to(Units::mm) + hypotf(x - x_old, y - y_old);
-            length = l_mm * Units::mm;
+            length += distance(p_old, p);
 
             // merken der Werte für Abstandsberechnung im nächsten Iterationschritt
-            x_old = x;
-            y_old = y;
+            p_old = p;
 
             // Wert der 1. Ableitung an Stelle t
             dx = c.x.val(t, 1);
@@ -334,7 +330,7 @@ private:
         // Begrenzung...
 
         //...der Bogenlänge: min. spline_iteration_distance
-        length = fmaxf(length.to(Units::mm), spline_iteration_distance.to(Units::mm)) * Units::mm;
+        length = max(length, spline_iteration_distance);
 
         //...der Krümmung: min. 1e-10f
         kappa_max = fmaxf(kappa_max, 1e-10f);
