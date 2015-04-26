@@ -2,6 +2,7 @@
 #define SPLINE_H
 
 #include "geometry.h"
+#include <cmath>
 
 namespace TURAG {
 
@@ -124,6 +125,10 @@ public:
         return order;
     }
 
+    inline constexpr Length getLength() const {
+        return length;
+    }
+
     inline Pose getPoseStep(float t)
     {
         Pose p;
@@ -169,7 +174,7 @@ private:
     }
     static inline bool isAngleDontCare(Units::Angle a)
     {
-        return (fabs(a.to(Units::rad) - (float)mc_no_angle) < 0.001);
+        return (fabs(a.to(Units::rad) - (float)mc_no_angle) < 0.001) || std::isnan(a.to(Units::rad));
     }
 
     inline bool calc_spline_catmullrom(Pose *poses, unsigned pose_index)
@@ -308,7 +313,7 @@ private:
 
             // Gesamtlänge += Abschnittslänge
             float l_mm = length.to(Units::mm) + hypotf(x - x_old, y - y_old);
-            length += l_mm * Units::mm;
+            length = l_mm * Units::mm;
 
             // merken der Werte für Abstandsberechnung im nächsten Iterationschritt
             x_old = x;
@@ -367,9 +372,8 @@ private:
     }
 
     static constexpr std::size_t Order = order;
-public:
+
     Polynomial2D<order> c;
-private:
     Length direct_dist;
     Length length;
     float kappa_max;
