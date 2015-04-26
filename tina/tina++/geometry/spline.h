@@ -60,260 +60,11 @@ inline void calc_spline_angle(Pose *p, unsigned i, unsigned pn, int dir) {
     }
 }
 
-inline float polyval3(float *c, float t) {
-    return ((c[0] * t + c[1]) * t + c[2]) * t + c[3];
-}
-
-inline float polyval3_der(float *c, float t) {
-    return (3.0f * c[0] * t + 2.0f * c[1]) * t + c[2];
-}
-
-inline float polyval3_dder(float *c, float t) {
-    return 6.0f * c[0] * t + 2.0f * c[1];
-}
-
-inline float polyval3_ddder(float *c, float t) {
-    UNUSED(t);
-    return 6.0f * c[0];
-}
-
-inline float polyval5(float *c, float t) {
-    return ((((c[0] * t + c[1]) * t + c[2]) * t + c[3]) * t + c[4]) * t + c[5];
-}
-
-inline float polyval5_der(float *c, float t) {
-    return (((5.0f * c[0] * t + 4.0f * c[1]) * t + 3.0f * c[2]) * t +
-                    2.0f * c[3]) *
-                         t +
-                 c[4];
-}
-
-inline float polyval5_dder(float *c, float t) {
-    return ((20.0f * c[0] * t + 12.0f * c[1]) * t + 6.0f * c[2]) * t +
-                 2.0f * c[3];
-}
-
-inline float polyval5_ddder(float *c, float t) {
-    return (60.0f * c[0] * t + 24.0f * c[1]) * t + 6.0f * c[2];
-}
-
-/*
- * calculate the angle of splinepoint
- */
-/*
-TODO: calc correct and symmetric
-why not computing each segment 1 to pn-2 central and the 0 and pn-1 forward and backward?
-*/
-inline void calc_spline_angle(Pose *p, unsigned i, unsigned pn, int dir) {
-    if (isPsiDontCare(p[i].psi)) {
-        if (i > 0) {
-            if (dir) {
-                p[i].psi = atan2f(p[i+1].y - p[i-1].y, p[i+1].x - p[i-1].x);
-            } else {
-                p[i].psi = atan2f(p[i-1].y - p[i+1].y, p[i-1].x - p[i+1].x); // turn angle for drive backwards
-            }
-        } else {
-            if (dir) {
-                p[i].psi = atan2f(p[i+1].y - p[i].y, p[i+1].x - p[i].x);
-            } else {
-                p[i].psi = atan2f(p[i].y - p[i+1].y, p[i].x - p[i+1].x);	// turn angle for drive backwards
-            }
-        }
-    }
-
-    if (isPsiDontCare(p[i+1].psi)) {
-        if (i < pn-2){
-            if (dir) {
-                p[i+1].psi = atan2f(p[i+2].y - p[i].y, p[i+2].x - p[i].x);
-            } else {
-                p[i+1].psi = atan2f(p[i].y - p[i+2].y, p[i].x - p[i+2].x);	// turn angle for drive backwards
-            }
-        } else {
-            if (dir) {
-                p[i+1].psi = atan2f(p[i+1].y - p[i].y, p[i+1].x - p[i].x);
-            } else {
-                p[i+1].psi = atan2f(p[i].y - p[i+1].y, p[i].x - p[i+1].x);	// turn angle for drive backwards
-            }
-        }
-    }
-}
-
-inline void calc_spline_param(spline_t *s) {
-
-}
-
-/*
- * calculate spline coefficients for polynom of 3rd degree
- *
- * (non-inline for testmenu)
- */
-void calc_spline(spline_t *s, Pose *p, unsigned i, unsigned pn, signed dir) {
-    s->type = CATMULL_ROM;
-
-    turag_infof("calc_spline(type=%d, i=%d, pn=%d, dir=%d)", s->type, i, pn, dir);
-
-    // calculate the angle of splinepoint
-    calc_spline_angle(p, i, pn, dir);
-
-    // spline form depends from distance between p[i] and p[i+1]
-    float d12 = hypotf(p[i + 1].x - p[i].x, p[i + 1].y - p[i].y);
-    float k = SPLINE_FORM_FACTOR * d12;
-
-    float vx[4] = { k * cosf(p[i].psi), k * cosf(p[i + 1].psi), p[i].x,
-                                    p[i + 1].x };
-    float vy[4] = { k * sinf(p[i].psi), k * sinf(p[i + 1].psi), p[i].y,
-                                    p[i + 1].y };
-
-    /* invertierte hermitesche kubische Matrix (siehe Wikipedia)
-     *
-     * errechnet Splineparameter anhand gegebener Randwerte:
-     * - Position p
-     * - Tangente bzw. Winkel m
-     *
-     *  v = [m0 m1 p0 p1]' siehe oben
-     */
-    int m[4][4]=   {{ 1, 1, 2,-2},
-                    {-2,-1,-3, 3},
-                    { 1, 0, 0, 0},
-                    { 0, 0, 1, 0}};
-    /*
-     * Matrixmultiplikation c = M * v
-     */
-    int j;
-    for (i = 0; i < 4; i++) {
-        s->cx[i] = 0.0f;
-        s->cy[i] = 0.0f;
-        for (j = 0; j < 4; j++) {
-            s->cx[i] += (float)m[i][j] * vx[j];
-            s->cy[i] += (float)m[i][j] * vy[j];
-        }
-        turag_infof("calc_spline: cx[%d] = %f cy[%d] = %f vx[%d] = %f vy[%d] = %f",
-                    i, s->cx[i], i, s->cy[i],
-                    i, vx[i], i, vy[i]);
-    }
-
-    s->direct_dist = d12;
-
-    turag_infof("calc_spline: direct_dist=%f", s->direct_dist);
-
-    calc_spline_param(s);
-}
-
-inline void calc_spline_param5(spline_t *s) {
-
-    float t, x, y, dx, dy, ddx, ddy;
-
-    float delta_t = SPLINE_ITERATION_DISTANCE / s->direct_dist;
-    float x_old = s->c5x[5];
-    float y_old = s->c5y[5];
-
-    s->kappa_max = 0.0f;
-    s->length = 0.0f;
-    for (t = delta_t; t <= 1.0f + delta_t; t = t + delta_t) {
-        x = polyval5(s->c5x, t);
-        y = polyval5(s->c5y, t);
-        s->length += hypotf(x - x_old, y - y_old);
-        x_old = x;
-        y_old = y;
-
-        dx = polyval5_der(s->c5x, t);
-        dy = polyval5_der(s->c5y, t);
-        ddx = polyval5_dder(s->c5x, t);
-        ddy = polyval5_dder(s->c5y, t);
-        s->kappa_max = fmaxf(s->kappa_max,
-                                                fabsf((dx * ddy - ddx * dy)) / cbcf(hypotf(dx, dy)));
-    }
-    s->length = fmaxf(s->length, SPLINE_ITERATION_DISTANCE);
-    s->kappa_max = fmaxf(s->kappa_max, 1e-10f);
-    // turag_infof("    spline length: %f ", s->length);
-    // turag_infof("    kappa max: %f ", s->kappa_max);
-}
-
-/*
- * calculate spline coefficients for polynom of 5th degree
- * (non-inline for testmenu)
- */
-void calc_spline5(spline_t *s, Pose *p, unsigned i, unsigned pn, signed dir) {
-
-    s->type = HERMITE_5;
-
-    // calculate the angle of splinepoint
-    calc_spline_angle(p, i, pn, dir);
-
-    // spline form depends from distance between p[i] and p[i+1]
-    float d12 = hypotf(p[i + 1].x - p[i].x, p[i + 1].y - p[i].y);
-    float k = SPLINE_FORM_FACTOR * d12;
-
-    float vx[4] = { p[i].x, k * cosf(p[i].psi), p[i + 1].x,
-                                    k * cosf(p[i + 1].psi) };
-    float vy[4] = { p[i].y, k * sinf(p[i].psi), p[i + 1].y,
-                                    k * sinf(p[i + 1].psi) };
-
-    int m[3][4] =  {{ -6,-3,  6,-3},
-                    { 15, 8,-15, 7},
-                    {-10,-6, 10,-4}};
-
-    s->c5x[3] = 0.0f;
-    s->c5y[3] = 0.0f;
-    s->c5x[4] = vx[1];
-    s->c5y[4] = vy[1];
-    s->c5x[5] = vx[0];
-    s->c5y[5] = vy[0];
-
-    int j;
-    for (i = 0; i < 3; i++) {
-        s->c5x[i] = 0.0f;
-        s->c5y[i] = 0.0f;
-        for (j = 0; j < 4; j++) {
-            s->c5x[i] += (float)m[i][j] * vx[j];
-            s->c5y[i] += (float)m[i][j] * vy[j];
-
-        }
-    }
-    /*
-    for (i = 0; i < 6; i++) {
-     turag_infof(" c5x[%d] = %f",i,s->c5x[i]);
-     turag_infof(" c5y[%d] = %f",i,s->c5y[i]);
-    }*/
-
-    s->direct_dist = d12;
-
-    calc_spline_param5(s);
-}
-
-inline void get_spline(Pose *p, float *bending, spline_t *s, float *t) {
-
-    p->x = polyval3(s->cx, *t);
-    p->y = polyval3(s->cy, *t);
-
-    float dx = polyval3_der(s->cx, *t);
-    float dy = polyval3_der(s->cy, *t);
-
-    p->psi = atan2f(dy, dx);
-
-    float ddx = polyval3_dder(s->cx, *t);
-    float ddy = polyval3_dder(s->cy, *t);
-
-    *bending = (dx * ddy - ddx * dy) / cbcf(hypotf(dx, dy));
-}
-
-inline void get_spline5(Pose *p, float *bending, spline_t *s, float *t) {
-
-    p->x = polyval5(s->c5x, *t);
-    p->y = polyval5(s->c5y, *t);
-
-    float dx = polyval5_der(s->c5x, *t);
-    float dy = polyval5_der(s->c5y, *t);
-
-    p->psi = atan2f(dy, dx);
-
-    float ddx = polyval5_dder(s->c5x, *t);
-    float ddy = polyval5_dder(s->c5y, *t);
-
-    *bending = (dx * ddy - ddx * dy) / cbcf(hypotf(dx, dy));
-}
 #endif
 
+/**
+ * @brief Polynomial of a given order that can be used to calculate its own and its derivations' steps.
+ */
 template<std::size_t order>
 class Polynomial
 {
@@ -371,6 +122,9 @@ public:
     float c[order+1];
 };
 
+/**
+ * @brief 2-dimensional polynomial
+ */
 template<std::size_t order>
 class Polynomial2D
 {
@@ -385,13 +139,15 @@ public:
 class Spline
 {
 public:
-    virtual bool calculate();
+    virtual bool calculate(Pose *poses, unsigned pose_index, unsigned pose_count);
     virtual bool getMaxVelocity();
-    virtual bool getStep();
+    virtual Pose getPoseStep(float t);
+    virtual float getBendingStep(float t);
     virtual constexpr unsigned getOrder();
 
 protected:
-    static constexpr Length spline_iteration_distance = 50*Units::mm;
+    static constexpr Length spline_iteration_distance = 50 * Units::mm;
+    static constexpr float spline_form_factor = 1.0f;
 };
 
 /**
@@ -402,15 +158,19 @@ class SplineOrder :
         public Spline
 {
 public:
-    bool calculate() {
-        return calculate_parameters();
+    bool calculate(Pose *poses, unsigned pose_index, unsigned pose_count) {
+        if (order == 3) {
+            //calc_spline_angle(p, i, pn, dir);
+            return calc_spline_catmullrom(poses, pose_index);
+        } else if (order == 5) {
+            //calc_spline_angle(p, i, pn, dir);
+            return calc_spline_hermite(poses, pose_index);
+        }
+
+        return false;
     }
 
     bool getMaxVelocity() {
-        return order*2;
-    }
-
-    bool getStep() {
         return order*2;
     }
 
@@ -418,8 +178,146 @@ public:
         return order;
     }
 
+    Pose getPoseStep(float t)
+    {
+        Pose p;
+
+        p.x = c.x.val(t) * Units::mm;
+        p.y = c.y.val(t) * Units::mm;
+
+        // calculate angle from tangent
+        float dx = c.x.val(t, 1);
+        float dy = c.y.val(t, 1);
+
+        p.phi = atan2f(dy, dx) * Units::rad;
+
+        return p;
+    }
+
+    float getBendingStep(float t)
+    {
+        float dx = c.x.val(t, 1);
+        float dy = c.y.val(t, 1);
+
+        float ddx = c.x.val(t, 2);
+        float ddy = c.y.val(t, 2);
+
+        float bending = (dx * ddy - ddx * dy) / cbcf(hypotf(dx, dy));
+        return bending;
+    }
+
 private:
-    bool calculate_parameters(void) {
+    static inline float cosfRad(Units::Angle a)
+    {
+        return cosf(a.to(Units::rad));
+    }
+    static inline float sinfRad(Units::Angle a)
+    {
+        return sinf(a.to(Units::rad));
+    }
+
+    bool calc_spline_catmullrom(Pose *poses, unsigned pose_index)
+    {
+        //static_assert(order == 3, "wrong spline order for this call");
+
+        Pose *p = poses;
+        unsigned i = pose_index;
+
+        // spline form depends from distance between p[i] and p[i+1]
+        float d12 = distance(p[i], p[i+1]).to(Units::mm);
+        float k = spline_form_factor * d12;
+
+        float vx[4] = { k * cosfRad(p[i].phi),
+                        k * cosfRad(p[i + 1].phi),
+                        p[i].x.to(Units::mm),
+                        p[i + 1].x.to(Units::mm) };
+        float vy[4] = { k * sinfRad(p[i].phi),
+                        k * sinfRad(p[i + 1].phi),
+                        p[i].y.to(Units::mm),
+                        p[i + 1].y.to(Units::mm) };
+
+        /* invertierte hermitesche kubische Matrix (siehe Wikipedia)
+         *
+         * errechnet Splineparameter anhand gegebener Randwerte:
+         * - Position p
+         * - Tangente bzw. Winkel m
+         *
+         *  v = [m0 m1 p0 p1]' siehe oben
+         */
+        int m[4][4]=   {{ 1, 1, 2,-2},
+                        {-2,-1,-3, 3},
+                        { 1, 0, 0, 0},
+                        { 0, 0, 1, 0}};
+
+        /*
+         * Matrixmultiplikation c = M * v
+         */
+        for (int i = 0; i < 4; i++) {
+            c.x.c[i] = 0.0f;
+            c.y.c[i] = 0.0f;
+
+            for (int j = 0; j < 4; j++) {
+                c.x.c[i] += (float)m[i][j] * vx[j];
+                c.y.c[i] += (float)m[i][j] * vy[j];
+            }
+        }
+
+        direct_dist = d12 * Units::mm;
+
+        bool ok = calculate_parameters();
+        return ok;
+    }
+
+    bool calc_spline_hermite(Pose *poses, unsigned pose_index)
+    {
+        //static_assert(order == 5, "wrong spline order for this call");
+
+        Pose *p = poses;
+        unsigned i = pose_index;
+
+        // spline form depends from distance between p[i] and p[i+1]
+        float d12 = distance(p[i], p[i+1]).to(Units::mm);
+        float k = spline_form_factor * d12;
+
+        float vx[4] = { p[i].x.to(Units::mm),
+                        k * sinfRad(p[i].phi),
+                        p[i + 1].x.to(Units::mm),
+                        k * sinfRad(p[i + 1].phi) };
+        float vy[4] = { p[i].y.to(Units::mm),
+                        k * sinfRad(p[i].phi),
+                        p[i + 1].y.to(Units::mm),
+                        k * sinfRad(p[i + 1].phi) };
+
+        int m[3][4] =  {{ -6,-3,  6,-3},
+                        { 15, 8,-15, 7},
+                        {-10,-6, 10,-4}};
+
+        c.x.c[3] = 0.0f;
+        c.y.c[3] = 0.0f;
+        c.x.c[4] = vx[1];
+        c.y.c[4] = vy[1];
+        c.x.c[5] = vx[0];
+        c.y.c[5] = vy[0];
+
+        for (int i = 0; i < 3; i++) {
+            c.x.c[i] = 0.0f;
+            c.y.c[i] = 0.0f;
+
+            for (int j = 0; j < 4; j++) {
+                c.x.c[i] += (float)m[i][j] * vx[j];
+                c.y.c[i] += (float)m[i][j] * vy[j];
+
+            }
+        }
+
+        direct_dist = d12 * Units::mm;
+
+        bool ok = calculate_parameters();
+        return ok;
+    }
+
+    bool calculate_parameters(void)
+    {
         static_assert(order == 3 || order == 5, "wrong spline order for this call");
 
         float t, x, y, dx, dy, ddx, ddy;
@@ -467,11 +365,6 @@ private:
 
         //...der Krümmung: min. 1e-10f
         kappa_max = fmaxf(kappa_max, 1e-10f);
-
-#if 0
-        turag_infof("calc_spline_param: spline length: %f", length);
-        turag_infof("calc_spline_param: kappa max: %f", kappa_max);
-#endif
 
         return true;
     }
