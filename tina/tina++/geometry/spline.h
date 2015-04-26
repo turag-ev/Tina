@@ -84,7 +84,6 @@ class Spline
 {
 public:
     virtual bool calculate(Pose *poses, unsigned pose_index, unsigned pose_count, int direction) = 0;
-    virtual bool getMaxVelocity() = 0;
     virtual Pose getPoseStep(float t) = 0;
     virtual float getBendingStep(float t) = 0;
     virtual constexpr unsigned getOrder() = 0;
@@ -115,10 +114,6 @@ public:
         }
 
         return false;
-    }
-
-    inline bool getMaxVelocity() {
-        return order*2;
     }
 
     inline constexpr unsigned getOrder() const {
