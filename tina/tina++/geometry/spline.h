@@ -87,6 +87,9 @@ public:
     virtual Pose getPoseStep(float t) = 0;
     virtual float getBendingStep(float t) = 0;
     virtual constexpr unsigned getOrder() = 0;
+    virtual constexpr Length getLength() = 0;
+    virtual constexpr float getKappaMax() = 0;
+    virtual constexpr Length getDirectDist() = 0;
 
 protected:
     static constexpr Length spline_iteration_distance = 50 * Units::mm;
@@ -122,6 +125,14 @@ public:
 
     inline constexpr Length getLength() const {
         return length;
+    }
+
+    inline constexpr float getKappaMax() const {
+        return kappa_max;
+    }
+
+    inline constexpr Length getDirectDist() const {
+        return direct_dist;
     }
 
     inline Pose getPoseStep(float t)
