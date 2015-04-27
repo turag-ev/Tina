@@ -12,59 +12,108 @@ namespace TURAG {
 template<std::size_t order>
 class Polynomial
 {
-private:
-    inline float val3(float t, unsigned derivation) const {
-        switch (derivation) {
-        case 0:
-            return ((c[0] * t + c[1]) * t + c[2]) * t + c[3];
-        case 1:
-            return (3.0f * c[0] * t + 2.0f * c[1]) * t + c[2];
-        case 2:
-            return 6.0f * c[0] * t + 2.0f * c[1];
-        case 3:
-            return 6.0f * c[0];
-        default:
-            return 0.0f;
-        }
-    }
-
-    inline float val5(float t, unsigned derivation) const {
-        switch (derivation) {
-        case 0:
-            return ((((c[0] * t + c[1]) * t + c[2]) * t + c[3]) * t + c[4]) * t + c[5];
-        case 1:
-            return (((5.0f * c[0] * t + 4.0f * c[1]) * t + 3.0f * c[2]) * t +
-                    2.0f * c[3]) * t + c[4];
-        case 2:
-            return ((20.0f * c[0] * t + 12.0f * c[1]) * t + 6.0f * c[2]) * t +
-                    2.0f * c[3];
-        case 3:
-            return (60.0f * c[0] * t + 24.0f * c[1]) * t + 6.0f * c[2];
-        case 4:
-            return 60.0f * c[0] * t + 24.0f * c[1];
-        case 5:
-            return 60.0f * c[0];
-        default:
-            return 0.0f;
-        }
-    }
-
+	static_assert(order == 3 || order == 5, "only order 3 and 5 implemented");
 public:
-    inline float val(float t, unsigned derivation=0) const {
-        if (order == 3) {
-            return val3(t, derivation);
-        } else if (order == 5) {
-            return val5(t, derivation);
-        }
-    }
+	template<std::size_t derivation = 0>
+	inline float val(float t) const { return 0.f; }
+	float val(float t, unsigned derivation) const;
 
-    inline float getNode(unsigned index) const {
+	constexpr float getNode(unsigned index) const {
         return c[index];
     }
+
+	const float& operator[](unsigned index) const {
+		return c[index];
+	}
+
+	float& operator[](unsigned index) {
+		return c[index];
+	}
 
     // polynomial coefficients
     float c[order+1];
 };
+
+template<> template<>
+inline float Polynomial<3>::val<0>(float t) const {
+	return ((c[0] * t + c[1]) * t + c[2]) * t + c[3];
+}
+template<> template<>
+inline float Polynomial<3>::val<1>(float t) const {
+	return (3.0f * c[0] * t + 2.0f * c[1]) * t + c[2];
+}
+template<> template<>
+inline float Polynomial<3>::val<2>(float t) const {
+	return 6.0f * c[0] * t + 2.0f * c[1];
+}
+template<> template<>
+inline float Polynomial<3>::val<3>(float) const {
+	return 6.0f * c[0];
+}
+template<>
+inline float Polynomial<3>::val<0>(float t, unsigned derivation) const {
+	switch (derivation) {
+	case 0:
+		return ((c[0] * t + c[1]) * t + c[2]) * t + c[3];
+	case 1:
+		return (3.0f * c[0] * t + 2.0f * c[1]) * t + c[2];
+	case 2:
+		return 6.0f * c[0] * t + 2.0f * c[1];
+	case 3:
+		return 6.0f * c[0];
+	default:
+		return 0.0f;
+	}
+}
+
+
+template<> template<>
+inline float Polynomial<5>::val<0>(float t) const {
+	return ((((c[0] * t + c[1]) * t + c[2]) * t + c[3]) * t + c[4]) * t + c[5];
+}
+template<> template<>
+inline float Polynomial<5>::val<1>(float t) const {
+	return (((5.0f * c[0] * t + 4.0f * c[1]) * t + 3.0f * c[2]) * t +
+			2.0f * c[3]) * t + c[4];
+}
+template<> template<>
+inline float Polynomial<5>::val<2>(float t) const {
+	return ((20.0f * c[0] * t + 12.0f * c[1]) * t + 6.0f * c[2]) * t +
+			2.0f * c[3];
+}
+template<> template<>
+inline float Polynomial<5>::val<3>(float t) const {
+	return (60.0f * c[0] * t + 24.0f * c[1]) * t + 6.0f * c[2];
+}
+template<> template<>
+inline float Polynomial<5>::val<4>(float t) const {
+	return 60.0f * c[0] * t + 24.0f * c[1];
+}
+template<> template<>
+inline float Polynomial<5>::val<5>(float) const {
+	return 60.0f * c[0];
+}
+template<>
+inline float Polynomial<5>::val(float t, unsigned derivation) const {
+	switch (derivation) {
+	case 0:
+		return ((((c[0] * t + c[1]) * t + c[2]) * t + c[3]) * t + c[4]) * t + c[5];
+	case 1:
+		return (((5.0f * c[0] * t + 4.0f * c[1]) * t + 3.0f * c[2]) * t +
+				2.0f * c[3]) * t + c[4];
+	case 2:
+		return ((20.0f * c[0] * t + 12.0f * c[1]) * t + 6.0f * c[2]) * t +
+				2.0f * c[3];
+	case 3:
+		return (60.0f * c[0] * t + 24.0f * c[1]) * t + 6.0f * c[2];
+	case 4:
+		return 60.0f * c[0] * t + 24.0f * c[1];
+	case 5:
+		return 60.0f * c[0];
+	default:
+		return 0.0f;
+	}
+}
 
 /**
  * @brief 2-dimensional polynomial
@@ -95,17 +144,52 @@ protected:
     static constexpr Length spline_iteration_distance = 50 * Units::mm;
     static constexpr float spline_form_factor = 1.0f;
     static constexpr float mc_no_angle = 4.f;
+
+	static inline bool isAngleDontCare(Units::Angle a)
+	{
+		return (fabsf(a.to(Units::rad) - mc_no_angle) < 0.001f) || std::isnan(a.to(Units::rad));
+	}
+
+	/**
+	 * @brief calc_spline_angle calculate missing angle of spline point
+	 */
+	static void calc_spline_angle(Pose *p, unsigned i, unsigned pn, int dir) {
+		if (i < pn && isAngleDontCare(p[i].phi)) {
+			if (i > 0) {
+				p[i].phi = angle_between(p[i-1], p[i+1]);
+			} else {
+				p[i].phi = angle_between(p[i], p[i+1]);
+			}
+
+			if (dir == -1) {
+				p[i].turn(180 * Units::deg); // turn angle for drive backwards
+			}
+		}
+
+		if ((i+1) < pn && isAngleDontCare(p[i+1].phi)) {
+			if (i < pn-2){
+				p[i+1].phi = angle_between(p[i], p[i+2]);
+			} else {
+				p[i+1].phi = angle_between(p[i], p[i+1]);
+			}
+
+			if (dir == -1) {
+				p[i+1].turn(180 * Units::deg); // turn angle for drive backwards
+			}
+		}
+	}
 };
 
 /**
  * @brief SplineOrder Spline of a certain order
  */
 template<std::size_t order>
-class SplineOrder :
+class SplineOrder final :
         public Spline
 {
+	static_assert(order == 3 || order == 5, "only order 3 and 5 implemented");
 public:
-    inline bool calculate(Pose *poses, unsigned pose_index, unsigned pose_count, int direction) {
+	bool calculate(Pose *poses, unsigned pose_index, unsigned pose_count, int direction) override {
         drive_direction = direction;
 
         if (order == 3) {
@@ -119,32 +203,32 @@ public:
         return false;
     }
 
-    inline constexpr unsigned getOrder() const {
+	constexpr unsigned getOrder() const override {
         return order;
     }
 
-    inline constexpr Length getLength() const {
+	constexpr Length getLength() const override {
         return length;
     }
 
-    inline constexpr float getKappaMax() const {
+	constexpr float getKappaMax() const override {
         return kappa_max;
     }
 
-    inline constexpr Length getDirectDist() const {
+	constexpr Length getDirectDist() const override {
         return direct_dist;
     }
 
-    inline Pose getPoseStep(float t)
+	Pose getPoseStep(float t) override
     {
         Pose p;
 
-        p.x = c.x.val(t) * Units::mm;
-        p.y = c.y.val(t) * Units::mm;
+		p.x = c.x.val(t) * Units::mm;
+		p.y = c.y.val(t) * Units::mm;
 
         // calculate angle from tangent
-        float dx = c.x.val(t, 1);
-        float dy = c.y.val(t, 1);
+		float dx = c.x.template val<1>(t);
+		float dy = c.y.template val<1>(t);
 
         p.phi = atan2f(dy, dx) * Units::rad;
 
@@ -157,33 +241,21 @@ public:
         return p;
     }
 
-    inline float getBendingStep(float t)
+	float getBendingStep(float t) override
     {
-        float dx = c.x.val(t, 1);
-        float dy = c.y.val(t, 1);
+		float dx = c.x.template val<1>(t);
+		float dy = c.y.template val<1>(t);
 
-        float ddx = c.x.val(t, 2);
-        float ddy = c.y.val(t, 2);
+		float ddx = c.x.template val<2>(t);
+		float ddy = c.y.template val<2>(t);
 
         float bending = (dx * ddy - ddx * dy) / cbcf(hypotf(dx, dy));
         return bending;
     }
 
 private:
-    static inline float cosfRad(Units::Angle a)
-    {
-        return cosf(a.to(Units::rad));
-    }
-    static inline float sinfRad(Units::Angle a)
-    {
-        return sinf(a.to(Units::rad));
-    }
-    static inline bool isAngleDontCare(Units::Angle a)
-    {
-        return (fabs(a.to(Units::rad) - (float)mc_no_angle) < 0.001) || std::isnan(a.to(Units::rad));
-    }
 
-    inline bool calc_spline_catmullrom(Pose *poses, unsigned pose_index)
+	bool calc_spline_catmullrom(Pose *poses, unsigned pose_index)
     {
         //static_assert(order == 3, "wrong spline order for this call");
 
@@ -200,12 +272,12 @@ private:
         float d12 = distance(p[i], p[i+1]).to(Units::mm);
         float k = spline_form_factor * d12;
 
-        float vx[4] = { k * cosfRad(p[i].phi + aoff),
-                        k * cosfRad(p[i + 1].phi + aoff),
+		float vx[4] = { k * cos(p[i].phi + aoff),
+						k * cos(p[i + 1].phi + aoff),
                         p[i].x.to(Units::mm),
                         p[i + 1].x.to(Units::mm) };
-        float vy[4] = { k * sinfRad(p[i].phi + aoff),
-                        k * sinfRad(p[i + 1].phi + aoff),
+		float vy[4] = { k * sin(p[i].phi + aoff),
+						k * sin(p[i + 1].phi + aoff),
                         p[i].y.to(Units::mm),
                         p[i + 1].y.to(Units::mm) };
 
@@ -241,7 +313,7 @@ private:
         return ok;
     }
 
-    inline bool calc_spline_hermite(Pose *poses, unsigned pose_index)
+	bool calc_spline_hermite(Pose *poses, unsigned pose_index)
     {
         //static_assert(order == 5, "wrong spline order for this call");
 
@@ -259,13 +331,13 @@ private:
         float k = spline_form_factor * d12;
 
         float vx[4] = { p[i].x.to(Units::mm),
-                        k * cosfRad(p[i].phi + aoff),
+						k * cos(p[i].phi + aoff),
                         p[i + 1].x.to(Units::mm),
-                        k * cosfRad(p[i + 1].phi + aoff) };
+						k * cos(p[i + 1].phi + aoff) };
         float vy[4] = { p[i].y.to(Units::mm),
-                        k * sinfRad(p[i].phi + aoff),
+						k * sin(p[i].phi + aoff),
                         p[i + 1].y.to(Units::mm),
-                        k * sinfRad(p[i + 1].phi + aoff) };
+						k * sin(p[i + 1].phi + aoff) };
 
         int m[3][4] =  {{ -6,-3,  6,-3},
                         { 15, 8,-15, 7},
@@ -295,7 +367,7 @@ private:
         return ok;
     }
 
-    inline bool calculate_parameters(void)
+	bool calculate_parameters(void)
     {
         static_assert(order == 3 || order == 5, "wrong spline order for this call");
 
@@ -322,12 +394,12 @@ private:
             p_old = p;
 
             // Wert der 1. Ableitung an Stelle t
-            dx = c.x.val(t, 1);
-            dy = c.y.val(t, 1);
+			dx = c.x.template val<1>(t);
+			dy = c.y.template val<1>(t);
 
             // Wert der 2. Ableitung an Stelle t
-            ddx = c.x.val(t, 2);
-            ddy = c.y.val(t, 2);
+			ddx = c.x.template val<2>(t);
+			ddy = c.y.template val<2>(t);
 
             // max Krümmung bestimmen
             kappa_max = fmaxf(kappa_max, fabsf((dx * ddy - ddx * dy)) / cbcf(hypotf(dx, dy)));
@@ -342,35 +414,6 @@ private:
         kappa_max = fmaxf(kappa_max, 1e-10f);
 
         return true;
-    }
-
-    /**
-     * @brief calc_spline_angle calculate missing angle of spline point
-     */
-    inline void calc_spline_angle(Pose *p, unsigned i, unsigned pn, int dir) {
-        if (i < pn && isAngleDontCare(p[i].phi)) {
-            if (i > 0) {
-                p[i].phi = angle_between(p[i-1], p[i+1]);
-            } else {
-                p[i].phi = angle_between(p[i], p[i+1]);
-            }
-
-            if (dir == -1) {
-                p[i].turn(180 * Units::deg); // turn angle for drive backwards
-            }
-        }
-
-        if ((i+1) < pn && isAngleDontCare(p[i+1].phi)) {
-            if (i < pn-2){
-                p[i+1].phi = angle_between(p[i], p[i+2]);
-            } else {
-                p[i+1].phi = angle_between(p[i], p[i+1]);
-            }
-
-            if (dir == -1) {
-                p[i+1].turn(180 * Units::deg); // turn angle for drive backwards
-            }
-        }
     }
 
     static constexpr std::size_t Order = order;
