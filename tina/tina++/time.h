@@ -7,11 +7,10 @@
 namespace TURAG {
 
 /// \defgroup Time Zeit [C/C++]
+/// Sachen mit Zeit
 /// \{
 
 /// \brief Zeitpunkt in Systemzeit
-///
-///
 class SystemTime {
 public:
     /// Systemzeit aus Systemticks erstellen
@@ -110,89 +109,104 @@ private:
     TuragSystemTicks value;
 };
 
-/// \{
-/// \brief Systemzeit vergleichen
 ///
+/// \}
+
+/// \relates SystemTime
+/// \brief Systemzeit vergleichen
 constexpr SystemTime operator + (SystemTime arg) {
     return arg;
 }
-
+/// \relates SystemTime
+/// \brief Systemzeit vergleichen
 constexpr SystemTime operator + (SystemTime lhs, SystemTime rhs) {
     return SystemTime{lhs.toTicks() + rhs.toTicks()};
 }
 
-/// \}
-
-/// Differenz zwischen zwei Systemzeitpunkten bilden
+/// \relates SystemTime
+/// \brief Differenz zwischen zwei Systemzeitpunkten bilden
 constexpr SystemTime operator - (SystemTime lhs, SystemTime rhs) {
     return SystemTime{lhs.toTicks() - rhs.toTicks()};
 }
 
-/// \{
+/// \relates SystemTime
 /// \brief Systemzeit multiplizieren
-
 constexpr SystemTime operator * (SystemTime lhs, unsigned rhs) {
     return SystemTime(lhs.toTicks() * rhs);
 }
-
+/// \relates SystemTime
+/// \brief Systemzeit multiplizieren
 constexpr SystemTime operator * (unsigned lhs, SystemTime rhs) {
     return SystemTime(lhs * rhs.toTicks());
 }
 
-/// \}
-
-/// \{
+/// \relates SystemTime
 /// \brief Systemzeit vergleichen
 constexpr bool operator <= (SystemTime lhs, SystemTime rhs) { return lhs.toTicks() <= rhs.toTicks(); }
+/// \relates SystemTime
+/// \brief Systemzeit vergleichen
 constexpr bool operator >= (SystemTime lhs, SystemTime rhs) { return lhs.toTicks() >= rhs.toTicks(); }
+/// \relates SystemTime
+/// \brief Systemzeit vergleichen
 constexpr bool operator == (SystemTime lhs, SystemTime rhs) { return lhs.toTicks() == rhs.toTicks(); }
+/// \relates SystemTime
+/// \brief Systemzeit vergleichen
 constexpr bool operator != (SystemTime lhs, SystemTime rhs) { return lhs.toTicks() != rhs.toTicks(); }
+/// \relates SystemTime
+/// \brief Systemzeit vergleichen
 constexpr bool operator <  (SystemTime lhs, SystemTime rhs) { return lhs.toTicks() <  rhs.toTicks();  }
+/// \relates SystemTime
+/// \brief Systemzeit vergleichen
 constexpr bool operator >  (SystemTime lhs, SystemTime rhs) { return lhs.toTicks() >  rhs.toTicks();  }
-/// \}
 
 #if GCC_VERSION >= 40700 || defined(__DOXYGEN__)
 
-/// \{
-/// Systemzeit aus Sekundenangabe erstellen
+/// \relates SystemTime
+/// \brief Systemzeit aus Sekundenangabe erstellen
 constexpr SystemTime operator"" _s(long double a) { return SystemTime::fromMsec(a / 1000.0); }
+/// \relates SystemTime
+/// \brief Systemzeit aus Sekundenangabe erstellen
 constexpr SystemTime operator"" _s(unsigned long long a) { return SystemTime::fromSec(a); }
-/// \}
 
-/// \{
-/// Systemzeit aus Millisekundenangabe erstellen
+/// \relates SystemTime
+/// \brief Systemzeit aus Millisekundenangabe erstellen
 constexpr SystemTime operator"" _ms(unsigned long long a) { return SystemTime::fromMsec(a); }
-/// \}
 
 #endif
 
 // alte Versionen:
 
+/// \relates SystemTime
 /// Systemzeit aus \p ms Millisekunden erstellen
+/// \deprecated benutze SystemTime::fromMsec
 constexpr _always_inline
 static SystemTime ms_to_ticks(unsigned ms) {
-    return turag_ms_to_ticks(ms);
+	return turag_ms_to_ticks(ms);
 }
 
 /// Systemzeit aus \p s Sekunden erstellen
+/// \relates SystemTime
+/// \deprecated benutze SystemTime::fromSec
 constexpr _always_inline
 static SystemTime s_to_ticks(unsigned s) {
     return turag_s_to_ticks(s);
 }
 
 /// gespeicherte Systemzeit in Millisekunden
+/// \relates SystemTime
+/// \deprecated benutze SystemTime::toMsec
 constexpr _always_inline
 unsigned ticks_to_ms(SystemTime time) {
     return turag_ticks_to_ms(time);
 }
 
 /// gespeicherte Systemzeit in Sekunden
+/// \relates SystemTime
+/// \deprecated benutze SystemTime::toMsec
 constexpr _always_inline
 unsigned ticks_to_s(SystemTime time) {
     return turag_ticks_to_s(time);
 }
-
-/// \}
 
 } // namespace TURAG
 

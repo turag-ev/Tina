@@ -42,8 +42,8 @@ namespace TURAG {
 /// mitgeben um die Herkunft des Ereignisses besser zu erkennen. Aus einer Ereignisklasse
 /// kann ein Ereignis erstellt werden.
 ///
-/// Eine Ereignisklasse wird erstellt durch das Makro \ref DEFINE_EVENT_CLASS oder
-/// \ref DEFINE_EVENT_CLASS_EXTRA. Dessen erstes Argument ist der Bezeichner für
+/// Eine Ereignisklasse wird erstellt durch das Makro \ref TURAG::DEFINE_EVENT_CLASS oder
+/// \ref TURAG::DEFINE_EVENT_CLASS_EXTRA. Dessen erstes Argument ist der Bezeichner für
 /// die Klasse, der später darf verwendet werden kann um die Ereignisklasse angeben zu können.
 /// Der zweite Parameter ist die Id der Ereignisklasse. Aus der Id wird die Beschreibung generiert.
 /// Will man eine detailiertere Beschreibung hinzufügen so ist das mit \ref DEFINE_EVENT_CLASS_EXTRA möglich, wo der

@@ -5,7 +5,7 @@
 
 namespace TURAG {
 
-/// \ingroup Misc
+/// \ingroup Time
 /// \brief Stopuhr
 ///
 /// Werkzeug zum Messen von Aufführzeiten von Funktionen.

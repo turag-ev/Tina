@@ -185,6 +185,7 @@ namespace detail {
 template<typename T, std::size_t N>
 class CircularBuffer {
   static_assert(!(N & (N-1)), "detail::CircularBuffer capacity must be a power of 2");
+  //static_assert(std::is_trivially_destructible<T>::value, "Es werde erstmal nur trivale Typen unterstützt.");
 
 public:
 #ifndef __DOXYGEN__

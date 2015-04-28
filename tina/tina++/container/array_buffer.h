@@ -67,6 +67,7 @@ struct _ArrayBufferHelper {
 template<typename T, size_t N>
 struct ArrayBuffer {
   static_assert(N > 0, "ArrayBuffer size must be greater than null.");
+  //static_assert(std::is_trivially_destructible<T>::value, "Es werde erstmal nur trivale Typen unterstützt.");
 
 public:
   typedef ArrayBuffer<T, N> self_type;
@@ -440,6 +441,7 @@ public:
   /// \param first Iterator auf erstes zu entfernendes Element
   /// \param last Iterator erstes nicht zu entfernendes Element
   void erase(iterator first, iterator last) {
+	if (first == last) return;
 	iterator new_end = std::move(last, end(), first);
 	bytes_.erase(new_end, end());
 	length_ = new_end - begin();
@@ -486,7 +488,8 @@ bool _ArrayBufferHelper<T>::prepare_for_insert(iterator position, iterator end, 
 	return false;
   }
 
-  std::move_backward(position, end, end + 1);
+  *end = std::move(*(end - 1)); //BUG: construct(end, std::move(*(end - 1)));
+  std::move_backward(position, end - 1, end);
   return true;
 }
 
@@ -502,16 +505,24 @@ bool _ArrayBufferHelper<T>::is_full(const_iterator end, const_iterator max_end) 
 /*
 template<typename T>
 void ArrayBufferBase<T>::copy(const ArrayBufferBase<T>& other) {
-	if (this == other) return;
+	if (this == &other) return;
 
 	std::size_t new_size = other.size();
-	if (new_size > max_size()) {
+	if (new_size > capacity()) {
 		turag_error("ArrayBuffer overflow!");
-		new_size = max_size();
+		new_size = capacity();
+	}
+
+	if (new_size > size()) {
+		auto& new_end = std::copy(other.begin(), other.end(), begin());
+		destroy(new_end, end());
+	} else {
+		std::copy(other.begin(), other.begin() + size(), begin());
+		std::__uninitialized_copy_a(other.begin() + size(), other.end(), end());
 	}
 
 	length_ = new_size;
-	std::copy(other.begin(), other.begin() + new_size, begin());
+
 }*/
 
 
