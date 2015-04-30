@@ -4,7 +4,6 @@
 #include "print.h"
 #include <tina/utils/base64.h>
 
-#ifdef TURAG_DEBUG_ENABLE_IMAGE
 
 static unsigned turag_image_index = 0;
 
@@ -154,4 +153,3 @@ void turag_image_doge(void)
 #endif // TURAG_DEBUG_ENABLE_IMAGE_DOGE
 }
 
-#endif

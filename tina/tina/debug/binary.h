@@ -17,6 +17,7 @@ extern "C" {
 /// \addtogroup Debug
 /// \{
 /// \defgroup Debugbinary Binärobjekte
+/// \brief Ausgabe beliebiger Binärdaten.
 ///
 /// Über die folgende Funktionen können Binärobjekte verschickt werden.
 /// Diese können für eine erweiterte Darstellung (z.B. Roboterposition auf Spielfeld,

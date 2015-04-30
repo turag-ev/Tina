@@ -109,7 +109,7 @@
 /// \code{.cpp}
 /// // Quelldatei beispiel.cpp:
 /// #define TURAG_DEBUG_LOG_SOURCE "T"
-/// #define TURAG_DEBUG_LEVEL 3 // Debuginformationen ausblenden
+/// #define TURAG_DEBUG_LEVEL 3 // Nur warning, critical und error anzeigen
 /// #include <utils/debug.h>
 ///
 /// // weitere includes
@@ -130,39 +130,13 @@
 ///
 /// \{
 
-/// Startzeichen für Debugmeldungen
-#define TURAG_DEBUG_LINE_PREFIX "\x02"
-
-/// Speziallevel: der Text wird ab sofort als Label der entsprechenden Logquelle benutzt.
-#define TURAG_DEBUG_REPORT_LOG_SOURCE_PREFIX  ">"
-
 #ifndef TURAG_DEBUG_LEVEL
 /// \brief Debuglevel
 ///
 /// Kann über Makefile oder in Zeilen vor erstem Include umdefiniert werden.
+///
+/// \note Dieser Wert hat einen direkten Einfluss auf das Verhalten aller Debug-Module.
 #define TURAG_DEBUG_LEVEL 4
-#endif
-
-// output graphs
-#if !defined(TURAG_DEBUG_ENABLE_GRAPH)
-# if TURAG_DEBUG_LEVEL > 3
-/// \brief Wenn definiert werden Messdatenmeldungen ausgegeben
-///
-/// Kann über Makefile oder in Zeilen vor erstem Include definiert werden.
-/// Wird standardmäßig bei TURAG_DEBUG_LEVEL größer 3 definiert.
-#  define TURAG_DEBUG_ENABLE_GRAPH
-# endif
-#endif
-
-// output images
-#if !defined(TURAG_DEBUG_ENABLE_IMAGE)
-# if TURAG_DEBUG_LEVEL > 3
-/// \brief Wenn definiert werden Bilder ausgegeben
-///
-/// Kann über Makefile oder in Zeilen vor erstem Include definiert werden.
-/// Wird standardmäßig bei TURAG_DEBUG_LEVEL größer 3 definiert.
-#  define TURAG_DEBUG_ENABLE_IMAGE
-# endif
 #endif
 
 #if !defined(TURAG_DEBUG_ENABLE_BINARY)
@@ -171,7 +145,10 @@
 ///
 /// Kann über Makefile oder in Zeilen vor erstem Include definiert werden.
 /// Wird standardmäßig nicht definiert.
-//#  define TURAG_DEBUG_ENABLE_BINARY
+/// \todo Sollte standardmäßig aktiviert werden.
+#  define TURAG_DEBUG_ENABLE_BINARY 0
+# else
+#  define TURAG_DEBUG_ENABLE_BINARY 0
 # endif
 #endif
 
@@ -191,6 +168,15 @@
 # define TURAG_PRINT_GAMETIME_AUTOMATIC 0
 #endif
 
+
+#ifndef __DOXYGEN__
+
+/// Startzeichen für Debugmeldungen
+#define TURAG_DEBUG_LINE_PREFIX "\x02"
+
+/// Speziallevel: der Text wird ab sofort als Label der entsprechenden Logquelle benutzt.
+#define TURAG_DEBUG_REPORT_LOG_SOURCE_PREFIX  ">"
+
 /// Prefix für Fehlermeldung
 #define TURAG_DEBUG_ERROR_PREFIX    "!"
 
@@ -208,6 +194,8 @@
 
 /// Prefix für Spielzeitausgaben
 #define TURAG_DEBUG_GAMETIME_PREFIX "T"
+
+#endif // __DOXYGEN__
 
 # if __WORDSIZE == 64
 #  define TURAG_32_PREFIX
