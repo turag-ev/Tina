@@ -4,7 +4,13 @@
 #include <hal.h>
 #include <ch.h>
 
+#include <tina++/thread.h>
+
 #include <cstddef>
+
+#if HAL_USE_GPT == FALSE
+# error HAL_USE_GPT must be TRUE
+#endif
 
 
 #ifndef __DOXYGEN__

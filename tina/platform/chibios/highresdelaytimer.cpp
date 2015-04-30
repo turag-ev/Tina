@@ -238,16 +238,21 @@ std::atomic<int> usedTimerIndex(0);
 
 
 namespace TURAG {
-	
+
 extern "C" {
 static void gpt_callback(GPTDriver *gptp) {
 	const GPTConfigExt* config = reinterpret_cast<const GPTConfigExt*>(gptp->config);
-	chBSemSignal(const_cast<BinarySemaphore*>(&config->sem));
+	BinarySemaphore* sem = const_cast<BinarySemaphore*>(&config->sem);
+	chSysLockFromIsr();
+	chBSemSignalI(sem);
+	chSysUnlockFromIsr();
 }
 }
 
 
 HighResDelayTimer::HighResDelayTimer() {
+	turag_info("HighResDelayTimer::HighResDelayTimer()");
+
 	unsigned myTimer = usedTimerIndex.fetch_add(1);
 
 	if (myTimer < length(availableTimers)) {
@@ -255,9 +260,10 @@ HighResDelayTimer::HighResDelayTimer() {
 		data.factor = availableTimers[myTimer].factor;
 		data.max_us = availableTimers[myTimer].max_us;
 		
-		chBSemInit(&data.config.sem, 0);
+		chBSemInit(&data.config.sem, true);
 		data.config.config.frequency = availableTimers[myTimer].frequency;
 		data.config.config.callback = &gpt_callback;
+		
 		gptStart(data.driver, &(data.config.config));
 	} else {
 		data.driver = nullptr;
@@ -267,7 +273,7 @@ HighResDelayTimer::HighResDelayTimer() {
 	}
 }
 
-void HighResDelayTimer::wait(uint32_t us) {
+void HighResDelayTimer::wait_us(uint32_t us) {
 	if (us == 0) {
 		return;
 	}
@@ -278,12 +284,12 @@ void HighResDelayTimer::wait(uint32_t us) {
 			Thread_delay(SystemTime::fromUsec(us));
 		} else {
 			uint16_t ticks = static_cast<uint16_t>(us) * data.factor;
-			
+
 			gptStartOneShot(data.driver, ticks);
 			chBSemWait(&data.config.sem);
 		}
 	} else {
-		// if no hardware timer is available, rely on 
+		// if no hardware timer is available, rely on
 		// systick to make the shortest delay possible.
 		// Relies on fromUsec() to round upwards to the
 		// next full systick.

@@ -24,6 +24,10 @@ namespace TURAG {
  * Verzögerungen nur eine Mindestverzögerung sein. Speziell wenn der
  * verzögerte %Thread nicht die höchste Priorität besitzt, kann
  * die tatsächliche Verzögerung beliebig lang werden.
+ * 
+ * \note Diese Implementierung ist reentrant, jedoch nicht thread-safe!
+ * Jede Instanz kann gleichzeitig von einem Thread zum warten benutzt
+ * werden.
  *
  */
 class HighResDelayTimer {
@@ -42,7 +46,7 @@ public:
 	 * @brief Blockiert den Thread um die angegebene Zeit.
 	 * @param us Zeit in Mikrosekunden.
 	 */
-	void wait(uint32_t us);
+	void wait_us(uint32_t us);
 	
 private:
 	// storage space for implementations
