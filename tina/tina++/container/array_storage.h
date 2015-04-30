@@ -75,13 +75,23 @@ public:
 
   // Create an object in aligned storage
   template<typename ...Args> _always_inline
-  void emplace(std::size_t index, Args&&... args) {
-    construct(reinterpret_cast<T*>(data_ + index), std::forward<Args>(args)...);
+  void construct(std::size_t index, Args&&... args) {
+	TURAG::construct(reinterpret_cast<T*>(data_ + index), std::forward<Args>(args)...);
   }
 
   template<typename ...Args> _always_inline
-  void emplace(iterator pos, Args&&... args) {
-    construct(&(*pos), std::forward<Args>(args)...);
+  static void construct(iterator pos, Args&&... args) {
+	TURAG::construct(pos, std::forward<Args>(args)...);
+  }
+
+  template<typename ...Args> _always_inline
+  void assign(std::size_t index, T&& arg) {
+	*reinterpret_cast<T*>(data_ + index) = std::move(arg);
+  }
+
+  template<typename ...Args> _always_inline
+  static void assign(iterator pos, T&& arg) {
+	*(pos) = std::move(arg);
   }
 
   // Access an object in aligned storage
@@ -101,11 +111,11 @@ public:
     destruct(reinterpret_cast<T*>(data_ + index));
   }
 
-  void erase(iterator ptr) {
+  static void erase(iterator ptr) {
     destruct(&(*ptr));
   }
 
-  void erase(iterator begin, iterator end) {
+  static void erase(iterator begin, iterator end) {
     destruct(begin, end);
   }
 
@@ -122,6 +132,7 @@ private:
   TypeStorage<T> data_[N];
 
 #ifdef TURAG_HEAVY_DEBUG
+  // TODO: use union without TURAG_HEAVY_DEBUG; remove TURAG_HEAVY_DEBUG
   // just for better debugging
   // a reference to data_ only with type
   T (* ref)[N];

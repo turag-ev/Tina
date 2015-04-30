@@ -116,10 +116,10 @@ public:
 
 private:
   /// Pose für linke Teamfarbe
-  const Pose left_;
+  Pose left_;
 
   /// Pose für rechte Teamfarbe
-  const Pose right_;
+  Pose right_;
 
   static TeamColor_t teamcolor_;
 };

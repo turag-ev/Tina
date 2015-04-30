@@ -4,6 +4,7 @@
 #include <iterator>
 #include <cassert>
 #include <algorithm>
+#include <cstring>
 
 #include "../tina.h"
 #include "../algorithm.h"
@@ -11,34 +12,6 @@
 #include "array_storage.h"
 
 namespace TURAG {
-
-#ifndef __DOXYGEN__
-template<typename T>
-struct _ArrayBufferHelper {
-  // types
-  typedef T value_type;
-  typedef T& reference;
-  typedef const T& const_reference;
-  typedef T* pointer;
-  typedef const T* const_pointer;
-  typedef std::size_t size_type;
-  typedef std::ptrdiff_t difference_type;
-
-  // iterator
-  typedef pointer iterator;
-  typedef const_pointer const_iterator;
-  typedef std::reverse_iterator<iterator> reverse_iterator;
-  typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
-
-#ifdef NDEBUG
-  static bool prepare_for_insert(iterator position, iterator end);
-
-#else
-  static bool prepare_for_insert(iterator position, iterator end, const_iterator max_end);
-  static bool is_full(const_iterator end, const_iterator max_end);
-#endif
-};
-#endif // __DOXYGEN__
 
 /** \brief Array mit variabler Länge und festgelegter Kapazität.
  * \ingroup Container
@@ -68,7 +41,6 @@ struct _ArrayBufferHelper {
 template<typename T, size_t N>
 struct ArrayBuffer {
   static_assert(N > 0, "ArrayBuffer size must be greater than null.");
-  //static_assert(std::is_trivially_destructible<T>::value, "Es werde erstmal nur trivale Typen unterstützt.");
 
 public:
   typedef ArrayBuffer<T, N> self_type;
@@ -95,16 +67,58 @@ public:
   { }
 
   /// \brief ein ArrayBuffer zerstören
-  /// \warning nie direkt aufrufen, für das Entfernen aller Elemente \a ArrayBuffer::clear benutzen.
   ~ArrayBuffer() {
+	  // TODO: = default if std::is_trivally_destructable<T>::value
 	bytes_.erase(begin(), end());
   }
 
-#ifndef __DOXYGEN__
-  // FIXME: create own copy und move constructors for not trivial desctructable types
-  COPYABLE(ArrayBuffer);
-  MOVABLE(ArrayBuffer);
-#endif
+  ArrayBuffer(const ArrayBuffer& other) :
+	  length_(), bytes_()
+  {
+	  copy(other);
+  }
+
+  template<typename U, std::size_t M>
+  ArrayBuffer(const ArrayBuffer<U, M>& other) :
+	  length_(), bytes_()
+  {
+	  copy(other);
+  }
+
+  ArrayBuffer(ArrayBuffer&& other) :
+	  length_(), bytes_()
+  {
+	  move(std::move(other));
+  }
+
+  template<typename U, std::size_t M>
+  ArrayBuffer(ArrayBuffer<U, M>&& other) :
+	  length_(), bytes_()
+  {
+	  move(std::move(other));
+  }
+
+  self_type& operator=(const ArrayBuffer& other)
+  {
+	  copy(other);
+  }
+
+  template<typename U, std::size_t M>
+  self_type& operator=(const ArrayBuffer<U, M>& other)
+  {
+	  copy(other);
+  }
+
+  self_type& operator=(ArrayBuffer&& other)
+  {
+	  move(std::move(other));
+  }
+
+  template<typename U, std::size_t M>
+  self_type& operator=(ArrayBuffer<U, M>&& other)
+  {
+	  move(std::move(other));
+  }
 
   // iterators
   /// gibt Zeiger auf erstes Element zurück
@@ -290,7 +304,7 @@ public:
   /// \endcode
   void push_back(const value_type& val) {
 	if (!is_full()) {
-	  bytes_.emplace(length_, val);
+	  bytes_.construct(length_, val);
 	  length_++;
 	}
   }
@@ -323,7 +337,7 @@ public:
   template<class... Args> _always_inline
   void emplace_back(Args&&... args) {
 	if (!is_full()) {
-	  bytes_.emplace(length_, std::forward<Args>(args)...);
+	  bytes_.construct(length_, std::forward<Args>(args)...);
 	  length_++;
 	}
   }
@@ -344,10 +358,7 @@ public:
   /// \param args Argumente für einen Konstruktor von Typ \a T um Element zu erstellen
   template<class... Args> _always_inline
   void emplace_front(Args&&... args) {
-	if (prepare_for_insert(begin())) {
-	  length_++;
-	  bytes_.emplace(begin(), std::forward<Args>(args)...);
-	}
+	emplace(begin(), std::forward<Args>(args)...);
   }
 
   /// Alle Elemente entfernen
@@ -380,10 +391,39 @@ public:
   /// \endcode
   /// \param position Iterator auf Element in Array an das Element eingefügt werden soll
   /// \param val einzufügendes Element
-  void insert(iterator position, value_type val) {
-	if (prepare_for_insert(position)) {
-	  length_++;
-	  bytes_.emplace(position, std::move(val));
+  void insert(iterator position, const value_type& val)
+  {
+	if (is_full())
+	{
+	  turag_internal_error("ArrayBuffer overflow!");
+	  return;
+	}
+
+	const iterator last = end();
+
+	length_++;
+
+	if (std::is_trivially_copyable<T>::value)
+	{
+		value_type copy(val);
+		const ptrdiff_t n = last - position;
+		if (n)
+		  memmove(position + 1, position, sizeof(T) * n);
+		bytes_.construct(position, copy);
+	}
+	else
+	{
+		value_type copy(val);
+		if (position != last)
+		{
+			construct(last, std::move(*(last - 1)));
+			TURAG::move_backward(position, last - 1, last);
+			*position = copy;
+		}
+		else
+		{
+			bytes_.construct(position, val);
+		}
 	}
   }
 
@@ -412,10 +452,37 @@ public:
   /// \param args Argumente für einen Konstruktor von Typ \a T um Element zu erstellen
   template<class... Args> _always_inline
   void emplace(iterator position, Args&&... args) {
-	if (prepare_for_insert(position)) {
+	  if (is_full())
+	  {
+		turag_internal_error("ArrayBuffer overflow!");
+		return;
+	  }
+
+	  const iterator last = end();
+
 	  length_++;
-	  bytes_.emplace(position, std::forward<Args>(args)...);
-	}
+
+	  if (std::is_trivially_copyable<T>::value)
+	  {
+		  const ptrdiff_t n = last - position;
+		  if (n)
+			memmove(position + 1, position, sizeof(T) * n);
+		  bytes_.construct(position, std::forward<Args>(args)...);
+	  }
+	  else
+	  {
+		  if (position != last)
+		  {
+			  construct(last, std::move(*(last - 1)));
+			  TURAG::move_backward(position, last - 1, last);
+			  *position = T(std::forward<Args>(args)...);
+		  }
+		  else
+		  {
+			  // es muss nichts verschoben werden, wir sind am Ende
+			  bytes_.construct(position, std::forward<Args>(args)...);
+		  }
+	  }
   }
 
   /// Element entfernen
@@ -460,66 +527,64 @@ private:
   // bytes for array
   ArrayStorage<T, N> bytes_;
 
-  bool prepare_for_insert(iterator position) {
-	return _ArrayBufferHelper<T>::prepare_for_insert(position, end(), const_iterator(&bytes_[N]));
-  }
-
   bool is_full() {
-	return _ArrayBufferHelper<T>::is_full(cend(), const_iterator(&bytes_[N]));
+	  if (size() == capacity()) {
+		turag_internal_error("ArrayBuffer overflow!");
+		return true;
+	  }
+	  return false;
   }
 
-#ifndef __DOXYGEN__
-  friend struct _ArrayBufferHelper<T>;
-#endif // __DOXYGEN__
+  template<typename U, std::size_t M>
+  void copy(const ArrayBuffer<U, M>& other) {
+	  if (this == &other) return;
+
+	  std::size_t new_size = other.size();
+	  if (M > N) {
+		  if (new_size > capacity()) {
+			  turag_internal_error("ArrayBuffer overflow!");
+			  new_size = capacity();
+		  }
+	  }
+
+	  if (new_size <= size()) {
+		  auto new_end = TURAG::copy(other.begin(), other.end(), begin());
+		  destruct(new_end, end());
+	  } else {
+		  auto other_mid = other.begin() + size();
+		  auto self_end = TURAG::copy(other.begin(), other_mid, begin());
+		  TURAG::uninitialized_copy(other_mid, other.end(), self_end);
+	  }
+
+	  length_ = new_size;
+  }
+
+  template<typename U, std::size_t M>
+  void move(ArrayBuffer<U, M>&& other) {
+	  if (this == &other) return;
+
+	  std::size_t new_size = other.size();
+	  if (M > N) {
+		  if (new_size > capacity()) {
+			  turag_internal_error("ArrayBuffer overflow!");
+			  new_size = capacity();
+		  }
+	  }
+
+	  if (new_size <= size()) {
+		  auto new_end = TURAG::move(other.begin(), other.end(), begin());
+		  destruct(new_end, end());
+	  } else {
+		  auto other_mid = other.begin() + size();
+		  auto self_end = TURAG::move(other.begin(), other_mid, begin());
+		  TURAG::uninitialized_move(other_mid, other.end(), self_end);
+	  }
+
+	  length_ = new_size;
+  }
 };
 
-#ifndef __DOXYGEN__
-
-template<typename T>
-bool _ArrayBufferHelper<T>::prepare_for_insert(iterator position, iterator end, const_iterator max_end) {
-  if (end == max_end) {
-	turag_internal_error("ArrayBuffer overflow!");
-	return false;
-  }
-
-  *end = std::move(*(end - 1)); //BUG: construct(end, std::move(*(end - 1)));
-  std::move_backward(position, end - 1, end);
-  return true;
-}
-
-template<typename T>
-bool _ArrayBufferHelper<T>::is_full(const_iterator end, const_iterator max_end) {
-  if (end == max_end) {
-	turag_internal_error("ArrayBuffer overflow!");
-	return true;
-  }
-  return false;
-}
-
-/*
-template<typename T>
-void ArrayBufferBase<T>::copy(const ArrayBufferBase<T>& other) {
-	if (this == &other) return;
-
-	std::size_t new_size = other.size();
-	if (new_size > capacity()) {
-		turag_error("ArrayBuffer overflow!");
-		new_size = capacity();
-	}
-
-	if (new_size > size()) {
-		auto& new_end = std::copy(other.begin(), other.end(), begin());
-		destroy(new_end, end());
-	} else {
-		std::copy(other.begin(), other.begin() + size(), begin());
-		std::__uninitialized_copy_a(other.begin() + size(), other.end(), end());
-	}
-
-	length_ = new_size;
-
-}*/
-
-
+#if 0
 template <typename T, size_t N>
 static ArrayBuffer<size_t, N> sort_indexes(const ArrayBuffer<T, N> &v) {
 
@@ -533,9 +598,7 @@ static ArrayBuffer<size_t, N> sort_indexes(const ArrayBuffer<T, N> &v) {
 
   return idx;
 }
-
-
-#endif // __DOXYGEN__
+#endif
 
 } // namespace TURAG
 

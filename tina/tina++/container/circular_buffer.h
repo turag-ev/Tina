@@ -378,7 +378,7 @@ public:
       return ;
     }
 
-    bytes_.emplace(last_.n_, x);
+	bytes_.construct(last_.n_, x);
   }
 
   template< class... Args >
@@ -391,11 +391,11 @@ public:
       return ;
     }
 
-    bytes_.emplace(last_.n_, std::forward<Args>(args)...);
+	bytes_.construct(last_.n_, std::forward<Args>(args)...);
   }
 
   void push_front(const T& x) {
-    bytes_.emplace(first_.n_,  x);
+	bytes_.construct(first_.n_,  x);
     --first_;
 
     if (last_ == first_) {
@@ -407,7 +407,7 @@ public:
 
   template< class... Args >
   void emplace_front(Args&&... args) {
-    bytes_.emplace(first_.n_, std::forward<Args>(args)...);
+	bytes_.construct(first_.n_, std::forward<Args>(args)...);
     --first_;
 
     if (last_.n_ == first_.n_) {
