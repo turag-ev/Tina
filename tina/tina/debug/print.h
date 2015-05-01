@@ -129,8 +129,26 @@ void turag_print_gametime_automatic_disable();
 
 #endif // __DOXYGEN__
 
+#ifdef __DOXYGEN__
 
+/**
+ * @brief Gibt die System-Spielzeit zurück.
+ * @return Zeit seit Systemstart oder dem letzten Aufruf von
+ * turag_print_system_gametime_reset().
+ */
+TuragSystemTime turag_debug_system_gametime_get(void);
 
+#else // __DOXYGEN__
+
+#if TURAG_DEBUG_LEVEL > 0
+# define turag_debug_system_gametime_get() \
+	_turag_ticks_to_time(turag_get_current_tick().value - turag_debug_print_gametime_gamestarttime.value)
+#else
+# define turag_debug_system_gametime_get() \
+	_turag_ticks_to_time(turag_get_current_tick().value)
+#endif
+
+#endif // __DOXYGEN__
 
 
 #ifdef __DOXYGEN__
