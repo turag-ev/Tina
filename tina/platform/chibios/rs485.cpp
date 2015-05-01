@@ -86,7 +86,7 @@ extern "C" bool turag_rs485_transceive(uint8_t *transmit, int* transmit_length, 
 	
 	// insert bus delay
 	if (delayTransmission) {
-		delay.wait(bus_delay);
+		delay.wait_us(bus_delay);
 	}
 
     if (transmit && transmit_length) {
