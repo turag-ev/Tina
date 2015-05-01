@@ -251,8 +251,6 @@ static void gpt_callback(GPTDriver *gptp) {
 
 
 HighResDelayTimer::HighResDelayTimer() {
-	turag_info("HighResDelayTimer::HighResDelayTimer()");
-
 	unsigned myTimer = usedTimerIndex.fetch_add(1);
 
 	if (myTimer < length(availableTimers)) {
