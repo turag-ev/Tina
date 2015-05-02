@@ -2,6 +2,7 @@
 #define TINAPP_MATH_H
 
 #include <tina/math.h>
+#include <limits>
 #include "tina.h"
 
 namespace std {
@@ -77,6 +78,18 @@ unsigned int gcd(int a, int b) {
 
 /// \brief silent not-a-number of float type
 constexpr float NaNf = __builtin_nanf("");
+
+/// \brief Prüfen ob zwei floats innerhalb der Toleranz Epsilon identisch sind
+constexpr
+bool float_equal(float a, float b) {
+  return fabsf(a - b) < std::numeric_limits<float>::epsilon();
+}
+
+/// \brief Prüfen ob a >= b mit Berückrichtigung von Epsilon
+constexpr
+bool float_gte(float a, float b) {
+  return (a - b) > -std::numeric_limits<float>::epsilon();
+}
 
 /// \}
 
