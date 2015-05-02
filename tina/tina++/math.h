@@ -88,7 +88,7 @@ bool float_equal(float a, float b) {
 /// \brief Prüfen ob a >= b mit Berückrichtigung von Epsilon
 constexpr
 bool float_gte(float a, float b) {
-  return (a - b) > -std::numeric_limits<float>::epsilon();
+  return static_cast<float>(a - b) > -std::numeric_limits<float>::epsilon();
 }
 
 /// \}

@@ -16,7 +16,6 @@ SRCFILES = \
 	$(wildcard *.cpp) \
 	$(wildcard tina/*.c) \
 	$(wildcard helper/*.cpp) \
-	../tina++/utils/cost.cpp \
 	../tina++/statemachine/state.cpp \
 	../tina++/geometry/rect.cpp \
 	../tina++/geometry/geometry.cpp
