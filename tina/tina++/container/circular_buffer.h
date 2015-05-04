@@ -41,14 +41,7 @@ struct container_traits<Container, typename std::enable_if<std::is_const<Contain
     typedef typename Container::const_reverse_iterator reverse_iterator;
 };
 
-/// circular buffer implementation
-///   -empty-     -2 elements-   -3 elements-
-///  +-+-+-+-+     +-+-+-+-+      +-+-+-+-+
-///  | | | | |     | |1|2| |      |3| |1|2|
-///  +-+-+-+-+     +-+-+-+-+      +-+-+-+-+
-///   ^             ^   ^          ^ ^
-///  first & last   |   last       | first
-///                first          last
+
 template<typename T>
 class CircularBufferIterator : public std::iterator<std::random_access_iterator_tag, typename container_traits<T>::value_type> {
 private:
@@ -182,18 +175,20 @@ namespace detail {
 
 /// \brief Ringbuffer
 /// \ingroup Container
+/// \code
+///   -empty-     -2 elements-   -3 elements-
+///  +-+-+-+-+     +-+-+-+-+      +-+-+-+-+
+///  | | | | |     |1|2| | |      |3| |1|2|
+///  +-+-+-+-+     +-+-+-+-+      +-+-+-+-+
+///   ^             ^                  ^
+///  first          first              first
+/// \endcode
 template<typename T, std::size_t N>
 class CircularBuffer {
   static_assert(!(N & (N-1)), "detail::CircularBuffer capacity must be a power of 2");
   //static_assert(std::is_trivially_destructible<T>::value, "Es werde erstmal nur trivale Typen unterstützt.");
 
 public:
-#ifndef __DOXYGEN__
-  // FIXME: create own copy und move constructors for non-trivial desctructable types
-  COPYABLE(CircularBuffer);
-  MOVABLE(CircularBuffer);
-#endif
-
   // types
   typedef T value_type;
   typedef T& reference;
@@ -212,25 +207,33 @@ public:
   // ctor/dtor
   constexpr
   explicit CircularBuffer() :
-    first_(), last_(), bytes_()
+	first_(), length_(0), bytes_()
   { }
 
-/*
+
   CircularBuffer(const CircularBuffer& other) :
-    first_(), last_(), bytes_()
+	first_(), length_(0), bytes_()
   { 
-    resize(other.size());
-    std::copy(other.begin(), other.end(), begin());
+	copy(other);
   }
 
   CircularBuffer& operator=(const CircularBuffer& other)
   { 
-    clear();
-    resize(other.size());
-    std::copy(other.begin(), other.end(), begin());
+	copy(other);
     return *this;
   }
-*/
+
+  CircularBuffer(CircularBuffer&& other) :
+	first_(), length_(0), bytes_()
+  {
+	move(other);
+  }
+
+  CircularBuffer& operator=(CircularBuffer&& other)
+  {
+	move(other);
+	return *this;
+  }
 
   ~CircularBuffer() {
       destruct(begin(), end());
@@ -296,19 +299,17 @@ public:
   // capacity
   constexpr
   bool empty() const {
-    return first_.n_ == last_.n_;
+	return length_ == 0;
   }
 
   constexpr
   bool full() const {
-    return size() == capacity();
+	return length_ >= capacity();
   }
 
   constexpr
   size_type size() const {
-    return (first_.n_ <= last_.n_)
-        ? last_.n_ - first_.n_
-        : N - first_.n_ + last_.n_;
+	return length_;
   }
 
   constexpr
@@ -318,7 +319,7 @@ public:
 
   constexpr
   size_type capacity() const {
-    return N - 1;
+	return N;
   }
 
   constexpr
@@ -328,98 +329,101 @@ public:
 
   // element access
   reference front() {
-    return bytes_[first_ + 1];
+	return bytes_[first_.n_];
   }
 
   reference back() {
-    return bytes_[last_.n_];
+	return bytes_[first_ + (length_-1)];
   }
 
   constexpr
   const_reference front() const {
-    return bytes_[first_ + 1];
+	return bytes_[first_.n_];
   }
 
   constexpr
   const_reference back() const {
-    return bytes_[last_.n_];
+	return bytes_[first_ + (length_-1)];
   }
 
   reference operator[](size_type n) {
-    return bytes_[first_ + (n + 1)];
+	return bytes_[first_ + n];
   }
 
   constexpr
   const_reference operator[](size_type n) const {
-    return bytes_[first_ + (n + 1)];
+	return bytes_[first_ + n];
   }
 
   // modifiers
   void pop_front() {
-    if (!empty()) {
-      ++first_;
+	  if (empty()) {
+		  turag_internal_error("CircularBuffer underflow!");
+		  return ;
+	  }
+
       bytes_.erase(first_.n_);
-    }
+	  ++first_;
+	  --length_;
   }
 
   void pop_back() {
-    if (!empty()) {
-      bytes_.erase(last_.n_);
-      --last_;
-    }
+	if (empty()) {
+		turag_internal_error("CircularBuffer underflow!");
+		return ;
+	}
+
+	bytes_.erase(first_ + length_);
+	--length_;
   }
 
   void push_back(const T& x) {
-    ++last_;
-
-    if (first_ == last_) {
+	if (length_ >= capacity()) {
 	  turag_internal_error("CircularBuffer overflow!");
-      --last_;
       return ;
     }
 
-	bytes_.construct(last_.n_, x);
+	bytes_.construct(first_ + length_, x);
+	++length_;
   }
 
   template< class... Args >
   void emplace_back(Args&&... args) {
-    ++last_;
-
-    if (first_.n_ == last_.n_) {
+	if (length_ >= capacity()) {
 	  turag_internal_error("CircularBuffer overflow!");
-      --last_;
       return ;
     }
 
-	bytes_.construct(last_.n_, std::forward<Args>(args)...);
+	bytes_.construct(first_ + length_, std::forward<Args>(args)...);
+	++length_;
   }
 
   void push_front(const T& x) {
-	bytes_.construct(first_.n_,  x);
-    --first_;
+	  if (length_ >= capacity()) {
+		  turag_internal_error("CircularBuffer overflow!");
+		  return ;
+	  }
 
-    if (last_ == first_) {
-	  turag_internal_error("CircularBuffer overflow!");
-      ++first_;
-      return ;
-    }
+	  ++length_;
+	  --first_;
+	  bytes_.construct(first_.n_,  x);
   }
 
   template< class... Args >
   void emplace_front(Args&&... args) {
-	bytes_.construct(first_.n_, std::forward<Args>(args)...);
-    --first_;
+	  if (length_ >= capacity()) {
+		  turag_internal_error("CircularBuffer overflow!");
+		  return ;
+	  }
 
-    if (last_.n_ == first_.n_) {
-	  turag_internal_error("CircularBuffer overflow!");
-      ++first_;
-      return ;
-    }
+	  ++length_;
+	  --first_;
+	  bytes_.construct(first_.n_, std::forward<Args>(args)...);
   }
 
   void clear() {
     destruct(begin(), end());
-    first_.n_ = last_.n_ = 0;
+	first_.n_ = length_ = 0;
   }
 
 private:
@@ -484,10 +488,58 @@ private:
   intern_iterator first_;
 
   // Index to last element of queue
-  intern_iterator last_;
+  std::size_t length_;
 
   // bytes needed to work around the value ctor at construction
   ArrayStorage<T, N> bytes_;
+
+  template<typename U, std::size_t M>
+  void copy(const CircularBuffer<U, M>& other) {
+	  if (this == &other) return;
+
+	  std::size_t new_size = other.size();
+	  if (M > N) {
+		  if (new_size > capacity()) {
+			  turag_internal_error("CircularBuffer overflow!");
+			  new_size = capacity();
+		  }
+	  }
+
+	  if (new_size <= size()) {
+		  auto new_end = TURAG::copy(other.begin(), other.end(), begin());
+		  destruct(new_end, end());
+	  } else {
+		  auto other_mid = other.begin() + size();
+		  auto self_end = TURAG::copy(other.begin(), other_mid, begin());
+		  TURAG::uninitialized_copy(other_mid, other.end(), self_end);
+	  }
+
+	  length_ = new_size;
+  }
+
+  template<typename U, std::size_t M>
+  void move(CircularBuffer<U, M>&& other) {
+	  if (this == &other) return;
+
+	  std::size_t new_size = other.size();
+	  if (M > N) {
+		  if (new_size > capacity()) {
+			  turag_internal_error("CircularBuffer overflow!");
+			  new_size = capacity();
+		  }
+	  }
+
+	  if (new_size <= size()) {
+		  auto new_end = TURAG::move(other.begin(), other.end(), begin());
+		  destruct(new_end, end());
+	  } else {
+		  auto other_mid = other.begin() + size();
+		  auto self_end = TURAG::move(other.begin(), other_mid, begin());
+		  TURAG::uninitialized_move(other_mid, other.end(), self_end);
+	  }
+
+	  length_ = new_size;
+  }
 };
 
 #ifndef __DOXYGEN__
@@ -495,7 +547,7 @@ private:
 } // namespace detail
 
 template<typename T, std::size_t N>
-using CircularBuffer = detail::CircularBuffer<T, next_power_of_two(N+1)>;
+using CircularBuffer = detail::CircularBuffer<T, next_power_of_two(N)>;
 
 #endif
 
