@@ -6,6 +6,7 @@
 #include <algorithm>
 
 #include "../tina.h"
+#include "../algorithm.h"
 #include <tina/debug/internal-debug.h>
 #include "array_storage.h"
 
@@ -448,15 +449,8 @@ public:
   }
 
   //remove all instances of a given value from the array
-  bool remove_value(const value_type& v) {
-      bool found_one = false;
-      for(auto it = begin(); it != end(); it++) {
-          if(*it == v) {
-              erase(it);
-              found_one = true;
-          }
-      }
-      return found_one;
+  void remove(const value_type& v) {
+	  TURAG::remove(*this, v);
   }
 
 private:
