@@ -1,8 +1,6 @@
 #ifndef TINAPP_GEOMETRY_GEOMETRY_H
 #define TINAPP_GEOMETRY_GEOMETRY_H
 
-#include <array>
-
 #include <tina/tina.h>
 
 #include "units.h"

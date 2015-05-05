@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <iterator>
 #include <type_traits>
+#include <functional>
 
 #include "../tina.h"
 #include "array_storage.h"
@@ -42,20 +43,20 @@ struct container_traits<Container, typename std::enable_if<std::is_const<Contain
 };
 
 
-template<typename T>
-class CircularBufferIterator : public std::iterator<std::random_access_iterator_tag, typename container_traits<T>::value_type> {
+template<typename Container>
+class CircularBufferIterator : public std::iterator<std::random_access_iterator_tag, typename container_traits<Container>::value_type> {
 private:
   typedef CircularBufferIterator self_type;
-  typedef CircularBufferIterator<const T> const_self_type;
+  typedef CircularBufferIterator<const Container> const_self_type;
 
-  typedef typename container_traits<T>::reference element_ref;
-  typedef typename container_traits<T>::pointer element_pointer;
+  typedef typename container_traits<Container>::reference element_ref;
+  typedef typename container_traits<Container>::pointer element_pointer;
 
 public:
 
   // ctor
   constexpr
-  CircularBufferIterator(T& queue, size_t pos) :
+  CircularBufferIterator(Container& queue, size_t pos) :
     queue_(queue), pos_(pos)
   { }
 
@@ -83,7 +84,7 @@ public:
 
   _always_inline
   element_ref operator*() {
-    return queue_[pos_];
+	return (queue_.get())[pos_];
   }
 
   CircularBufferIterator& operator+=(std::size_t n) {
@@ -134,7 +135,7 @@ public:
 
   constexpr
   bool operator==(const self_type& other) const {
-    return &queue_ == &other.queue_ && pos_ == other.pos_;
+	return &(queue_.get()) == &(other.queue_.get()) && pos_ == other.pos_;
   }
 
   constexpr
@@ -143,19 +144,19 @@ public:
   }
 
   constexpr
-  typename T::difference_type index() const {
+  typename Container::difference_type index() const {
       return pos_;
   }
 
   constexpr
-  const T& container() const {
-      return queue_;
+  const Container& container() const {
+	  return queue_.get();
   }
 
 private:
   template <class> friend class CircularBufferIterator;
 
-  T& queue_;
+  std::reference_wrapper<Container> queue_;
   std::size_t pos_;
 };
 

@@ -117,12 +117,11 @@ constexpr bool operator==(Cost lhs, Cost rhs)     { return lhs.toUnsigned() == r
 /// \brief Kosten vergleichen
 constexpr bool operator!=(Cost lhs, Cost rhs)     { return lhs.toUnsigned() != rhs.toUnsigned(); }
 
-/// \{
 /// \relates Cost
 /// \brief Kosten vergleichen
 /// \bug unsigned-Wert darf nicht die Größe von <code>std::numeric_limits<unsigned>::max() - 2</code> überschreiten
-constexpr bool operator< (Cost lhs, unsigned rhs) { return lhs.toUnsigned() <  rhs;              }
-constexpr bool operator< (unsigned lhs, Cost rhs) { return              lhs <  rhs.toUnsigned(); }
+constexpr bool operator<(Cost lhs, unsigned rhs) { return lhs.toUnsigned() <  rhs;              }
+constexpr bool operator<(unsigned lhs, Cost rhs) { return              lhs <  rhs.toUnsigned(); }
 
 constexpr bool operator> (Cost lhs, unsigned rhs) { return lhs.toUnsigned() >  rhs;              }
 constexpr bool operator> (unsigned lhs, Cost rhs) { return              lhs >  rhs.toUnsigned(); }
@@ -138,7 +137,6 @@ constexpr bool operator==(unsigned lhs, Cost rhs) { return              lhs == r
 
 constexpr bool operator!=(Cost lhs, unsigned rhs) { return lhs.toUnsigned() != rhs;              }
 constexpr bool operator!=(unsigned lhs, Cost rhs) { return              lhs != rhs.toUnsigned(); }
-/// \}
 
 /// \relates Cost
 /// \{

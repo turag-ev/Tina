@@ -23,6 +23,9 @@ SRCFILES = \
 # make everything public :P
 CXXFLAGS += -Dprivate=public -Dprotected=public
 
+# more checks (Concept checks, ...)
+CXXFLAGS += -D_GLIBCXX_CONCEPT_CHECKS -D_GLIBCXX_DEBUG
+
 # no config
 CXXFLAGS += -DTURAG_NO_PROJECT_CONFIG -DTURAG_NO_PLATFORM_CONFIG
 CFLAGS += -DTURAG_NO_PROJECT_CONFIG -DTURAG_NO_PLATFORM_CONFIG
