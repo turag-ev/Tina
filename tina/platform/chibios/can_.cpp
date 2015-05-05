@@ -40,42 +40,46 @@ uint64_t call(Id remote_id, FuncId func_id, uint64_t param, ErrorCode* error_res
     return result;
 }
 
-ErrorCode read_blackboard(const Blackboard *object, pointer dest) {
+bool readBlackboard(const Blackboard *object, pointer dest, ErrorCode* error)
+{
     static unsigned errorcnt = 0;
-    uint64_t timestamp;
+    systime_t timestamp;
 
     if (!object) {
         turag_critical("read_blackboard called with nullptr!");
         return -1;
     }
 
-    ErrorCode error = Casa_BBRead((Casa_BBObject_t*)object, dest, (systime_t*)&timestamp);
+    ErrorCode e = Casa_BBRead((Casa_BBObject_t*)object, dest, &timestamp);
+    
+    if (error != nullptr)
+      *error = e;
 
-    if (error != -CASA_ENOERR) {
+    if (e != -CASA_ENOERR) {
         if (errorcnt++ <= 4) {
             turag_errorf("CASA BlackBoard read failed with error code: objId %d, objOwner 0x%x, err %d (0x%.8x)",
-                object->id, object->owner, error, error);
+                object->id, object->owner, e, e);
             if (errorcnt == 5)
                 turag_errorf("(omitting the following 5k CASABB messages)");
         } else if (errorcnt == 5000) {
             errorcnt = 0;
-        }
-    } else {
-        errorcnt = 0;
+        }        
+        return false;
     }
-
-    return error;
+    
+    errorcnt = 0;
+    return true;
 }
 
 // C Interface
 
 extern "C"
-ErrorCode turag_can_read_blackboard(const Blackboard* object, pointer dest) {
-    return CAN::read_blackboard(object, dest);
+bool turag_can_read_blackboard(const Blackboard* object, pointer dest, TuragCanErrorCode* error_res) {
+    return CAN::readBlackboard(object, dest, error_res);
 }
 
 extern "C"
-uint64_t turag_can_call(Id remote_id, FuncId func_id, uint64_t param, ErrorCode* error_res) {
+uint64_t turag_can_call(Id remote_id, FuncId func_id, uint64_t param, TuragCanErrorCode* error_res) {
 	return call(remote_id, func_id, param, error_res);
 }
 

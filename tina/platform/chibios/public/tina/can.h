@@ -25,7 +25,7 @@ typedef Casa_FuncId_t TuragCanFuncId;
 /// Blackboard callback function type
 typedef Casa_BBCallback_t TuragBlackboardCallback;
 
-TuragCanErrorCode turag_can_read_blackboard(const TuragCanBlackboard* object, void* dest);
+bool turag_can_read_blackboard(const TuragCanBlackboard* object, void* dest, TuragCanErrorCode* error);
 
 /// Call a CASA RPC
 /// \param remote_id id of the reciver

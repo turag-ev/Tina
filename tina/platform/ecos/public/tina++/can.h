@@ -35,7 +35,9 @@ uint64_t call(Id remote_id, FuncId func_id, uint64_t param, ErrorCode* error_res
 /// Read value from CASA blackboard
 /// \param object a CASA blackboard
 /// \param dest   destination of blackboard value
-ErrorCode read_blackboard(const Blackboard* object, pointer dest);
+/// \param error  destination of error value or \a nullptr
+/// \returns \a true if opertation was successful
+bool readBlackboard(const Blackboard *object, pointer dest, ErrorCode* error = nullptr);
 
 } // namespace CAN
 
