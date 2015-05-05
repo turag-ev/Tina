@@ -9,6 +9,7 @@
 /// \addtogroup Debug
 /// \{
 /// \defgroup Debugprint Meldungsausgabe
+/// \brief Ausgabe formatierter Textmeldungen.
 /// \{
 
 extern TuragSystemTime turag_debug_print_gametime_gamestarttime;

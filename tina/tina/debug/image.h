@@ -4,16 +4,38 @@
 #include <tina/debugprint.h>
 #include "defines.h"
 
+
+
+
 /// \addtogroup Debug
 /// \{
 /// \defgroup Debugimage Bilddaten-Ausgabe
+/// \brief Ausgabe von Bildern/Video-Streams.
 /// \{
+
+// output images
+#if !defined(TURAG_DEBUG_ENABLE_IMAGE)
+# if TURAG_DEBUG_LEVEL > 3 || defined(__DOXYGEN__)
+/// \brief Wenn definiert werden Bilder ausgegeben
+///
+/// Kann über Makefile oder in Zeilen vor erstem Include definiert werden.
+/// Wird standardmäßig bei TURAG_DEBUG_LEVEL größer 3 definiert.
+#  define TURAG_DEBUG_ENABLE_IMAGE 1
+# else
+#  define TURAG_DEBUG_ENABLE_IMAGE 0
+# endif
+#endif
+
+#ifndef __DOXYGEN__
 
 // graph output prefixes
 #define TURAG_DEBUG_IMAGE_PREFIX          "B"
 #define TURAG_DEBUG_IMAGE_TRANSMISSION    ":"
 
-#ifdef TURAG_DEBUG_ENABLE_IMAGE
+#endif // __DOXYGEN__
+
+
+#if TURAG_DEBUG_ENABLE_IMAGE || defined(__DOXYGEN__)
 
 #ifdef __cplusplus
 extern "C" {
