@@ -6,6 +6,11 @@
 #include "defines.h"
 #include "log-source.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 /// \addtogroup Debug
 /// \{
 /// \defgroup Debugprint Meldungsausgabe
@@ -151,6 +156,25 @@ TuragSystemTime turag_debug_system_gametime_get(void);
 
 #endif // __DOXYGEN__
 
+#if TURAG_DEBUG_LEVEL > 0 || defined(__DOXYGEN__)
+
+/**
+ * @brief Enthält die Bezeichnungen der Logquellen.
+ *
+ * Dieses Array enthält 127 Elemente.
+ */
+extern const char* turag_log_source_table[127];
+
+/**
+ * @brief Macht die vorhandenen Logquellen bekannt.
+ *
+ * Es wird der Inhalt der turag_log_source_table ausgegeben.
+ */
+void turag_debug_print_logsources(void);
+
+#else
+# define turag_debug_print_logsources(x,y) while(0)
+#endif
 
 #ifdef __DOXYGEN__
 
@@ -440,5 +464,11 @@ void turag_debug(const char* msg);
 
 /// \}
 /// \}
+
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif // TINA_DEBUG_PRINT_H
