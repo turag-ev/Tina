@@ -32,6 +32,21 @@
 # define turag_internal_error(msg) while(0)
 #endif
 
+#if TURAG_DEBUG_LEVEL > 0
+# if TURAG_PRINT_GAMETIME_AUTOMATIC == 1
+#  define _turag_print_error(msg) \
+	do{ \
+	if (turag_debug_print_gametime_auto_output_enabled) {turag_print_system_gametime(); }               \
+	turag_debug_puts(msg); \
+	}while(0)
+# else
+#  define _turag_print_error(msg) \
+	turag_debug_puts(msg)
+# endif
+#else
+# define _turag_print_error(msg) while(0)
+#endif
+
 #endif // __DOXYGEN__
 
 #endif // TINA_DEBUG_INTERNALDEBUG_H
