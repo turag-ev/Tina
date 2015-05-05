@@ -2,6 +2,7 @@
 #define TINAPP_HELPER_NORMALIZE_TYPE_TRAITS_H
 
 #include <type_traits>
+#include "normalize.h"
 
 namespace std {
 
@@ -21,6 +22,12 @@ struct is_trivially_copyable : public
 			has_trivial_copy_constructor<T>::value
 		>
 { };
+
+template<typename T>
+using is_trivially_copy_assignable = has_trivial_copy_assign<T>;
+
+template<typename T>
+using is_trivially_copy_constructable = has_trivial_copy_constructor<T>;
 #endif
 
 #endif // __DOXYGEN__

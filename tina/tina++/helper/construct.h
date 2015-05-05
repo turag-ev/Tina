@@ -236,10 +236,11 @@ struct copy_move_backward<IsMove, true, std::random_access_iterator_tag>
 		static_assert(std::is_copy_assignable<T>::value,
 					  "type is not assignable");
 
-		const ptrdiff_t n = last - first;
+		const std::ptrdiff_t n = last - first;
+		result -= n;
 		if (n)
-			std::memmove(result - n, first, sizeof(T) * n);
-		return result - n;
+			std::memmove(result, first, sizeof(T) * n);
+		return result;
 	}
 };
 
@@ -250,10 +251,10 @@ copy_move_backward_a(BI1 first, BI1 last, BI2 result)
 	typedef typename std::iterator_traits<BI1>::value_type ValueType1;
 	typedef typename std::iterator_traits<BI2>::value_type ValueType2;
 	typedef typename std::iterator_traits<BI1>::iterator_category Category;
-	const bool simple = std::is_trivially_copyable<ValueType1>::value &&
+	const bool simple = std::is_trivially_copy_assignable<ValueType1>::value &&
 						std::is_pointer<BI1>::value &&
 						std::is_pointer<BI2>::value &&
-						std::is_same<ValueType1, ValueType2>::value;
+						std::is_same<typename std::remove_const<ValueType1>::type, ValueType2>::value;
 
 	return copy_move_backward<IsMove, simple, Category>::copy_move_b(first, last, result);
 }
@@ -360,10 +361,10 @@ inline OI uninitialized_copy_move_a(II first, II last, OI result)
 	typedef typename std::iterator_traits<II>::value_type ValueTypeI;
 	typedef typename std::iterator_traits<OI>::value_type ValueTypeO;
 	typedef typename std::iterator_traits<II>::iterator_category Category;
-	const bool simple = (std::is_trivially_copyable<ValueTypeI>::value &&
+	const bool simple = (std::is_trivially_copy_assignable<ValueTypeI>::value &&
 						 std::is_pointer<II>::value &&
 						 std::is_pointer<OI>::value &&
-						 std::is_same<ValueTypeI, ValueTypeO>::value);
+						 std::is_same<typename std::remove_const<ValueTypeI>::type, ValueTypeO>::value);
 
 	return uninitialized_copy_move<IsMove, simple, Category>::copy_m(first, last, result);
 }
@@ -464,10 +465,10 @@ uninitialized_copy_move_backward_a(BI1 first, BI1 last, BI2 result)
 	typedef typename std::iterator_traits<BI1>::value_type ValueType1;
 	typedef typename std::iterator_traits<BI2>::value_type ValueType2;
 	typedef typename std::iterator_traits<BI1>::iterator_category Category;
-	const bool simple = std::is_trivially_copyable<ValueType1>::value &&
+	const bool simple = std::is_trivially_copy_constructable<ValueType1>::value &&
 						std::is_pointer<BI1>::value &&
 						std::is_pointer<BI2>::value &&
-						std::is_same<ValueType1, ValueType2>::value;
+						std::is_same<typename std::remove_const<ValueType1>::type, ValueType2>::value;
 
 	return uninitialized_copy_move_backward<IsMove, simple, Category>::copy_move_b(first, last, result);
 }
