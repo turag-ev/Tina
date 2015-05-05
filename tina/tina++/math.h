@@ -80,8 +80,7 @@ unsigned int gcd(int a, int b) {
 constexpr float NaNf = __builtin_nanf("");
 
 /// \brief Prüfen ob zwei floats innerhalb der Toleranz Epsilon identisch sind
-constexpr
-bool float_equal(float a, float b) {
+static inline bool float_equal(float a, float b) {
   return fabsf(a - b) < std::numeric_limits<float>::epsilon();
 }
 
