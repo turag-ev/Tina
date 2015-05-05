@@ -11,7 +11,8 @@
 #define TINA_DEBUG_H
 
 #include <tina/debug/print.h>
-#include <tina/debug/graph.h>
+#include <tina/debug/image.h>
+#include <tina/debug/binary.h>
 
 #endif // TINA_DEBUG_H
 

@@ -11,7 +11,9 @@
 #define TINAPP_DEBUG_H
 
 #include <tina/debug/print.h>
-#include <tina/debug/graph.h>
+#include <tina/debug/image.h>
+#include <tina++/debug/binary.h>
+#include <tina++/debug/graph.h>
 
 namespace TURAG {
 
