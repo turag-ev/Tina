@@ -4,19 +4,36 @@
 
 namespace TURAG {
 
-bool ErrorObserver::failure()
+bool ErrorObserver::doErrorOutput(bool success)
 {
-	SystemTime now = SystemTime::now();
-	if (now - last_error_message_ > interval_ || counter_ == 0) {
+	if (success)
+	{
+		// Erfolg
+		++success_counter_;
+	}
+	else
+	{
+		// Fehler
+		SystemTime now = SystemTime::now();
+		if (now - last_error_message_ > interval_ || failure_counter_ == 0) {
 
-		// Fehlermeldung ausgeben
-		last_error_message_ = now;
-		++counter_;
-		return true;
+			// Fehlermeldung ausgeben
+			last_error_message_ = now;
+			++failure_counter_;
+			return true;
+		}
+
+		++failure_counter_;
 	}
 
-	++counter_;
 	return false;
+}
+
+void ErrorObserver::reset()
+{
+	failure_counter_ = 0;
+	success_counter_ = 0;
+	last_error_message_ = SystemTime(0);
 }
 
 } // namespace TURAG

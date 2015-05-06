@@ -18,13 +18,10 @@ namespace TURAG {
 /// static ErrorObserver error_observer(SystemTime::fromSec(25)); // Definition
 /// void getGpsPos() {
 ///   Point point;
-///   if (!GPS::getPosition(&point)) {
-///     // Fehler
-///     if (error_observer.failure()) {
-///       // Zeit für neue Ausgabe ist gekommen, da letzter Fehler ausrechend entfernt oder
-///       // noch nie ein Fehler aufgetretten
-///       turag_errorf("Konnte schon zum %u. mal keine GPS-Position lesen.", error_observer.getErrorCount());
-///     }
+///   if (error_observer.doErrorOutput(GPS::getPosition(&point))) {
+///     // Zeit für neue Ausgabe ist gekommen, da letzter Fehler ausrechend entfernt oder
+///     // noch nie ein Fehler aufgetretten
+///     turag_errorf("Konnte schon zum %u. mal keine GPS-Position lesen.", error_observer.getErrorCount());
 ///   }
 /// }
 /// \endcode
@@ -42,10 +39,16 @@ public:
 
 	// verändern
 
-	/// \brief Fehler signalisieren
+	/// \brief Abfrage, ob Ausgabe erfolgen soll, bei neuer Operationsausführung
 	///
-	/// wenn letzter Fehler mehr als getMinInterval() entfernt ist, dann wird Fehlermeldung ausgegeben
-	bool failure();
+	/// \param success Operation war erfolgreich
+	/// \returns \a true, wenn Fehlerausgabe fällig ist
+	bool doErrorOutput(bool success);
+
+	/// \brief Fehlerüberwacher zurücksetzen
+	///
+	/// Fehler- und Erfolgszähler sowie letzten Fehlerzeitpunkt zurücksetzen
+	void reset();
 
 	// Parameter auslesen
 
@@ -55,7 +58,10 @@ public:
 	// Werte auslesen
 
 	/// \brief Anzahl der Fehler, die aufgetretten sind
-	unsigned getErrorCount() const { return counter_; }
+	unsigned getErrorCount() const { return failure_counter_; }
+
+	/// \brief Anzahl der erfolgreichen Durchführungen
+	unsigned getSuccessCount() const { return success_counter_; }
 
 	/// \brief Zeitpunkt, an dem letzte Fehlermeldung ausgegeben wurde
 	///
@@ -65,7 +71,10 @@ public:
 
 private:
 	/// Fehlerzähler
-	unsigned counter_ = 0;
+	unsigned failure_counter_ = 0;
+
+	/// Erfolgszähler
+	unsigned success_counter_ = 0;
 
 	/// letzter Fehler
 	SystemTime last_error_message_ = SystemTime(0);
