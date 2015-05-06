@@ -4,6 +4,7 @@
 #include <tina++/time.h>
 
 namespace TURAG {
+namespace Debug {
 
 /// \brief Fehlerüberwacher
 /// \ingroup Debug
@@ -83,6 +84,7 @@ private:
 	SystemTime interval_;
 };
 
+} // namespace Debug
 } // namespace TURAG
 
 #endif // ERROROBSERVER_H

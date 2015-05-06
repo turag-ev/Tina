@@ -3,6 +3,7 @@
 #include <tina/debug/internal-debug.h>
 
 namespace TURAG {
+namespace Debug {
 
 bool ErrorObserver::doErrorOutput(bool success)
 {
@@ -36,4 +37,5 @@ void ErrorObserver::reset()
 	last_error_message_ = SystemTime(0);
 }
 
+} // namespace Debug
 } // namespace TURAG
