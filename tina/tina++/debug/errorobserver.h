@@ -33,9 +33,10 @@ public:
 
 	/// Fehlerüberwacher erstellen
 	/// \param min_interval minimales Intervall in dem Fehlermeldungen ausgegeben werden dürfen
+	/// \param min_errors Fehler die mindestens ausgegeben werden, bevor die Ausgabe reduziert wird.
 	constexpr
-	ErrorObserver(SystemTime min_interval) :
-		interval_(min_interval)
+	ErrorObserver(SystemTime min_interval, unsigned min_errors = 5) :
+		interval_(min_interval), min_errors_(min_errors)
 	{ }
 
 	// verändern
@@ -58,11 +59,34 @@ public:
 
 	// Werte auslesen
 
-	/// \brief Anzahl der Fehler, die aufgetretten sind
+	/// \brief Anzahl der Fehler, die aufgetreten sind
 	unsigned getErrorCount() const { return failure_counter_; }
 
 	/// \brief Anzahl der erfolgreichen Durchführungen
 	unsigned getSuccessCount() const { return success_counter_; }
+
+	/// \brief Erfolgsquote in Prozent
+	unsigned getSuccessRatio() { return 100 * success_counter_ / (failure_counter_ + success_counter_); }
+
+	/// \brief Fehlerquote in Prozent
+	unsigned getErrorRatio() { return 100 * failure_counter_ / (failure_counter_ + success_counter_); }
+	/// \brief Anzahl alle Durchführungen
+	unsigned getTotalCount() { return failure_counter_ + success_counter_; }
+
+	/// \brief Anzahl der Fehler, die seit letzter Ausgabe aufgetreten sind
+	unsigned getErrorCountSinceLastOutput() { return failuresSinceLastOutput_; }
+
+	/// \brief Anzahl der erfolgreichen Durchführungen seit letzter Ausgabe
+	unsigned getSuccessCountSinceLastOutput() { return successesSinceLastOutput_; }
+
+	/// \brief Erfolgsquote in Prozent seit letzter Ausgabe
+	unsigned getSuccessRatioSinceLastOutput() { return 100 * successesSinceLastOutput_ / (failuresSinceLastOutput_ + successesSinceLastOutput_); }
+
+	/// \brief Fehlerquote in Prozent seit letzter Ausgabe
+	unsigned getErrorRatioSinceLastOutput() { return 100 * failuresSinceLastOutput_ / (failuresSinceLastOutput_ + successesSinceLastOutput_); }
+
+	/// \brief Anzahl alle Durchführungen seit der letzten Ausgabe
+	unsigned getTotalCountSinceLastOutput() { return failuresSinceLastOutput_ + successesSinceLastOutput_; }
 
 	/// \brief Zeitpunkt, an dem letzte Fehlermeldung ausgegeben wurde
 	///
@@ -73,15 +97,21 @@ public:
 private:
 	/// Fehlerzähler
 	unsigned failure_counter_ = 0;
+	unsigned failuresOnLastOutput_ = 0;
+	unsigned failuresSinceLastOutput_ = 0;
 
 	/// Erfolgszähler
 	unsigned success_counter_ = 0;
+	unsigned successesOnLastOutput_ = 0;
+	unsigned successesSinceLastOutput_ = 0;
 
 	/// letzter Fehler
 	SystemTime last_error_message_ = SystemTime(0);
 
 	/// minimales Intervall in dem Fehlermeldungen ausgegeben werden dürfen
 	SystemTime interval_;
+
+	unsigned min_errors_;
 };
 
 } // namespace Debug
