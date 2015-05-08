@@ -51,7 +51,7 @@ inline float Polynomial<3>::val<3>(float) const {
 	return 6.0f * c[0];
 }
 template<>
-inline float Polynomial<3>::val<0>(float t, unsigned derivation) const {
+inline float Polynomial<3>::val(float t, unsigned derivation) const {
 	switch (derivation) {
 	case 0:
 		return ((c[0] * t + c[1]) * t + c[2]) * t + c[3];
@@ -136,7 +136,7 @@ public:
     virtual Pose getPoseStep(float t) = 0;
     virtual float getBendingStep(float t) = 0;
     virtual constexpr unsigned getOrder() = 0;
-    virtual constexpr Length getLength() = 0;
+	virtual constexpr Length getLength() = 0;
     virtual constexpr float getKappaMax() = 0;
     virtual constexpr Length getDirectDist() = 0;
 
