@@ -240,6 +240,18 @@ struct Pose {
 	Pose getRelativePose(const Pose& other) const {
 		return Pose(*this).translate(other);
 	}
+
+    /// neue Pose erstellen mit überschriebenem x-Wert
+    /// \param new_x neuer x-Wert
+    constexpr Pose overwriteX(const Length new_x) const {
+        return Pose(new_x, y, phi);
+    }
+
+    /// neue Pose erstellen mit überschriebenem y-Wert
+    /// \param new_y neuer y-Wert
+    constexpr Pose overwriteY(const Length new_y) const {
+        return Pose(x, new_y, phi);
+    }
 };
 
 ////////////////////////////////////////////////////////////////////////////////
