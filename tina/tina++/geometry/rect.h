@@ -73,6 +73,8 @@ private:
 
 ///
 /// \brief Prüft ob Punkt in Rechteck liegt.
+/// \relates Rechteck
+///
 /// Liegt der Punkt auf dem Rand des Rechtecks, so wird auch \a true zurück gegeben.
 /// \param rect Rechteck
 /// \param point Punkt
@@ -81,6 +83,7 @@ private:
 bool located_in(const Rect& rect, const Point& point);
 
 /// \brief Prüft ob ein Rechteck sich in der Nähe von Punkt befindet
+/// \relates Rechteck
 /// Berührt der Kreis aus Punkt und Radius \a r den Rand des Rechtecks, so wird auch \a true zurück gegeben.
 /// \param pos Position
 /// \param rect Rechteck
@@ -90,6 +93,7 @@ bool located_in(const Rect& rect, const Point& point);
 bool in_range(const Point& pos, const Rect& rect, Length r);
 
 /// \brief Prüft ob ein Rechteck sich in der Nähe von Punkt befindet
+/// \relates Rechteck
 /// Berührt der Kreis aus Punkt \a pos und Radius \a r den Rand des Rechtecks, so wird auch \a true zurück gegeben.
 /// \param pos Position
 /// \param rect Rechteck

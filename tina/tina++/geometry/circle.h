@@ -23,11 +23,7 @@ struct Circle {
 		m(), r(-1.f*Units::mm)
 	{ }
 
-	/// Kopierkonstruktor
-	constexpr Circle(const Circle&) = default;
-
-	/// Kopierkonstruktor
-	Circle& operator=(const Circle&) = default;
+	constexpr Point getCenter() const { return m; }
 
 	/// Mittelpunkt des Kreies
 	Point m;
@@ -37,12 +33,37 @@ struct Circle {
 };
 
 /// Schnittpunkte zwischen zwei Kreisen zurückgeben.
+/// \relates Circle
+///
 /// \param one,two Kreise
 /// \param[out] results Schnittpunkte, wenn Rückgabewert \a true
 ///
 /// \retval true es existiert endliche Anzahl an Schnittpunkten, die in \a results gespeichert wird.
 /// \retval false es existiert kein Schnittpunkt zwischen den beiden Kreisen oder beide Kreise sind gleich (unendlich viele Schnittpunkte)
-bool intersect(Circle one, Circle two, std::array<Point, 2>& results);
+bool intersect(const Circle& one, const Circle& two, std::array<Point, 2>& results);
+
+_always_inline
+bool in_range(const Circle& one, const Circle& two, Length radius) {
+	return in_range(one.m, two.m, one.r + two.r + radius);
+}
+
+_always_inline
+bool in_range(const Pose& one, const Circle& two, Length radius) {
+	return in_range(one, two.m, two.r + radius);
+}
+_always_inline
+bool in_range(const Circle& one, const Pose& two, Length radius) {
+	return in_range(two, one, radius);
+}
+
+_always_inline
+bool in_range(const Point& one, const Circle& two, Length radius) {
+	return in_range(one, two.m, two.r + radius);
+}
+_always_inline
+bool in_range(const Circle& one, const Point& two, Length radius) {
+	return in_range(two, one, radius);
+}
 
 } // namespace TURAG
 

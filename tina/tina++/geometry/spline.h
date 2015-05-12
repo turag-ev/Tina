@@ -22,7 +22,7 @@ public:
         return c[index];
     }
 
-	const float& operator[](unsigned index) const {
+	constexpr float& operator[](unsigned index) const {
 		return c[index];
 	}
 

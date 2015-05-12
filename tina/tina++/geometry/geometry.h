@@ -313,16 +313,16 @@ Length distance(const T1& a, const T2& b) {
 }
 
 /// einfachen Abstand zwischen zwei kartesischen Punkten zubestimmen.
-math_constexpr inline Length distance(Point a, Point b) { return hypot(b.x - a.x, b.y - a.y); }
+math_constexpr inline Length distance(const Point& a, const Point& b) { return hypot(b.x - a.x, b.y - a.y); }
 
 /// einfachen Abstand zwischen zwei kartesischen Punkten zubestimmen.
-math_constexpr inline Length distance(Pose  a, Point b) { return hypot(b.x - a.x, b.y - a.y); }
+math_constexpr inline Length distance(const Pose&  a, const Point& b) { return hypot(b.x - a.x, b.y - a.y); }
 
 /// einfachen Abstand zwischen zwei kartesischen Punkten zubestimmen.
-math_constexpr inline Length distance(Point a, Pose  b) { return hypot(b.x - a.x, b.y - a.y); }
+math_constexpr inline Length distance(const Point& a, const Pose&  b) { return hypot(b.x - a.x, b.y - a.y); }
 
 /// einfachen Abstand zwischen zwei kartesischen Punkten zubestimmen.
-math_constexpr inline Length distance(Pose  a, Pose  b) { return hypot(b.x - a.x, b.y - a.y); }
+math_constexpr inline Length distance(const Pose&  a, const Pose&  b) { return hypot(b.x - a.x, b.y - a.y); }
 
 /// Schauen ob Punkt \a a in einem maximalen Radius \a r zu Punkt \a b liegt.
 /// \returns \f$ (x_a - x_b)^2 + (y_a - y_b)^2 \leq r^2 \f$
