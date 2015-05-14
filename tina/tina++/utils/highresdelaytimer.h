@@ -43,6 +43,11 @@ public:
 	~HighResDelayTimer(void);
 	
 	/**
+	 * @brief Initialisiert den DelayTimer.
+	 */
+	void init(void);
+	
+	/**
 	 * @brief Blockiert den Thread um die angegebene Zeit.
 	 * @param us Zeit in Mikrosekunden.
 	 */

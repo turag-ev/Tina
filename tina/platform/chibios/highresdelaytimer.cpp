@@ -249,8 +249,11 @@ static void gpt_callback(GPTDriver *gptp) {
 }
 }
 
-
 HighResDelayTimer::HighResDelayTimer() {
+	data.driver = nullptr;
+}
+
+void HighResDelayTimer::init() {
 	unsigned myTimer = usedTimerIndex.fetch_add(1);
 
 	if (myTimer < length(availableTimers)) {
@@ -297,6 +300,7 @@ void HighResDelayTimer::wait_us(uint32_t us) {
 
 HighResDelayTimer::~HighResDelayTimer() {
 }
+
 
 } // namespace TURAG
  
