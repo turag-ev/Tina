@@ -4,7 +4,7 @@
 #include <tina++/private/highresdelaytimer_private.h>
 
 #if !TURAG_USE_TINA_HIGH_RES_DELAY_TIMER
-# error TURAG_USE_TINA_HIGH_RES_DELAY_TIMER must be defined to 1
+# warning TURAG_USE_TINA_HIGH_RES_DELAY_TIMER must be defined to 1
 #endif
 
 namespace TURAG {
@@ -28,6 +28,9 @@ namespace TURAG {
  * \note Diese Implementierung ist reentrant, jedoch nicht thread-safe!
  * Jede Instanz kann gleichzeitig von nur einem Thread zum warten benutzt
  * werden.
+ *
+ * \pre \ref TURAG_USE_TINA_HIGH_RES_DELAY_TIMER muss auf 1 definiert sein, um
+ * die Klasse bereitzustellen.
  *
  */
 class HighResDelayTimer {

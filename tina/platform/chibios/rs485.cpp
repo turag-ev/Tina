@@ -1,6 +1,6 @@
 #define TURAG_DEBUG_LOG_SOURCE "H"
 
-#include <tina/tina.h>
+#include <tina++/tina.h>
 
 #if TURAG_USE_TURAG_FELDBUS_HOST
 

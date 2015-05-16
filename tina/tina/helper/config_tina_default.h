@@ -8,6 +8,7 @@
  * 
  * Diese Datei enthält eine Standardkonfiguration für TinA.
  * 
+ * \see \ref Konfigurierbarkeit
  */
 
 
@@ -42,6 +43,7 @@
 #endif
 
 /// Aktiviert TinA HighResDelay-Timer.
+/// \see \ref TURAG::HighResDelayTimer
 #if !defined(TURAG_USE_TINA_HIGH_RES_DELAY_TIMER) || defined(__DOXYGEN__)
 # define TURAG_USE_TINA_HIGH_RES_DELAY_TIMER		0
 #endif
@@ -89,17 +91,20 @@
 
 
 /** @name Feldbus Hostklassen-Konfiguration
- *  
  * @{
  */
 
 /// Legt fest, ob Host-Support für den TURAG-Feldbus verfügbar ist.
+/// Wenn auf 0 definiert, werden die zum Feldbus gehörenden Quelldateien
+/// nicht compiliert. Daran sollten sich auch alle neuen Klassen halten.
+/// \see \ref feldbus-host
 #if !defined(TURAG_USE_TURAG_FELDBUS_HOST) || defined(__DOXYGEN__)
 # define TURAG_USE_TURAG_FELDBUS_HOST		0
 #endif
 
 /// enables some features in feldbus classes that 
 /// require dynamic memory
+/// \see \ref feldbus-host
 #if !defined(TURAG_FELDBUS_AKTOR_STRUCTURED_OUTPUT_AVAILABLE) || defined(__DOXYGEN__)
 # define TURAG_FELDBUS_AKTOR_STRUCTURED_OUTPUT_AVAILABLE 0
 #endif
