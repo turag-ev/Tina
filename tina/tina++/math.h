@@ -90,6 +90,11 @@ bool float_gte(float a, float b) {
   return static_cast<float>(a - b) > -std::numeric_limits<float>::epsilon();
 }
 
+/// \brief Prüfen ob a <= b mit Berückrichtigung von Epsilon
+constexpr
+bool float_lte(float a, float b) {
+  return static_cast<float>(b - a) > -std::numeric_limits<float>::epsilon();
+}
 /// \}
 
 } // namespace TURAG
