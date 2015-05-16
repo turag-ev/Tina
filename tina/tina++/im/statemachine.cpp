@@ -62,6 +62,8 @@ Statemachine::Statemachine(
     myEventOnSuccessfulInitialization(eventOnSuccessfulInitialization),
     myEventOnGracefulShutdown(eventOnGracefulShutdown),
     myEventOnErrorShutdown(eventOnErrorShutdown),
+    myEventOnGracefulShutdownOverride(nullptr),
+    myEventOnErrorShutdownOverride(nullptr),
     eventqueue_(nullptr)
 { }
 
@@ -93,9 +95,12 @@ void Statemachine::start(EventQueue* eventqueue, int32_t argument) {
         } else {
             Statemachine::first_to_be_activated_statemachine = this;
             Statemachine::last_to_be_activated_statemachine = this;
-            next_to_be_activated = nullptr;
         }
         next_to_be_activated = nullptr;
+
+        // reset event overrides
+        myEventOnGracefulShutdownOverride = nullptr;
+        myEventOnErrorShutdownOverride = nullptr;
     }
 }
 
@@ -223,20 +228,35 @@ void Statemachine::doStatemachineProcessing(void) {
         State *state = sm->pcurrent_state->transition_function();
         lock.lock();
 
+        // Save event overrides and clear them. This keeps the state instances clean.
+        sm->myEventOnGracefulShutdownOverride = sm->pcurrent_state->getEventOnGracefulShutdownOverride();
+        sm->myEventOnErrorShutdownOverride = sm->pcurrent_state->getEventOnErrorShutdownOverride();
+        sm->pcurrent_state->clearEventOverrides();
+
 
         // execute appropriate actions, depending on new state
         // don't do anything, if state == sm->pcurrent_state
         if (state == Statemachine::error) {
             sm->removeFromActiveList();
             sm->status_ = Status::stopped_on_error;
-            sm->emitEvent(sm->myEventOnErrorShutdown);
 
+            if (sm->myEventOnErrorShutdownOverride) {
+                turag_infof("%s: emitting overriden shutdown on error event", sm->name);
+                sm->emitEvent(sm->myEventOnErrorShutdownOverride);
+            } else {
+                sm->emitEvent(sm->myEventOnErrorShutdown);
+            }
             turag_infof("%s cancelled on error", sm->name);
         } else if (state == Statemachine::finished) {
             sm->removeFromActiveList();
             sm->status_ = Status::stopped_gracefully;
-            sm->emitEvent(sm->myEventOnGracefulShutdown);
 
+            if (sm->myEventOnGracefulShutdownOverride) {
+                turag_infof("%s: emitting overriden graceful shutdown event", sm->name);
+                sm->emitEvent(sm->myEventOnGracefulShutdownOverride);
+            } else {
+                sm->emitEvent(sm->myEventOnGracefulShutdown);
+            }
             turag_infof("%s finished", sm->name);
         } else if (state == Statemachine::restartState) {
             turag_warningf("%s: Do Statefunc again", sm->name);
@@ -320,6 +340,7 @@ void Statemachine::removeFromActiveList(void) {
             next_active->last_active = last_active;
         }
     }
+    pcurrent_state = nullptr;
 }
 
 bool Statemachine::isActiveInternal(void) {

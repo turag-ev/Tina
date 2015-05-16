@@ -227,7 +227,8 @@ public:
      * \param name_ Name of the state.
      */
     State(const char* const name_) :
-        name(name_), hasSignal_(false), signal_(0), eventqueue_(nullptr) {}
+        name(name_), hasSignal_(false), signal_(0), eventOnGracefulShutdown(nullptr),
+        eventOnErrorShutdown(nullptr), eventqueue_(nullptr) {}
 
 protected:
     /*!
@@ -294,6 +295,40 @@ protected:
     }
 
     /**
+     * @brief Überschreibt das Event, das beim korrekten Beenden der Statemaschine emittiert wird.
+     * @param eventOnGracefulShutdown_ Zu emittierendes Event.
+     *
+     * Mit dieser Funktion kann das Event, welches automatisch beim erfolgreichen
+     * Beenden der Statemachine emittiert wird, überschrieben werden. Dies gilt für
+     * die aktuelle Ausführung der Statemachine, bei einem erneuten Start der Statemachine
+     * gilt wieder das im Konstruktor übergebene.
+     *
+     * \note Es ist nicht möglich, die Ausgabe des Events zu unterdrücken,
+     * indem nullptr an diese Funktion übergeben wird. Wird nullptr übergeben, tut diese
+     * Funktion nichts.
+     */
+    void overrideEventOnGracefulShutdown(const EventClass*  eventOnGracefulShutdown_) {
+        eventOnGracefulShutdown = eventOnGracefulShutdown_;
+    }
+
+    /**
+     * @brief Überschreibt das Event, das beim Fehler-Abbruch der Statemaschine emittiert wird.
+     * @param eventOnErrorShutdown_ Zu emittierendes Event.
+     *
+     * Mit dieser Funktion kann das Event, welches automatisch beim durch einen Fehler
+     * ausgelösten Abbruch der Statemachine emittiert wird, überschrieben werden. Dies gilt für
+     * die aktuelle Ausführung der Statemachine, bei einem erneuten Start der Statemachine
+     * gilt wieder das im Konstruktor übergebene.
+     *
+     * \note Es ist nicht möglich, die Ausgabe des Events zu unterdrücken,
+     * indem nullptr an diese Funktion übergeben wird. Wird nullptr übergeben, tut diese
+     * Funktion nichts.
+     */
+    void overrideEventOnErrorShutdown(const EventClass*  eventOnErrorShutdown_) {
+        eventOnErrorShutdown = eventOnErrorShutdown_;
+    }
+
+    /**
      * \brief State-function modeling the pre-condition of the state.
      * \details Implement this abstract function with the functionality required to check
      * whether all preconditions needed to enter the state are fulfilled and all actions that should be
@@ -329,16 +364,8 @@ protected:
 
 
 private:
-    bool hasSignal_;
-    int32_t signal_;
-    int32_t argument_;
-    SystemTime stateStarttime_;
-    SystemTime statemachineStarttime_;
-
-    EventQueue* eventqueue_;
-
     void setEventQueue(EventQueue* eventqueue) { eventqueue_ = eventqueue; }
-    
+
     void setSignal(int32_t signal = 0) { signal_ = signal; hasSignal_ = true; }
     void clearSignal(void) { hasSignal_ = false; }
 
@@ -346,6 +373,28 @@ private:
 
     void setStarttime(SystemTime starttime) { stateStarttime_ = starttime; }
     void setStatemachineStarttime(SystemTime starttime) { statemachineStarttime_ = starttime; }
+
+    const EventClass* getEventOnGracefulShutdownOverride(void) {
+        return eventOnGracefulShutdown;
+    }
+    const EventClass* getEventOnErrorShutdownOverride(void) {
+        return eventOnErrorShutdown;
+    }
+    void clearEventOverrides(void) {
+        eventOnGracefulShutdown = nullptr;
+        eventOnErrorShutdown = nullptr;
+    }
+
+    bool hasSignal_;
+    int32_t signal_;
+    int32_t argument_;
+    SystemTime stateStarttime_;
+    SystemTime statemachineStarttime_;
+
+    const EventClass*  eventOnGracefulShutdown;
+    const EventClass*  eventOnErrorShutdown;
+
+    EventQueue* eventqueue_;
 
 };
 
@@ -356,12 +405,7 @@ private:
  * execution for a specific amount of time.
  * The length of the delay is specified in the constructor.
  */
-#ifndef __DOXYGEN__
 class DelayState final : public State {
-#else
-class DelayState final : private State {
-#endif // __DOXYGEN__
-
 public:
     /*!
      * \brief DelayState-Constructor
@@ -405,12 +449,7 @@ private:
  * execution until the statemachine received en external signal (the argument of
  * the received signal is ignored).
  */
-#ifndef __DOXYGEN__
 class WaitForSignalState final : public State {
-#else
-class WaitForSignalState final : private State {
-#endif // __DOXYGEN__
-
 public:
     /*!
      * \brief WaitForSignalState-Constructor
@@ -654,6 +693,9 @@ private:
     const EventClass* const myEventOnSuccessfulInitialization;
     const EventClass* const myEventOnGracefulShutdown;
     const EventClass* const myEventOnErrorShutdown;
+
+    const EventClass* myEventOnGracefulShutdownOverride;
+    const EventClass* myEventOnErrorShutdownOverride;
 
     static EventQueue* defaultEventqueue_;
     EventQueue* eventqueue_;
