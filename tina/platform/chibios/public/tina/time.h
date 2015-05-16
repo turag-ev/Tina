@@ -32,12 +32,20 @@ TuragSystemTime turag_s_to_ticks(int s) {
 
 static _always_inline _constexpr_func
 TuragSystemTime turag_ms_to_ticks(int ms) {
-  return _turag_ticks_to_time(MS2ST(ms));
+	if (ms == 0) {
+		return _turag_ticks_to_time(0);
+	} else {
+		return _turag_ticks_to_time(MS2ST(ms));
+	}
 }
 
 static _always_inline _constexpr_func
 TuragSystemTime turag_us_to_ticks(int us) {
-  return _turag_ticks_to_time(US2ST(us));
+	if (us == 0) {
+		return _turag_ticks_to_time(0);
+	} else {
+		return _turag_ticks_to_time(US2ST(us));
+	}
 }
 
 static _always_inline _constexpr_func
@@ -47,12 +55,20 @@ unsigned turag_ticks_to_s(TuragSystemTime time) {
 
 static _always_inline _constexpr_func
 unsigned turag_ticks_to_ms(TuragSystemTime time) {
-  return (((time.value - 1L) * 1000L) / CH_FREQUENCY + 1L);
+	if (time.value == 0) {
+		return 0;
+	} else {
+		return (((time.value - 1L) * 1000L) / CH_FREQUENCY + 1L);
+	}
 }
 
 static _always_inline _constexpr_func
 unsigned turag_ticks_to_us(TuragSystemTime time) {
-  return (((time.value - 1L) * 1000000L) / CH_FREQUENCY + 1L);
+	if (time.value == 0) {
+		return 0;
+	} else {
+		return (((time.value - 1L) * 1000000L) / CH_FREQUENCY + 1L);
+	}
 }
 
 #define TURAG_TIME_INFINITE_TICKS TIME_INFINITE
