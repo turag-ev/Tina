@@ -229,8 +229,12 @@ void Statemachine::doStatemachineProcessing(void) {
         lock.lock();
 
         // Save event overrides and clear them. This keeps the state instances clean.
-        sm->myEventOnGracefulShutdownOverride = sm->pcurrent_state->getEventOnGracefulShutdownOverride();
-        sm->myEventOnErrorShutdownOverride = sm->pcurrent_state->getEventOnErrorShutdownOverride();
+        if (sm->pcurrent_state->getEventOnGracefulShutdownOverride()) {
+            sm->myEventOnGracefulShutdownOverride = sm->pcurrent_state->getEventOnGracefulShutdownOverride();
+        }
+        if (sm->pcurrent_state->getEventOnErrorShutdownOverride()) {
+            sm->myEventOnErrorShutdownOverride = sm->pcurrent_state->getEventOnErrorShutdownOverride();
+        }
         sm->pcurrent_state->clearEventOverrides();
 
 

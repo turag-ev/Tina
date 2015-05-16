@@ -374,10 +374,10 @@ private:
     void setStarttime(SystemTime starttime) { stateStarttime_ = starttime; }
     void setStatemachineStarttime(SystemTime starttime) { statemachineStarttime_ = starttime; }
 
-    const EventClass* getEventOnGracefulShutdownOverride(void) {
+    const EventClass* getEventOnGracefulShutdownOverride(void) const {
         return eventOnGracefulShutdown;
     }
-    const EventClass* getEventOnErrorShutdownOverride(void) {
+    const EventClass* getEventOnErrorShutdownOverride(void) const {
         return eventOnErrorShutdown;
     }
     void clearEventOverrides(void) {
