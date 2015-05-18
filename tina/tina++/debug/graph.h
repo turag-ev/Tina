@@ -251,7 +251,8 @@ public:
 	 * @param on Aktivieren oder deaktivieren.
 	 *
 	 * Beginnt ein neues Diagramm, wenn plot() mit einer Zeit aufgerufen wird,
-     * die kleiner ist als beim letzten Aufruf.
+     * die kleiner ist als beim letzten Aufruf. Diese Option greift nicht,
+     * wenn Daten mit plot2D() ausgegeben werden.
      *
      * Dies passiert zum Beispiel immer dann, wenn das Spiel beginnt und die
      * Zeit mit turag_debug_system_gametime_get() ausgegeben wird.
