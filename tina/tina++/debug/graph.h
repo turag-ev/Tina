@@ -251,9 +251,12 @@ public:
 	 * @param on Aktivieren oder deaktivieren.
 	 *
 	 * Beginnt ein neues Diagramm, wenn plot() mit einer Zeit aufgerufen wird,
-	 * die kleiner ist als beim letzten Aufruf.
+     * die kleiner ist als beim letzten Aufruf.
+     *
+     * Dies passiert zum Beispiel immer dann, wenn das Spiel beginnt und die
+     * Zeit mit turag_debug_system_gametime_get() ausgegeben wird.
 	 */
-	void setStartNewDiagramOnTimeOverflow(bool on) {
+    void setStartNewDiagramOnTimeReset(bool on) {
 		startNewDiagramOnTimeOverflow = on;
 	}
 
