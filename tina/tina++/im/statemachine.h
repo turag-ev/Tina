@@ -566,24 +566,32 @@ public:
      * \brief Start the statemachine.
      * \details The started statemachine will use the default eventqueue to emit events.
      * \param argument Optional argument to execute the statemachine with.
+     * \param supressStatechangeDebugMessages Supress the automatic output of debug
+     * messages informing about state changes.
      * \remark This function is thread-safe.
      */
-    void start(int32_t argument = 0);
+    void start(int32_t argument = 0, bool supressStatechangeDebugMessages = false);
 
     /*!
      * \brief Start the statemachine.
      * \param eventqueue Eventqueue the statemachine should use for emitting events.
      * \param argument Optional argument to execute the statemachine with.
+     * \param supressStatechangeDebugMessages Supress the automatic output of debug
+     * messages informing about state changes.
      * \remark This function is thread-safe.
      */
-    void start(EventQueue* eventqueue, int32_t argument = 0);
+    void start(EventQueue* eventqueue, int32_t argument = 0, bool supressStatechangeDebugMessages = false);
 
     /*!
      * \brief Start the statemachine in silent mode (no event will ever be emitted).
      * \param argument Optional argument to execute the statemachine with.
+     * \param supressStatechangeDebugMessages Supress the automatic output of debug
+     * messages informing about state changes.
      * \remark This function is thread-safe.
      */
-    void startSilent(int32_t argument = 0) { start(nullptr, argument); }
+    void startSilent(int32_t argument = 0, bool supressStatechangeDebugMessages = false) {
+        start(nullptr, argument, supressStatechangeDebugMessages);
+    }
 
     /*!
      * \brief Stop the statemachine.
@@ -661,6 +669,23 @@ public:
     static void doStatemachineProcessing(void);
 
 private:
+    bool change_state(State* next_state, ScopedLock<Mutex>* lock) ;
+
+    void removeFromActiveList(void);
+
+    bool isActiveInternal(void);
+    bool isRunningInternal(void);
+    Status getStatusInternal(void) { return status_; }
+
+    void emitEvent(const EventClass* event_class, EventArg params = 0) const {
+        if (eventqueue_ && event_class && event_class->id != EventQueue::event_null) eventqueue_->push(event_class, params);
+    }
+    template<typename T, REQUIRES(!std::is_integral<T>)> _always_inline
+    void push(const EventClass* event_class, T param) const {
+      emitEvent(event_class, pack<EventArg>(param));
+    }
+
+
     // doubly linked list to manage active statemachines
     static Statemachine* first_active_statemachine;
     Statemachine* next_active;
@@ -700,22 +725,7 @@ private:
     static EventQueue* defaultEventqueue_;
     EventQueue* eventqueue_;
 
-
-    bool change_state(State* next_state, ScopedLock<Mutex>* lock) ;
-
-    void removeFromActiveList(void);
-
-    bool isActiveInternal(void);
-    bool isRunningInternal(void);
-    Status getStatusInternal(void) { return status_; }
-
-    void emitEvent(const EventClass* event_class, EventArg params = 0) const {
-        if (eventqueue_ && event_class && event_class->id != EventQueue::event_null) eventqueue_->push(event_class, params);
-    }
-    template<typename T, REQUIRES(!std::is_integral<T>)> _always_inline
-    void push(const EventClass* event_class, T param) const {
-      emitEvent(event_class, pack<EventArg>(param));
-    }
+    bool supressStatechangeDebugMessages;
 };
 
 

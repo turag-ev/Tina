@@ -67,11 +67,11 @@ Statemachine::Statemachine(
     eventqueue_(nullptr)
 { }
 
-void Statemachine::start(int32_t argument) {
-    start(defaultEventqueue_, argument);
+void Statemachine::start(int32_t argument, bool supressStatechangeDebugMessages) {
+    start(defaultEventqueue_, argument, supressStatechangeDebugMessages);
 }
 
-void Statemachine::start(EventQueue* eventqueue, int32_t argument) {
+void Statemachine::start(EventQueue* eventqueue, int32_t argument, bool supressStatechangeDebugMessages_) {
     Mutex::Lock lock(interface_mutex);
 
     argument_ = argument;
@@ -101,6 +101,7 @@ void Statemachine::start(EventQueue* eventqueue, int32_t argument) {
         // reset event overrides
         myEventOnGracefulShutdownOverride = nullptr;
         myEventOnErrorShutdownOverride = nullptr;
+        supressStatechangeDebugMessages = supressStatechangeDebugMessages_;
     }
 }
 
@@ -182,7 +183,11 @@ void Statemachine::doStatemachineProcessing(void) {
                 sm->next_active->last_active = sm;
             Statemachine::first_active_statemachine = sm;
 
-            turag_infof("%s activated", sm->name);
+            if (!sm->supressStatechangeDebugMessages) {
+                turag_infof("%s activated", sm->name);
+            } else {
+                turag_infof("%s activated; output of state change debug messages supressed", sm->name);
+            }
         } else {
             sm->status_ = Status::stopped_on_error;
             sm->emitEvent(sm->myEventOnErrorShutdown);
@@ -291,9 +296,9 @@ void Statemachine::doStatemachineProcessing(void) {
 
 
 bool Statemachine::change_state(State* next_state, ScopedLock<Mutex> *lock) {
-	if (!next_state) {
-		return false;
-	} else {
+    if (!next_state) {
+        return false;
+    } else {
         // before calling the state function, we forward argument
         // and eventqueue arguments into the state
         // this enables unlocked access to this data
@@ -307,14 +312,16 @@ bool Statemachine::change_state(State* next_state, ScopedLock<Mutex> *lock) {
         // we don't know anything about this function and it could
         // take a little while to return
         lock->unlock();
-		bool success = next_state->state_function();
+        bool success = next_state->state_function();
         lock->lock();
 
-		if (success) {
-            if (pcurrent_state) {
-                turag_infof("%s: %s --> %s", name, pcurrent_state->name, next_state->name);
-            } else {
-                turag_infof("%s: entered initial state: %s", name, next_state->name);
+        if (success) {
+            if (!supressStatechangeDebugMessages) {
+                if (pcurrent_state) {
+                    turag_infof("%s: %s --> %s", name, pcurrent_state->name, next_state->name);
+                } else {
+                    turag_infof("%s: entered initial state: %s", name, next_state->name);
+                }
             }
 
             if (next_state == initializedState && status_ == Status::running) {
@@ -324,11 +331,11 @@ bool Statemachine::change_state(State* next_state, ScopedLock<Mutex> *lock) {
 
             pcurrent_state = next_state;
             return true;
-		} else {
-			turag_criticalf("%s: statechange failed", name);
-			return false;
-		}
-	}
+        } else {
+            turag_criticalf("%s: statechange failed", name);
+            return false;
+        }
+    }
 }
 
 
