@@ -60,39 +60,47 @@ public:
 	// Werte auslesen
 
 	/// \brief Anzahl der Fehler, die aufgetreten sind
-	unsigned getErrorCount() const { return failure_counter_; }
+	constexpr unsigned getErrorCount() const { return failure_counter_; }
 
 	/// \brief Anzahl der erfolgreichen Durchführungen
-	unsigned getSuccessCount() const { return success_counter_; }
+	constexpr unsigned getSuccessCount() const { return success_counter_; }
 
 	/// \brief Erfolgsquote in Prozent
-	unsigned getSuccessRatio() { return 100 * success_counter_ / (failure_counter_ + success_counter_); }
+	constexpr unsigned getSuccessRatio() const
+	{ return 100 * success_counter_ / (failure_counter_ + success_counter_); }
 
 	/// \brief Fehlerquote in Prozent
-	unsigned getErrorRatio() { return 100 * failure_counter_ / (failure_counter_ + success_counter_); }
+	constexpr unsigned getErrorRatio() const
+	{ return 100 * failure_counter_ / (failure_counter_ + success_counter_); }
 	/// \brief Anzahl alle Durchführungen
-	unsigned getTotalCount() { return failure_counter_ + success_counter_; }
+	constexpr unsigned getTotalCount() const
+	{ return failure_counter_ + success_counter_; }
 
 	/// \brief Anzahl der Fehler, die seit letzter Ausgabe aufgetreten sind
-	unsigned getErrorCountSinceLastOutput() { return failuresSinceLastOutput_; }
+	constexpr unsigned getErrorCountSinceLastOutput() const
+	{ return failuresSinceLastOutput_; }
 
 	/// \brief Anzahl der erfolgreichen Durchführungen seit letzter Ausgabe
-	unsigned getSuccessCountSinceLastOutput() { return successesSinceLastOutput_; }
+	constexpr unsigned getSuccessCountSinceLastOutput() const
+	{ return successesSinceLastOutput_; }
 
 	/// \brief Erfolgsquote in Prozent seit letzter Ausgabe
-	unsigned getSuccessRatioSinceLastOutput() { return 100 * successesSinceLastOutput_ / (failuresSinceLastOutput_ + successesSinceLastOutput_); }
+	constexpr unsigned getSuccessRatioSinceLastOutput() const
+	{ return 100 * successesSinceLastOutput_ / (failuresSinceLastOutput_ + successesSinceLastOutput_); }
 
 	/// \brief Fehlerquote in Prozent seit letzter Ausgabe
-	unsigned getErrorRatioSinceLastOutput() { return 100 * failuresSinceLastOutput_ / (failuresSinceLastOutput_ + successesSinceLastOutput_); }
+	constexpr unsigned getErrorRatioSinceLastOutput() const
+	{ return 100 * failuresSinceLastOutput_ / (failuresSinceLastOutput_ + successesSinceLastOutput_); }
 
 	/// \brief Anzahl alle Durchführungen seit der letzten Ausgabe
-	unsigned getTotalCountSinceLastOutput() { return failuresSinceLastOutput_ + successesSinceLastOutput_; }
+	constexpr unsigned getTotalCountSinceLastOutput() const
+	{ return failuresSinceLastOutput_ + successesSinceLastOutput_; }
 
 	/// \brief Zeitpunkt, an dem letzte Fehlermeldung ausgegeben wurde
 	///
 	/// Wenn noch kein Fehler aufgetretten ist (getErrorCount() == 0), dann
 	/// wird `SystemTime(0)` zurück gegeben.
-	const SystemTime& getLastErrorMessageTime() const { return last_error_message_;}
+	constexpr const SystemTime& getLastErrorMessageTime() const { return last_error_message_;}
 
 private:
 	/// Fehlerzähler
