@@ -3,11 +3,25 @@
 
 #include "defines.h"
 
-// log source
 #ifndef TURAG_DEBUG_LOG_SOURCE
-/// \brief Debugquelle
+/// \brief Debugquelle.
 ///
-/// Sollte über Makefile oder in Zeilen vor erstem Include umdefiniert werden.
+/// \ingroup Debug
+///
+/// Sollte in erster Zeile von Quelldatei vor den Includes definiert werden.
+/// \warning Niemals in Headerdatei definieren.
+///
+/// \code
+/// // source.cpp
+/// // Logquelle auf A setzen
+/// #define TURAG_DEBUG_LOG_SOURCE "A"
+///
+/// // Includes:
+/// #include <tina++/debug.h>
+///
+/// // Quellcode
+/// ...
+/// \endcode
 # define TURAG_DEBUG_LOG_SOURCE "_"
 //# warning Makro TURAG_DEBUG_LOG_SOURCE nicht definiert!
 #endif

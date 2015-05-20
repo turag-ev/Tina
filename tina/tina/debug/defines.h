@@ -110,7 +110,7 @@
 /// // Quelldatei beispiel.cpp:
 /// #define TURAG_DEBUG_LOG_SOURCE "T"
 /// #define TURAG_DEBUG_LEVEL 3 // Nur warning, critical und error anzeigen
-/// #include <utils/debug.h>
+/// #include <tina/debug.h>
 ///
 /// // weitere includes
 ///
@@ -163,7 +163,7 @@
 /// Sollte über Makefile oder in Zeilen vor erstem Include umdefiniert werden.
 /// Standardmäßig deaktiviert.
 /// Die Makrodefinition schaltet das Feature lediglich frei - die tatsächliche
-/// Ausgabe muss explizit durch einen Aufruf von turag_print_gametime_automatic_enable() 
+/// Ausgabe muss explizit durch einen Aufruf von turag_print_gametime_automatic_enable()
 /// aktiviert werden.
 # define TURAG_PRINT_GAMETIME_AUTOMATIC 0
 #endif
