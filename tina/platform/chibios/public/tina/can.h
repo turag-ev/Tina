@@ -65,6 +65,9 @@ uint64_t turag_can_call(TuragCanId remote_id, TuragCanFuncId func_id, uint64_t p
     commBuffer: NULL, \
     buffer: { 0 } \
   }
+
+// forward declarations
+#define EXTERN_CAN_BBOBJECT(name) extern "C" const Casa_BBObject_t name
   
 /// Set Callback that is called, when new values arrive
 /// \param object Blackboard
