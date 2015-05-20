@@ -45,12 +45,6 @@ extern "C" bool turag_rs485_init(uint32_t baud_rate, TuragSystemTime timeout) {
     sdStart(&RS485SD, &serial_cfg_rs485);       // CtrlM-specific
     rs485_timeout = timeout;
 	
-	// calculate bus delay required for 15 frames distance of
-	// TURAG feldbus [us]
-	// we always round up, unless our result is even.
-	bus_delay = (15 * 1000000 - 1) / baud_rate + 1;
-	delay.init();
-	
     // setup RTS receive
     palSetPadMode(GPIOD, BPD_SC_RTS, PAL_MODE_OUTPUT_PUSHPULL);
     palClearPad(GPIOD, BPD_SC_RTS);
@@ -69,7 +63,15 @@ extern "C" bool turag_rs485_init(uint32_t baud_rate, TuragSystemTime timeout) {
         turag_error("RS485 init FAILED!");
     }
 
-    return (RS485SD.state == SD_READY);
+	// calculate bus delay required for 15 frames distance of
+	// TURAG feldbus [us]
+	// we always round up, unless our result is even.
+//	bus_delay = (15 * 1000000 - 1) / baud_rate + 1;
+	// TODO: why are 90 us required????
+	bus_delay = 90;
+	delay.init();
+
+	return (RS485SD.state == SD_READY);
 }
 
 extern "C" bool turag_rs485_ready(void) {
