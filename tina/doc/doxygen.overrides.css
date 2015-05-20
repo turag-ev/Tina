@@ -1,4 +1,4 @@
-tina/doc/doxygen.overrides.css/* Schrift 'Roboto' importieren */
+/* Schrift 'Roboto' importieren */
 @import url(http://fonts.googleapis.com/css?family=Roboto);
 
 /* allgemein */
@@ -328,6 +328,30 @@ dl.pre, dl.post, dl.invariant {
 div.line {
 	font-family: "Ubuntu Mono", "Droid Sans Mono", Consolas, monospace;
 	color: #000;
+}
+
+/* Zeilennummer */
+span.lineno {
+	/* Nicht markierbar -> damit nur Quellcode kopiert wird */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
+	border: none;
+  border-right: 1px solid #ccc;
+	background: none;
+}
+
+span.lineno a {
+	background: none;
+}
+
+span.lineno a:hover {
+	background: none;
+	text-decoration: none;
 }
 
 /* Kommentar */
