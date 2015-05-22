@@ -26,7 +26,7 @@ namespace TURAG {
  * die tatsächliche Verzögerung beliebig lang werden.
  * 
  * \note Diese Implementierung ist reentrant, jedoch nicht thread-safe!
- * Jede Instanz kann gleichzeitig von einem Thread zum warten benutzt
+ * Jede Instanz kann gleichzeitig von nur einem Thread zum warten benutzt
  * werden.
  *
  */
@@ -35,12 +35,12 @@ public:
 	/**
 	 * \brief Konstruktor
 	 */
-	HighResDelayTimer(void);
+    HighResDelayTimer(void);
 	
 	/**
 	 * \brief Destruktor
 	 */
-	~HighResDelayTimer(void);
+    ~HighResDelayTimer(void);
 	
 	/**
 	 * @brief Initialisiert den DelayTimer.
@@ -52,6 +52,26 @@ public:
 	 * @param us Zeit in Mikrosekunden.
 	 */
 	void wait_us(uint32_t us);
+
+    /**
+     * @brief Startet den Timer.
+     * @param us Zeit in Mikrosekunden.
+     *
+     * Diese Funktion startet den Timer mit der gewünschten Zeit
+     * und kehrt sofort zurück. isRunning() kann benutzt werden
+     * um zu prüfen, ob der Timer schon abgelaufen ist.
+     */
+    void startTimeout_us(uint32_t us);
+
+    /**
+     * @brief Prüft ob der Timer läuft.
+     * @return True, wenn der Timer läuft, ansonsten false.
+     *
+     * Diese Funktion kann nach einem Aufruf von startTimeout_us()
+     * benutzt werden um zu prüfen, ob die entsprechende Zeit bereits
+     * vergangen ist.
+     */
+    bool isRunning(void);
 	
 private:
 	// storage space for implementations

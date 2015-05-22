@@ -241,10 +241,11 @@ namespace TURAG {
 
 extern "C" {
 static void gpt_callback(GPTDriver *gptp) {
-	const GPTConfigExt* config = reinterpret_cast<const GPTConfigExt*>(gptp->config);
-	BinarySemaphore* sem = const_cast<BinarySemaphore*>(&config->sem);
+    GPTConfigExt* config = const_cast<GPTConfigExt*>(reinterpret_cast<const GPTConfigExt*>(gptp->config));
+    config->timerRunning.store(false);
+
 	chSysLockFromIsr();
-	chBSemSignalI(sem);
+    chBSemSignalI(&config->sem);
 	chSysUnlockFromIsr();
 }
 }
@@ -260,6 +261,8 @@ void HighResDelayTimer::init() {
 		data.driver = availableTimers[myTimer].driver;
 		data.factor = availableTimers[myTimer].factor;
 		data.max_us = availableTimers[myTimer].max_us;
+        data.config.timerRunning.store(false);
+        data.waitUntil = SystemTime(0);
 		
 		chBSemInit(&data.config.sem, true);
 		data.config.config.frequency = availableTimers[myTimer].frequency;
@@ -275,27 +278,56 @@ void HighResDelayTimer::init() {
 }
 
 void HighResDelayTimer::wait_us(uint32_t us) {
-	if (us == 0) {
-		return;
-	}
-	
-	if (data.driver) {
-		if (us > data.max_us) {
-			// if we can't produce the requested delay, fallback to systick delay
-			Thread_delay(SystemTime::fromUsec(us));
-		} else {
-			uint16_t ticks = static_cast<uint16_t>(us) * data.factor;
+    data.doWait(us, true);
+}
 
-			gptStartOneShot(data.driver, ticks);
-			chBSemWait(&data.config.sem);
-		}
-	} else {
-		// if no hardware timer is available, rely on
-		// systick to make the shortest delay possible.
-		// Relies on fromUsec() to round upwards to the
-		// next full systick.
-		Thread_delay(SystemTime::fromUsec(us));
-	}
+void HighResDelayTimer::startTimeout_us(uint32_t us) {
+    data.doWait(us, false);
+}
+
+void HighResDelayTimerPrivate::doWait(uint32_t us, bool block) {
+    if (us == 0) {
+        return;
+    }
+
+    if (driver) {
+        if (us > max_us) {
+            // if we can't produce the requested delay, fallback to systick delay
+            waitUntil = SystemTime::now() + SystemTime::fromUsec(us);
+            if (block) {
+                Thread_delay(SystemTime::fromUsec(us));
+            }
+        } else {
+            uint16_t ticks = static_cast<uint16_t>(us) * factor;
+            config.timerRunning.store(true);
+            waitUntil = SystemTime(0);
+
+            if (block) {
+                chBSemReset(&config.sem, true);
+            }
+            gptStartOneShot(driver, ticks);
+            if (block) {
+                chBSemWait(&config.sem);
+            }
+        }
+    } else {
+        // if no hardware timer is available, rely on
+        // systick to make the shortest delay possible.
+        // Relies on fromUsec() to round upwards to the
+        // next full systick.
+        waitUntil = SystemTime::now() + SystemTime::fromUsec(us);
+        if (block) {
+            Thread_delay(SystemTime::fromUsec(us));
+        }
+    }
+}
+
+bool HighResDelayTimer::isRunning(void) {
+    if (data.waitUntil != SystemTime(0)) {
+        return SystemTime::now() < data.waitUntil;
+    } else {
+        return data.config.timerRunning;
+    }
 }
 
 HighResDelayTimer::~HighResDelayTimer() {
