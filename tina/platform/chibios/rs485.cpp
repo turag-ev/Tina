@@ -66,9 +66,7 @@ extern "C" bool turag_rs485_init(uint32_t baud_rate, TuragSystemTime timeout) {
 	// calculate bus delay required for 15 frames distance of
 	// TURAG feldbus [us]
 	// we always round up, unless our result is even.
-//	bus_delay = (15 * 1000000 - 1) / baud_rate + 1;
-	// TODO: why are 90 us required????
-	bus_delay = 90;
+	bus_delay = (15 * 1000000 - 1) / baud_rate + 1;
 	delay.init();
 
 	return (RS485SD.state == SD_READY);
@@ -85,11 +83,13 @@ extern "C" bool turag_rs485_transceive(uint8_t *transmit, int* transmit_length, 
 
     bool send_ok = true, recv_ok = true;
 
+	// communication on the bus should always be atomic, thus the semaphore wait.
     chBSemWait(&_RS485_Sem);
 	
-	// insert bus delay
+	// Insert bus delay, if required. The timer is started after each transmission,
+	// making sure we never wait longer than necessary.
 	if (delayTransmission) {
-		delay.wait_us(bus_delay);
+		delay.wait();
 	}
 
     if (transmit && transmit_length) {
@@ -100,6 +100,9 @@ extern "C" bool turag_rs485_transceive(uint8_t *transmit, int* transmit_length, 
 			palSetPad(GPIOD, BPD_SC_RTS);
 			int ok = sdWriteTimeout(&RS485SD, transmit, transmit_length_copy, MS2ST(5));
 			// TC interrupt handler sets the RTS pin after transmission is completed
+
+			// wait for transmission to complete
+
 
 			send_ok = (transmit_length_copy == ok);
 			*transmit_length = ok;
@@ -127,6 +130,12 @@ extern "C" bool turag_rs485_transceive(uint8_t *transmit, int* transmit_length, 
 			turag_debugf("turag_rs485_transceive: receiving %d bytes, retval %d, driver state %d, OK: %d", receive_length_copy, ok, RS485SD.state, recv_ok);
 		}
     }
+
+	// Start the delay timer after communication is finished.
+	// On the next call of this function we can wait for the timeout.
+	// This way we can use the required delay time for computing if there
+	// is anything to be done.
+	delay.startTimeout_us(bus_delay);
 
     chBSemSignal(&_RS485_Sem);
 
