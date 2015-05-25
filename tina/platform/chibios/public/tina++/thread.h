@@ -89,6 +89,10 @@ public:
   static _always_inline void setName(const char *name) {
     chRegSetThreadName(name);
   }
+
+  static _always_inline void delayUntil(SystemTime time) {
+      chThdSleepUntil(time.toTicks());
+  }
 };
 
 /// lets the current thread sleeps for a time of ecos ticks

@@ -72,6 +72,17 @@ public:
      * vergangen ist.
      */
     bool isRunning(void);
+
+	/**
+	 * @brief Blockiert den Thread, bis der Timer abgelaufen ist.
+	 *
+	 * Kann benutzt werden, um auf den Ablauf des zu einem früheren
+	 * Zeitpunkt mit startTimeout_us() gestarteten Timers zu warten.
+	 *
+	 * Wenn der Timer bereits abgelaufen ist oder noch nicht gestartet
+	 * wurde, kehrt diese Funktion sofort zurück.
+	 */
+	void wait(void);
 	
 private:
 	// storage space for implementations

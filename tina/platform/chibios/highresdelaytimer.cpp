@@ -285,6 +285,18 @@ void HighResDelayTimer::startTimeout_us(uint32_t us) {
     data.doWait(us, false);
 }
 
+void HighResDelayTimer::wait(void) {
+	if (data.waitUntil != SystemTime(0)) {
+		if (SystemTime::now() < data.waitUntil) {
+			CurrentThread::delayUntil(data.waitUntil);
+		}
+	} else {
+		if (data.config.timerRunning) {
+			chBSemWait(&data.config.sem);
+		}
+	}
+}
+
 void HighResDelayTimerPrivate::doWait(uint32_t us, bool block) {
     if (us == 0) {
         return;
@@ -302,9 +314,7 @@ void HighResDelayTimerPrivate::doWait(uint32_t us, bool block) {
             config.timerRunning.store(true);
             waitUntil = SystemTime(0);
 
-            if (block) {
-                chBSemReset(&config.sem, true);
-            }
+			chBSemReset(&config.sem, true);
             gptStartOneShot(driver, ticks);
             if (block) {
                 chBSemWait(&config.sem);
