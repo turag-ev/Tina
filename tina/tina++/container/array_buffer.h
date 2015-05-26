@@ -289,10 +289,10 @@ public:
   /// // array = { 1 }
   /// \endcode
   void pop_back() {
-	if (!empty()) {
-	  length_--;
-	  bytes_.erase(length_);
-	}
+	if (unlikely(empty())) return;
+
+	length_--;
+	bytes_.erase(length_);
   }
 
   /// Element anfügen
@@ -303,10 +303,10 @@ public:
   /// // array = {1, 2}
   /// \endcode
   void push_back(const value_type& val) {
-	if (!is_full()) {
-	  bytes_.construct(length_, val);
-	  length_++;
-	}
+	if (unlikely(is_full())) return;
+
+	bytes_.construct(length_, val);
+	length_++;
   }
 
   /// Element für Konstructor anfügen.
@@ -336,10 +336,10 @@ public:
   /// \param args Argumente für einen Konstruktor von Typ \a T um Element zu erstellen
   template<class... Args> _always_inline
   void emplace_back(Args&&... args) {
-	if (!is_full()) {
-	  bytes_.construct(length_, std::forward<Args>(args)...);
-	  length_++;
-	}
+	if (unlikely(is_full())) return;
+
+	bytes_.construct(length_, std::forward<Args>(args)...);
+	length_++;
   }
 
   /// Fügt Element \a val vorne an
@@ -393,7 +393,7 @@ public:
   /// \param val einzufügendes Element
   void insert(iterator position, const value_type& val)
   {
-	if (is_full())
+	if (unlikely(is_full()))
 	{
 	  turag_internal_error("ArrayBuffer overflow!");
 	  return;
@@ -452,7 +452,7 @@ public:
   /// \param args Argumente für einen Konstruktor von Typ \a T um Element zu erstellen
   template<class... Args> _always_inline
   void emplace(iterator position, Args&&... args) {
-	  if (is_full())
+	  if (unlikely(is_full()))
 	  {
 		turag_internal_error("ArrayBuffer overflow!");
 		return;
@@ -528,7 +528,7 @@ private:
   ArrayStorage<T, N> bytes_;
 
   bool is_full() {
-	  if (size() == capacity()) {
+	  if (unlikely(size() == capacity())) {
 		turag_internal_error("ArrayBuffer overflow!");
 		return true;
 	  }
@@ -537,7 +537,7 @@ private:
 
   template<typename U, std::size_t M>
   void copy(const ArrayBuffer<U, M>& other) {
-	  if (this == &other) return;
+	  if (unlikely(this == &other)) return;
 
 	  std::size_t new_size = other.size();
 	  if (M > N) {
@@ -561,7 +561,7 @@ private:
 
   template<typename U, std::size_t M>
   void move(ArrayBuffer<U, M>&& other) {
-	  if (this == &other) return;
+	  if (unlikely(this == &other)) return;
 
 	  std::size_t new_size = other.size();
 	  if (M > N) {

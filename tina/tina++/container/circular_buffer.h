@@ -358,7 +358,7 @@ public:
 
   // modifiers
   void pop_front() {
-	  if (empty()) {
+	  if (unlikely(empty())) {
 		  turag_internal_error("CircularBuffer underflow!");
 		  return ;
 	  }
@@ -369,7 +369,7 @@ public:
   }
 
   void pop_back() {
-	if (empty()) {
+	if (unlikely(empty())) {
 		turag_internal_error("CircularBuffer underflow!");
 		return ;
 	}
@@ -379,7 +379,7 @@ public:
   }
 
   void push_back(const T& x) {
-	if (length_ >= capacity()) {
+	if (unlikely(length_ >= capacity())) {
 	  turag_internal_error("CircularBuffer overflow!");
       return ;
     }
@@ -390,7 +390,7 @@ public:
 
   template< class... Args >
   void emplace_back(Args&&... args) {
-	if (length_ >= capacity()) {
+	if (unlikely(length_ >= capacity())) {
 	  turag_internal_error("CircularBuffer overflow!");
       return ;
     }
@@ -400,7 +400,7 @@ public:
   }
 
   void push_front(const T& x) {
-	  if (length_ >= capacity()) {
+	  if (unlikely(length_ >= capacity())) {
 		  turag_internal_error("CircularBuffer overflow!");
 		  return ;
 	  }
@@ -412,7 +412,7 @@ public:
 
   template< class... Args >
   void emplace_front(Args&&... args) {
-	  if (length_ >= capacity()) {
+	  if (unlikely(length_ >= capacity())) {
 		  turag_internal_error("CircularBuffer overflow!");
 		  return ;
 	  }
@@ -496,11 +496,11 @@ private:
 
   template<typename U, std::size_t M>
   void copy(const CircularBuffer<U, M>& other) {
-	  if (this == &other) return;
+	  if (unlikely(this == &other)) return;
 
 	  std::size_t new_size = other.size();
 	  if (M > N) {
-		  if (new_size > capacity()) {
+		  if (unlikely(new_size > capacity())) {
 			  turag_internal_error("CircularBuffer overflow!");
 			  new_size = capacity();
 		  }
@@ -520,11 +520,11 @@ private:
 
   template<typename U, std::size_t M>
   void move(CircularBuffer<U, M>&& other) {
-	  if (this == &other) return;
+	  if (unlikely(this == &other)) return;
 
 	  std::size_t new_size = other.size();
 	  if (M > N) {
-		  if (new_size > capacity()) {
+		  if (unlikely(new_size > capacity())) {
 			  turag_internal_error("CircularBuffer overflow!");
 			  new_size = capacity();
 		  }
