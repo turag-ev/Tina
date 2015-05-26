@@ -65,7 +65,7 @@ extern "C" bool turag_rs485_init(uint32_t baud_rate, TuragSystemTime timeout) {
 
 	// calculate bus delay required for 15 frames distance of
 	// TURAG feldbus [us]
-	// we always round up, unless our result is even.
+	// we always round up.
 	bus_delay = (15 * 1000000 - 1) / baud_rate + 1;
 	delay.init();
 
@@ -77,11 +77,13 @@ extern "C" bool turag_rs485_ready(void) {
 }
 
 extern "C" bool turag_rs485_transceive(uint8_t *transmit, int* transmit_length, uint8_t *receive, int* receive_length, bool delayTransmission) {
+	// prevents crashes
     while (!turag_rs485_ready()) {
         chThdSleepMilliseconds(10);
     }
 
     bool send_ok = true, recv_ok = true;
+	uint16_t transmit_delay = 0;
 
 	// communication on the bus should always be atomic, thus the semaphore wait.
     chBSemWait(&_RS485_Sem);
@@ -92,22 +94,20 @@ extern "C" bool turag_rs485_transceive(uint8_t *transmit, int* transmit_length, 
 		delay.wait();
 	}
 
-    if (transmit && transmit_length) {
+	if (transmit && transmit_length && *transmit_length) {
 		int transmit_length_copy = *transmit_length;
 		
-		if (transmit_length_copy > 0) {
-			// activate RS485 driver for sending
-			palSetPad(GPIOD, BPD_SC_RTS);
-			int ok = sdWriteTimeout(&RS485SD, transmit, transmit_length_copy, MS2ST(5));
-			// TC interrupt handler sets the RTS pin after transmission is completed
+		// activate RS485 driver for sending
+		palSetPad(GPIOD, BPD_SC_RTS);
+		int ok = sdWriteTimeout(&RS485SD, transmit, transmit_length_copy, MS2ST(5));
+		// TC interrupt handler sets the RTS pin after transmission is completed
 
-			// wait for transmission to complete
+		// calculate transmit time in [us]
+		transmit_delay = 1000000 * 10 / serial_cfg_rs485.speed * ok;
 
-
-			send_ok = (transmit_length_copy == ok);
-			*transmit_length = ok;
-			turag_debugf("turag_rs485_transceive: sending %d bytes, %d bytes written ok, driver state %d, OK: %d", transmit_length_copy, ok, RS485SD.state, send_ok);
-		}
+		send_ok = (transmit_length_copy == ok);
+		*transmit_length = ok;
+		turag_debugf("turag_rs485_transceive: sending %d bytes, %d bytes written ok, driver state %d, OK: %d", transmit_length_copy, ok, RS485SD.state, send_ok);
     }
     
     if (!send_ok) {
@@ -118,24 +118,25 @@ extern "C" bool turag_rs485_transceive(uint8_t *transmit, int* transmit_length, 
 		return false;
     }
 
-    if (receive && receive_length) {
+	if (receive && receive_length && *receive_length) {
 		int receive_length_copy = *receive_length;
 		
-		if (receive_length_copy > 0) {
-			// read answer, timeout in systemticks!
-			int ok = sdReadTimeout(&RS485SD, receive, receive_length_copy, rs485_timeout.value);
+		// read answer, timeout in systemticks!
+		int ok = sdReadTimeout(&RS485SD, receive, receive_length_copy, rs485_timeout.value);
 
-			recv_ok = (ok == receive_length_copy);
-			*receive_length = ok;
-			turag_debugf("turag_rs485_transceive: receiving %d bytes, retval %d, driver state %d, OK: %d", receive_length_copy, ok, RS485SD.state, recv_ok);
-		}
-    }
+		recv_ok = (ok == receive_length_copy);
+		*receive_length = ok;
+		turag_debugf("turag_rs485_transceive: receiving %d bytes, retval %d, driver state %d, OK: %d", receive_length_copy, ok, RS485SD.state, recv_ok);
 
-	// Start the delay timer after communication is finished.
-	// On the next call of this function we can wait for the timeout.
-	// This way we can use the required delay time for computing if there
-	// is anything to be done.
-	delay.startTimeout_us(bus_delay);
+		// Start the delay timer after communication is finished.
+		// On the next call of this function we can wait for the timeout.
+		// This way we can use the required delay time for computing if there
+		// is anything to be done.
+		delay.startTimeout_us(bus_delay);
+	} else {
+		// also wait for transmission to finish if we did not receive any data
+		delay.startTimeout_us(bus_delay + transmit_delay);
+	}
 
     chBSemSignal(&_RS485_Sem);
 
