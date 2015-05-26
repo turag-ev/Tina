@@ -120,7 +120,7 @@ constexpr _always_inline
 Units::Quantity<typename Units::dim_pow<Dim, Pow>::type>
 power_helper(Units::Quantity<Dim> arg) {
   return Units::Quantity< typename Units::dim_pow<Dim, Pow>::type >
-          (std::cbrt(arg.value));
+          (::cbrt(arg.value));
 }
 
 } // detail
@@ -230,10 +230,10 @@ saturate(Units::Quantity<Dim> val, Units::Quantity<Dim> min_val, Units::Quantity
 /// \endcode
 template<typename Dim>
 constexpr _always_inline
-Units::Dimensionless
+int
 sgn(Units::Quantity<Dim> x) {
 	using namespace Units;
-  return (x > null) ? Dimensionless(1.0) : ((x == null) ? Dimensionless(0.) : Dimensionless(-1.0));
+  return (x > null) ? 1 : ((x == null) ? 0 : -1);
 }
 
 /// Sinus berechnen
@@ -270,6 +270,20 @@ math_constexpr _always_inline
 Units::Length hypot(Units::Length x, Units::Length y) {
     return Units::Length(::hypot(x.value, y.value));
 }
+
+/// Is value not a Number (NaN)
+template<typename Dim>
+math_constexpr _always_inline
+bool isnan(Units::Quantity<Dim> arg) {
+	return std::isnan(arg.value);
+}
+
+struct NaN {
+	template<typename Dim>
+	explicit operator Units::Quantity<Dim>() {
+		return Units::Quantity<Dim>(__builtin_nanf(""), Units::unsafe);
+	}
+};
 
 /// \}
 

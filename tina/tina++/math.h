@@ -2,43 +2,9 @@
 #define TINAPP_MATH_H
 
 #include <tina/math.h>
+#include <cmath>
 #include <limits>
 #include "tina.h"
-
-namespace std {
-using ::acos;
-using ::atan;
-using ::atan2;
-using ::ceil;
-using ::copysign;
-using ::cos;
-using ::fabs;
-using ::floor;
-using ::hypot;
-using ::pow;
-using ::sin;
-using ::sqrt;
-using ::tan;
-using ::scalbn;
-using ::lround;
-using ::cbrt;
-}
-
-using ::acos;
-using ::atan;
-using ::atan2;
-using ::ceil;
-using ::copysign;
-using ::cos;
-using ::fabs;
-using ::floor;
-using ::hypot;
-using ::pow;
-using ::sin;
-using ::sqrt;
-using ::tan;
-using ::scalbn;
-using ::lround;
 
 namespace TURAG {
 
@@ -58,7 +24,7 @@ T sqr(T x) {
 /// \retval 0.0f \f$ x = 0 \f$
 /// \retval -1.0f \f$ x < 0 \f$
 _always_inline constexpr
-float sgn(float x) {
+int sgn(float x) {
   return (x > 0.f) ? 1.0f : ((x == 0.f) ? 0.f : -1.0f);
 }
 

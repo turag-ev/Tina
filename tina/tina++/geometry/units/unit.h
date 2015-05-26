@@ -18,6 +18,7 @@ namespace Units {
 
 typedef std::ratio<0> RationalNull;
 typedef std::ratio<1> RationalOne;
+typedef std::ratio<2> RationalTwo;
 
 template<typename Length, typename Angle, typename Time>
 struct Dimension {
@@ -30,6 +31,7 @@ typedef Dimension<RationalNull, RationalNull, RationalNull> DimensionlessDimensi
 typedef Dimension<RationalOne,  RationalNull, RationalNull> LengthDimension;
 typedef Dimension<RationalNull, RationalOne,  RationalNull> AngleDimension;
 typedef Dimension<RationalNull, RationalNull, RationalOne > TimeDimension;
+typedef Dimension<RationalNull, RationalNull, RationalTwo > QuadTimeDimension;
 
 template<typename LhsDimension, typename RhsDimension>
 struct dim_mul {
@@ -121,6 +123,11 @@ constexpr struct null_t {
 
 } null = {};
 
+/// Tag für unsichere Funktionen
+/// \internal
+/// \warning nur für interne Nutzung
+constexpr struct unsafe_t { } unsafe = { };
+
 // roundToInt
 #ifndef __DOXYGEN__
 namespace detail {
@@ -181,6 +188,14 @@ struct Quantity {
   constexpr
   Quantity() :
 	value(0)
+  { }
+
+  /// Variable Wert erstellen
+  /// \internal
+  /// \warning nur für interne Nutzung
+  constexpr explicit
+  Quantity(Value value, unsafe_t) :
+	value(value)
   { }
 
   /// Variable mit Einheit und Wert Null erstellen
@@ -450,6 +465,12 @@ typedef Quantity< typename dim_div<TimeDimension, LengthDimension>::type > Inver
 
 /// Typ für Winkelgeschwindigkeit
 typedef Quantity< typename dim_div<AngleDimension, TimeDimension>::type > AngularVelocity;
+
+/// Typen für Beschleunigung
+typedef Quantity< typename dim_div<LengthDimension, QuadTimeDimension>::type > Acceleration;
+
+/// Typ für Winkelbeschleunigung
+typedef Quantity< typename dim_div<AngleDimension, QuadTimeDimension>::type > AngularAcceleration;
 
 /// \}
 
