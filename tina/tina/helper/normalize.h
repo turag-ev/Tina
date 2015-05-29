@@ -75,10 +75,14 @@
 // likely
 
 /// provide the compiler with branch prediction information
-#define likely(x)      __builtin_expect(!!(x), 1)
+#ifndef likely
+# define likely(x)      __builtin_expect(!!(x), 1)
+#endif
 
 /// provide the compiler with branch prediction information
-#define unlikely(x)    __builtin_expect(!!(x), 0)
+#ifndef unlikely
+# define unlikely(x)    __builtin_expect(!!(x), 0)
+#endif
 
 // /////////////////////////////////////////////////////////////////////////////
 // extra gcc attribute shortcuts
