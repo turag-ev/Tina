@@ -6,8 +6,8 @@
 namespace TURAG {
 namespace Debug {
 
-/// \brief Fehlerüberwacher
 /// \ingroup Debug
+/// \brief Fehlerüberwacher
 ///
 /// Die Klasse dient dazu häufige Fehlermeldungen nicht sofort
 /// auszugeben, sondern nur in bestimmten Abständen, damit

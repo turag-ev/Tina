@@ -169,7 +169,6 @@
 #endif
 
 
-#ifndef __DOXYGEN__
 
 /// Startzeichen für Debugmeldungen
 #define TURAG_DEBUG_LINE_PREFIX "\x02"
@@ -195,7 +194,7 @@
 /// Prefix für Spielzeitausgaben
 #define TURAG_DEBUG_GAMETIME_PREFIX "T"
 
-#endif // __DOXYGEN__
+
 
 # if __WORDSIZE == 64
 #  define TURAG_32_PREFIX

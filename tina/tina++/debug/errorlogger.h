@@ -8,8 +8,8 @@ namespace TURAG {
 namespace Debug {
 
 
-/// \brief Fehlerzähler, der selbstständig Fehlermeldung generiert
 /// \ingroup Debug
+/// \brief Fehlerzähler, der selbstständig Fehlermeldung generiert
 ///
 /// Ist dem \ref ErrorObserver ähnlich, aber arbeitet auf einer höheren
 /// Abstraktionsebene, so wird im Konstruktor eine Fehlermeldung angegeben, die
@@ -22,8 +22,8 @@ namespace Debug {
 ///
 /// Mit der Funktion \ref logResult wird das Ergebnis der letzten Operation übergeben.
 /// Diese Funktion gibt wenn nötig eine die Fehlermeldung mit Statistik aus.
-/// Zurückgegeben wird von der Funktion, der Parameter, sodass der LogResult-Aufruf
-/// direkt in eine if-Bedingung eingefügt werden kann, wo sonst nur der Parameter
+/// logResult() gibt den ihr übergebenen Parameter zurück, sodass der logResult-Aufruf
+/// direkt in eine if-Bedingung eingefügt werden kann, wo sonst nur der Parameter selbst
 /// stehen würde.
 ///
 /// Beispielcode:
@@ -33,7 +33,7 @@ namespace Debug {
 ///     = ERROR_LOGGER("Konnte keine GPS-Position lesen.", SystemTime::fromSec(25), 5);
 /// void getGpsPos() {
 ///   Point point;
-///   if (error_observer.logResult(GPS::getPosition(&point))) {
+///   if (error_logger.logResult(GPS::getPosition(&point))) {
 ///     // Operation `GPS::getPosition(&point)` war erfolgreich:
 ///     // was mit `point` machen:
 ///     global.updateGPSPosition(point);

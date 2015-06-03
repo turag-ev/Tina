@@ -34,6 +34,11 @@ bool ErrorLogger::logResult(bool result)
 
 	if (observer_.doErrorOutput(result))
 	{
+		
+		// FIXME: es ist nicht nötig die komplette Nachricht in einem Puffer zusammenzubauen.
+		// Alle Zeichen können direkt ausgegeben werden, was Stack spart und einfache
+		// Prozentzeichen in der vom User angegebenen Fehlermeldung erlaubt.
+		
 		// Fehlermeldung ausgeben
 		std::size_t message_length = message_length_ + (length(LOG_STATISTICS)-1);
 		std::uint8_t paket[3 + message_length + newline_size + 1];
