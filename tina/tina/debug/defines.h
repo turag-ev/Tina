@@ -46,7 +46,7 @@
 /// Codierung
 /// ---------
 ///
-/// Es wird das <a href="https://www.turag.de/wiki/doku.php/id,04_programmierung;protokolle_busse;tina-debugprotokoll">
+/// Es wird das <a href="https://intern.turag.de/wiki/doku.php/id,04_programmierung;protokolle_busse;tina-debugprotokoll">
 /// Tina-Debugprotokoll</a> verwendet.
 /// Die Ausgabe in der seriellen Konsole sieht dann so aus:
 /// \code

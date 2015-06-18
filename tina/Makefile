@@ -11,3 +11,4 @@ tests:
 
 clean:
 	rm -rf doc/html
+	rm -rf doc/qtdoc

@@ -18,7 +18,7 @@ namespace Debug {
  * \brief Ermöglicht die grafische 2D-Darstellung von Daten.
  *
  * Die %Graph-Klassen implementieren das
- * <a href="https://www.turag.de/wiki/doku.php/id,04_programmierung;protokolle_busse;tina-debugprotokoll">TinA-Debugprotokoll.</a>
+ * <a href="https://intern.turag.de/wiki/doku.php/id,04_programmierung;protokolle_busse;tina-debugprotokoll">TinA-Debugprotokoll.</a>
  *
  * Zum Ausgeben von Daten muss die init()-Funktion einer Instanz einer der Klassen aufgerufen werden, wodurch jedes
  * Diagramm einen Titel erhält. Jedes Diagramm kann eine beliebige Anzahl von Channels enthalten,

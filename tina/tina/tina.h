@@ -11,7 +11,7 @@
  * 
  * Die vorliegende Dokumentation wird server-seitig automatisch aus den Quellen
  * generiert und spiegelt stets den neuesten Stand des master-Branches
- * des [programmierung-git-Repositories](https://www.turag.de/gitweb?fetch=gitweb%2F%3Fp%3Dprogrammierung.git%3Ba%3Dsummary) 
+ * des [programmierung-git-Repositories](https://intern.turag.de/gitweb?fetch=gitweb%2F%3Fp%3Dprogrammierung.git%3Ba%3Dsummary) 
  * wider.
  * 
  * Diese Dokumentation ist in Modulen strukturiert, die Modulübersicht ist daher ein guter
@@ -29,7 +29,7 @@
  * englisch sein.
  * 
  * Weiterführende Informationen zu doxygen finden sich auf der enstprechenden
- * [Wiki-Seite](https://www.turag.de/wiki/doku.php/id,04_software;doxygen).
+ * [Wiki-Seite](https://intern.turag.de/wiki/doku.php/id,04_software;doxygen).
  * 
  * \section Einschränkungen
  * Bei der Entwicklung und Benutzung von TinA gelten einige Vereinbarungen:
