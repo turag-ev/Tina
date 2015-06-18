@@ -194,8 +194,8 @@ struct Quantity {
   /// \internal
   /// \warning nur für interne Nutzung
   constexpr explicit
-  Quantity(Value value, unsafe_t) :
-	value(value)
+  Quantity(Value v, unsafe_t) :
+	value(v)
   { }
 
   /// Variable mit Einheit und Wert Null erstellen

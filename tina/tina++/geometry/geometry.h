@@ -35,10 +35,10 @@ struct Vector {
 	U y;
 
 	/// Vektor aus Komponeten erstellen
-	/// \param x,y Koordinaten
+	/// \param x_corr,y_corr Koordinaten
 	constexpr
-	Vector(U x, U y) :
-		x(x), y(y)
+	Vector(U x_corr, U y_corr) :
+		x(x_corr), y(y_corr)
 	{ }
 
     /// Vektor skalieren
@@ -66,8 +66,8 @@ struct Point {
 
 	/// Punkt aus zwei kartesischen Korrdinaten erstellen
 	constexpr
-	Point(Length x, Length y) :
-		x(x), y(y)
+	Point(Length x_corr, Length y_corr) :
+		x(x_corr), y(y_corr)
 	{ }
 
 	/// Kopierkonstruktor
@@ -118,8 +118,8 @@ struct VectorPolar {
 
 	/// Punkt aus zwei Polarkorrdinaten erstellen
 	constexpr
-	VectorPolar(U1 r, U2 phi) :
-		r(r), phi(phi)
+	VectorPolar(U1 r_, U2 phi_) :
+		r(r_), phi(phi_)
 	{ }
 
 	/// Kopierkonstruktor
@@ -148,8 +148,8 @@ struct Pose {
 
 	/// Pose aus zwei kartesischen Korrdinaten und Winkel erstellen
 	constexpr
-	Pose(Length x, Length y, Angle phi) :
-		x(x), y(y), phi(phi)
+	Pose(Length x_, Length y_, Angle phi_) :
+		x(x_), y(y_), phi(phi_)
 	{ }
 
 	/// Kopierkonstruktor
