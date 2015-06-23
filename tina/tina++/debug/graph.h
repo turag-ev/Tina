@@ -3,6 +3,7 @@
 
 #include <tina/debug/defines.h>
 #include <tina++/math.h>
+#include <tina/debug/defines.h>
 
 #include <initializer_list>
 #include <atomic>
@@ -69,24 +70,6 @@ namespace Debug {
 #  define TURAG_DEBUG_ENABLE_GRAPH_DEFAULT 0
 # endif
 #endif
-
-
-#ifndef __DOXYGEN__
-
-// graph output prefixes
-#define TURAG_DEBUG_GRAPH_PREFIX    		"D"
-#define TURAG_DEBUG_GRAPH_CREATE    		"n"
-#define TURAG_DEBUG_GRAPH_COPY				"r"
-#define TURAG_DEBUG_GRAPH_CHANNEL   		"b"
-#define TURAG_DEBUG_GRAPH_CHANNEL_FIXED		"B"
-#define TURAG_DEBUG_GRAPH_DATA      		"d"
-#define TURAG_DEBUG_GRAPH_DATA2D      		"D"
-#define TURAG_DEBUG_GRAPH_VERTICAL_MARKER  	"m"
-#define TURAG_DEBUG_GRAPH_CHANNELGROUP  	"g"
-
-#endif // __DOXYGEN__
-
-
 
 /**
  * @brief Basis-Graph-Klasse.

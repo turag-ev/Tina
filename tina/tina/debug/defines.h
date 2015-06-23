@@ -195,6 +195,22 @@
 #define TURAG_DEBUG_GAMETIME_PREFIX "T"
 
 
+#ifndef __DOXYGEN__
+
+// graph output prefixes
+#define TURAG_DEBUG_GRAPH_PREFIX    		"D"
+#define TURAG_DEBUG_GRAPH_CREATE    		"n"
+#define TURAG_DEBUG_GRAPH_COPY				"r"
+#define TURAG_DEBUG_GRAPH_CHANNEL   		"b"
+#define TURAG_DEBUG_GRAPH_CHANNEL_FIXED		"B"
+#define TURAG_DEBUG_GRAPH_DATA      		"d"
+#define TURAG_DEBUG_GRAPH_DATA2D      		"D"
+#define TURAG_DEBUG_GRAPH_VERTICAL_MARKER  	"m"
+#define TURAG_DEBUG_GRAPH_CHANNELGROUP  	"g"
+
+#endif // __DOXYGEN__
+
+
 
 # if __WORDSIZE == 64
 #  define TURAG_32_PREFIX
