@@ -161,6 +161,9 @@ constexpr bool operator >  (SystemTime lhs, SystemTime rhs) { return lhs.toTicks
 
 #if GCC_VERSION >= 40700 || defined(__DOXYGEN__)
 
+inline namespace Literals {
+inline namespace SystemTimeLiterals {
+
 /// \relates SystemTime
 /// \brief Systemzeit aus Sekundenangabe erstellen
 constexpr SystemTime operator"" _s(long double a) { return SystemTime::fromMsec(a / 1000.0); }
@@ -171,6 +174,9 @@ constexpr SystemTime operator"" _s(unsigned long long a) { return SystemTime::fr
 /// \relates SystemTime
 /// \brief Systemzeit aus Millisekundenangabe erstellen
 constexpr SystemTime operator"" _ms(unsigned long long a) { return SystemTime::fromMsec(a); }
+
+} // inline namespace SystemTimeLiterals
+} // inline namespace Literals
 
 #endif
 
