@@ -2,15 +2,48 @@
 #define ARRAYREF_H
 
 #include <tina++/tina.h>
+#include <type_traits>
+
+namespace std {
+template<typename T, std::size_t N> class array;
+template<typename T, typename Alloc> class vector;
+} // namespace std
 
 namespace TURAG {
 
 template<typename T>
 class ArrayRef {
+	using T_nonconst = typename std::remove_const<T>::type;
+
 public:
 	template<std::size_t N>
-	explicit constexpr ArrayRef(T (&a)[N]) :
+	explicit constexpr ArrayRef(const T_nonconst (&a)[N]) :
 		ptr_(a), size_(N)
+	{ }
+
+	template<std::size_t N>
+	explicit constexpr ArrayRef(T_nonconst (&a)[N]) :
+		ptr_(a), size_(N)
+	{ }
+
+	template<std::size_t N>
+	explicit constexpr ArrayRef(const std::array<const T_nonconst,N>& a) :
+		ptr_(a.data()), size_(a.size())
+	{ }
+
+	template<std::size_t N>
+	explicit constexpr ArrayRef(const std::array<T_nonconst,N>& a) :
+		ptr_(a.data()), size_(a.size())
+	{ }
+
+	template<typename Alloc>
+	explicit constexpr ArrayRef(const std::vector<const T_nonconst,Alloc>& a) :
+		ptr_(a.data()), size_(a.size())
+	{ }
+
+	template<typename Alloc>
+	explicit constexpr ArrayRef(const std::vector<T_nonconst,Alloc>& a) :
+		ptr_(a.data()), size_(a.size())
 	{ }
 
 	explicit constexpr ArrayRef() :

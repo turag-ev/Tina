@@ -405,20 +405,20 @@ public:
 
 	if (std::is_trivially_copyable<T>::value)
 	{
-		value_type copy(val);
+		value_type tmp(val);
 		const ptrdiff_t n = last - position;
 		if (n)
 		  memmove(position + 1, position, sizeof(T) * n);
-		bytes_.construct(position, copy);
+		bytes_.construct(position, tmp);
 	}
 	else
 	{
-		value_type copy(val);
+		value_type tmp(val);
 		if (position != last)
 		{
 			construct(last, std::move(*(last - 1)));
 			TURAG::move_backward(position, last - 1, last);
-			*position = copy;
+			*position = tmp;
 		}
 		else
 		{
