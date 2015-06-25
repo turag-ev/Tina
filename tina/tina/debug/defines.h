@@ -165,7 +165,7 @@
 /// Die Makrodefinition schaltet das Feature lediglich frei - die tatsächliche
 /// Ausgabe muss explizit durch einen Aufruf von turag_print_gametime_automatic_enable()
 /// aktiviert werden.
-# define TURAG_PRINT_GAMETIME_AUTOMATIC 0
+//# define TURAG_PRINT_GAMETIME_AUTOMATIC 0
 #endif
 
 
