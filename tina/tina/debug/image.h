@@ -84,7 +84,7 @@ void turag_image_doge(void);
 
 #else // TURAG_DEBUG_ENABLE_IMAGE
 
-# define turag_image_transmit(channel_name, timestamp_ticks, colorspace_abbrev, resolution_x, resolution_y, resolution_depth, image_buffer) while(0)
+# define turag_image_transmit(channel_name, timestamp_ticks, colorspace_abbrev, resolution_x, resolution_y, resolution_depth, image_buffer) TURAG_MACRO_NOOP
 
 #endif // TURAG_DEBUG_ENABLE_IMAGE
 

@@ -62,10 +62,10 @@ extern "C" {
  * \param[in] init_value Initial value to assign to the locked variable.
  */
 #define turag_locked_init(name, init_value) 	\
-    do{                                     	\
+	TURAG_MACRO_BEGIN                          	\
 		(name).value = init_value;				\
 		turag_mutex_init(&(name).mutex);        \
-    }while(0)
+	TURAG_MACRO_END
 
 /*!
  * \brief Assign the value of a locked variable to a different variable.
@@ -74,11 +74,11 @@ extern "C" {
  * This macro works on plain variables as output argument rather than on pointers.
  */
 #define turag_locked_load(name, destination)	\
-    do{                                     	\
+	TURAG_MACRO_BEGIN                          	\
 		turag_mutex_lock(&(name).mutex);		\
 		destination = (name).value;				\
 		turag_mutex_unlock(&(name).mutex);      \
-    }while(0)
+	TURAG_MACRO_END
 
 /*!
  * \brief Assign a new value to a locked variable.
@@ -86,11 +86,11 @@ extern "C" {
  * \param[in] new_value New data.
  */
 #define turag_locked_store(name, new_value)		\
-    do{                                     	\
+	TURAG_MACRO_BEGIN                          	\
 		turag_mutex_lock(&(name).mutex);		\
 		(name).value = new_value;				\
 		turag_mutex_unlock(&(name).mutex);     	\
-    }while(0)
+	TURAG_MACRO_END
 
 
 #ifdef __cplusplus

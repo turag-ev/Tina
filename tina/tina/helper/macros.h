@@ -162,6 +162,39 @@
 #define TURAG_STRINGIFY(x) _TURAG_STRINGIFY(x)
 
 ////////////////////////////////////////////////////////////////////////////////
+// Macro utils
+
+/// \brief leere Anweisung in Makro
+///
+/// Beispiel:
+/// \code
+/// #if OPTION == 42
+/// # define my_function() printf("%d", 42)
+/// #else
+/// # define my_function() TURAG_MACRO_NOOP
+/// #endif
+/// \endcode
+#define TURAG_MACRO_NOOP while (0)
+
+/// \brief Anfang von Makro mit mehreren Anweisungen
+///
+/// Beispiel:
+/// \code
+/// #define PRINT_INT_ARRAY(c) TURAG_MACRO_BEGIN \​
+///                      for (size_t i = 0; i < sizeof(c)/sizeof(c[0]); i++) { \​
+///                         printf("%d ", c[i]); \​
+///                      } TURAG_MACRO_END
+/// \endcode
+/// Wird dieses Marko bei Makros mit mehreren Anweisungen nicht verwenden, kann
+/// es z.B. bei `if`-Anweisungen ohne Block, zu nicht gewollten Verhalten kommen.
+/// \sa TURAG_MACRO_END
+#define TURAG_MACRO_BEGIN do {
+
+/// \brief Ende von Makro mit mehreren Anweisungen
+/// \sa TURAG_MACRO_BEGIN
+#define TURAG_MACRO_END } while (0)
+
+////////////////////////////////////////////////////////////////////////////////
 // Compiler utils
 
 /// use it to shut the compiler up talking about unused variables

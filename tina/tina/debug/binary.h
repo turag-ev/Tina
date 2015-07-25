@@ -116,7 +116,7 @@ void _turag_binary_send(char source, char object_id, const void* object, size_t 
 
 #else // TURAG_DEBUG_ENABLE_BINARY
 
-#define turag_binary_send(object_id, object) while(0)
+#define turag_binary_send(object_id, object) TURAG_MACRO_NOOP
 
 #endif // TURAG_DEBUG_ENABLE_BINARY
 
