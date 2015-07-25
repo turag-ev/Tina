@@ -133,7 +133,7 @@ void GraphAuto::init(const char *name, std::initializer_list<std::initializer_li
 
 	auto groupIterator = channelGroups.begin();
 
-	for (auto&& list : channelNames) {
+	for (const auto& list : channelNames) {
 		unsigned channel_begin = channels;
 
 		for (const char* channel_title : list) {
@@ -195,7 +195,7 @@ void GraphFixedSize::init(const char *name, int x_left, int y_bottom, unsigned w
 
 	auto groupIterator = channelGroups.begin();
 
-	for (auto&& list : channelNames) {
+	for (const auto& list : channelNames) {
 		unsigned channel_begin = channels;
 
 		for (const char* channel_title : list) {
@@ -246,7 +246,7 @@ void GraphFixedTime::init(const char *name, unsigned time, std::initializer_list
 
 	auto groupIterator = channelGroups.begin();
 
-	for (auto&& list : channelNames) {
+	for (const auto&list : channelNames) {
 		unsigned channel_begin = channels;
 
 		for (const char* channel_title : list) {
