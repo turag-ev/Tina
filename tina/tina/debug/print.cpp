@@ -43,18 +43,34 @@ public:
 	{ auto_output_ = value; }
 
 	void reset()
-	{ game_start_time_ = SystemTime::now(); }
+	{
+		game_start_time_ = SystemTime::now();
+		turag_print_gametime_ms(0);
+	}
 
 private:
 	SystemTime game_start_time_;
+	SystemTime last_gametime_output_;
 	bool auto_output_ = false;
 };
 
+
 void GameTime::onBeforePrint()
 {
-	if (!isAutomaticPrintActive()) return;
+#if TURAG_PRINT_GAMETIME_AUTOMATIC
 
-	print();
+	if (!isAutomaticPrintActive())
+		return;
+
+	SystemTime now = SystemTime::now();
+
+	if (now == last_gametime_output_)
+		return;
+
+	last_gametime_output_ = now;
+	turag_print_gametime_ms((now - getGameStartTime()).toMsec());
+
+#endif
 }
 
 GameTime game_time;
