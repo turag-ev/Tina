@@ -33,7 +33,7 @@
 
 /// Spielzeit vor Debugausgaben mit ausgeben
 #if !defined(TURAG_PRINT_GAMETIME_AUTOMATIC) || defined(__DOXYGEN__)
-# define TURAG_PRINT_GAMETIME_AUTOMATIC 1
+# define TURAG_PRINT_GAMETIME_AUTOMATIC 0
 #endif
 
 /// enable this if you link with default c++ runtime support.

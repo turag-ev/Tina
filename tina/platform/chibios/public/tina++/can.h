@@ -44,7 +44,7 @@ uint64_t call(Id remote_id, FuncId func_id, uint64_t param, ErrorCode* error_res
 /// \param dest   destination of blackboard value
 /// \param error  destination of error value or \a nullptr
 /// \returns \a true if opertation was successful
-bool readBlackboard(const Blackboard *object, pointer dest, ErrorCode* error = nullptr);
+bool readBlackboard(const Blackboard *object, void* dest, ErrorCode* error = nullptr);
 
 /// \copydoc turag_set_blackboard_notify_callback
 inline

@@ -14,7 +14,7 @@ namespace TURAG {
 class SystemTime {
 public:
     /// Systemzeit aus Systemticks erstellen
-    constexpr explicit
+	constexpr explicit
     SystemTime(TuragSystemTicks ticks = 0) :
         value(ticks)
     { }

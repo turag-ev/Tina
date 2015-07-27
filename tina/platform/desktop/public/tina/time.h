@@ -4,6 +4,12 @@
 #include <tina/tina.h>
 #include "timetype.h"
 
+#ifdef _WIN32
+# include <windows.h>
+#else
+# include <sys/time.h>
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -64,7 +70,16 @@ unsigned turag_ticks_to_us(TuragSystemTime time) {
 /**
  * \return sys ticks
  */
-extern uint64_t turag_plattform_dependent_get_tick(void);
+#ifdef _WIN32
+# define turag_plattform_dependent_get_tick GetTickCount
+#else
+static inline uint64_t turag_plattform_dependent_get_tick()
+{
+    struct timeval time_value;
+	  gettimeofday(&time_value, NULL);
+	  return time_value.tv_sec * 1000 + time_value.tv_usec / 1000;
+}
+#endif
 
 static _always_inline
 TuragSystemTime turag_get_current_tick(void) { // [tick]

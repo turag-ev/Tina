@@ -1,13 +1,10 @@
 #ifndef TINA_DEBUG_PRINT_H
 #define TINA_DEBUG_PRINT_H
 
-#include <tina/tina.h>
-#include <tina/debugprint.h>
 #include <tina/time.h>
-
+#include <tina/debugprint.h>
 #include "defines.h"
 #include "log-source.h"
-#include "debug_time.h"
 
 TURAG_C_API_BEGIN
 
