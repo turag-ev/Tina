@@ -40,7 +40,7 @@ uint64_t call(Id remote_id, FuncId func_id, uint64_t param, ErrorCode* error_res
     return result;
 }
 
-bool readBlackboard(const Blackboard *object, pointer dest, ErrorCode* error)
+bool readBlackboard(const Blackboard *object, void* dest, ErrorCode* error)
 {
     static unsigned errorcnt = 0;
     systime_t timestamp;
@@ -74,7 +74,7 @@ bool readBlackboard(const Blackboard *object, pointer dest, ErrorCode* error)
 // C Interface
 
 extern "C"
-bool turag_can_read_blackboard(const Blackboard* object, pointer dest, TuragCanErrorCode* error_res) {
+bool turag_can_read_blackboard(const Blackboard* object, void* dest, TuragCanErrorCode* error_res) {
     return CAN::readBlackboard(object, dest, error_res);
 }
 
