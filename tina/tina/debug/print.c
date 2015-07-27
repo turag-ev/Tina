@@ -26,11 +26,25 @@ int turag_debug_print_gametime_auto_output_enabled = 0;
 
 void turag_log_puts(const char* s)
 {
+#if TURAG_PRINT_GAMETIME_AUTOMATIC
+	if (turag_debug_print_gametime_auto_output_enabled)
+	{
+		turag_print_system_gametime();
+	}
+#endif
+
 	turag_debug_puts(s);
 }
 
 void turag_log_printf(const char* fmt, ...)
 {
+#if TURAG_PRINT_GAMETIME_AUTOMATIC
+	if (turag_debug_print_gametime_auto_output_enabled)
+	{
+		turag_print_system_gametime();
+	}
+#endif
+
 	va_list vargs;
 	va_start(vargs, fmt);
 	turag_debug_vprintf(fmt, vargs);
