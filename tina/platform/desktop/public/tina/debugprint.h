@@ -1,12 +1,14 @@
 #ifndef TINA_SIM_DEBUGPRINT_H
 #define TINA_SIM_DEBUGPRINT_H
 
+#include <stdio.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void turag_debug_puts(const char* s);
-void turag_debug_printf(const char* fmt, ...) __attribute__((format(printf, 1, 2)));
+#define turag_debug_puts puts
+#define turag_debug_vprintf vprintf
 
 #ifdef __cplusplus
 } // extern "C"

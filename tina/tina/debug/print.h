@@ -1,8 +1,10 @@
 #ifndef TINA_DEBUG_PRINT_H
 #define TINA_DEBUG_PRINT_H
 
+#include <tina/tina.h>
 #include <tina/debugprint.h>
 #include <tina/time.h>
+
 #include "defines.h"
 #include "log-source.h"
 #include "debug_time.h"
@@ -38,6 +40,28 @@ void turag_debug_print_logsources(void);
 # define turag_debug_print_logsources(x,y) TURAG_MACRO_NOOP
 #endif
 
+#ifndef __DOXYGEN__
+
+// gibt im Unterschied zu turag_debug_puts in Regelmäßigen Abständen die Spielzeit aus
+void turag_log_puts(const char* s);
+
+// gibt im Unterschied zu turag_debug_printf in Regelmäßigen Abständen die Spielzeit aus
+void turag_log_printf(const char* fmt, ...) __attribute__ ((format(printf, 1, 2)));
+
+void turag_debug_printf(const char* fmt, ...);
+
+// turag_debug_* Implementation wählen
+#if TURAG_DEBUG_LEVEL > 0 && TURAG_PRINT_GAMETIME_AUTOMATIC
+# define turag_debug_puts_impl turag_log_puts
+# define turag_debug_printf_impl turag_log_printf
+#else
+# define turag_debug_puts_impl turag_debug_puts
+# define turag_debug_printf_impl turag_debug_printf
+#endif
+
+#endif
+
+
 #ifdef __DOXYGEN__
 
 /// \brief Gibt Systemmeldungen formatiert aus.
@@ -62,18 +86,18 @@ void turag_system_print(const char* msg);
 #  define turag_system_printf(format, args...)  \
 	TURAG_MACRO_BEGIN \
 		if (turag_debug_print_gametime_auto_output_enabled) {turag_print_system_gametime(); }             \
-		turag_debug_printf(TURAG_DEBUG_LINE_PREFIX ";;" format TURAG_DEBUG_NEWLINE, ##args);				\
+		turag_debug_printf_impl(TURAG_DEBUG_LINE_PREFIX ";;" format TURAG_DEBUG_NEWLINE, ##args);				\
 	TURAG_MACRO_END
 #  define turag_system_print(msg)   \
 	TURAG_MACRO_BEGIN \
 		if (turag_debug_print_gametime_auto_output_enabled) {turag_print_system_gametime(); }    \
-		turag_debug_puts(TURAG_DEBUG_LINE_PREFIX ";;" msg TURAG_DEBUG_NEWLINE);					\
+		turag_debug_puts_impl(TURAG_DEBUG_LINE_PREFIX ";;" msg TURAG_DEBUG_NEWLINE);					\
 	TURAG_MACRO_END
 # else
 #  define turag_system_printf(format, args...) \
-    turag_debug_printf(TURAG_DEBUG_LINE_PREFIX ";;" format TURAG_DEBUG_NEWLINE, ##args)
+	turag_debug_printf_impl(TURAG_DEBUG_LINE_PREFIX ";;" format TURAG_DEBUG_NEWLINE, ##args)
 #  define turag_system_print(msg)   \
-    turag_debug_puts(TURAG_DEBUG_LINE_PREFIX ";;" msg TURAG_DEBUG_NEWLINE)
+	turag_debug_puts_impl(TURAG_DEBUG_LINE_PREFIX ";;" msg TURAG_DEBUG_NEWLINE)
 # endif
 #else
 # define turag_system_printf(format, args...) TURAG_MACRO_NOOP
@@ -106,18 +130,18 @@ void turag_error(const char* msg);
 #  define turag_errorf(format, args...) \
 	TURAG_MACRO_BEGIN \
 		if (turag_debug_print_gametime_auto_output_enabled) {turag_print_system_gametime(); }              \
-		turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_ERROR_PREFIX format TURAG_DEBUG_NEWLINE, ##args); \
+		turag_debug_printf_impl(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_ERROR_PREFIX format TURAG_DEBUG_NEWLINE, ##args); \
 	TURAG_MACRO_END
 #  define turag_error(msg) \
 	TURAG_MACRO_BEGIN \
 		if (turag_debug_print_gametime_auto_output_enabled) {turag_print_system_gametime(); }               \
-		turag_debug_puts(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_ERROR_PREFIX msg TURAG_DEBUG_NEWLINE); \
+		turag_debug_puts_impl(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_ERROR_PREFIX msg TURAG_DEBUG_NEWLINE); \
 	TURAG_MACRO_END
 # else
 #  define turag_errorf(format, args...) \
-    turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_ERROR_PREFIX format TURAG_DEBUG_NEWLINE, ##args)
+	turag_debug_printf_impl(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_ERROR_PREFIX format TURAG_DEBUG_NEWLINE, ##args)
 #  define turag_error(msg) \
-    turag_debug_puts(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_ERROR_PREFIX msg TURAG_DEBUG_NEWLINE)
+	turag_debug_puts_impl(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_ERROR_PREFIX msg TURAG_DEBUG_NEWLINE)
 # endif
 #else
 # define turag_errorf(format, args...) TURAG_MACRO_NOOP
@@ -150,18 +174,18 @@ void turag_critical(const char* msg);
 #  define turag_criticalf(format, args...) \
 	TURAG_MACRO_BEGIN \
 		if (turag_debug_print_gametime_auto_output_enabled) {turag_print_system_gametime(); }              \
-		turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_CRITICAL_PREFIX format TURAG_DEBUG_NEWLINE, ##args); \
+		turag_debug_printf_impl(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_CRITICAL_PREFIX format TURAG_DEBUG_NEWLINE, ##args); \
 	TURAG_MACRO_END
 #  define turag_critical(msg) \
 	TURAG_MACRO_BEGIN \
 		if (turag_debug_print_gametime_auto_output_enabled) {turag_print_system_gametime(); }               \
-		turag_debug_puts(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_CRITICAL_PREFIX msg TURAG_DEBUG_NEWLINE); \
+		turag_debug_puts_impl(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_CRITICAL_PREFIX msg TURAG_DEBUG_NEWLINE); \
 	TURAG_MACRO_END
 # else
 #  define turag_criticalf(format, args...) \
-    turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_CRITICAL_PREFIX format TURAG_DEBUG_NEWLINE, ##args)
+	turag_debug_printf_impl(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_CRITICAL_PREFIX format TURAG_DEBUG_NEWLINE, ##args)
 #  define turag_critical(msg) \
-    turag_debug_puts(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_CRITICAL_PREFIX msg TURAG_DEBUG_NEWLINE)
+	turag_debug_puts_impl(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_CRITICAL_PREFIX msg TURAG_DEBUG_NEWLINE)
 # endif
 #else
 # define turag_criticalf(format, args...) TURAG_MACRO_NOOP
@@ -194,12 +218,12 @@ void turag_warning(const char* msg);
 #  define turag_warningf(format, args...) \
 	TURAG_MACRO_BEGIN \
 		if (turag_debug_print_gametime_auto_output_enabled) {turag_print_system_gametime(); }               \
-		turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_WARN_PREFIX format TURAG_DEBUG_NEWLINE,  ##args); \
+		turag_debug_printf_impl(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_WARN_PREFIX format TURAG_DEBUG_NEWLINE,  ##args); \
 	TURAG_MACRO_END
 #  define turag_warning(msg) \
 	TURAG_MACRO_BEGIN \
 		if (turag_debug_print_gametime_auto_output_enabled) {turag_print_system_gametime(); }               \
-		turag_debug_puts(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_WARN_PREFIX msg TURAG_DEBUG_NEWLINE); \
+		turag_debug_puts_impl(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_WARN_PREFIX msg TURAG_DEBUG_NEWLINE); \
 	TURAG_MACRO_END
 # else
 #  define turag_warningf(format, args...) \
@@ -238,18 +262,18 @@ void turag_info(const char* msg);
 #  define turag_infof(format, args...) \
 	TURAG_MACRO_BEGIN \
 		if (turag_debug_print_gametime_auto_output_enabled) {turag_print_system_gametime(); }               \
-		turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_INFO_PREFIX format TURAG_DEBUG_NEWLINE, ##args); \
+		turag_debug_printf_impl(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_INFO_PREFIX format TURAG_DEBUG_NEWLINE, ##args); \
 	TURAG_MACRO_END
 #  define turag_info(msg) \
 	TURAG_MACRO_BEGIN \
 		if (turag_debug_print_gametime_auto_output_enabled) {turag_print_system_gametime(); }               \
-		turag_debug_puts(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_INFO_PREFIX msg TURAG_DEBUG_NEWLINE); \
+		turag_debug_puts_impl(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_INFO_PREFIX msg TURAG_DEBUG_NEWLINE); \
 	TURAG_MACRO_END
 # else
 #  define turag_infof(format, args...) \
-    turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_INFO_PREFIX format TURAG_DEBUG_NEWLINE, ##args)
+	turag_debug_printf_impl(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_INFO_PREFIX format TURAG_DEBUG_NEWLINE, ##args)
 #  define turag_info(msg) \
-    turag_debug_puts(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_INFO_PREFIX msg TURAG_DEBUG_NEWLINE)
+	turag_debug_puts_impl(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_INFO_PREFIX msg TURAG_DEBUG_NEWLINE)
 # endif
 #else
 # define turag_infof(format, args...) TURAG_MACRO_NOOP
@@ -290,18 +314,18 @@ void turag_debug(const char* msg);
 #  define turag_debugf(format, args...) \
 	TURAG_MACRO_BEGIN \
 		if (turag_debug_print_gametime_auto_output_enabled) {turag_print_system_gametime(); }               \
-		turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_DEBUG_PREFIX format TURAG_DEBUG_NEWLINE, ##args); \
+		turag_debug_printf_impl(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_DEBUG_PREFIX format TURAG_DEBUG_NEWLINE, ##args); \
 	TURAG_MACRO_END
 #  define turag_debug(msg) \
 	TURAG_MACRO_BEGIN \
 		if (turag_debug_print_gametime_auto_output_enabled) {turag_print_system_gametime(); }               \
-		turag_debug_puts(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_DEBUG_PREFIX msg TURAG_DEBUG_NEWLINE); \
+		turag_debug_puts_impl(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_DEBUG_PREFIX msg TURAG_DEBUG_NEWLINE); \
 	TURAG_MACRO_END
 # else
 #  define turag_debugf(format, args...) \
-    turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_DEBUG_PREFIX format TURAG_DEBUG_NEWLINE, ##args)
+	turag_debug_printf_impl(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_DEBUG_PREFIX format TURAG_DEBUG_NEWLINE, ##args)
 #  define turag_debug(msg) \
-    turag_debug_puts(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_DEBUG_PREFIX msg TURAG_DEBUG_NEWLINE)
+	turag_debug_puts_impl(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_DEBUG_PREFIX msg TURAG_DEBUG_NEWLINE)
 # endif
 #else
 # define turag_debugf(format, args...) TURAG_MACRO_NOOP

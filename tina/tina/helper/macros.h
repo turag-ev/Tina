@@ -202,6 +202,26 @@
 #  define UNUSED(x) (void)x
 #endif
 
+#ifdef __DOXYGEN__
+/// \brief Start von Definition von C-API
+/// \sa TURAG_C_API_END
+# define TURAG_C_API_BEGIN extern "C" {
+
+/// \brief Ende von Definition von C-API
+/// \sa TURAG_C_API_BEGIN
+# define TURAG_C_API_END }
+#else
+
+# ifdef __cplusplus
+#  define TURAG_C_API_BEGIN extern "C" {
+#  define TURAG_C_API_END }
+#else
+#  define TURAG_C_API_BEGIN
+#  define TURAG_C_API_END
+#endif
+
+#endif
+
 ////////////////////////////////////////////////////////////////////////////////
 // INITIALIZATION and FINALIZATION
 

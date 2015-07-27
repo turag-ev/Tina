@@ -3,10 +3,9 @@
 
 #include "defines.h"
 #include <tina/time.h>
+#include <tina/debugprint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+TURAG_C_API_BEGIN
 
 /// \addtogroup Debug
 /// \{
@@ -16,6 +15,7 @@ extern "C" {
 
 extern TuragSystemTime turag_debug_print_gametime_gamestarttime;
 extern int turag_debug_print_gametime_auto_output_enabled;
+
 
 #ifdef __DOXYGEN__
 
@@ -157,8 +157,6 @@ TuragSystemTime turag_debug_system_gametime_get(void);
 /// \}
 /// \}
 
-#ifdef __cplusplus
-}
-#endif
+TURAG_C_API_END
 
 #endif // DEBUG_TIME_H

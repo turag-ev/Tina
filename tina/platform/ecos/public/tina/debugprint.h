@@ -13,7 +13,7 @@ extern "C" {
 void turag_debug_puts(const char* s);
 
 /// Zeichenkette formatiert ausgeben
-#define turag_debug_printf printf
+#define turag_debug_vprintf vprintf
 
 #ifdef __cplusplus
 } // extern "C"

@@ -1,6 +1,7 @@
 #include "print.h"
 
 #include <tina/time.h>
+#include <stdarg.h>
 
 #if TURAG_DEBUG_LEVEL > 0
 
@@ -13,6 +14,35 @@ void turag_debug_print_logsources(void) {
 			turag_debug_printf(TURAG_DEBUG_LINE_PREFIX "%c" TURAG_DEBUG_REPORT_LOG_SOURCE_PREFIX "%s" TURAG_DEBUG_NEWLINE, i, turag_log_source_table[i]);
 		}
 	}
+}
+
+TuragSystemTime turag_debug_print_gametime_gamestarttime = { 0 };
+
+#if TURAG_PRINT_GAMETIME_AUTOMATIC
+
+int turag_debug_print_gametime_auto_output_enabled = 0;
+
+#endif
+
+void turag_log_puts(const char* s)
+{
+	turag_debug_puts(s);
+}
+
+void turag_log_printf(const char* fmt, ...)
+{
+	va_list vargs;
+	va_start(vargs, fmt);
+	turag_debug_vprintf(fmt, vargs);
+	va_end(vargs);
+}
+
+void turag_debug_printf(const char* fmt, ...)
+{
+	va_list vargs;
+	va_start(vargs, fmt);
+	turag_debug_vprintf(fmt, vargs);
+	va_end(vargs);
 }
 
 #endif
