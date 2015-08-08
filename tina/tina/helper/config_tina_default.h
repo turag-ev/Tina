@@ -62,7 +62,7 @@
  *  
  * @{
  */
-/// Stellt ein, welcher Algorithmus zur CRC8-Berechnung verwendet werden
+/// Stellt ein, welcher Algorithmus zur CRC8-Berechnung (CRC-8/I-CODE) verwendet werden
 /// soll. 
 ///
 /// Mögliche Werte:
@@ -72,6 +72,18 @@
 /// - 3: Kompromiss aus 1 und 2
 #if !defined(TURAG_CRC_CRC8_ALGORITHM) || defined(__DOXYGEN__)
 # define TURAG_CRC_CRC8_ALGORITHM 0
+#endif
+
+/// Stellt ein, welcher Algorithmus zur CRC8-Berechnung (Maxim 1-Wire CRC) verwendet werden
+/// soll. 
+///
+/// Mögliche Werte:
+/// - 0: Feature deaktivieren
+/// - 1: tabellenbasiert
+/// - 2: bit-by-bit
+/// - 3: Kompromiss aus 1 und 2
+#if !defined(TURAG_CRC_CRC8_MOW_ALGORITHM) || defined(__DOXYGEN__)
+# define TURAG_CRC_CRC8_MOW_ALGORITHM 0
 #endif
 
 /// Stellt ein, welcher Algorithmus zur CRC16-Berechnung verwendet werden
@@ -125,6 +137,9 @@
  */
 #if TURAG_CRC_CRC8_ALGORITHM < 0 || TURAG_CRC_CRC8_ALGORITHM > 3
 # error TURAG_CRC_CRC8_ALGORITHM must be between 0 and 3
+#endif
+#if TURAG_CRC_CRC8_MOW_ALGORITHM < 0 || TURAG_CRC_CRC8_MOW_ALGORITHM > 3
+# error TURAG_CRC_CRC8_MOW_ALGORITHM must be between 0 and 3
 #endif
 #if TURAG_CRC_CRC16_ALGORITHM < 0 || TURAG_CRC_CRC16_ALGORITHM > 2
 # error TURAG_CRC_CRC16_ALGORITHM must be between 0 and 2
