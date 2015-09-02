@@ -12,8 +12,7 @@
 /// when definied, than getStackUsage will give real values. But thread creating time will increase.
 #define THREADS_STACK_MEASUREMENT
 
-#undef TURAG_ATTR_SECTION_CCMDATA
-#define TURAG_ATTR_SECTION_CCMDATA
+#define TURAG_ATTR_SECTION_CCMDATA ATTR_SECTION_CCMDATA
 
 namespace TURAG {
 
@@ -79,13 +78,13 @@ struct CurrentThread {
 private:
   // von dieser Klasse gibt es keine Instanz
   CurrentThread();
-  
+
 public:
   /// lets the current thread sleeps for a time of ecos ticks
   static _always_inline void delay(SystemTime ticks) {
     chThdSleep(ticks.toTicks());
   }
-  
+
   static _always_inline void setName(const char *name) {
     chRegSetThreadName(name);
   }

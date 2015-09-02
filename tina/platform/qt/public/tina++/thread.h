@@ -21,7 +21,7 @@
 /// when definied, than getStackUsage will give real values. But thread creating time will increase.
 //#define THREADS_STACK_MEASUREMENT
 
-#undef TURAG_ATTR_SECTION_CCMDATA
+// stub, no CCM on PC
 #define TURAG_ATTR_SECTION_CCMDATA
 
 namespace TURAG {
@@ -51,12 +51,12 @@ public:
     void start(int, void (*entry) ()) {
         thread_.reset(new std::thread(entry));
     }
-    
+
     _always_inline
     void terminate() {
       terminate_request_ = true;
     }
-    
+
     _always_inline
     bool shouldTerminate() {
       return terminate_request_;
@@ -64,7 +64,7 @@ public:
 
 private:
     std::unique_ptr<std::thread> thread_;
-    
+
     std::atomic<bool> terminate_request_;
 };
 
