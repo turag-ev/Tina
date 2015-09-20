@@ -145,6 +145,14 @@
 
 /// \brief GCC does not produce a warning for this variable.
 /// This attribute, attached to a variable, means that the variable is meant to be possibly unused.
+/// \bug Sorgt in MingW für eine Namenskollision.
+
+// we include windows.h to circumvent a name clash
+// in winioctl.h
+#ifdef _WIN32
+# include <windows.h>
+#endif
+
 #define _unused __attribute__ ((unused))
 
 /// \}
