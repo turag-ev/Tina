@@ -139,7 +139,7 @@ void turag_print_gametime_automatic_disable() { }
 
 TuragSystemTime turag_debug_system_gametime_get()
 {
-	return SystemTime::now();
+	return TURAG::SystemTime::now();
 }
 
 #endif

@@ -54,8 +54,8 @@ void turag_debug_printf(const char* fmt, ...) __attribute__ ((format(printf, 1, 
 #  define turag_debug_printf_impl turag_debug_printf
 # endif // TURAG_PRINT_GAMETIME_AUTOMATIC
 #else
-# define turag_debug_puts_impl TURAG_MACRO_NOOP
-# define turag_debug_printf_impl TURAG_MACRO_NOOP
+# define turag_debug_puts_impl(...) TURAG_MACRO_NOOP
+# define turag_debug_printf_impl(...) TURAG_MACRO_NOOP
 #endif
 
 #endif

@@ -5,6 +5,8 @@
 #include <tina/utils/base64.h>
 
 
+#if TURAG_DEBUG_ENABLE_IMAGE
+
 static unsigned turag_image_index = 0;
 
 /**
@@ -152,4 +154,6 @@ void turag_image_doge(void)
     turag_debug_puts(doge);
 #endif // TURAG_DEBUG_ENABLE_IMAGE_DOGE
 }
+
+#endif // TURAG_DEBUG_ENABLE_IMAGE
 
