@@ -104,6 +104,9 @@ struct Point {
 	}
 };
 
+/// robot velocity in x and y
+typedef Vector<Units::Velocity> PositionVelocity;
+
 /// Darstellung für zweidimensionalen Polarvektor
 ///
 /// \tparam U1 Typ des Radius (Standardmäßig \ref TURAG::Length)
@@ -253,6 +256,9 @@ struct Pose {
         return Pose(x, new_y, phi);
     }
 };
+
+/// robot velocity in translation and rotation
+typedef VectorPolar<Units::Velocity, Units::AngularVelocity> PoseVelocity;
 
 ////////////////////////////////////////////////////////////////////////////////
 
