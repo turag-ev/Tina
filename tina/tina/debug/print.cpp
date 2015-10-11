@@ -25,6 +25,9 @@ using namespace TURAG;
 
 class GameTime {
 public:
+	explicit GameTime(void) :
+		auto_output_(false) {}
+	
 	void print()
 	{ turag_print_gametime_ms(getGameTime().toMsec()); }
 
@@ -51,7 +54,7 @@ public:
 private:
 	SystemTime game_start_time_;
 	SystemTime last_gametime_output_;
-	bool auto_output_ = false;
+	bool auto_output_;
 };
 
 
