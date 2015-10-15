@@ -11,8 +11,8 @@ namespace TURAG {
 
 template<class Abstract, class ...Variants>
 class VariantClass final {
-	//static_assert(all_true<std::is_trivially_copyable<Variants>...>::value, "FIXME");
 	static_assert(all_true<std::is_base_of<Abstract, Variants>...>::value, "Nicht alle Klassen sind Implemtierungen von ersten Templateparameter");
+    //static_assert(all_true<std::is_trivially_copyable<Variants>...>::value, "FIXME");
 
 public:
 
@@ -27,8 +27,24 @@ public:
 		erase();
 	}
 
-	// empty
+    template<class T>
+    VariantClass(const T& rhs):
+        active_(reinterpret_cast<Abstract*>(data_) )
+    {
+        static_assert(!all_false<std::is_same<T,Variants>...>::value, "Can't construct from non-variant class.");
+        construct(reinterpret_cast<T*>(data_), rhs);
+    }
 
+    VariantClass(const VariantClass<Abstract, Variants...>& rhs)
+    {
+        memcpy(data_, rhs.data_, max_value(sizeof(Variants)...) );
+        if(rhs.empty())
+            active_ = nullptr;
+        else
+            active_ = reinterpret_cast<Abstract*>(data_);
+    }
+
+    // empty
 	constexpr
 	bool empty() const {
 		return active_ == nullptr;
@@ -87,14 +103,14 @@ public:
 				"Der Templateparamter ist keiner der speicherbaren Typen. "
 				"Typ muss zu VariantClass-Definition als Parameter hinzugefügt werden.");
 		erase();
-		construct(reinterpret_cast<T*>(&data_), std::forward<Args>(args)...);
-		active_ = static_cast<Abstract*>(reinterpret_cast<T*>(&data_));
-		assert(active_ != nullptr);
+        construct(reinterpret_cast<T*>(data_), std::forward<Args>(args)...);
+        active_ = static_cast<Abstract*>(reinterpret_cast<T*>(data_));
+        //assert(active_ != nullptr);
 	}
 
 private:
-	UnionStorage<Variants...> data_;
-	Abstract* active_;
+    unsigned char data_[max_value(sizeof(Variants)...)];
+    Abstract* active_;
 };
 
 } // namespace TURAG
