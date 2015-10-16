@@ -2,6 +2,7 @@
 #define TINAPP_HELPER_TRAITS_ALGORITHMS_H_
 
 #include <type_traits>
+#include <utility>
 
 namespace TURAG {
 
