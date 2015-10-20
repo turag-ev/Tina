@@ -31,6 +31,12 @@ public:
     /// Kopierkonstruktor
     SystemTime& operator=(const SystemTime&) = default;
 
+	SystemTime& operator+=(const SystemTime& other)
+	{
+		value += other.toTicks();
+		return *this;
+	}
+
     /// implizit in äquivalenten C-Typ umwandeln
     constexpr
     operator TuragSystemTime () {
