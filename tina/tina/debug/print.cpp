@@ -27,7 +27,7 @@ class GameTime {
 public:
 	explicit GameTime(void) :
 		auto_output_(false) {}
-	
+
 	void print()
 	{ turag_print_gametime_ms(getGameTime().toMsec()); }
 
