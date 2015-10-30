@@ -38,6 +38,12 @@ struct DebugObject<T, typename std::enable_if<std::is_empty<T>::value>::type> {
 	unsigned char version;
 };
 
+template<typename T>
+void send(const DebugObject<T>& obj)
+{
+	turag_binary_send(T::DebugObjectId, obj);
+}
+
 } // namespace TURAG
 
 #endif // TINAPP_DEBUG_BINARY_H

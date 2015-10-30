@@ -60,8 +60,6 @@ private:
 
 void GameTime::onBeforePrint()
 {
-#if TURAG_PRINT_GAMETIME_AUTOMATIC
-
 	if (!isAutomaticPrintActive())
 		return;
 
@@ -72,8 +70,6 @@ void GameTime::onBeforePrint()
 
 	last_gametime_output_ = now;
 	turag_print_gametime_ms((now - getGameStartTime()).toMsec());
-
-#endif
 }
 
 GameTime game_time;
@@ -107,18 +103,14 @@ TuragSystemTime turag_debug_system_gametime_get()
 
 void turag_log_puts(const char* s)
 {
-#if TURAG_PRINT_GAMETIME_AUTOMATIC
 	game_time.onBeforePrint();
-#endif
 
 	turag_debug_puts(s);
 }
 
 void turag_log_printf(const char* fmt, ...)
 {
-#if TURAG_PRINT_GAMETIME_AUTOMATIC
 	game_time.onBeforePrint();
-#endif
 
 	va_list vargs;
 	va_start(vargs, fmt);
