@@ -2,6 +2,7 @@
 #define TINAPP_HELPER_INTEGER_H
 
 #include <tina/tina.h>
+#include <type_traits>
 
 namespace TURAG {
 
@@ -38,6 +39,18 @@ constexpr unsigned least_bytes_needed(unsigned n) {
 //constexpr unsigned least_bytes_needed_for_value(unsigned value) {
 //	return (value + 255) >> 8; // (value + 255) / 256;
 //}
+
+template<typename T, T Div>
+constexpr typename std::decay<T>::type div_n_ceil(T x)
+{
+	return (x + (Div-1)) / Div;
+}
+
+template<typename T>
+constexpr typename std::decay<T>::type div_n_ceil(T x, T div)
+{
+	return (x + (div-1)) / div;
+}
 
 /// \brief Typ für vorzeichenlose Ganzzahlen
 /// \tparam Bytes Anzahl der Bytes des Ganzzahltypes (nur 1, 2, 4 und 8 erlaubt)
