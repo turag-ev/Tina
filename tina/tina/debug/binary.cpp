@@ -7,7 +7,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstddef>
-#include <tina/debug/defines.h>
+#include <tina/debug/print.h>
 #include <tina++/utils/base64.h>
 #include <tina++/algorithm.h>
 
@@ -39,7 +39,7 @@ void _turag_binary_send(char source, char object_id, const void* object, size_t 
 	}
 	paket[elen+4+newline_size] = '\0';
 
-	turag_debug_puts((const char*)paket);
+	turag_debug_puts_impl((const char*)paket);
 }
 
 #endif

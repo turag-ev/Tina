@@ -64,7 +64,6 @@ void GameTime::onBeforePrint()
 		return;
 
 	SystemTime now = SystemTime::now();
-
 	if (now == last_gametime_output_)
 		return;
 
