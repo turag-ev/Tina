@@ -27,7 +27,7 @@ template<typename T>
 using is_trivially_copy_assignable = has_trivial_copy_assign<T>;
 
 template<typename T>
-using is_trivially_copy_constructable = has_trivial_copy_constructor<T>;
+using is_trivially_copy_constructible = has_trivial_copy_constructor<T>;
 #endif
 
 #endif // __DOXYGEN__

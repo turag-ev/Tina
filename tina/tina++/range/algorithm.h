@@ -51,6 +51,13 @@ is_equal_predicate<typename std::remove_reference<T>::type> is_equal(T&& t) {
 ////////////////////////////////////////////////////////////////////////////////
 // std extention
 
+template<typename ContainerA, typename ContainerB>
+ContainerA& append(ContainerA& a, const ContainerB& b)
+{
+	a.insert(a.end(), b.begin(), b.end());
+	return a;
+}
+
 /// \brief Elemente mit Wert \p val von Container entfernen und entsprechend Größe anpassen.
 /// \param container Container
 /// \param val Wert von Element, dass entfernt werden soll

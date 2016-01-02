@@ -465,7 +465,7 @@ uninitialized_copy_move_backward_a(BI1 first, BI1 last, BI2 result)
 	typedef typename std::iterator_traits<BI1>::value_type ValueType1;
 	typedef typename std::iterator_traits<BI2>::value_type ValueType2;
 	typedef typename std::iterator_traits<BI1>::iterator_category Category;
-	const bool simple = std::is_trivially_copy_constructable<ValueType1>::value &&
+	const bool simple = std::is_trivially_copy_constructible<ValueType1>::value &&
 						std::is_pointer<BI1>::value &&
 						std::is_pointer<BI2>::value &&
 						std::is_same<typename std::remove_const<ValueType1>::type, ValueType2>::value;
