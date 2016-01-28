@@ -37,7 +37,7 @@ namespace TURAG {
         if(phi < 0*Units::deg)
             phi += 180*Units::deg;
 
-        //check if one of the vectors hits the pie
+        //check if the center-to-center vector or one of the tangent vectors hits the pie
         return (between_angles(start,pie.width,phi) ||
                 between_angles(start,pie.width,theta0) ||
                 between_angles(start,pie.width,theta1) );
