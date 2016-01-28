@@ -1,5 +1,4 @@
 #include "pie.h"
-#include <tina++/debug.h>
 
 namespace TURAG {
     //assumes angles are [0,360] deg
@@ -19,7 +18,7 @@ namespace TURAG {
         Angle delta = asin(circle.r.to(Units::mm) / dist.to(Units::mm)) * Units::rad;
 
         //Angle of vector between centers
-        Angle phi = norm_angle(angle_between(circle.m, pie.m));
+        Angle phi = norm_angle(angle_between(pie.m, circle.m) );
 
         //Angles of tangent vectors
         Angle theta0 = norm_angle(phi + delta);
@@ -27,15 +26,6 @@ namespace TURAG {
 
         //extra variable to prevent side-effects even though there shouldn't be any ;>
         Angle start = norm_angle(pie.start);
-        //Transform angles into [0-360] deg range
-        if(theta0 < 0*Units::deg)
-            theta0 += 180*Units::deg;
-        if(theta1 < 0*Units::deg)
-            theta1 += 180*Units::deg;
-        if(start < 0*Units::deg)
-            start += 180*Units::deg;
-        if(phi < 0*Units::deg)
-            phi += 180*Units::deg;
 
         //check if the center-to-center vector or one of the tangent vectors hits the pie
         return (between_angles(start,pie.width,phi) ||
