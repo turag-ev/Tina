@@ -255,6 +255,10 @@ struct Pose {
     constexpr Pose overwriteY(const Length new_y) const {
         return Pose(x, new_y, phi);
     }
+    /// neue Pose erstellen mit überschiebenem Winkel
+    constexpr Pose overwritePhi(const Angle new_phi) const {
+        return Pose(x, y, new_phi);
+    }
 };
 
 /// robot velocity in translation and rotation
