@@ -1,3 +1,5 @@
+#ifdef TURAG_USE_CASA
+
 #include <cstdio>
 #define TURAG_DEBUG_LOG_SOURCE "C"
 #include <tina/debug.h>
@@ -86,3 +88,6 @@ uint64_t turag_can_call(Id remote_id, FuncId func_id, uint64_t param, TuragCanEr
 } /* namespace CAN */
 
 } /* namespace TURAG */
+
+#endif // TURAG_USE_CASA
+
