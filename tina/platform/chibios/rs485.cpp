@@ -96,7 +96,7 @@ extern "C" bool turag_rs485_transceive(uint8_t *transmit, int* transmit_length, 
 
 	if (transmit && transmit_length && *transmit_length) {
 		int transmit_length_copy = *transmit_length;
-		
+
 		// activate RS485 driver for sending
 		palSetPad(GPIOD, BPD_SC_RTS);
 		int ok = sdWriteTimeout(&RS485SD, transmit, transmit_length_copy, MS2ST(5));
