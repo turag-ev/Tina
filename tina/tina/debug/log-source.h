@@ -23,7 +23,7 @@
 /// ...
 /// \endcode
 # define TURAG_DEBUG_LOG_SOURCE "_"
-# warning Makro TURAG_DEBUG_LOG_SOURCE nicht definiert!
+//# warning Makro TURAG_DEBUG_LOG_SOURCE nicht definiert!
 #endif
 
 #endif // TINA_DEBUG_LOGSOURCE_H

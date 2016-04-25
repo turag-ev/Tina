@@ -1,4 +1,4 @@
-#include "print.h"
+#include "print-impl.h"
 
 #include <stdarg.h>
 #include "game_time.h"

@@ -188,9 +188,7 @@
 #ifndef IM_STATEMACHINE_H
 #define IM_STATEMACHINE_H
 
-#include <tina++/tina.h>
 #include <tina++/time.h>
-#include <tina++/debug.h>
 #include <tina++/statemachine.h>
 #include <tina++/helper/scoped_lock.h>
 #include <tina++/helper/packed.h>
