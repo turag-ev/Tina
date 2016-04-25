@@ -1,5 +1,6 @@
 
-#include <tina/debug/print.h>
+#include <tina/debug/print-impl.h>
+#include <tina/debug/internal-debug.h>
 #include <tina++/utils/base64.h>
 #include <tina++/debug/graph.h>
 
@@ -15,7 +16,7 @@ bool Graph::allEnabled{TURAG_DEBUG_ENABLE_GRAPH_DEFAULT ? true : false};
 
 void Graph::init(const char *name_, bool enabled_) {
 	if (isInitialized()) {
-		turag_warning("ignored call Graph::init on already initialized instance");
+        turag_internal_warning("ignored call Graph::init on already initialized instance");
 	} else {
 		channels = 0;
 		enabled = enabled_;
@@ -27,7 +28,7 @@ void Graph::init(const char *name_, bool enabled_) {
 
 void Graph::startNewDiagram(void) {
 	if (!isInitialized()) {
-		turag_error("tried to call Graph::startNewDiagram prior to initialization");
+        turag_internal_error("tried to call Graph::startNewDiagram prior to initialization");
 	} else if (enabled && allEnabled) {
 		// we change index to the new index after sending the copy command to circumvent threading problems
 		unsigned new_index = graphCount.fetch_add(1);
@@ -38,9 +39,9 @@ void Graph::startNewDiagram(void) {
 
 void Graph::plot(float time, float* data, size_t count) {
 	if (!isInitialized()) {
-		turag_error("tried to call Graph::plot prior to initialization");
+        turag_internal_error("tried to call Graph::plot prior to initialization");
 	} else if (count > channels) {
-		turag_errorf("GraphBase::plot: got %d elements, but only %d channels are defined", (int)count, channels);
+        turag_internal_errorf("GraphBase::plot: got %d elements, but only %d channels are defined", (int)count, channels);
 	} else if (enabled && allEnabled) {
 		if (startNewDiagramOnTimeOverflow && time < lastTime) {
 			startNewDiagram();
@@ -66,9 +67,9 @@ void Graph::plot(float time, float* data, size_t count) {
 
 void Graph::plot2D(unsigned channelIndex, float x, float y) {
 	if (!isInitialized()) {
-		turag_error("tried to call Graph::plot2D prior to initialization");
+        turag_internal_error("tried to call Graph::plot2D prior to initialization");
 	} else if (channelIndex > channels) {
-		turag_errorf("GraphBase::plot2D: channel with index %u not defined", channelIndex);
+        turag_internal_errorf("GraphBase::plot2D: channel with index %u not defined", channelIndex);
 	} else if (enabled && allEnabled) {
 		turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_GRAPH_DATA2D TURAG_DEBUG_GRAPH_PREFIX "%u %u ", index, channelIndex);
 
@@ -85,7 +86,7 @@ void Graph::plot2D(unsigned channelIndex, float x, float y) {
 
 void Graph::addChannelGroup(const char* label, std::initializer_list<unsigned> channelIndices) {
 	if (!isInitialized()) {
-		turag_error("tried to call Graph::addChannelGroup prior to initialization");
+        turag_internal_error("tried to call Graph::addChannelGroup prior to initialization");
 	} else {
 		turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_GRAPH_CHANNELGROUP TURAG_DEBUG_GRAPH_PREFIX "%u %u", index, (unsigned)channelIndices.size());
 
@@ -103,7 +104,7 @@ void Graph::addChannelGroup(const char* label, std::initializer_list<unsigned> c
 
 void GraphAuto::init(const char *name, std::initializer_list<const char*> channelNames, bool enabled) {
 	if (isInitialized()) {
-		turag_warning("ignored call GraphAuto::init on already initialized instance");
+        turag_internal_warning("ignored call GraphAuto::init on already initialized instance");
 		return;
 	}
 
@@ -116,7 +117,7 @@ void GraphAuto::init(const char *name, std::initializer_list<const char*> channe
 
 void GraphAuto::init(const char *name, std::initializer_list<std::initializer_list<const char*>> channelNames, std::initializer_list<const char*> channelGroups, bool enabled) {
 	if (isInitialized()) {
-		turag_warning("ignored call GraphAuto::init on already initialized instance");
+        turag_internal_warning("ignored call GraphAuto::init on already initialized instance");
 		return;
 	}
 
@@ -126,7 +127,7 @@ void GraphAuto::init(const char *name, std::initializer_list<std::initializer_li
 	static_assert(channelNames.size() == channelGroups.size(), "channelNames.size() == channelGroups.size() not true");
 #else
 	if (channelNames.size() != channelGroups.size()) {
-		turag_error("GraphAuto::GraphAuto: channelNames.size() == channelGroups.size() not true");
+        turag_internal_error("GraphAuto::GraphAuto: channelNames.size() == channelGroups.size() not true");
 		return;
 	}
 #endif
@@ -151,7 +152,7 @@ void GraphAuto::init(const char *name, std::initializer_list<std::initializer_li
 
 void GraphAuto::addChannel(const char* title) {
 	if (!isInitialized()) {
-		turag_error("tried to call GraphAuto::addChannel prior to initialization");
+        turag_internal_error("tried to call GraphAuto::addChannel prior to initialization");
 	} else {
 		turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_GRAPH_CHANNEL TURAG_DEBUG_GRAPH_PREFIX "%d 0 %s" TURAG_DEBUG_NEWLINE,
 						   index, title);
@@ -165,7 +166,7 @@ void GraphAuto::addChannel(const char* title) {
 
 void GraphFixedSize::init(const char *name, int x_left, int y_bottom, unsigned width, unsigned height, std::initializer_list<const char*> channelNames, bool enabled) {
 	if (isInitialized()) {
-		turag_warning("ignored call GraphFixedSize::init on already initialized instance");
+        turag_internal_warning("ignored call GraphFixedSize::init on already initialized instance");
 		return;
 	}
 
@@ -178,7 +179,7 @@ void GraphFixedSize::init(const char *name, int x_left, int y_bottom, unsigned w
 
 void GraphFixedSize::init(const char *name, int x_left, int y_bottom, unsigned width, unsigned height, std::initializer_list<std::initializer_list<const char*>> channelNames, std::initializer_list<const char*> channelGroups, bool enabled) {
 	if (isInitialized()) {
-		turag_warning("ignored call GraphFixedSize::init on already initialized instance");
+        turag_internal_warning("ignored call GraphFixedSize::init on already initialized instance");
 		return;
 	}
 
@@ -188,7 +189,7 @@ void GraphFixedSize::init(const char *name, int x_left, int y_bottom, unsigned w
 	static_assert(channelNames.size() == channelGroups.size(), "channelNames.size() == channelGroups.size() not true");
 #else
 	if (channelNames.size() != channelGroups.size()) {
-		turag_error("GraphAuto::GraphAuto: channelNames.size() == channelGroups.size() not true");
+        turag_internal_error("GraphAuto::GraphAuto: channelNames.size() == channelGroups.size() not true");
 		return;
 	}
 #endif
@@ -213,7 +214,7 @@ void GraphFixedSize::init(const char *name, int x_left, int y_bottom, unsigned w
 
 void GraphFixedSize::addChannel(const char* title, int x_left, int y_bottom, unsigned width, unsigned height) {
 	if (!isInitialized()) {
-		turag_error("tried to call GraphFixedSize::addChannel prior to initialization");
+        turag_internal_error("tried to call GraphFixedSize::addChannel prior to initialization");
 	} else {
 		turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_GRAPH_CHANNEL_FIXED TURAG_DEBUG_GRAPH_PREFIX "%d %d %d %d %d %s" TURAG_DEBUG_NEWLINE,
 						   index, x_left, y_bottom, width, height, title);
@@ -239,7 +240,7 @@ void GraphFixedTime::init(const char *name, unsigned time, std::initializer_list
 	static_assert(channelNames.size() == channelGroups.size(), "channelNames.size() == channelGroups.size() not true");
 #else
 	if (channelNames.size() != channelGroups.size()) {
-		turag_error("GraphAuto::GraphAuto: channelNames.size() == channelGroups.size() not true");
+        turag_internal_error("GraphAuto::GraphAuto: channelNames.size() == channelGroups.size() not true");
 		return;
 	}
 #endif
@@ -264,7 +265,7 @@ void GraphFixedTime::init(const char *name, unsigned time, std::initializer_list
 
 void GraphFixedTime::addChannel(const char* title, unsigned time) {
 	if (!isInitialized()) {
-		turag_error("tried to call GraphFixedTime::addChannel prior to initialization");
+        turag_internal_error("tried to call GraphFixedTime::addChannel prior to initialization");
 	} else {
 		turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_GRAPH_CHANNEL TURAG_DEBUG_GRAPH_PREFIX "%d %d %s" TURAG_DEBUG_NEWLINE,
 						   index, time, title);

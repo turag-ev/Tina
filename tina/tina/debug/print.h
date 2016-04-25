@@ -5,6 +5,7 @@
 #include <tina/debugprint.h>
 #include "defines.h"
 #include "log-source.h"
+#include "print-impl.h"
 
 TURAG_C_API_BEGIN
 
@@ -32,32 +33,6 @@ void turag_debug_print_logsources(void);
 
 #else
 # define turag_debug_print_logsources() TURAG_MACRO_NOOP
-#endif
-
-#ifndef __DOXYGEN__
-
-// gibt im Unterschied zu turag_debug_puts in Regelmäßigen Abständen die Spielzeit aus
-void turag_log_puts(const char* s);
-
-// gibt im Unterschied zu turag_debug_printf in Regelmäßigen Abständen die Spielzeit aus
-void turag_log_printf(const char* fmt, ...) __attribute__ ((format(printf, 1, 2)));
-
-void turag_debug_printf(const char* fmt, ...) __attribute__ ((format(printf, 1, 2)));
-
-// turag_debug_* Implementation wählen
-#if TURAG_DEBUG_LEVEL > 0
-# if TURAG_PRINT_GAMETIME_AUTOMATIC
-#  define turag_debug_puts_impl turag_log_puts
-#  define turag_debug_printf_impl turag_log_printf
-# else // TURAG_PRINT_GAMETIME_AUTOMATIC
-#  define turag_debug_puts_impl turag_debug_puts
-#  define turag_debug_printf_impl turag_debug_printf
-# endif // TURAG_PRINT_GAMETIME_AUTOMATIC
-#else
-# define turag_debug_puts_impl(...) TURAG_MACRO_NOOP
-# define turag_debug_printf_impl(...) TURAG_MACRO_NOOP
-#endif
-
 #endif
 
 // turag_system_print(f)
@@ -172,9 +147,9 @@ void turag_warning(const char* msg);
 
 #if TURAG_DEBUG_LEVEL > 2
 # define turag_warningf(format, args...) \
-    turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_WARN_PREFIX format TURAG_DEBUG_NEWLINE,  ##args)
+    turag_debug_printf_impl(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_WARN_PREFIX format TURAG_DEBUG_NEWLINE,  ##args)
 # define turag_warning(msg) \
-    turag_debug_puts(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_WARN_PREFIX msg TURAG_DEBUG_NEWLINE)
+    turag_debug_puts_impl(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_WARN_PREFIX msg TURAG_DEBUG_NEWLINE)
 #else
 # define turag_warningf(format, args...) TURAG_MACRO_NOOP
 # define turag_warning(msg) TURAG_MACRO_NOOP

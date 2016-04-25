@@ -60,11 +60,6 @@ public:
 		return ref_;
 	}
 
-	/// Zugriff zu Adresse von Objekt
-	DataType* operator&() {
-		return &ref_;
-	}
-
 private:
 	/// gelocker Mutex
 	Mutex::Lock lock_;
