@@ -82,8 +82,8 @@ struct Point {
 
 	/// zwei Punkte addieren
 	constexpr
-	Vector<Length> operator+(const Point& other) {
-		return Vector<Length>(x + other.x, y + other.y);
+	Point operator+(const Point& other) {
+		return Point(x + other.x, y + other.y);
 	}
     /// Punkt und Vektor addieren (nur Punkt+Vektor, nicht Vektor+Punkt)
     constexpr
