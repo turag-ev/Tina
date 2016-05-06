@@ -77,7 +77,7 @@ public:
   /// lets the current thread sleeps for a time of ecos ticks
   static void delay(SystemTime ticks);
 
-  static _always_inline void setName(const char *) { }
+  static _always_inline void setName(const char *name) { }
 };
 
 inline void Thread_delay(SystemTime d /* [ticks] */) {
