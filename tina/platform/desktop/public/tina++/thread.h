@@ -83,62 +83,97 @@ public:
 // ConditionVariable
 
 class ConditionVariable {
-    NOT_COPYABLE(ConditionVariable);
+	NOT_COPYABLE(ConditionVariable);
 
-    class Unlocker {
-        NOT_COPYABLE(Unlocker);
-        NOT_MOVABLE(Unlocker);
+	class Unlocker {
+		NOT_COPYABLE(Unlocker);
+		NOT_MOVABLE(Unlocker);
 
-    public:
-        _always_inline explicit Unlocker(Mutex& m) :
-            m_(m), locked_(false)
-        {
-            m_.unlock();
-        }
+	public:
+		_always_inline explicit Unlocker(Mutex& m) :
+			m_(m), locked_(false)
+		{
+			m_.unlock();
+		}
 
-        _always_inline ~Unlocker() {
-            if (!locked_) {
-                m_.lock();
-            }
-        }
+		_always_inline ~Unlocker() {
+			if (!locked_) {
+				m_.lock();
+			}
+		}
 
-    private:
-        Mutex& m_;
-        bool locked_;
-    };
+	private:
+		Mutex& m_;
+		bool locked_;
+	};
 
 public:
-    _always_inline ConditionVariable(Mutex* mut) :
-        cond_(), workaround_mut_(), mut_(mut)
-    { }
+	class Lock : public std::unique_lock<std::mutex> {
+	public:
+		Lock(ConditionVariable& condvar) :
+			std::unique_lock<std::mutex>(condvar.getMutex()),
+			condvar_(condvar)
+		{ }
 
-    _always_inline bool wait() {
-        std::unique_lock<std::mutex> lock(workaround_mut_);
-        Unlocker unlock(*mut_);
-        cond_.wait(lock);
-        return true;
-    }
+		_always_inline bool wait() {
+			return condvar_.wait(*this);
+		}
 
-    bool waitFor(SystemTime timeout) {
-        std::unique_lock<std::mutex> lock(workaround_mut_);
-        Unlocker unlock(*mut_);
-        return cond_.wait_for(lock,
-                              std::chrono::milliseconds(ticks_to_ms(timeout)))
-                == std::cv_status::no_timeout;
-    }
+		_always_inline bool waitFor(SystemTime timeout) {
+			return condvar_.waitFor(*this, timeout);
+		}
 
-    _always_inline void signal() {
-        cond_.notify_one();
-    }
+	private:
+		ConditionVariable& condvar_;
+	};
 
-    _always_inline void broadcast() {
-        cond_.notify_all();
-    }
+public:
+	_always_inline ConditionVariable(Mutex* mut) :
+		cond_(), workaround_mut_(), mut_(mut)
+	{ }
+
+	_always_inline bool wait() {
+		std::unique_lock<std::mutex> lock(workaround_mut_);
+		Unlocker unlock(*mut_);
+		cond_.wait(lock);
+		return true;
+	}
+
+	_always_inline bool wait(std::unique_lock<std::mutex>& lock) {
+		cond_.wait(lock);
+		return true;
+	}
+
+	bool waitFor(SystemTime timeout) {
+		std::unique_lock<std::mutex> lock(workaround_mut_);
+		Unlocker unlock(*mut_);
+		return cond_.wait_for(lock,
+							  std::chrono::milliseconds(timeout.toMsec()))
+				== std::cv_status::no_timeout;
+	}
+
+	bool waitFor(std::unique_lock<std::mutex>& lock, SystemTime timeout) {
+		return cond_.wait_for(lock,
+							  std::chrono::milliseconds(timeout.toMsec()))
+				== std::cv_status::no_timeout;
+	}
+
+	_always_inline void signal() {
+		cond_.notify_one();
+	}
+
+	_always_inline void broadcast() {
+		cond_.notify_all();
+	}
+
+	Mutex& getMutex() {
+		return *mut_;
+	}
 
 private:
-    std::condition_variable cond_;
-    std::mutex workaround_mut_;
-    Mutex* mut_;
+	std::condition_variable cond_;
+	std::mutex workaround_mut_;
+	Mutex* mut_;
 };
 
 

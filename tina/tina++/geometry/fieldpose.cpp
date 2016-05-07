@@ -6,16 +6,16 @@ TeamColor_t FieldPose::teamcolor_ = TeamColor_None;
 
 void FieldPose::switchSide(Pose& pose) {
   pose.x = -pose.x;
-  pose.phi = (pose.phi != NO_ANGLE * Units::rad)
+  pose.phi = (pose.phi != 4 * Units::rad)
       ? (pose.phi >= Units::null ? Units::angle_pi - pose.phi : -Units::angle_pi - pose.phi)
-      : NO_ANGLE * Units::rad;
+	  : 4 * Units::rad;
 }
 
 Angle FieldPose::independentAngle(Angle angle) {
   if (!FieldPose::isRightTeamcolor()) {
-    return (angle != NO_ANGLE * Units::rad)
+	return (angle != 4 * Units::rad)
         ? (angle >= Units::null ? Units::angle_pi - angle : -Units::angle_pi - angle)
-        : NO_ANGLE * Units::rad;
+		: 4 * Units::rad;
   } else {
     return angle;
   }
@@ -23,9 +23,9 @@ Angle FieldPose::independentAngle(Angle angle) {
 
 Pose FieldPose::independentPose(const Pose& pose) {
   if (!FieldPose::isRightTeamcolor()) {
-    return Pose(-pose.x, pose.y, (pose.phi != NO_ANGLE * Units::rad)
+	return Pose(-pose.x, pose.y, (pose.phi != 4 * Units::rad)
                 ? (pose.phi >= Units::null ? Units::angle_pi - pose.phi : -Units::angle_pi - pose.phi)
-                : NO_ANGLE * Units::rad);
+				: 4 * Units::rad);
   } else {
     return pose;
   }

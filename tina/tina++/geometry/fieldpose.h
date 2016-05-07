@@ -4,7 +4,7 @@
 #include "tina++/tina.h"
 #include "geometry.h"
 
-#include <global/eurobot.h>
+#include <global/global.h>
 
 namespace TURAG {
 
@@ -42,7 +42,7 @@ public:
   /// Feldposition aus einzelnen Koordinaten erstellen
   constexpr explicit
   FieldPose(Length x, Length y, Angle phi, bool mirror_phi=true) :
-    left_(-x, y, (mirror_phi && (phi != NO_ANGLE * Units::rad))
+	left_(-x, y, (mirror_phi && (phi != 4 * Units::rad))
                   ? (phi >= Units::null ? Units::angle_pi - phi : -Units::angle_pi - phi)
                   : phi),
     right_(x, y, phi)
@@ -51,7 +51,7 @@ public:
   /// Feldposition aus Pose erstellen
   constexpr explicit
   FieldPose(const Pose& pose) :
-    left_(-pose.x, pose.y, (pose.phi != NO_ANGLE * Units::rad)
+	left_(-pose.x, pose.y, (pose.phi != 4 * Units::rad)
                             ? (pose.phi >= Units::null ? Units::angle_pi - pose.phi : -Units::angle_pi - pose.phi)
                             : pose.phi),
     right_(pose)
