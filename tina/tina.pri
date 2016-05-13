@@ -26,7 +26,6 @@ HEADERS  += \
     $$PWD/tina++/helper/packed.h \
     $$PWD/tina++/helper/scoped_lock.h \
     $$PWD/tina++/helper/static_const.h \
-    $$PWD/tina++/helper/tmp_length.h \
     $$PWD/tina++/helper/traits_algorithms.h \
     $$PWD/tina++/helper/uninitialized.h \
     $$PWD/tina++/range/algorithm.h \
