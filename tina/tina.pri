@@ -46,6 +46,8 @@ HEADERS  += \
     $$PWD/tina/bytes.h \
     $$PWD/tina/math.h
 
+DISTR_FILES += $$PWD/tina.pri
+
 #
 # debug
 

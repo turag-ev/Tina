@@ -12,3 +12,5 @@ HEADERS  += \
     $$PWD/public/tina/timetype.h \
     $$PWD/public/tina++/can.h \
     $$PWD/public/tina++/thread.h
+
+DISTR_FILES += $$PWD/tina-desktop.pri
