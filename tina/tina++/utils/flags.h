@@ -186,35 +186,35 @@ public:
   }
 
   constexpr _always_inline Flags operator|(Flags f) const {
-    return Flags(Enum(i | f.i));
+    return Flags(i | f.i);
   }
 
   constexpr _always_inline Flags operator|(Enum f) const {
-    return Flags(Enum(i | bit(f)));
+    return Flags(i | bit(f));
   }
 
   constexpr _always_inline Flags operator^(Flags f) const {
-    return Flags(Enum(i ^ f.i));
+    return Flags(i ^ f.i);
   }
 
   constexpr _always_inline Flags operator^(Enum f) const {
-    return Flags(Enum(i ^ bit(f)));
+    return Flags(i ^ bit(f));
   }
 
   constexpr _always_inline Flags operator&(int mask) const {
-    return Flags(Enum(i & mask));
+    return Flags(i & mask);
   }
 
   constexpr _always_inline Flags operator&(unsigned mask) const {
-    return Flags(Enum(i & mask));
+    return Flags(i & mask);
   }
 
   constexpr _always_inline Flags operator&(Enum f) const {
-    return Flags(Enum(i & bit(f)));
+    return Flags(i & bit(f));
   }
 
   constexpr _always_inline Flags operator~() const {
-    return Flags(Enum(~i));
+    return Flags(~i);
   }
 
   constexpr _always_inline bool operator!() const {
