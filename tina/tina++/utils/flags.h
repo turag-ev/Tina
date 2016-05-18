@@ -33,10 +33,6 @@ public:
     i(0)
   {}
 
-  explicit constexpr _always_inline Flags(int f) :
-    i(f)
-  {}
-
   explicit constexpr _always_inline Flags(unsigned f) :
     i(f)
   {}
