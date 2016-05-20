@@ -10,16 +10,13 @@
 namespace TURAG {
 
 template<typename T, class Enable = void>
-struct DebugObject {
-	enum : unsigned char { Version = T::Version };
-
-	DebugObject() :
-		version(Version)
-	{ }
+struct _packed DebugObject
+{
+	DebugObject() = default;
 
 	template<typename...Args>
 	DebugObject(Args&&...args) :
-		version(Version), data(std::forward<Args>(args)...)
+		version(T::Version), data(std::forward<Args>(args)...)
 	{ }
 
 	unsigned char version;
@@ -28,19 +25,15 @@ struct DebugObject {
 
 // with empty data type
 template<typename T>
-struct DebugObject<T, typename std::enable_if<std::is_empty<T>::value>::type> {
-	enum : unsigned char { Version = T::Version };
-
-	DebugObject() :
-		version(Version)
-	{ }
-
+struct _packed DebugObject<T, typename std::enable_if<std::is_empty<T>::value>::type>
+{
 	unsigned char version;
 };
 
-template<typename T>
-void send(const DebugObject<T>& obj)
+template<typename T> inline
+void send(DebugObject<T>& obj)
 {
+	obj.version = T::Version;
 	turag_binary_send(T::DebugObjectId, obj);
 }
 

@@ -20,7 +20,7 @@ struct Pie {
     /// unintialisierten Kreisausschnitt erstellen (Radius ist negativ)
     constexpr explicit
     Pie() :
-        m(), r(-1.f*Units::mm)
+		m(), r(-1.f*Units::mm), start(0), width(0)
     { }
 
     constexpr Point getCenter() const { return m; }
