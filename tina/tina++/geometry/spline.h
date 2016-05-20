@@ -302,8 +302,8 @@ private:
             c.y.c[i] = 0.0f;
 
             for (int j = 0; j < 4; j++) {
-                c.x.c[i] += (float)m[i][j] * vx[j];
-                c.y.c[i] += (float)m[i][j] * vy[j];
+				c.x.c[i] += static_cast<float>(m[i][j]) * vx[j];
+				c.y.c[i] += static_cast<float>(m[i][j]) * vy[j];
             }
         }
 
@@ -355,8 +355,8 @@ private:
             c.y.c[i] = 0.0f;
 
             for (int j = 0; j < 4; j++) {
-                c.x.c[i] += (float)m[i][j] * vx[j];
-                c.y.c[i] += (float)m[i][j] * vy[j];
+				c.x.c[i] += static_cast<float>(m[i][j]) * vx[j];
+				c.y.c[i] += static_cast<float>(m[i][j]) * vy[j];
 
             }
         }

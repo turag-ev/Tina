@@ -41,7 +41,7 @@ void Graph::plot(float time, float* data, size_t count) {
 	if (!isInitialized()) {
         turag_internal_error("tried to call Graph::plot prior to initialization");
 	} else if (count > channels) {
-        turag_internal_errorf("GraphBase::plot: got %d elements, but only %d channels are defined", (int)count, channels);
+		turag_internal_errorf("GraphBase::plot: got %d elements, but only %d channels are defined", static_cast<int>(count), channels);
 	} else if (enabled && allEnabled) {
 		if (startNewDiagramOnTimeOverflow && time < lastTime) {
 			startNewDiagram();
@@ -52,12 +52,12 @@ void Graph::plot(float time, float* data, size_t count) {
 
 		uint8_t encoded[7] = {0};
 
-		turag_base64_encode((uint8_t*)&time, 4, encoded);
-		turag_debug_puts((char*)encoded);
+		turag_base64_encode(reinterpret_cast<uint8_t*>(&time), 4, encoded);
+		turag_debug_puts(reinterpret_cast<const char*>(encoded));
 
 		for ( unsigned i = 0; i < count; ++i ) {
-			turag_base64_encode((uint8_t*)data, 4, encoded);
-			turag_debug_puts((char*)encoded);
+			turag_base64_encode(reinterpret_cast<uint8_t*>(data), 4, encoded);
+			turag_debug_puts(reinterpret_cast<const char*>(encoded));
 			++data;
 		}
 
@@ -75,10 +75,10 @@ void Graph::plot2D(unsigned channelIndex, float x, float y) {
 
 		uint8_t encoded[7] = {0};
 
-		turag_base64_encode((uint8_t*)&x, 4, encoded);
-		turag_debug_puts((char*)encoded);
-		turag_base64_encode((uint8_t*)&y, 4, encoded);
-		turag_debug_puts((char*)encoded);
+		turag_base64_encode(reinterpret_cast<uint8_t*>(&x), 4, encoded);
+		turag_debug_puts(reinterpret_cast<char*>(encoded));
+		turag_base64_encode(reinterpret_cast<uint8_t*>(&y), 4, encoded);
+		turag_debug_puts(reinterpret_cast<char*>(encoded));
 		
 		turag_debug_puts(TURAG_DEBUG_NEWLINE);
 	}
@@ -88,7 +88,7 @@ void Graph::addChannelGroup(const char* label, std::initializer_list<unsigned> c
 	if (!isInitialized()) {
         turag_internal_error("tried to call Graph::addChannelGroup prior to initialization");
 	} else {
-		turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_GRAPH_CHANNELGROUP TURAG_DEBUG_GRAPH_PREFIX "%u %u", index, (unsigned)channelIndices.size());
+		turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_GRAPH_CHANNELGROUP TURAG_DEBUG_GRAPH_PREFIX "%u %u", index, static_cast<unsigned>(channelIndices.size()));
 
 		for (unsigned i : channelIndices) {
 			turag_debug_printf(" %d", i);

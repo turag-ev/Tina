@@ -61,7 +61,7 @@ bool ErrorLogger::logResult(bool result)
 		}
 		paket[message_length+3+newline_size] = '\0';
 
-		turag_debug_printf((const char*)paket, observer_.getErrorCount());
+		turag_debug_printf(reinterpret_cast<const char*>(paket), observer_.getErrorCount());
 	}
 
 	return result;
