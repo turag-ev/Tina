@@ -44,7 +44,7 @@ struct Vector {
     /// Vektor skalieren
     /// \param rhs Faktor
     constexpr
-    Vector operator*(float rhs) {
+    Vector operator*(float rhs) const {
         return Vector<U>(x*rhs, y*rhs);
     }
 
@@ -82,24 +82,24 @@ struct Point {
 
 	/// zwei Punkte addieren
 	constexpr
-	Point operator+(const Point& other) {
+    Point operator+(const Point& other) const {
 		return Point(x + other.x, y + other.y);
 	}
     /// Punkt und Vektor addieren (nur Punkt+Vektor, nicht Vektor+Punkt)
     constexpr
-    Point operator+(const Vector<Length>& rhs) {
+    Point operator+(const Vector<Length>& rhs) const {
         return Point(x + rhs.x, y + rhs.y);
     }
 
 	/// relativer Vektor zwischen zwei Punkte erhalten
 	constexpr
-	Vector<Length> operator-(const Point& other) {
+    Vector<Length> operator-(const Point& other) const {
 		return Vector<Length>(x - other.x, y - other.y);
 	}
 
 	/// zwei Punkte vergleichen
 	constexpr
-	bool operator!=(const Point& other) {
+    bool operator!=(const Point& other) const {
 		return (x != other.x) || (y != other.y);
 	}
 };
