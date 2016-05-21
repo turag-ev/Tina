@@ -2,6 +2,7 @@
 #define TINAPP_RANGE_ALGORITHM_H
 
 #include <algorithm>
+#include <type_traits>
 
 #include "../tina.h"
 #include "../helper/static_const.h"
@@ -54,9 +55,26 @@ is_equal_predicate<typename std::remove_reference<T>::type> is_equal(T&& t) {
 template<typename ContainerA, typename ContainerB>
 ContainerA& append(ContainerA& a, const ContainerB& b)
 {
-	a.insert(a.end(), b.begin(), b.end());
+    a.insert(a.end(), std::begin(b), std::end(b));
 	return a;
 }
+
+template<typename ContainerA, typename T, typename Func>
+auto max_value(const ContainerA& a, T min, Func func) -> T
+{
+    auto first = std::begin(a);
+    auto last = std::end(a);
+
+    for (; first != last; ++first)
+    {
+        auto test = func(*first);
+        if (min < test)
+            min = std::move(test);
+    }
+
+    return min;
+}
+
 
 /// \brief Elemente mit Wert \p val von Container entfernen und entsprechend Größe anpassen.
 /// \param container Container

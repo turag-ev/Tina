@@ -182,6 +182,7 @@ protected:
 
 /**
  * @brief SplineOrder Spline of a certain order
+ * @todo move impl to cpp-file and remove code bloat
  */
 template<std::size_t order>
 class SplineOrder final :
