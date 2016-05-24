@@ -135,10 +135,10 @@ public:
     virtual bool calculate(Pose *poses, unsigned pose_index, unsigned pose_count, int direction) = 0;
     virtual Pose getPoseStep(float t) = 0;
     virtual float getBendingStep(float t) = 0;
-    virtual constexpr unsigned getOrder() const = 0;
-    virtual constexpr Length getLength() const = 0;
-    virtual constexpr float getKappaMax() const = 0;
-    virtual constexpr Length getDirectDist() const = 0;
+    virtual unsigned getOrder() const = 0;
+    virtual Length getLength() const = 0;
+    virtual float getKappaMax() const = 0;
+    virtual Length getDirectDist() const = 0;
 
 protected:
     static constexpr Length spline_iteration_distance = 50 * Units::mm;
