@@ -13,8 +13,8 @@ struct Circle {
 	/// \tparam Typ mit x- und y-Koordinate
 	template<typename P>
 	constexpr explicit
-	Circle(const P& t, Length r) :
-		m(t.x, t.y), r(r)
+	Circle(const P& t, Length r_) :
+		m(t.x, t.y), r(r_)
 	{ }
 
 	/// unintialisierten Kreis erstellen (Radius ist negativ)

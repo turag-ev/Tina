@@ -102,26 +102,26 @@ void Graph::addChannelGroup(const char* label, std::initializer_list<unsigned> c
 
 
 
-void GraphAuto::init(const char *name, std::initializer_list<const char*> channelNames, bool enabled) {
+void GraphAuto::init(const char *name_, std::initializer_list<const char*> channelNames, bool enabled_) {
 	if (isInitialized()) {
         turag_internal_warning("ignored call GraphAuto::init on already initialized instance");
 		return;
 	}
 
-	Graph::init(name, enabled);
+	Graph::init(name_, enabled_);
 
 	for (const char* channel_title : channelNames) {
 		addChannel(channel_title);
 	}
 }
 
-void GraphAuto::init(const char *name, std::initializer_list<std::initializer_list<const char*>> channelNames, std::initializer_list<const char*> channelGroups, bool enabled) {
+void GraphAuto::init(const char *name_, std::initializer_list<std::initializer_list<const char*>> channelNames, std::initializer_list<const char*> channelGroups, bool enabled_) {
 	if (isInitialized()) {
         turag_internal_warning("ignored call GraphAuto::init on already initialized instance");
 		return;
 	}
 
-	Graph::init(name, enabled);
+	Graph::init(name_, enabled_);
 
 #if __cplusplus >= 201300L
 	static_assert(channelNames.size() == channelGroups.size(), "channelNames.size() == channelGroups.size() not true");
@@ -164,26 +164,26 @@ void GraphAuto::addChannel(const char* title) {
 
 
 
-void GraphFixedSize::init(const char *name, int x_left, int y_bottom, unsigned width, unsigned height, std::initializer_list<const char*> channelNames, bool enabled) {
+void GraphFixedSize::init(const char *name_, int x_left, int y_bottom, unsigned width, unsigned height, std::initializer_list<const char*> channelNames, bool enabled_) {
 	if (isInitialized()) {
         turag_internal_warning("ignored call GraphFixedSize::init on already initialized instance");
 		return;
 	}
 
-	Graph::init(name, enabled);
+	Graph::init(name_, enabled_);
 
 	for (const char* channel_title : channelNames) {
 		addChannel(channel_title, x_left, y_bottom, width, height);
 	}
 }
 
-void GraphFixedSize::init(const char *name, int x_left, int y_bottom, unsigned width, unsigned height, std::initializer_list<std::initializer_list<const char*>> channelNames, std::initializer_list<const char*> channelGroups, bool enabled) {
+void GraphFixedSize::init(const char *name_, int x_left, int y_bottom, unsigned width, unsigned height, std::initializer_list<std::initializer_list<const char*>> channelNames, std::initializer_list<const char*> channelGroups, bool enabled_) {
 	if (isInitialized()) {
         turag_internal_warning("ignored call GraphFixedSize::init on already initialized instance");
 		return;
 	}
 
-	Graph::init(name, enabled);
+	Graph::init(name_, enabled_);
 
 #if __cplusplus >= 201300L
 	static_assert(channelNames.size() == channelGroups.size(), "channelNames.size() == channelGroups.size() not true");
@@ -225,16 +225,16 @@ void GraphFixedSize::addChannel(const char* title, int x_left, int y_bottom, uns
 
 
 
-void GraphFixedTime::init(const char *name, unsigned time, std::initializer_list<const char*> channelNames, bool enabled) {
-	Graph::init(name, enabled);
+void GraphFixedTime::init(const char *name_, unsigned time, std::initializer_list<const char*> channelNames, bool enabled_) {
+	Graph::init(name_, enabled_);
 
 	for (const char* channel_title : channelNames) {
 		addChannel(channel_title, time);
 	}
 }
 
-void GraphFixedTime::init(const char *name, unsigned time, std::initializer_list<std::initializer_list<const char*>> channelNames, std::initializer_list<const char*> channelGroups, bool enabled) {
-	Graph::init(name, enabled);
+void GraphFixedTime::init(const char *name_, unsigned time, std::initializer_list<std::initializer_list<const char*>> channelNames, std::initializer_list<const char*> channelGroups, bool enabled_) {
+	Graph::init(name_, enabled_);
 
 #if __cplusplus >= 201300L
 	static_assert(channelNames.size() == channelGroups.size(), "channelNames.size() == channelGroups.size() not true");

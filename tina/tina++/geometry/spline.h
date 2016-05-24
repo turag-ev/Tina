@@ -261,7 +261,7 @@ private:
         //static_assert(order == 3, "wrong spline order for this call");
 
         Pose *p = poses;
-        unsigned i = pose_index;
+		unsigned i = pose_index;
 
         // see getPoseStep()
         Angle aoff = 0 * Units::deg;
@@ -270,17 +270,17 @@ private:
         }
 
         // spline form depends from distance between p[i] and p[i+1]
-        float d12 = distance(p[i], p[i+1]).to(Units::mm);
+		float d12 = distance(p[i], p[i+1]).to(Units::mm);
         float k = spline_form_factor * d12;
 
 		float vx[4] = { k * cos(p[i].phi + aoff),
 						k * cos(p[i + 1].phi + aoff),
-                        p[i].x.to(Units::mm),
-                        p[i + 1].x.to(Units::mm) };
+						p[i].x.to(Units::mm),
+						p[i + 1].x.to(Units::mm) };
 		float vy[4] = { k * sin(p[i].phi + aoff),
 						k * sin(p[i + 1].phi + aoff),
-                        p[i].y.to(Units::mm),
-                        p[i + 1].y.to(Units::mm) };
+						p[i].y.to(Units::mm),
+						p[i + 1].y.to(Units::mm) };
 
         /* invertierte hermitesche kubische Matrix (siehe Wikipedia)
          *
@@ -298,7 +298,7 @@ private:
         /*
          * Matrixmultiplikation c = M * v
          */
-        for (int i = 0; i < 4; i++) {
+		for (i = 0; i < 4; i++) {
             c.x.c[i] = 0.0f;
             c.y.c[i] = 0.0f;
 
@@ -351,7 +351,7 @@ private:
         c.x.c[5] = vx[0];
         c.y.c[5] = vy[0];
 
-        for (int i = 0; i < 3; i++) {
+		for (i = 0; i < 3; i++) {
             c.x.c[i] = 0.0f;
             c.y.c[i] = 0.0f;
 
