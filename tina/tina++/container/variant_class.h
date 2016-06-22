@@ -37,6 +37,10 @@ public:
 
     VariantClass(const VariantClass<Abstract, Variants...>& rhs)
     {
+        *this = rhs;
+    }
+
+    const VariantClass& operator=(const VariantClass<Abstract, Variants...> &rhs) {
         memcpy(data_, rhs.data_, max_value(sizeof(Variants)...) );
         if(rhs.empty())
             active_ = nullptr;
