@@ -51,8 +51,9 @@
    down we could also use it with other compilers, but since this
    affects only the quality of diagnostics, why bother?  */
 #if (4 < __GNUC__ + (6 <= __GNUC_MINOR__) \
-     && (201112L <= __STDC_VERSION__  || !defined __STRICT_ANSI__) \
-     && !defined __cplusplus)
+     && !defined __cplusplus) \
+     && (defined(__STDC_VERSION__) && 201112L <= __STDC_VERSION__  || !defined __STRICT_ANSI__)
+     
 # define _GL_HAVE__STATIC_ASSERT 1
 #endif
 /* static_assert available in g++ since 4.3  */
@@ -195,7 +196,7 @@
    (!!sizeof (_GL_VERIFY_TYPE (R, DIAGNOSTIC)))
 
 #ifdef __cplusplus
-# if !GNULIB_defined_struct__gl_verify_type
+# if !defined(GNULIB_defined_struct__gl_verify_type) || !GNULIB_defined_struct__gl_verify_type
 template <int w>
   struct _gl_verify_type {
     unsigned int _gl_verify_error_if_negative: w;
