@@ -172,7 +172,6 @@ contains(TINA, feldbus-host) {
       $$PWD/tina++/feldbus/host/servo_tina.cpp
 
   HEADERS  += \
-      $$PWD/tina/feldbus/host/rs485.h \
       $$PWD/tina++/feldbus/host/aktor.h \
       $$PWD/tina++/feldbus/host/aseb.h \
       $$PWD/tina++/feldbus/host/bootloader.h \
@@ -180,7 +179,8 @@ contains(TINA, feldbus-host) {
       $$PWD/tina++/feldbus/host/device.h \
       $$PWD/tina++/feldbus/host/farbsensor.h \
       $$PWD/tina++/feldbus/host/sensor.h \
-      $$PWD/tina++/feldbus/host/servo.h
+      $$PWD/tina++/feldbus/host/servo.h \
+      $$PWD/tina++/feldbus/host/feldbusabstraction.h
 }
 
 #
@@ -189,12 +189,12 @@ contains(TINA, feldbus-host) {
 contains(TINA, feldbus-dynamixel) {
   SOURCES += \
       $$PWD/tina++/feldbus/dynamixel/dynamixeldevice.cpp \
-      $$PWD/tina/feldbus/dynamixel/dxl_hal.c \
-      $$PWD/tina/feldbus/dynamixel/dynamixel.c
+      $$PWD/tina++/feldbus/dynamixel/dxl_hal.cpp \
+      $$PWD/tina++/feldbus/dynamixel/dynamixel.c
 
   HEADERS  += \
-      $$PWD/tina/feldbus/dynamixel/dxl_hal.h \
-      $$PWD/tina/feldbus/dynamixel/dynamixel.h \
+      $$PWD/tina++/feldbus/dynamixel/dxl_hal.h \
+      $$PWD/tina++/feldbus/dynamixel/dynamixel.h \
       $$PWD/tina++/feldbus/dynamixel/dynamixeldevice.h
 }
 
