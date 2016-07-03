@@ -13,59 +13,71 @@ namespace {
 
 } // namespace
 
-ErrorLogger::ErrorLogger(
-		char log_level,
-		char log_source,
-		const char* message,
-		SystemTime min_interval,
-		unsigned min_errors)
-	:
-	observer_(min_interval, min_errors),
-	log_level_(log_level),
-	log_source_(log_source),
-	message_(message),
-	message_length_(std::strlen(message))
+
+bool ErrorLogger::log(bool result)
 {
+	return observer.log(result);
 }
 
-bool ErrorLogger::logResult(bool result)
+void ErrorLogger::printMessage(void) const
 {
-	static constexpr std::size_t newline_size = length(TURAG_DEBUG_NEWLINE) - 1;
+	char preamble[] = {TURAG_DEBUG_LINE_PREFIX[0], log_source_, log_level_, 0};
+	turag_debug_puts_impl(preamble);
+	turag_debug_puts_impl(message_);
 
-	if (observer_.doErrorOutput(result))
+	if (observer.getErrorCount() <= observer.getMinErrors())
 	{
-		
-		// FIXME: es ist nicht nötig die komplette Nachricht in einem Puffer zusammenzubauen.
-		// Alle Zeichen können direkt ausgegeben werden, was Stack spart und einfache
-		// Prozentzeichen in der vom User angegebenen Fehlermeldung erlaubt.
-		
-		// Fehlermeldung ausgeben
-		std::size_t message_length = message_length_ + (length(LOG_STATISTICS)-1);
-		std::uint8_t paket[3 + message_length + newline_size + 1];
+		turag_debug_puts_impl(TURAG_DEBUG_NEWLINE);
+	}
+	else
+	{
+		switch (messageType_) {
+		case MessageType::Simpel:
+			turag_debug_printf_impl(" (zum %u.-mal)" TURAG_DEBUG_NEWLINE, observer.getErrorCount());
+			break;
 
-		// 3 header bytes
-		paket[0] = TURAG_DEBUG_LINE_PREFIX[0];
-		paket[1] = log_source_;
-		paket[2] = log_level_;
-
-		// Nachricht
-		std::memcpy(paket+3, message_, message_length_);
-		std::memcpy(paket+3+message_length_, LOG_STATISTICS, length(LOG_STATISTICS)); // TODO: sprintf benutzen
-
-		// end
-		if (newline_size == 1) {
-			paket[message_length+3] = TURAG_DEBUG_NEWLINE[0];
-		} else {
-			paket[message_length+3] = TURAG_DEBUG_NEWLINE[0];
-			paket[message_length+3+1] = TURAG_DEBUG_NEWLINE[1];
+		case MessageType::Statistics:
+			turag_debug_printf_impl(" (%u mal seit letzter Ausgabe, gesamt: %u/%u erfolgreich (%u %%))" TURAG_DEBUG_NEWLINE,
+									observer.getErrorCountSinceLastOutput(),
+									observer.getSuccessCount(),
+									observer.getErrorCount(),
+									observer.getSuccessRatio());
+			break;
 		}
-		paket[message_length+3+newline_size] = '\0';
+	}
+}
 
-		turag_debug_printf(reinterpret_cast<const char*>(paket), observer_.getErrorCount());
+
+
+bool CheapErrorLogger::logResult(bool result)
+{
+	if (!result)
+	{
+		uint32_t now_ms = static_cast<uint32_t>(SystemTime::now().toMsec());
+		++failuresSinceLastOutput_;
+
+		if ((last_error_message_ms_ == 0) || (failuresSinceLastOutput_ == 0xffff) || (now_ms - last_error_message_ms_ > interval_ms_))
+		{
+			char preamble[] = {TURAG_DEBUG_LINE_PREFIX[0], log_source_, log_level_, 0};
+			turag_debug_puts_impl(preamble);
+			turag_debug_puts_impl(message_);
+			if (failuresSinceLastOutput_ > 1)
+			{
+				turag_debug_printf_impl(" (%u mal" TURAG_DEBUG_NEWLINE, failuresSinceLastOutput_);
+			}
+			else
+			{
+				turag_debug_puts_impl(TURAG_DEBUG_NEWLINE);
+			}
+
+			last_error_message_ms_ = now_ms;
+			failuresSinceLastOutput_ = 0;
+		}
 	}
 
 	return result;
 }
+
 
 } // namespace Debug
 } // namespace TURAG
