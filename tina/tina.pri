@@ -169,7 +169,8 @@ contains(TINA, feldbus-host) {
       $$PWD/tina++/feldbus/host/dcmotor_tina.cpp \
       $$PWD/tina++/feldbus/host/device_tina.cpp \
       $$PWD/tina++/feldbus/host/farbsensor_tina.cpp \
-      $$PWD/tina++/feldbus/host/servo_tina.cpp
+      $$PWD/tina++/feldbus/host/servo_tina.cpp \
+      $$PWD/tina++/feldbus/host/feldbusabstraction.cpp
 
   HEADERS  += \
       $$PWD/tina++/feldbus/host/aktor.h \

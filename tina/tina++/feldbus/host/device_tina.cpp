@@ -21,6 +21,7 @@
 
 #include "device.h"
 
+
 namespace TURAG {
 namespace Feldbus {
 
@@ -39,18 +40,16 @@ struct DeviceInfoInternal {
 
 }
 
-int Device::globalTransmissionErrorCounter{0};
-unsigned Device::addressOfLastTransmission{TURAG_FELDBUS_BROADCAST_ADDR};
-Mutex Device::mutex;
+Mutex Device::listMutex;
 Device* Device::firstDevice(nullptr);
 
 
-Device::Device(const char* name, unsigned address, FeldbusAbstraction *feldbus, ChecksumType type,
+Device::Device(const char* name, unsigned address, FeldbusAbstraction& feldbus, ChecksumType type,
        const AddressLength addressLength,
        unsigned int max_transmission_attempts,
        unsigned int max_transmission_errors) :
-	dysFunctionalLog_(SystemTime::fromSec(25)),
-	bus(feldbus),
+	dysFunctionalLog_(SystemTime::fromSec(5)),
+	bus_(feldbus),
 	myNextDevice(nullptr),
 	name_(name),
 	myAddress(address),
@@ -66,23 +65,24 @@ Device::Device(const char* name, unsigned address, FeldbusAbstraction *feldbus, 
 	myAddressLength(static_cast<uint8_t>(addressLength)),
 	hasCheckedAvailabilityYet(false)
 {
-	Mutex::Lock lock(mutex);
+	{
+		Mutex::Lock lock(listMutex);
 
-	if (firstDevice == nullptr) {
-		firstDevice = this;
-	} else {
-		myNextDevice = firstDevice;
-		firstDevice = this;
+		if (firstDevice == nullptr) {
+			firstDevice = this;
+		} else {
+			myNextDevice = firstDevice;
+			firstDevice = this;
+		}
+	}
+	if (!name_) {
+		name_ = "???";
 	}
 }
 
  
-bool Device::transceive(uint8_t *transmit, int transmit_length, uint8_t *receive, int receive_length, bool ignoreDysfunctional) {
-//    if (!bus) {
-//        turag_errorf("%s: pointer to FeldbusAbstraction is zero", name);
-//        return false;
-//    }
-
+bool Device::transceive(uint8_t *transmit, int transmit_length, uint8_t *receive, int receive_length, bool ignoreDysfunctional)
+{
 	bool bailOutBecauseDysfunctional = isDysfunctional() && !ignoreDysfunctional;
 
 	if (dysFunctionalLog_.doErrorOutput(!bailOutBecauseDysfunctional)) {
@@ -91,31 +91,39 @@ bool Device::transceive(uint8_t *transmit, int transmit_length, uint8_t *receive
 	}
 	if (bailOutBecauseDysfunctional) {
         return false;
-    } else {
-		// we assume the caller wants to transmit a broadcast, if he does not supply any means to store an answer.
-		// Thus we use zero rather than the device's address.
-		unsigned useAddress = !receive || !receive_length ? TURAG_FELDBUS_BROADCAST_ADDR : myAddress;
-		
-		switch (myAddressLength) {
-		case 1:
-			transmit[0] = static_cast<uint8_t>(useAddress);
-			break;
-			
-		case 2:
-			transmit[0] = static_cast<uint8_t>(useAddress & 0xff);
-			transmit[1] = static_cast<uint8_t>(useAddress >> 8);
-			break;
-		}
-		
-        switch (myChecksumType) {
-        case ChecksumType::xor_based:
-            transmit[transmit_length - 1] = XOR::calculate(transmit, transmit_length - 1);
-            break;
+	}
 
-        case ChecksumType::crc8_icode:
-            transmit[transmit_length - 1] = CRC8::calculate(transmit, transmit_length - 1);
-            break;
-        }
+	// Generate target address.
+	// We assume the caller wants to transmit a broadcast, if he does not supply any means to store an answer.
+	// Thus we use zero rather than the device's address.
+	unsigned useAddress = !receive || !receive_length ? TURAG_FELDBUS_BROADCAST_ADDR : myAddress;
+
+	switch (myAddressLength) {
+	case 1:
+		transmit[0] = static_cast<uint8_t>(useAddress);
+		break;
+
+	case 2:
+		transmit[0] = static_cast<uint8_t>(useAddress & 0xff);
+		transmit[1] = static_cast<uint8_t>(useAddress >> 8);
+		break;
+
+	default: return false;
+	}
+
+	// Generate checksum for transmission.
+	switch (myChecksumType) {
+	case ChecksumType::xor_based:
+		transmit[transmit_length - 1] = XOR::calculate(transmit, transmit_length - 1);
+		break;
+
+	case ChecksumType::crc8_icode:
+		transmit[transmit_length - 1] = CRC8::calculate(transmit, transmit_length - 1);
+		break;
+
+	case ChecksumType::none:
+		break;
+	}
 
 
 //            turag_infof("%s: transceive tx [", name);
@@ -125,91 +133,51 @@ bool Device::transceive(uint8_t *transmit, int transmit_length, uint8_t *receive
 //            turag_info("]\n");
 
 
-        bool success = false, checksum_correct = false;
-        unsigned int attempt = 0;
+	FeldbusAbstraction::ResultStatus status = FeldbusAbstraction::ResultStatus::TransmissionError;
+	unsigned int attempt = 0;
 
-		// If the device is dysfunctional, we can force transmissions with
-		// ignoreDysfunctional. But in this case it wouldn't make sense
-		// to try more than a single transmission as the reason for a failure
-		// is then most likely the device still being dysfunctional.
-		unsigned maxAttempts = isDysfunctional() ? 1 : maxTransmissionAttempts;
-		
-
-		// protect globalTransmissionErrorCounter and addressOfLastTransmission
-		// FIXME: THIS CAUSES PROBLEMS WITH BUS ABSTRACTION!
-		Mutex::Lock lock(mutex);
-
-		// we try to transmit until either
-		// - the transmission succeeds and the checksum is correct or
-		// - the number of transmission attempts is exceeded or
-		// - the first attempt failed when the device is already dysfunctional.
-		while (attempt < maxAttempts && !(success && checksum_correct)) {
-			int transmit_length_copy = transmit_length;
-			int receive_length_copy = receive_length;
+	// If the device is dysfunctional, we can force transmissions with
+	// ignoreDysfunctional. But in this case it wouldn't make sense
+	// to try more than a single transmission as the reason for a failure
+	// is then most likely the device still being dysfunctional.
+	unsigned maxAttempts = isDysfunctional() ? 1 : maxTransmissionAttempts;
 
 
-			// we need to delay the transmission for protocol compliance reasons in the following
-			// cases:
-			// - our last transmission was a broadcast
-			// - the last transmission was sent to a different slave
-			bool insertTransmissionDelay;
-			if (addressOfLastTransmission == TURAG_FELDBUS_BROADCAST_ADDR ||
-					addressOfLastTransmission != useAddress) {
-				insertTransmissionDelay = true;
+	// we try to transmit until either
+	// - the transmission succeeds and the checksum is correct or
+	// - the number of transmission attempts is exceeded or
+	// - the first attempt failed when the device is already dysfunctional.
+	while (attempt < maxAttempts && status != FeldbusAbstraction::ResultStatus::Success) {
+		int transmit_length_copy = transmit_length;
+		int receive_length_copy = receive_length;
+
+		// clear buffer from any previous failed transmissions, then send
+		bus_.clearBuffer();
+		status = bus_.transceive(transmit, &transmit_length_copy, receive, &receive_length_copy, useAddress, myChecksumType);
+
+
+		switch (status) {
+		case FeldbusAbstraction::ResultStatus::TransmissionError:
+			if (transmit_length_copy < transmit_length) {
+				++myTotalTransmitErrors;
+			} else if (receive_length_copy == 0) {
+				++myTotalNoAnswerErrors;
 			} else {
-				insertTransmissionDelay = false;
+				++myTotalMissingDataErrors;
 			}
+			break;
 
-			// clear buffer from any previous failed transmissions
-            bus->clearBuffer();
-            success = bus->transceive(transmit, &transmit_length_copy, receive, &receive_length_copy, insertTransmissionDelay);
+		case FeldbusAbstraction::ResultStatus::ChecksumError:
+			++myTotalChecksumErrors;
+			break;
 
-			addressOfLastTransmission = useAddress;
+		case FeldbusAbstraction::ResultStatus::Success: break;
+		}
 
-            if (success) {
-                if (!receive || receive_length == 0) {
-                    // if the caller doesn't want to receive anything and the transmission was successful
-                    // we leave the loop (that happens in the case of broadcasts)
-                    checksum_correct = true;
-                } else {
-                    // transmission seems fine, lets look at the checksum
-                    switch (myChecksumType) {
-                    case ChecksumType::xor_based:
-                        checksum_correct = XOR::check(receive, receive_length-1, receive[receive_length-1]);
-                        break;
+		++attempt;
+	}
+	myTotalTransmissions += attempt;
 
-                    case ChecksumType::crc8_icode:
-                        checksum_correct = CRC8::check(receive, receive_length-1, receive[receive_length-1]);
-                        break;
-                    }
-                    
-                    if (!checksum_correct) {
-						++myTotalChecksumErrors;
-						
-						++globalTransmissionErrorCounter;
-						if (!(globalTransmissionErrorCounter % 25)) {
-							turag_criticalf("%d failed transmissions on the bus so far.", globalTransmissionErrorCounter);
-						}
-                    }
-                }
-            } else {
-                if (transmit_length_copy < transmit_length) {
-					++myTotalTransmitErrors;
-                } else if (receive_length_copy == 0) {
-					++myTotalNoAnswerErrors;
-				} else {
-					++myTotalMissingDataErrors;
-				}
-				
-                ++globalTransmissionErrorCounter;
-				if (!(globalTransmissionErrorCounter % 25)) {
-					turag_criticalf("%d failed transmissions on the bus so far.", globalTransmissionErrorCounter);
-                }
-            }
-            ++attempt;
-        }
-
-		lock.unlock();
 
 //            turag_infof("%s: transceive rx success(%x|%x) [", name, success, checksum_correct);
 //            for (int j = 0; j < receive_length; ++j) {
@@ -217,28 +185,26 @@ bool Device::transceive(uint8_t *transmit, int transmit_length, uint8_t *receive
 //            }
 //            turag_info("]\n");
 
-        myTotalTransmissions += attempt;
 
-        if (success && checksum_correct) {
-            // if we had a successful transmission, we reset the error counter
-            // but resetting the error only makes sense if we got a response from the device
-            if (receive && receive_length != 0) {
-                myCurrentErrorCounter = 0;
+	if (status == FeldbusAbstraction::ResultStatus::Success) {
+		// if we had a successful transmission, we reset the error counter
+		// but resetting the error only makes sense if we got a response from the device
+		if (receive && receive_length != 0) {
+			myCurrentErrorCounter = 0;
 
-				// Because resetting the error counter essentially
-				// means setting the device to be functional again
-				// we also have to reset the dysFunctionalLog_ to get
-				// an error message if the device fails again within
-				// a short time.
-				dysFunctionalLog_.resetAll();
-            }
-            return true;
-        } else {
-			turag_warningf("%s: rs485 transceive failed", name_);
-            myCurrentErrorCounter += attempt;
-            return false;
-        }
-    }
+			// Because resetting the error counter essentially
+			// means setting the device to be functional again
+			// we also have to reset the dysFunctionalLog_ to get
+			// an error message if the device fails again within
+			// a short time.
+			dysFunctionalLog_.resetAll();
+		}
+		return true;
+	} else {
+		turag_warningf("%s: rs485 transceive failed", name_);
+		myCurrentErrorCounter += attempt;
+		return false;
+	}
 }
 
 bool Device::sendPing(void) {
@@ -470,11 +436,6 @@ bool Device::resetSlaveErrors(void) {
 	Response<> response;
 	
 	return transceive(request, &response);
-}
-
-int Device::getGlobalTransmissionErrors(void) const {
-	Mutex::Lock lock(mutex);
-	return globalTransmissionErrorCounter;
 }
 
 
