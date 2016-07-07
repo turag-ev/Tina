@@ -123,14 +123,10 @@ void GraphAuto::init(const char *name_, std::initializer_list<std::initializer_l
 
 	Graph::init(name_, enabled_);
 
-#if __cplusplus >= 201300L
-	static_assert(channelNames.size() == channelGroups.size(), "channelNames.size() == channelGroups.size() not true");
-#else
 	if (channelNames.size() != channelGroups.size()) {
         turag_internal_error("GraphAuto::GraphAuto: channelNames.size() == channelGroups.size() not true");
 		return;
 	}
-#endif
 
 	auto groupIterator = channelGroups.begin();
 
@@ -185,14 +181,10 @@ void GraphFixedSize::init(const char *name_, int x_left, int y_bottom, unsigned 
 
 	Graph::init(name_, enabled_);
 
-#if __cplusplus >= 201300L
-	static_assert(channelNames.size() == channelGroups.size(), "channelNames.size() == channelGroups.size() not true");
-#else
 	if (channelNames.size() != channelGroups.size()) {
         turag_internal_error("GraphAuto::GraphAuto: channelNames.size() == channelGroups.size() not true");
 		return;
 	}
-#endif
 
 	auto groupIterator = channelGroups.begin();
 
@@ -236,14 +228,10 @@ void GraphFixedTime::init(const char *name_, unsigned time, std::initializer_lis
 void GraphFixedTime::init(const char *name_, unsigned time, std::initializer_list<std::initializer_list<const char*>> channelNames, std::initializer_list<const char*> channelGroups, bool enabled_) {
 	Graph::init(name_, enabled_);
 
-#if __cplusplus >= 201300L
-	static_assert(channelNames.size() == channelGroups.size(), "channelNames.size() == channelGroups.size() not true");
-#else
 	if (channelNames.size() != channelGroups.size()) {
         turag_internal_error("GraphAuto::GraphAuto: channelNames.size() == channelGroups.size() not true");
 		return;
 	}
-#endif
 
 	auto groupIterator = channelGroups.begin();
 
