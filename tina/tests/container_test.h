@@ -8,7 +8,7 @@
 #include <tina++/algorithm.h>
 #include <tina/helper/macros.h>
 
-#include <ostream>
+#include <iostream>
 
 namespace TURAG {
 

@@ -6,6 +6,8 @@
 
 using namespace TURAG;
 
+constexpr void* null = nullptr;
+
 
 BOOST_AUTO_TEST_SUITE(VariantClassTests)
 
@@ -81,12 +83,14 @@ BOOST_AUTO_TEST_CASE(define) {
 	using Type = VariantClass<Base, A, B>;
 
 	Type variant;
+	BOOST_CHECK_GE(sizeof(Type), sizeof(A));
+	BOOST_CHECK_GE(sizeof(Type), sizeof(B));
 	BOOST_CHECK_EQUAL(variant.empty(), true);
-	BOOST_CHECK_EQUAL(variant.get(), (void*)nullptr);
+	BOOST_CHECK_EQUAL(variant.get(), null);
 
 	variant.emplace<A>();
 	BOOST_CHECK_EQUAL(variant.empty(), false);
-	BOOST_CHECK_NE(variant.get(), (void*)nullptr);
+	BOOST_CHECK_NE(variant.get(), null);
 	BOOST_CHECK_EQUAL(variant->getValue(), 0xAAAA);
 
 	variant.emplace<B>();
@@ -95,11 +99,14 @@ BOOST_AUTO_TEST_CASE(define) {
 
 	variant.erase();
 	BOOST_CHECK_EQUAL(variant.empty(), true);
-	BOOST_CHECK_EQUAL(variant.get(), (void*)nullptr);
+	BOOST_CHECK_EQUAL(variant.get(), null);
 
 	variant.emplace<A>();
 	BOOST_CHECK_EQUAL(variant.empty(), false);
 	BOOST_CHECK_EQUAL(variant->getValue(), 0xAAAA);
+
+	Type variant2(variant);
+	BOOST_CHECK_NE(variant.get(), variant2.get());
 }
 
 BOOST_AUTO_TEST_CASE(multi) {
@@ -131,7 +138,7 @@ BOOST_AUTO_TEST_CASE(multi) {
 
 	Type variant;
 	BOOST_CHECK_EQUAL(variant.empty(), true);
-	BOOST_CHECK_EQUAL(variant.operator ->(), (void*)nullptr);
+	BOOST_CHECK_EQUAL(variant.operator ->(), null);
 
 	variant.emplace<A>();
 	BOOST_CHECK_EQUAL(variant.empty(), false);
@@ -145,7 +152,7 @@ BOOST_AUTO_TEST_CASE(multi) {
 
 	variant.erase();
 	BOOST_CHECK_EQUAL(variant.empty(), true);
-	BOOST_CHECK_EQUAL(variant.operator ->(), (void*)nullptr);
+	BOOST_CHECK_EQUAL(variant.operator ->(), null);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
