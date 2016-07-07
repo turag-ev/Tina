@@ -34,9 +34,11 @@ public:
 	/// Fehlerüberwacher erstellen
 	/// \param min_interval minimales Intervall in dem Fehlermeldungen ausgegeben werden dürfen
 	/// \param min_errors Fehler die mindestens ausgegeben werden, bevor die Ausgabe reduziert wird.
+	/// \param max_errors Fehleranzahl seit der letzten Ausgabe, ab der bereits vor Ablauf von
+	/// min_interval eine Ausgabe gemacht wird. Bei 0 ist das Feature deaktiviert.
 	constexpr
-	ErrorObserver(SystemTime min_interval, unsigned min_errors = 5) :
-		interval_ms_(min_interval.toMsec()), min_errors_(min_errors)
+	ErrorObserver(SystemTime min_interval, uint16_t min_errors = 5, uint16_t max_errors = 0) :
+		interval_ms_(min_interval.toMsec()), min_errors_(min_errors), max_errors_(max_errors)
 	{ }
 
 	// verändern
@@ -119,7 +121,8 @@ private:
 	/// minimales Intervall in dem Fehlermeldungen ausgegeben werden dürfen
 	unsigned interval_ms_;
 
-	unsigned min_errors_;
+	uint16_t min_errors_;
+	uint16_t max_errors_;
 };
 
 
