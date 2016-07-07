@@ -13,7 +13,7 @@ namespace std {
 template<std::size_t Len, typename... Types>
 struct aligned_union {
 	using type =
-		std::aligned_storage<Len, TURAG::max_integral_constant<std::alignment_of<Types>...>::value>;
+		typename std::aligned_storage<Len, TURAG::max_integral_constant<std::alignment_of<Types>...>::value>::type;
 };
 }
 #endif

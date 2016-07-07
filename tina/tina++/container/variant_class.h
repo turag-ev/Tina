@@ -29,23 +29,24 @@ public:
 
     template<class T>
     VariantClass(const T& rhs):
-        active_(reinterpret_cast<Abstract*>(data_) )
+		active_(reinterpret_cast<Abstract*>(&data_) )
     {
         static_assert(!all_false<std::is_same<T,Variants>...>::value, "Can't construct from non-variant class.");
-        construct(reinterpret_cast<T*>(data_), rhs);
-    }
+		construct(reinterpret_cast<T*>(&data_), rhs);
+	}
 
     VariantClass(const VariantClass<Abstract, Variants...>& rhs)
     {
-        *this = rhs;
-    }
-
-    const VariantClass& operator=(const VariantClass<Abstract, Variants...> &rhs) {
-        memcpy(data_, rhs.data_, max_value(sizeof(Variants)...) );
+		*this = rhs;
+	}
+	const VariantClass& operator=(const VariantClass &rhs) {
+		memcpy(&data_, &rhs.data_, max_value(sizeof(Variants)...) );
         if(rhs.empty())
             active_ = nullptr;
         else
-            active_ = reinterpret_cast<Abstract*>(data_);
+			active_ = reinterpret_cast<Abstract*>(&data_);
+
+		return *this;
     }
 
     // empty
@@ -107,13 +108,19 @@ public:
 				"Der Templateparamter ist keiner der speicherbaren Typen. "
 				"Typ muss zu VariantClass-Definition als Parameter hinzugefügt werden.");
 		erase();
-        construct(reinterpret_cast<T*>(data_), std::forward<Args>(args)...);
-        active_ = static_cast<Abstract*>(reinterpret_cast<T*>(data_));
+		construct(reinterpret_cast<T*>(&data_), std::forward<Args>(args)...);
+		active_ = static_cast<Abstract*>(reinterpret_cast<T*>(&data_));
         //assert(active_ != nullptr);
 	}
 
 private:
-    unsigned char data_[max_value(sizeof(Variants)...)];
+#if GCC_VERSION < 40800
+	// some strange f*** compiler bug evaluates the wrong union size, when Variants...
+	// get passed through UnionStorage... ?!?
+	typename std::aligned_union<max_value(sizeof(Variants)...), Variants...>::type data_;
+#else
+	UnionStorage<Variants...> data_;
+#endif
     Abstract* active_;
 };
 
