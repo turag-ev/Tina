@@ -23,7 +23,8 @@ public:
 	data_(), active_(nullptr)
 	{ }
 
-	~VariantClass() {
+	~VariantClass()
+	{
 		erase();
 	}
 
@@ -35,17 +36,18 @@ public:
 		construct(reinterpret_cast<T*>(&data_), rhs);
 	}
 
-    VariantClass(const VariantClass<Abstract, Variants...>& rhs)
+	VariantClass(const VariantClass& rhs)
     {
 		*this = rhs;
 	}
-	const VariantClass& operator=(const VariantClass &rhs) {
+
+	const VariantClass& operator=(const VariantClass &rhs)
+	{
 		memcpy(&data_, &rhs.data_, max_value(sizeof(Variants)...) );
         if(rhs.empty())
             active_ = nullptr;
         else
 			active_ = reinterpret_cast<Abstract*>(&data_);
-
 		return *this;
     }
 

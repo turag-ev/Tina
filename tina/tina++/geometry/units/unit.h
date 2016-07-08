@@ -20,49 +20,67 @@ typedef std::ratio<0> RationalNull;
 typedef std::ratio<1> RationalOne;
 typedef std::ratio<2> RationalTwo;
 
-template<typename Length, typename Angle, typename Time>
+template<typename Length, typename Angle, typename Time, typename Mass, typename Ampere>
 struct Dimension {
   typedef Length length;
   typedef Angle angle;
   typedef Time time;
+  typedef Mass mass;
+  typedef Ampere ampere;
 };
 
-typedef Dimension<RationalNull, RationalNull, RationalNull> DimensionlessDimension;
-typedef Dimension<RationalOne,  RationalNull, RationalNull> LengthDimension;
-typedef Dimension<RationalNull, RationalOne,  RationalNull> AngleDimension;
-typedef Dimension<RationalNull, RationalNull, RationalOne > TimeDimension;
-typedef Dimension<RationalNull, RationalNull, RationalTwo > QuadTimeDimension;
+typedef Dimension<RationalNull, RationalNull, RationalNull, RationalNull, RationalNull> DimensionlessDimension;
+typedef Dimension<RationalOne,  RationalNull, RationalNull, RationalNull, RationalNull> LengthDimension;
+typedef Dimension<RationalNull, RationalOne,  RationalNull, RationalNull, RationalNull> AngleDimension;
+typedef Dimension<RationalNull, RationalNull, RationalOne , RationalNull, RationalNull> TimeDimension;
+typedef Dimension<RationalNull, RationalNull, RationalTwo , RationalNull, RationalNull> QuadTimeDimension;
+typedef Dimension<RationalNull, RationalNull, RationalOne , RationalOne , RationalNull> MassDimension;
+typedef Dimension<RationalNull, RationalNull, RationalOne , RationalNull, RationalOne > AmpereDimension;
+typedef Dimension<RationalOne, RationalNull, std::ratio<-2>, RationalOne, RationalOne> ForceDimension;
+typedef Dimension<RationalTwo, RationalNull, std::ratio<-3>, RationalOne, std::ratio<-1>> VoltageDimension;
 
 template<typename LhsDimension, typename RhsDimension>
 struct dim_mul {
-  typedef Dimension<typename std::ratio_add<typename LhsDimension::length, typename RhsDimension::length>::type,
-							typename std::ratio_add<typename LhsDimension::angle,  typename RhsDimension::angle>::type,
-							typename std::ratio_add<typename LhsDimension::time,   typename RhsDimension::time>::type>
-		  type;
+  typedef Dimension<
+  		typename std::ratio_add<typename LhsDimension::length, typename RhsDimension::length>::type,
+			typename std::ratio_add<typename LhsDimension::angle,  typename RhsDimension::angle>::type,
+			typename std::ratio_add<typename LhsDimension::time,   typename RhsDimension::time>::type,
+			typename std::ratio_add<typename LhsDimension::mass,   typename RhsDimension::mass>::type,
+			typename std::ratio_add<typename LhsDimension::ampere, typename RhsDimension::ampere>::type
+	> type;
 };
 
 template<typename LhsDimension, typename RhsDimension>
 struct dim_div {
-  typedef Dimension<typename std::ratio_subtract<typename LhsDimension::length, typename RhsDimension::length>::type,
-							typename std::ratio_subtract<typename LhsDimension::angle,  typename RhsDimension::angle>::type,
-							typename std::ratio_subtract<typename LhsDimension::time,   typename RhsDimension::time>::type>
-		  type;
+  typedef Dimension<
+  		typename std::ratio_subtract<typename LhsDimension::length, typename RhsDimension::length>::type,
+			typename std::ratio_subtract<typename LhsDimension::angle,  typename RhsDimension::angle>::type,
+			typename std::ratio_subtract<typename LhsDimension::time,   typename RhsDimension::time>::type,
+			typename std::ratio_subtract<typename LhsDimension::mass,   typename RhsDimension::mass>::type,
+			typename std::ratio_subtract<typename LhsDimension::ampere, typename RhsDimension::ampere>::type
+	> type;
 };
 
 template<typename Dim, typename N>
 struct dim_root {
-  typedef Dimension<typename std::ratio_divide<typename Dim::length, N>::type,
-							typename std::ratio_divide<typename Dim::angle,  N>::type,
-							typename std::ratio_divide<typename Dim::time,   N>::type>
-		  type;
+  typedef Dimension<
+  		typename std::ratio_divide<typename Dim::length, N>::type,
+			typename std::ratio_divide<typename Dim::angle,  N>::type,
+			typename std::ratio_divide<typename Dim::time,   N>::type,
+			typename std::ratio_divide<typename Dim::mass,   N>::type,
+			typename std::ratio_divide<typename Dim::ampere, N>::type
+	> type;
 };
 
 template<typename Dim, typename N>
 struct dim_pow {
-  typedef Dimension<typename std::ratio_multiply<typename Dim::length, N>::type,
-							typename std::ratio_multiply<typename Dim::angle,  N>::type,
-							typename std::ratio_multiply<typename Dim::time,   N>::type>
-		  type;
+  typedef Dimension<
+  		typename std::ratio_multiply<typename Dim::length, N>::type,
+			typename std::ratio_multiply<typename Dim::angle,  N>::type,
+			typename std::ratio_multiply<typename Dim::time,   N>::type,
+			typename std::ratio_multiply<typename Dim::mass,   N>::type,
+			typename std::ratio_multiply<typename Dim::ampere, N>::type
+	> type;
 };
 
 #endif
@@ -455,6 +473,18 @@ typedef Quantity<AngleDimension> Angle;
 
 /// Typ für Zeitvariablen
 typedef Quantity<TimeDimension> Time;
+
+/// Typ für Massenvariablen
+typedef Quantity<MassDimension> Mass;
+
+/// Typ für Stromvariablen
+typedef Quantity<AmpereDimension> Ampere;
+
+/// Typ für Kraftvariablen
+typedef Quantity<ForceDimension> Force;
+
+/// Typ für Spannungsvariablen
+typedef Quantity<VoltageDimension> Voltage;
 
 /// Typ für Flächen
 typedef Quantity< typename dim_mul<LengthDimension, LengthDimension>::type > Area;
