@@ -35,9 +35,9 @@ constexpr Angle angle_pi = M_PI * rad;
 /// \endcode
 template<typename Dim>
 constexpr _always_inline
-Units::Quantity<typename Units::dim_pow<Dim, std::ratio<2> >::type >
+Units::Quantity<Units::dim_pow<Dim, std::ratio<2> > >
 sqr(Units::Quantity<Dim> arg) {
-    return Units::Quantity< typename Units::dim_pow<Dim, std::ratio<2> >::type >
+    return Units::Quantity< Units::dim_pow<Dim, std::ratio<2> > >
             (arg.value * arg.value);
 }
 
@@ -49,9 +49,9 @@ sqr(Units::Quantity<Dim> arg) {
 /// sqrt(4.f * Units::mm * Units::mm) // entspricht 2 mm
 /// \endcode
 template<typename Dim> math_constexpr _always_inline
-Units::Quantity<typename Units::dim_root<Dim, std::ratio<2> >::type>
+Units::Quantity<Units::dim_root<Dim, std::ratio<2> >>
 sqrt(Units::Quantity<Dim> arg) {
-    return Units::Quantity<typename Units::dim_root<Dim, std::ratio<2> >::type>
+    return Units::Quantity<Units::dim_root<Dim, std::ratio<2> >>
             (std::sqrt(arg.value));
 }
 
@@ -65,61 +65,61 @@ template<typename Pow, REQUIRES2(
          !(Pow::num == 1 && (Pow::num <= 3 && Pow::num >= 0))    // Spezialversionen vorhanden
          ), typename Dim>
 constexpr _always_inline
-Units::Quantity<typename Units::dim_pow<Dim, Pow>::type>
+Units::Quantity<Units::dim_pow<Dim, Pow>>
 power_helper(Units::Quantity<Dim> arg) {
-    return Units::Quantity<typename Units::dim_pow<Dim, Pow>::type >
+    return Units::Quantity<Units::dim_pow<Dim, Pow> >
             (std::pow(arg.value, Value(Pow::num) / Value(Pow::den)));
 }
 
 template<typename Pow, REQUIRES2(Pow::den == 1 && Pow::num == 0), typename Dim>
 constexpr _always_inline
-Units::Quantity<typename Units::dim_pow<Dim, Pow>::type>
+Units::Quantity<Units::dim_pow<Dim, Pow>>
 power_helper(Units::Quantity<Dim> arg) {
-  return Units::Quantity<typename Units::dim_pow<Dim, Pow>::type>(
+  return Units::Quantity<Units::dim_pow<Dim, Pow>>(
               arg != 0. ? 1. : std::pow(arg, arg));
 }
 
 template<typename Pow, REQUIRES2(Pow::den == 1 && Pow::num == 1), typename Dim>
 constexpr _always_inline
-Units::Quantity<typename Units::dim_pow<Dim, Pow>::type >
+Units::Quantity<Units::dim_pow<Dim, Pow> >
 power_helper(Units::Quantity<Dim> arg) {
   return arg;
 }
 
 template<typename Pow, REQUIRES2(Pow::den == 1 && Pow::num == 2), typename Dim>
 constexpr _always_inline
-Units::Quantity<typename Units::dim_pow<Dim, Pow>::type>
+Units::Quantity<Units::dim_pow<Dim, Pow>>
 power_helper(Units::Quantity<Dim> arg) {
   return sqr(arg);
 }
 
 template<typename Pow, REQUIRES2(Pow::den == 1 && Pow::num == 3), typename Dim>
 constexpr _always_inline
-Units::Quantity<typename Units::dim_pow<Dim, Pow>::type>
+Units::Quantity<Units::dim_pow<Dim, Pow>>
 power_helper(Units::Quantity<Dim> arg) {
-  return Units::Quantity<typename Units::dim_pow<Dim, Pow>::type>
+  return Units::Quantity<Units::dim_pow<Dim, Pow>>
       (arg.value * arg.value * arg.value);
 }
 
 template<typename Pow, REQUIRES2(Pow::den == 1 && Pow::num == 4), typename Dim>
 constexpr _always_inline
-Units::Quantity<typename Units::dim_pow<Dim, Pow>::type>
+Units::Quantity<Units::dim_pow<Dim, Pow>>
 power_helper(Units::Quantity<Dim> arg) {
   return sqr(sqr(arg));
 }
 
 template<typename Pow, REQUIRES2(Pow::den == 2 && Pow::num == 1), typename Dim>
 constexpr _always_inline
-Units::Quantity<typename Units::dim_pow<Dim, Pow>::type>
+Units::Quantity<Units::dim_pow<Dim, Pow>>
 power_helper(Units::Quantity<Dim> arg) {
   return sqrt(arg);
 }
 
 template<typename Pow, REQUIRES2(Pow::den == 3 && Pow::num == 1), typename Dim>
 constexpr _always_inline
-Units::Quantity<typename Units::dim_pow<Dim, Pow>::type>
+Units::Quantity<Units::dim_pow<Dim, Pow>>
 power_helper(Units::Quantity<Dim> arg) {
-  return Units::Quantity< typename Units::dim_pow<Dim, Pow>::type >
+  return Units::Quantity< Units::dim_pow<Dim, Pow> >
           (::cbrt(arg.value));
 }
 
@@ -138,7 +138,7 @@ power_helper(Units::Quantity<Dim> arg) {
 /// \endcode
 template<std::intmax_t Num, std::intmax_t Denom = 1, typename Dim>
 constexpr _always_inline
-Units::Quantity<typename Units::dim_pow<Dim, std::ratio<Num, Denom> >::type>
+Units::Quantity<Units::dim_pow<Dim, std::ratio<Num, Denom> >>
 power(Units::Quantity<Dim> arg) {
     return detail::power_helper<std::ratio<Num, Denom> >(arg);
 }
@@ -154,7 +154,7 @@ power(Units::Quantity<Dim> arg) {
 /// \endcode
 template<std::intmax_t Num, std::intmax_t Denom = 1, typename Dim>
 constexpr _always_inline
-Units::Quantity< typename Units::dim_root<Dim, std::ratio<Num, Denom> >::type>
+Units::Quantity< Units::dim_root<Dim, std::ratio<Num, Denom> >>
 root(Units::Quantity<Dim> arg) {
     return detail::power_helper<std::ratio<Denom, Num> >(arg);
 }

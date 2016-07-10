@@ -20,13 +20,13 @@ typedef std::ratio<0> RationalNull;
 typedef std::ratio<1> RationalOne;
 typedef std::ratio<2> RationalTwo;
 
-template<typename Length, typename Angle, typename Time, typename Mass, typename Ampere>
+template<typename Length, typename Angle, typename Time, typename Mass, typename Current>
 struct Dimension {
   typedef Length length;
   typedef Angle angle;
   typedef Time time;
   typedef Mass mass;
-  typedef Ampere ampere;
+  typedef Current ampere;
 };
 
 typedef Dimension<RationalNull, RationalNull, RationalNull, RationalNull, RationalNull> DimensionlessDimension;
@@ -34,54 +34,50 @@ typedef Dimension<RationalOne,  RationalNull, RationalNull, RationalNull, Ration
 typedef Dimension<RationalNull, RationalOne,  RationalNull, RationalNull, RationalNull> AngleDimension;
 typedef Dimension<RationalNull, RationalNull, RationalOne , RationalNull, RationalNull> TimeDimension;
 typedef Dimension<RationalNull, RationalNull, RationalTwo , RationalNull, RationalNull> QuadTimeDimension;
-typedef Dimension<RationalNull, RationalNull, RationalOne , RationalOne , RationalNull> MassDimension;
-typedef Dimension<RationalNull, RationalNull, RationalOne , RationalNull, RationalOne > AmpereDimension;
-typedef Dimension<RationalOne, RationalNull, std::ratio<-2>, RationalOne, RationalOne> ForceDimension;
+typedef Dimension<RationalNull, RationalNull, RationalNull, RationalOne , RationalNull> MassDimension;
+typedef Dimension<RationalNull, RationalNull, RationalNull, RationalNull, RationalOne > CurrentDimension;
+typedef Dimension<RationalOne, RationalNull, std::ratio<-2>, RationalOne, RationalNull> ForceDimension;
 typedef Dimension<RationalTwo, RationalNull, std::ratio<-3>, RationalOne, std::ratio<-1>> VoltageDimension;
 
 template<typename LhsDimension, typename RhsDimension>
-struct dim_mul {
-  typedef Dimension<
+using dim_mul =
+    Dimension<
   		typename std::ratio_add<typename LhsDimension::length, typename RhsDimension::length>::type,
-			typename std::ratio_add<typename LhsDimension::angle,  typename RhsDimension::angle>::type,
-			typename std::ratio_add<typename LhsDimension::time,   typename RhsDimension::time>::type,
-			typename std::ratio_add<typename LhsDimension::mass,   typename RhsDimension::mass>::type,
-			typename std::ratio_add<typename LhsDimension::ampere, typename RhsDimension::ampere>::type
-	> type;
-};
+        typename std::ratio_add<typename LhsDimension::angle,  typename RhsDimension::angle>::type,
+        typename std::ratio_add<typename LhsDimension::time,   typename RhsDimension::time>::type,
+        typename std::ratio_add<typename LhsDimension::mass,   typename RhsDimension::mass>::type,
+        typename std::ratio_add<typename LhsDimension::ampere, typename RhsDimension::ampere>::type
+    >;
 
 template<typename LhsDimension, typename RhsDimension>
-struct dim_div {
-  typedef Dimension<
+using dim_div =
+    Dimension<
   		typename std::ratio_subtract<typename LhsDimension::length, typename RhsDimension::length>::type,
-			typename std::ratio_subtract<typename LhsDimension::angle,  typename RhsDimension::angle>::type,
-			typename std::ratio_subtract<typename LhsDimension::time,   typename RhsDimension::time>::type,
-			typename std::ratio_subtract<typename LhsDimension::mass,   typename RhsDimension::mass>::type,
-			typename std::ratio_subtract<typename LhsDimension::ampere, typename RhsDimension::ampere>::type
-	> type;
-};
+        typename std::ratio_subtract<typename LhsDimension::angle,  typename RhsDimension::angle>::type,
+        typename std::ratio_subtract<typename LhsDimension::time,   typename RhsDimension::time>::type,
+        typename std::ratio_subtract<typename LhsDimension::mass,   typename RhsDimension::mass>::type,
+        typename std::ratio_subtract<typename LhsDimension::ampere, typename RhsDimension::ampere>::type
+    >;
 
 template<typename Dim, typename N>
-struct dim_root {
-  typedef Dimension<
+using dim_root =
+    Dimension<
   		typename std::ratio_divide<typename Dim::length, N>::type,
-			typename std::ratio_divide<typename Dim::angle,  N>::type,
-			typename std::ratio_divide<typename Dim::time,   N>::type,
-			typename std::ratio_divide<typename Dim::mass,   N>::type,
-			typename std::ratio_divide<typename Dim::ampere, N>::type
-	> type;
-};
+        typename std::ratio_divide<typename Dim::angle,  N>::type,
+        typename std::ratio_divide<typename Dim::time,   N>::type,
+        typename std::ratio_divide<typename Dim::mass,   N>::type,
+        typename std::ratio_divide<typename Dim::ampere, N>::type
+    >;
 
 template<typename Dim, typename N>
-struct dim_pow {
-  typedef Dimension<
+using dim_pow =
+    Dimension<
   		typename std::ratio_multiply<typename Dim::length, N>::type,
-			typename std::ratio_multiply<typename Dim::angle,  N>::type,
-			typename std::ratio_multiply<typename Dim::time,   N>::type,
-			typename std::ratio_multiply<typename Dim::mass,   N>::type,
-			typename std::ratio_multiply<typename Dim::ampere, N>::type
-	> type;
-};
+        typename std::ratio_multiply<typename Dim::angle,  N>::type,
+        typename std::ratio_multiply<typename Dim::time,   N>::type,
+        typename std::ratio_multiply<typename Dim::mass,   N>::type,
+        typename std::ratio_multiply<typename Dim::ampere, N>::type
+    >;
 
 #endif
 
@@ -107,10 +103,10 @@ public:
 /// 2 * Units::mm * Units::mm // ergibt 2 Quadradmillimeter
 /// \endcode
 template<typename Dim1, typename Dim2> constexpr
-Unit<typename dim_mul<Dim1, Dim2>::type>
+Unit<dim_mul<Dim1, Dim2>>
 operator * (Unit<Dim1> a, Unit<Dim2> b)
 {
-  return Unit<typename dim_mul<Dim1, Dim2>::type>(a.factor * b.factor);
+  return Unit<dim_mul<Dim1, Dim2>>(a.factor * b.factor);
 }
 
 /// zwei Einheiten dividieren
@@ -119,10 +115,10 @@ operator * (Unit<Dim1> a, Unit<Dim2> b)
 /// 2 * Units::m / Units::s // ergibt 2 Meter pro Sekunde
 /// \endcode
 template<typename Dim1, typename Dim2> constexpr
-Unit<typename dim_div<Dim1, Dim2>::type>
+Unit<dim_div<Dim1, Dim2>>
 operator / (Unit<Dim1> a, Unit<Dim2> b)
 {
-  return Unit<typename dim_div<Dim1, Dim2>::type>(a.factor / b.factor);
+  return Unit<dim_div<Dim1, Dim2>>(a.factor / b.factor);
 }
 
 /// Typ um Besonderheiten der Null zu nutzen
@@ -190,10 +186,10 @@ template <typename Dim>
 struct Quantity {
 
   /// Dimension der Einheit
-  typedef Dim dimension;
+  typedef Dim DimensionType;
 
   /// Typ für Einheit
-  typedef Unit<Dim> unit;
+  typedef Unit<Dim> UnitType;
 
   /// Variable mit Einheit aus Zahl erstellen
   /// \warning nur verwenden wenn, man weiß man macht!
@@ -300,10 +296,10 @@ Quantity<Dim> operator * (Unit<Dim> unit, Value value)
 /// Zahl durch Einheit dividieren
 /// \returns Variable mit inverse Einheit \a unit und Wert von \a value
 template<typename Dim> constexpr
-Quantity<typename dim_div<DimensionlessDimension, Dim>::type>
+Quantity<dim_div<DimensionlessDimension, Dim>>
 operator / (Value value, Unit<Dim> unit)
 {
-  return Quantity<typename dim_div<DimensionlessDimension, Dim>::type>
+  return Quantity<dim_div<DimensionlessDimension, Dim>>
 	  (value / unit.factor);
 }
 
@@ -348,18 +344,18 @@ Quantity<Dim> operator - (Quantity<Dim> lhs, Quantity<Dim> rhs)
 
 /// zwei Variablen mit Einheit multiplizieren
 template<typename Dim1, typename Dim2> constexpr
-QuantityResultType<typename dim_mul<Dim1, Dim2>::type>
+QuantityResultType<dim_mul<Dim1, Dim2>>
 operator * (Quantity<Dim1> lhs, Quantity<Dim2> rhs)
 {
-  return QuantityResultType<typename dim_mul<Dim1, Dim2>::type> (lhs.value * rhs.value);
+  return QuantityResultType<dim_mul<Dim1, Dim2>> (lhs.value * rhs.value);
 }
 
 /// zwei Variablen mit Einheit dividieren
 template<typename Dim1, typename Dim2> constexpr
-QuantityResultType<typename dim_div<Dim1, Dim2>::type>
+QuantityResultType<dim_div<Dim1, Dim2>>
 operator / (Quantity<Dim1> lhs, Quantity<Dim2> rhs)
 {
-  return QuantityResultType<typename dim_div<Dim1, Dim2>::type>(lhs.value / rhs.value);
+  return QuantityResultType<dim_div<Dim1, Dim2>>(lhs.value / rhs.value);
 }
 
 /// zwei Variablen mit Einheit vergleichen
@@ -445,10 +441,10 @@ Quantity<Dim> operator * (Quantity<Dim> lhs, Value rhs)
 
 /// Zahl durch Variable mit Einheit dividieren
 template<typename Dim> constexpr
-QuantityResultType<typename dim_div<DimensionlessDimension, Dim>::type>
+QuantityResultType<dim_div<DimensionlessDimension, Dim>>
 operator / (Value lhs, Quantity<Dim> rhs)
 {
-  return QuantityResultType<typename dim_div<DimensionlessDimension, Dim>::type>
+  return QuantityResultType<dim_div<DimensionlessDimension, Dim>>
 	  (lhs / rhs.value);
 }
 
@@ -477,30 +473,44 @@ typedef Quantity<TimeDimension> Time;
 /// Typ für Massenvariablen
 typedef Quantity<MassDimension> Mass;
 
-/// Typ für Stromvariablen
-typedef Quantity<AmpereDimension> Ampere;
-
 /// Typ für Kraftvariablen
 typedef Quantity<ForceDimension> Force;
+
+/// Typ für Stromvariablen
+typedef Quantity<CurrentDimension> Current;
 
 /// Typ für Spannungsvariablen
 typedef Quantity<VoltageDimension> Voltage;
 
+/// Typ für Leistung
+typedef decltype(Current() * Voltage()) Power;
+
+/// Typ für Wiederstände
+typedef decltype(Voltage() / Current()) Resistance;
+
 /// Typ für Flächen
-typedef Quantity< typename dim_mul<LengthDimension, LengthDimension>::type > Area;
+typedef Quantity< dim_mul<LengthDimension, LengthDimension> > Area;
 
 /// Typen für Geschwindigkeit
-typedef Quantity< typename dim_div<LengthDimension, TimeDimension>::type > Velocity;
-typedef Quantity< typename dim_div<TimeDimension, LengthDimension>::type > InverseVelocity;
+typedef Quantity< dim_div<LengthDimension, TimeDimension> > Velocity;
+typedef Quantity< dim_div<TimeDimension, LengthDimension> > InverseVelocity;
 
 /// Typ für Winkelgeschwindigkeit
-typedef Quantity< typename dim_div<AngleDimension, TimeDimension>::type > AngularVelocity;
+typedef Quantity< dim_div<AngleDimension, TimeDimension> > AngularVelocity;
 
 /// Typen für Beschleunigung
-typedef Quantity< typename dim_div<LengthDimension, QuadTimeDimension>::type > Acceleration;
+typedef Quantity< dim_div<LengthDimension, QuadTimeDimension> > Acceleration;
 
 /// Typ für Winkelbeschleunigung
-typedef Quantity< typename dim_div<AngleDimension, QuadTimeDimension>::type > AngularAcceleration;
+typedef Quantity< dim_div<AngleDimension, QuadTimeDimension> > AngularAcceleration;
+
+/// Typ für Moment
+typedef Quantity<dim_mul<ForceDimension, LengthDimension>> Torque;
+
+/// Typ für magmetische Feldstärke
+typedef decltype(Mass() / (Current() * Time() * Time())) MagneticField;
+
+// TODO: weitere Typen einführen
 
 /// \}
 

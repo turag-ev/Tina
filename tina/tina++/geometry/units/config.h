@@ -78,6 +78,22 @@ namespace Units {
 #define TURAG_UNITS_FACTOR_TO_SECOND 1.f
 #endif
 
+#ifndef TURAG_UNITS_FACTOR_TO_KILOGRAMM
+/// Faktor zwischen internem zu speichernden Wert und Kilogramm
+///
+/// \par Standardwert
+///   1.f
+#define TURAG_UNITS_FACTOR_TO_KILOGRAMM 1.f
+#endif
+
+#ifndef TURAG_UNITS_FACTOR_TO_AMPERE
+/// Faktor zwischen internem zu speichernden Wert und Ampere
+///
+/// \par Standardwert
+///   1.f
+#define TURAG_UNITS_FACTOR_TO_AMPERE 1.f
+#endif
+
 /// Typ für Gleitkommazahlen
 ///
 /// Konfigurierbar über Definition von \ref TURAG_UNITS_REAL_TYPE
@@ -101,6 +117,8 @@ typedef Real UnitFactor;
 constexpr UnitFactor FROM_SI_CONVERT_FACTOR_LENGTH = TURAG_UNITS_FACTOR_TO_METER;
 constexpr UnitFactor FROM_SI_CONVERT_FACTOR_ANGLE  = TURAG_UNITS_FACTOR_TO_RADIAN;
 constexpr UnitFactor FROM_SI_CONVERT_FACTOR_TIME   = TURAG_UNITS_FACTOR_TO_SECOND;
+constexpr UnitFactor FROM_SI_CONVERT_FACTOR_MASS   = TURAG_UNITS_FACTOR_TO_KILOGRAMM;
+constexpr UnitFactor FROM_SI_CONVERT_FACTOR_CURRENT = TURAG_UNITS_FACTOR_TO_AMPERE;
 #endif
 
 /// \} \}
