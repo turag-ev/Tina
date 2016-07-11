@@ -21,6 +21,8 @@ typedef decltype(Voltage() / Current()) Resistance;
 /// Typ für magmetische Feldstärke
 typedef decltype(Mass() / (Current() * Time() * Time())) MagneticField;
 
+// TODO: mehr Größen ...
+
 // Einheiten
 
 /// Definition für Volt
@@ -40,6 +42,8 @@ constexpr Resistance::UnitType Ohm(V / A);
 
 /// Tesla
 constexpr MagneticField::UnitType T(kg / (A * s*s));
+
+// TODO: mehr Einheiten ...
 
 } } // namespace TURAG::Units
 

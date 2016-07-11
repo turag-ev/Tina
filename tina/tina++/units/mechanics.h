@@ -31,6 +31,8 @@ typedef Quantity< dim_div<LengthDimension, QuadTimeDimension> > Acceleration;
 /// Typ für Winkelbeschleunigung
 typedef Quantity< dim_div<AngleDimension, QuadTimeDimension> > AngularAcceleration;
 
+// TODO: Trägheitsmoment, ...
+
 // Einheiten
 
 /// Definition für Newton
