@@ -2,6 +2,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include <tina++/geometry/units.h>
+#include <tina++/units/electronics.h>
 
 using namespace TURAG;
 using namespace TURAG::Units;

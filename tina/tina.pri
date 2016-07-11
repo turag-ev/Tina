@@ -44,7 +44,14 @@ HEADERS  += \
     $$PWD/tina/helper/types.h \
     $$PWD/tina/utils/bit_macros.h \
     $$PWD/tina/bytes.h \
-    $$PWD/tina/math.h
+    $$PWD/tina/math.h \
+    $$PWD/tina++/units/config.h \
+    $$PWD/tina++/units/math.h \
+    $$PWD/tina++/units/unit.h \
+    $$PWD/tina++/units/units.h \
+    $$PWD/tina++/units/mechanics.h \
+    $$PWD/tina++/units/electronics.h \
+    $$PWD/tina++/units.h
 
 DISTR_FILES += $$PWD/tina.pri
 
@@ -90,10 +97,6 @@ contains(TINA, geometry) {
       $$PWD/tina++/geometry/spline.cpp
 
   HEADERS  += \
-      $$PWD/tina++/geometry/units/config.h \
-      $$PWD/tina++/geometry/units/math.h \
-      $$PWD/tina++/geometry/units/unit.h \
-      $$PWD/tina++/geometry/units/units.h \
       $$PWD/tina++/geometry/circle.h \
       $$PWD/tina++/geometry/fieldpose.h \
       $$PWD/tina++/geometry/geometry.h \

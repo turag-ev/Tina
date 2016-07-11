@@ -4,9 +4,9 @@
 #include <type_traits>
 #include <ratio>
 
-#include "../../math.h"
+#include "../math.h"
 #include "config.h"
-#include <tina/tina.h>
+#include <tina++/tina.h>
 
 namespace TURAG {
 namespace Units {
@@ -473,42 +473,8 @@ typedef Quantity<TimeDimension> Time;
 /// Typ für Massenvariablen
 typedef Quantity<MassDimension> Mass;
 
-/// Typ für Kraftvariablen
-typedef Quantity<ForceDimension> Force;
-
 /// Typ für Stromvariablen
 typedef Quantity<CurrentDimension> Current;
-
-/// Typ für Spannungsvariablen
-typedef Quantity<VoltageDimension> Voltage;
-
-/// Typ für Leistung
-typedef decltype(Current() * Voltage()) Power;
-
-/// Typ für Wiederstände
-typedef decltype(Voltage() / Current()) Resistance;
-
-/// Typ für Flächen
-typedef Quantity< dim_mul<LengthDimension, LengthDimension> > Area;
-
-/// Typen für Geschwindigkeit
-typedef Quantity< dim_div<LengthDimension, TimeDimension> > Velocity;
-typedef Quantity< dim_div<TimeDimension, LengthDimension> > InverseVelocity;
-
-/// Typ für Winkelgeschwindigkeit
-typedef Quantity< dim_div<AngleDimension, TimeDimension> > AngularVelocity;
-
-/// Typen für Beschleunigung
-typedef Quantity< dim_div<LengthDimension, QuadTimeDimension> > Acceleration;
-
-/// Typ für Winkelbeschleunigung
-typedef Quantity< dim_div<AngleDimension, QuadTimeDimension> > AngularAcceleration;
-
-/// Typ für Moment
-typedef Quantity<dim_mul<ForceDimension, LengthDimension>> Torque;
-
-/// Typ für magmetische Feldstärke
-typedef decltype(Mass() / (Current() * Time() * Time())) MagneticField;
 
 // TODO: weitere Typen einführen
 

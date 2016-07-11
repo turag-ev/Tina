@@ -46,35 +46,11 @@ constexpr Mass::UnitType g(FROM_SI_CONVERT_FACTOR_MASS / 1000.f);
 /// Definition für Kilogramm
 constexpr Mass::UnitType kg(FROM_SI_CONVERT_FACTOR_MASS);
 
-/// Definition für Newton
-constexpr Force::UnitType N(kg*m/(s*s));
-
-/// Definition für Newtonmeter
-constexpr Torque::UnitType Nm(N*m);
-
 /// Definition für Ampere
 constexpr Current::UnitType A(FROM_SI_CONVERT_FACTOR_CURRENT);
 
 /// Definition für Milliampere
 constexpr Current::UnitType mA(FROM_SI_CONVERT_FACTOR_CURRENT / 1000.f);
-
-/// Definition für Volt
-constexpr Voltage::UnitType V(N*m/(A*s));
-
-/// Definition für Millivolt
-constexpr Voltage::UnitType mV(V.factor / 1000.f);
-
-/// Definition für Walt
-constexpr Power::UnitType W(A * V);
-
-/// Definition für Milliwalt
-constexpr Power::UnitType mW(mA * V);
-
-/// Definition für Ohm
-constexpr Resistance::UnitType Ohm(V / A);
-
-/// Tesla
-constexpr MagneticField::UnitType T(kg / (A * s*s));
 
 /// \}
 
