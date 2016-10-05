@@ -9,15 +9,14 @@ namespace Debug {
 
 
 /// \ingroup Debug
-/// \brief Fehlerzähler, der selbstständig Fehlermeldung generiert
+/// \brief Universeller Fehlerzähler, der selbstständig Fehlermeldung generiert.
 ///
-/// Ist dem \ref ErrorObserver ähnlich, aber arbeitet auf einer höheren
-/// Abstraktionsebene, so wird im Konstruktor eine Fehlermeldung angegeben, die
-/// wie bei Benutzung von \ref ErrorObserver in regelmäßigen Abständen die
-/// Ausgabe selbsttätig ausgibt mit zustätzlicher Statistik zur Häufigkeit des Fehlers.
+/// Ist dem \ref ErrorObserver ähnlich, verfügt aber zusätzlich über eine
+/// Reihe vordefinierter Ausgabemeldungen, die automatisch an eine
+/// benutzerdefinierte Ausgabe angehängt werden.
 ///
-/// Das \ref ErrorLogger Objekt kann über das Makro ERROR_LOGGER erstellt
-/// werden. Damit entfällt die Angabe der Logquelle (TURAG_DEBUG_LOG_SOURCE),
+/// Das \ref ErrorLogger Objekt kann über das Makro \ref ERROR_LOGGER erstellt
+/// werden. Damit entfällt die Angabe der Logquelle (\ref TURAG_DEBUG_LOG_SOURCE),
 /// die über das Makro eingelesen und dem Konstruktur übergeben wird.
 ///
 /// Mit der Funktion \ref logResult wird das Ergebnis der letzten Operation übergeben.
@@ -94,18 +93,131 @@ private:
 	/// der ErrorObserver, der benutzt wird, für die richtige Arbeit
 	ErrorObserver observer_;
 
+	/// Länge der Fehlermeldung
+	std::size_t message_length_;
+
+	/// Fehlermeldung
+	const char* message_;
+
 	/// Loglevel
 	char log_level_;
 
 	/// Logquelle
 	char log_source_;
+};
 
+
+/// \ingroup Debug
+/// \brief Einfacher Fehlerzähler mit geringem Speicherbedarf.
+///
+/// Ist dem \ref CheapErrorObserver ähnlich, gibt allerdings selbsttätig eine
+/// konfigurierbare Meldung, erweitert um die Anzahl der seit der letzten
+/// Ausgabe aufgetretenen Fehler aus.
+///
+/// Das \ref ErrorLogger Objekt kann über das Makro \ref CHEAP_ERROR_LOGGER erstellt
+/// werden. Damit entfällt die Angabe der Logquelle (\ref TURAG_DEBUG_LOG_SOURCE),
+/// die über das Makro eingelesen und dem Konstruktur übergeben wird.
+///
+/// Mit der Funktion \ref logResult wird das Ergebnis der letzten Operation übergeben.
+/// Diese Funktion gibt wenn nötig eine Fehlermeldung mit Statistik aus.
+/// log() gibt den ihr übergebenen Parameter zurück, sodass der logResult-Aufruf
+/// direkt in eine if-Bedingung eingefügt werden kann, wo sonst nur der Parameter selbst
+/// stehen würde.
+///
+/// Diese Klasse ist im Vergleich zu ErrorLogger deutlich leichtgewichtiger im
+/// Speicherverbrauch (üblicherweise 16 Byte).
+///
+/// Beispielcode:
+/// \code
+/// // Definition
+/// static CheapErrorLogger error_logger
+///     = CHEAP_ERROR_LOGGER("Konnte keine GPS-Position lesen.", SystemTime::fromSec(25));
+/// void getGpsPos() {
+///   Point point;
+///   if (error_logger.logResult(GPS::getPosition(&point))) {
+///     // Operation `GPS::getPosition(&point)` war erfolgreich:
+///     // was mit `point` machen:
+///     global.updateGPSPosition(point);
+///   }
+/// }
+/// \endcode
+class CheapErrorLogger
+{
+public:
+	///
+	/// \brief Einfachen Meldungslogger erstellen
+	///
+	/// Es wird empfohlen, das Hilfsmakro \ref CHEAP_ERROR_LOGGER zu benutzen.
+	///
+	/// \param log_level Loglevel (z.B. `TURAG_DEBUG_ERROR_PREFIX[0]`)
+	/// \param log_source Logquelle: `TURAG_DEBUG_LOG_SOURCE[0]`
+	/// \param message Fehlermeldung
+	/// \param min_interval Minimales Intervall in dem Fehlermeldungen ausgegeben werden dürfen.
+	/// Maximal 65.535 ms.
+	///
+	/// \bug Prozentzeichen in \p message müssen gedoppelt werden (wie in printf).
+	///
+	/// \sa CHEAP_ERROR_LOGGER
+	CheapErrorLogger(char log_level, char log_source, const char* message, SystemTime min_interval);
+
+	///
+	/// \brief Einfachen Meldungslogger für Fehlermeldungen erstellen
+	///
+	/// entspricht dem Aufruf mit dem ersten Parameter als `TURAG_DEBUG_ERROR_PREFIX[0]`.
+	CheapErrorLogger(char log_source, const char* message, SystemTime min_interval) :
+		CheapErrorLogger(TURAG_DEBUG_ERROR_PREFIX[0], log_source, message, min_interval)
+	{ }
+
+	/// \brief Ergebnis von letzter Operation loggen
+	/// \param result Ergebnis von letzter Operation
+	/// \return \p result
+	bool logResult(bool result);
+
+	/// \brief Loglevel verändern
+	/// \param log_level_char TURAG_DEBUG_ERROR_PREFIX[0],
+	///   TURAG_DEBUG_CRITICAL_PREFIX[0], TURAG_DEBUG_WARN_PREFIX[0],
+	///   TURAG_DEBUG_INFO_PREFIX[0] oder TURAG_DEBUG_DEBUG_PREFIX[0]
+	void setLogLevel(char log_level_char) { log_level_ = log_level_char; }
+
+	/// \brief Loglevel zurückgeben
+	/// \returns TURAG_DEBUG_ERROR_PREFIX[0], TURAG_DEBUG_CRITICAL_PREFIX[0],
+	///    TURAG_DEBUG_WARN_PREFIX[0], TURAG_DEBUG_INFO_PREFIX[0] oder
+	///    TURAG_DEBUG_DEBUG_PREFIX[0]
+	char getLogLevel() const { return log_level_; }
+
+	///
+	/// \brief Setzt den Meldungslogger zurück.
+	///
+	void reset()
+	{
+		last_error_message_ms_ = 0;
+		failuresSinceLastOutput_ = 0;
+	}
+
+
+private:
 	/// Fehlermeldung
 	const char* message_;
 
-	/// Länge der Fehlermeldung
-	std::size_t message_length_;
+	/// letzter Fehler
+	uint32_t last_error_message_ms_;
+
+	/// minimales Intervall in dem Fehlermeldungen ausgegeben werden dürfen
+	uint16_t interval_ms_;
+
+	/// Fehlerzähler
+	uint16_t failuresSinceLastOutput_;
+
+	uint16_t message_length_;
+
+	/// Loglevel
+	char log_level_;
+
+	/// Logquelle
+	char log_source_;
 };
+
+
 
 /// \brief Helfer zum Erstellen von \ref TURAG::Debug::ErrorLogger
 ///
@@ -125,6 +237,26 @@ private:
 /// \sa TURAG_DEBUG_LOG_SOURCE, TURAG::Debug::ErrorLogger::ErrorLogger
 #define ERROR_LOGGER(message, min_interval, min_errors) \
 	TURAG::Debug::ErrorLogger(TURAG_DEBUG_LOG_SOURCE[0], message, min_interval, min_errors)
+
+
+/// \brief Helfer zum Erstellen von \ref TURAG::Debug::CheapErrorLogger
+///
+/// \relates TURAG::Debug::CheapErrorLogger
+///
+/// Ruft Konstruktor von \ref TURAG::Debug::CheapErrorLogger auf mit `TURAG_DEBUG_LOG_SOURCE[0]` als ersten Parameter.
+/// \param message Fehlermeldung
+/// \param min_interval minimales Intervall in dem Fehlermeldungen ausgegeben werden dürfen
+///
+/// Beispielcode:
+/// \code
+/// static CheapErrorLogger error_logger
+///     = CHEAP_ERROR_LOGGER("meine schöne Fehlermeldung", SystemTime::fromSec(25));
+/// \endcode
+///
+/// \sa TURAG_DEBUG_LOG_SOURCE, TURAG::Debug::CheapErrorLogger::CheapErrorLogger
+#define CHEAP_ERROR_LOGGER(message, min_interval) \
+	TURAG::Debug::CheapErrorLogger(TURAG_DEBUG_LOG_SOURCE[0], message, min_interval)
+
 
 } // namespace Debug
 } // namespace TURAG

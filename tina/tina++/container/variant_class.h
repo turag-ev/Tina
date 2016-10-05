@@ -11,7 +11,7 @@ namespace TURAG {
 
 template<class Abstract, class ...Variants>
 class VariantClass {
-	static_assert(all_true<std::is_base_of<Abstract, Variants>...>::value, "Nicht alle Klassen sind Implemtierungen von ersten Templateparameter");
+	static_assert(all_true<std::is_base_of<Abstract, Variants>...>::value, "Nicht alle Klassen sind Implementierungen des ersten Templateparameters");
     //static_assert(all_true<std::is_trivially_copyable<Variants>...>::value, "FIXME");
 
 public:
