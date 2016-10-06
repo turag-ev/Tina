@@ -15,6 +15,8 @@ namespace Debug {
 /// Reihe vordefinierter Ausgabemeldungen, die automatisch an eine
 /// benutzerdefinierte Ausgabe angehängt werden.
 ///
+/// \todo Ausgabemeldung ist derzeit noch nicht konfigurierbar.
+///
 /// Das \ref ErrorLogger Objekt kann über das Makro \ref ERROR_LOGGER erstellt
 /// werden. Damit entfällt die Angabe der Logquelle (\ref TURAG_DEBUG_LOG_SOURCE),
 /// die über das Makro eingelesen und dem Konstruktur übergeben wird.
@@ -114,7 +116,7 @@ private:
 /// konfigurierbare Meldung, erweitert um die Anzahl der seit der letzten
 /// Ausgabe aufgetretenen Fehler aus.
 ///
-/// Das \ref ErrorLogger Objekt kann über das Makro \ref CHEAP_ERROR_LOGGER erstellt
+/// Das \ref CheapErrorLogger Objekt kann über das Makro \ref CHEAP_ERROR_LOGGER erstellt
 /// werden. Damit entfällt die Angabe der Logquelle (\ref TURAG_DEBUG_LOG_SOURCE),
 /// die über das Makro eingelesen und dem Konstruktur übergeben wird.
 ///
