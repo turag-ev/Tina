@@ -1,0 +1,4 @@
+Enthält die Doxygen-Konfiguration zum Erstellen der Quellcode-Docu.
+
+Mit `make' oder `make doc' wird die HTML-Doku erstellt,
+mit `make qtdoc' das Help-File, was in den Qt-Creator importiert werden kann.
