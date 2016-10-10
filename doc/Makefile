@@ -5,10 +5,7 @@ doc:
 qtdoc:
 	doxygen doxyfile.qtdoc > /dev/null
 	
-tests:
-	cd tests
-	make -j4
 
 clean:
-	rm -rf doc/html
-	rm -rf doc/qtdoc
+	rm -rf html
+	rm -rf qtdoc
