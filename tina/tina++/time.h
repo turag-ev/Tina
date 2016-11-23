@@ -111,6 +111,12 @@ public:
         return SystemTime(TURAG_TIME_INFINITE_TICKS);
     }
 
+    /// Frequenz der plattformabhängigen Ticks
+    constexpr
+    static unsigned frequency() {
+        return turag_get_systick_frequency();
+    }
+
 private:
     TuragSystemTicks value;
 };

@@ -71,9 +71,9 @@ unsigned turag_ticks_to_us(TuragSystemTime time) {
  * \return sys ticks
  */
 #ifdef _WIN32
-# define turag_plattform_dependent_get_tick GetTickCount
+# define turag_platform_dependent_get_tick GetTickCount
 #else
-static inline uint64_t turag_plattform_dependent_get_tick()
+static inline uint64_t turag_platform_dependent_get_tick()
 {
     struct timeval time_value;
 	  gettimeofday(&time_value, NULL);
@@ -83,7 +83,13 @@ static inline uint64_t turag_plattform_dependent_get_tick()
 
 static _always_inline
 TuragSystemTime turag_get_current_tick(void) { // [tick]
-  return _turag_ticks_to_time(turag_plattform_dependent_get_tick());
+  return _turag_ticks_to_time(turag_platform_dependent_get_tick());
+}
+
+/// Frequenz der plattformabhängigen Ticks
+static _always_inline _constexpr_func
+unsigned turag_get_systick_frequency(void) {
+    return turag_s_to_ticks(1).value;
 }
 
 #ifdef __cplusplus

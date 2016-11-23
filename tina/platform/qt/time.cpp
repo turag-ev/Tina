@@ -8,7 +8,7 @@
 
 extern "C" {
 
-uint64_t turag_plattform_dependent_get_tick()
+uint64_t turag_platform_dependent_get_tick()
 {
 #ifdef _WIN32
 		return GetTickCount(); 

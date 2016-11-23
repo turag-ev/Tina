@@ -67,6 +67,12 @@ TuragSystemTime turag_get_current_tick(void) { // [tick]
   return _turag_ticks_to_time(chTimeNow());
 }
 
+/// Frequenz der plattformabhängigen Ticks
+static _always_inline _constexpr_func
+unsigned turag_get_systick_frequency(void) {
+    return CH_FREQUENCY;
+}
+
 #ifdef __cplusplus
 } // extern "C"
 #endif
