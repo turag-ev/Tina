@@ -9,12 +9,58 @@
 #include <tina++/time.h>
 #include <tina++/helper/scoped_lock.h>
 
+#include <atomic>
+
 
 namespace TURAG {
 
 ////////////////////////////////////////////////////////////////////////////////
 // Thread
+extern "C" void _turag_thread_entry(void* data);
 
+
+class ThreadImpl
+{
+    NOT_COPYABLE(ThreadImpl);
+
+protected:
+    // should only be created through Thread
+    explicit ThreadImpl(void* working_area, size_t size) :
+        working_area_(working_area), stack_size_(size), 
+        thread_(nullptr), terminate_request_(false) { }
+
+public:
+    ~ThreadImpl() {}
+
+    void start(int priority, void (*entry) ()) {
+        thread_ = chThdCreateStatic(working_area_, stack_size_,
+                                NORMALPRIO + priority,
+                                (tfunc_t)_turag_thread_entry,
+                                (void*)entry);
+    }
+
+    void terminate() {
+      terminate_request_ = true;
+    }
+
+    bool shouldTerminate() const {
+      return terminate_request_;
+    }
+
+    /// returns maximal used stack size in bytes
+    std::size_t getStackUsage() const;
+    
+private:
+    void* working_area_;
+    size_t stack_size_;
+    
+    Thread *thread_;
+
+    std::atomic<bool> terminate_request_;
+};    
+    
+    
+    
 /**
  * \class Thread
  * \brief Plattform independent thread
@@ -23,49 +69,20 @@ namespace TURAG {
  */
 namespace detail {
 
-extern "C" {
-extern void _turag_thread_entry(void* data);
-}
-
-std::size_t thread_get_stack_usage(const char* stack, std::size_t stack_size);
 
 template<size_t size>
-class thread_detail {
-  NOT_COPYABLE(thread_detail);
+class thread_detail : public ThreadImpl {
+    NOT_COPYABLE(thread_detail);
 
 public:
-  // returns size of stack
-  static constexpr std::size_t StackSize = size;
+    explicit thread_detail() :
+        ThreadImpl(working_area_, size) { }
 
-  _always_inline thread_detail() :
-    thread_(nullptr)
-  { }
-
-  _always_inline
-  void start(tprio_t priority, void (*entry) ()) {
-    thread_ = chThdCreateStatic(working_area_, sizeof(working_area_),
-                                NORMALPRIO + priority,
-                                (tfunc_t)_turag_thread_entry,
-                                (void*)entry);
-  }
-
-  /// returns maximal used stack size in bytes
-  _always_inline std::size_t getStackUsage() const {
-#ifdef CH_DBG_FILL_THREADS
-    return thread_get_stack_usage(reinterpret_cast<const char*>(&working_area_), sizeof(working_area_));
-#else
-    return 0;
-#endif
-  }
-
-  _always_inline
-  bool shouldTerminate() {
-    return false;
-  }
+    // returns size of stack
+    static constexpr std::size_t StackSize = size;
 
 private:
-  Thread *thread_;
-  WORKING_AREA(working_area_, size);
+    WORKING_AREA(working_area_, size);
 };
 
 } // namespace detail
@@ -337,8 +354,10 @@ typedef detail::semaphore_detail Semaphore;
 // work-around because chibios binary semaphore structure is also named BinarySemaphore
 //typedef detail::binary_semaphore_detail BinarySemaphore;
 
+#ifdef CH_USE_MAILBOXES
 // work-around because chibios mailbox structure is also named Mailbox
 template<std::size_t size> class Mailbox : public detail::mailbox_detail<size> { };
+#endif
 
 // work-around because chibios thread structure is also named Thread
 // and WORKING_AREA have problems with this.

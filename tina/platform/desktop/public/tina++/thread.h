@@ -24,44 +24,47 @@ namespace TURAG {
 ////////////////////////////////////////////////////////////////////////////////
 // Thread
 
-template<size_t size = 0>
-class Thread {
-    NOT_COPYABLE(Thread);
+class ThreadImpl
+{
+	NOT_COPYABLE(ThreadImpl);
+    
+protected:
+    // should only be created through Thread
+    explicit ThreadImpl() :
+		terminate_request_(false) { }
 
 public:
-    explicit Thread() :
-      terminate_request_(false)
-    { }
+	~ThreadImpl() {}
 
-    _always_inline
-    void join() {
+	void join() {
         if (thread_) {
             thread_->join();
         }
     }
 
-	static std::size_t getStackUsage() { return 0; }
+	void start(int, void (*entry) ()) {
+		thread_.reset(new std::thread(entry));
+	}
 
-    _always_inline
-    void start(int, void (*entry) ()) {
-        thread_.reset(new std::thread(entry));
-    }
-    
-    _always_inline
-    void terminate() {
-      terminate_request_ = true;
-    }
-    
-    _always_inline
-    bool shouldTerminate() {
-      return terminate_request_;
-    }
+	void terminate() {
+	  terminate_request_ = true;
+	}
+
+	bool shouldTerminate() const {
+	  return terminate_request_;
+	}
+
+	std::size_t getStackUsage() const { return 0; }
 
 private:
-    std::unique_ptr<std::thread> thread_;
-    
-    std::atomic<bool> terminate_request_;
+	std::unique_ptr<std::thread> thread_;
+
+	std::atomic<bool> terminate_request_;
 };
+
+
+template<size_t size>
+class Thread : public ThreadImpl {};
 
 struct CurrentThread {
 private:
@@ -72,7 +75,7 @@ public:
   /// lets the current thread sleep
   static void delay(SystemTime ticks);
 
-  static _always_inline void setName(const char *) { }
+  static void setName(const char *name);
 };
 
 inline void Thread_delay(SystemTime d /* [ticks] */) {

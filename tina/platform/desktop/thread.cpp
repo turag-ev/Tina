@@ -1,8 +1,11 @@
 #include <unistd.h>
 #include <limits.h>
 #include <errno.h>
+
 #ifdef _WIN32
 # include <windows.h>
+#else
+# include <sys/prctl.h>
 #endif
 
 #include "public/tina++/thread.h"
@@ -22,6 +25,13 @@ void CurrentThread::delay(SystemTime d /* [ticks] */) {
     sleep(d.toSec());
 #endif
   }
+}
+
+void CurrentThread::setName(const char *name)
+{
+#ifndef _WIN32
+    prctl(PR_SET_NAME, reinterpret_cast<unsigned long>(name), 0, 0, 0);
+#endif
 }
 
 extern "C"

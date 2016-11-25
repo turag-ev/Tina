@@ -7,11 +7,8 @@
 #include <tina/debug.h>
 #include <stackusage.h>
 
-typedef Thread ChThread;
-
 namespace TURAG {
 
-namespace detail {
 
 extern "C"
 void _turag_thread_entry(void* data) {
@@ -23,8 +20,8 @@ void _turag_thread_entry(void* data) {
 
 #ifdef CH_DBG_FILL_THREADS
 
-std::size_t thread_get_stack_usage(const char* stack, std::size_t stack_size) {
-  return su_get_stack_usage(stack, stack_size);
+std::size_t ThreadImpl::getStackUsage() const {
+    return su_get_stack_usage(static_cast<char*>(working_area_), stack_size_);
 }
 
 extern "C"
@@ -32,11 +29,20 @@ size_t turag_thread_get_stack_usage(const TuragThread* thread) {
   return su_get_stack_usage(static_cast<const char*>(thread->stack),
                             thread->stack_size);
 }
+#else // CH_DBG_FILL_THREADS
 
-#endif
+std::size_t ThreadImpl::getStackUsage() const {
+    return 0;
+}
+
+extern "C"
+size_t turag_thread_get_stack_usage(const TuragThread* thread) {
+  return 0;
+}
+
+#endif // CH_DBG_FILL_THREADS
 
 
-} // namespace detail
 
 bool Semaphore::wait(SystemTime time) {
 	while (1) {
