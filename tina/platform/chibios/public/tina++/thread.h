@@ -9,10 +9,6 @@
 #include <tina++/time.h>
 #include <tina++/helper/scoped_lock.h>
 
-/// when definied, than getStackUsage will give real values. But thread creating time will increase.
-#define THREADS_STACK_MEASUREMENT
-
-#define TURAG_ATTR_SECTION_CCMDATA ATTR_SECTION_CCMDATA
 
 namespace TURAG {
 

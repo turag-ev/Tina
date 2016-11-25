@@ -53,6 +53,12 @@
 # define TURAG_USE_TINA_HIGH_RES_DELAY_TIMER		0
 #endif
 
+/// Kann benutzt werden, um statische Variablen in einem speziellen
+/// Speicherbereich anzulegen. Plattformabhängig.
+#if !defined(TURAG_ATTR_SECTION_CCMDATA) || defined(__DOXYGEN__)
+# define TURAG_ATTR_SECTION_CCMDATA
+#endif
+
 
 /**
  * @}
@@ -107,16 +113,24 @@
  */
 
 
-/** @name Feldbus Hostklassen-Konfiguration
+/** @name Feldbus Konfiguration
  * @{
  */
 
 /// Legt fest, ob Host-Support für den TURAG-Feldbus verfügbar ist.
-/// Wenn auf 0 definiert, werden die zum Feldbus gehörenden Quelldateien
+/// Wenn auf 0 definiert, werden die zu Feldbus-Host gehörenden Quelldateien
 /// nicht compiliert. Daran sollten sich auch alle neuen Klassen halten.
 /// \see \ref feldbus-host
 #if !defined(TURAG_USE_TURAG_FELDBUS_HOST) || defined(__DOXYGEN__)
 # define TURAG_USE_TURAG_FELDBUS_HOST		0
+#endif
+
+/// Legt fest, ob Slave-Support für den TURAG-Feldbus verfügbar ist.
+/// Wenn auf 0 definiert, werden die zu Feldbus-Slave gehörenden Quelldateien
+/// nicht compiliert. Daran sollten sich auch alle neuen Klassen halten.
+/// \see \ref feldbus-host
+#if !defined(TURAG_USE_TURAG_FELDBUS_SLAVE) || defined(__DOXYGEN__)
+# define TURAG_USE_TURAG_FELDBUS_SLAVE       0
 #endif
 
 /// enables some features in feldbus classes that 
