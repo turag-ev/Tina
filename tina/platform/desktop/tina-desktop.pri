@@ -1,7 +1,8 @@
 INCLUDEPATH += $$PWD/public
 
 SOURCES += \
-    $$PWD/thread.cpp
+    $$PWD/thread.cpp \
+    $$PWD/debugprint.cpp
 
 HEADERS  += \
     $$PWD/public/tina/can.h \

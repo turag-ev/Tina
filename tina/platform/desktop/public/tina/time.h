@@ -73,7 +73,7 @@ unsigned turag_ticks_to_us(TuragSystemTime time) {
 #ifdef _WIN32
 # define turag_platform_dependent_get_tick GetTickCount
 #else
-static inline uint64_t turag_platform_dependent_get_tick()
+static inline uint64_t turag_platform_dependent_get_tick(void)
 {
     struct timeval time_value;
 	  gettimeofday(&time_value, NULL);

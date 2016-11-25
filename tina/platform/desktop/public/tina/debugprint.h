@@ -1,17 +1,30 @@
 #ifndef TINA_SIM_DEBUGPRINT_H
 #define TINA_SIM_DEBUGPRINT_H
 
-#include <stdio.h>
+
+#ifdef QT_CORE_LIB
+
+#include <stdarg.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define turag_debug_puts puts
-#define turag_debug_vprintf vprintf
+void turag_debug_puts(const char* s);
+void turag_debug_vprintf(const char* fmt, va_list vargs);
 
 #ifdef __cplusplus
 } // extern "C"
 #endif
+
+#else // #ifdef QT_CORE_LIB
+
+#include <stdio.h>
+
+#define turag_debug_puts puts
+#define turag_debug_vprintf vprintf
+
+#endif // #ifdef QT_CORE_LIB
+
 
 #endif // TINA_SIM_DEBUGPRINT_H

@@ -18,17 +18,11 @@
 #include <tina++/tina.h>
 #include <tina++/time.h>
 
-/// when definied, than getStackUsage will give real values. But thread creating time will increase.
-//#define THREADS_STACK_MEASUREMENT
 
 namespace TURAG {
 
 ////////////////////////////////////////////////////////////////////////////////
 // Thread
-
-void Thread_delay(SystemTime d /* [ticks] */);
-void Thread_pause_all();
-void Thread_resume_all();
 
 template<size_t size = 0>
 class Thread {
@@ -46,9 +40,7 @@ public:
         }
     }
 
-    static void setName(const char *) { }
-    static void delay(SystemTime d) { Thread_delay(d); }
-    static std::size_t getStackUsage(const char*, std::size_t) { return 0; }
+	static std::size_t getStackUsage() { return 0; }
 
     _always_inline
     void start(int, void (*entry) ()) {
@@ -70,6 +62,23 @@ private:
     
     std::atomic<bool> terminate_request_;
 };
+
+struct CurrentThread {
+private:
+  // von dieser Klasse gibt es keine Instanz
+  CurrentThread();
+
+public:
+  /// lets the current thread sleep
+  static void delay(SystemTime ticks);
+
+  static _always_inline void setName(const char *) { }
+};
+
+inline void Thread_delay(SystemTime d /* [ticks] */) {
+	CurrentThread::delay(d);
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Mutex
@@ -210,7 +219,7 @@ public:
         std::unique_lock<std::mutex> lock(mutex_);
         while (!count_) {
             std::cv_status status = condition_.wait_for(lock,
-                std::chrono::milliseconds(ticks_to_ms(timeout)));
+                std::chrono::milliseconds(timeout.toMsec()));
             if (status == std::cv_status::timeout)
                 return false;
         }

@@ -26,8 +26,6 @@ QMAKE_CXXFLAGS += -Wno-unused-parameter
 LIBS += -lboost_unit_test_framework
 
 SOURCES += \
-    ../platform/qt/debugprint.cpp \
-    ../platform/qt/time.cpp \
     main.cpp \
     container_test.cpp \
     container_test_test.cpp \
@@ -46,9 +44,9 @@ HEADERS += \
     extentions.h
 
 INCLUDEPATH += \
-    ../platform/qt/public
 
 TINA += debug statemachine geometry base64
 
 include(../../src/common/TURAG-common.pri)
 include(../tina.pri)
+include(../platform/desktop/tina-desktop.pri)
