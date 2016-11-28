@@ -1,10 +1,8 @@
 #define TURAG_DEBUG_LOG_SOURCE "_"
 #include "public/tina++/thread.h"
 #include "public/tina/thread.h"
-#include <tina/debug.h>
 #include <cstdint>
 
-#include <tina/debug.h>
 #include <stackusage.h>
 
 namespace TURAG {
