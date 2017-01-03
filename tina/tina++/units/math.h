@@ -1,7 +1,7 @@
 #ifndef TINAPP_UNITS_MATH_H
 #define TINAPP_UNITS_MATH_H
 
-#include "../../math.h"
+#include "../math.h"
 #include "units.h"
 
 namespace TURAG {
