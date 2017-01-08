@@ -39,8 +39,6 @@ State* const Statemachine::error = nullptr;
 Statemachine::Statemachine(
         const char* const pname,
         State* const pentrystate,
-        State* const initState,
-        const EventClass* const eventOnSuccessfulInitialization,
         State* const pabortstate,
         const EventClass* const eventOnGracefulShutdown,
         const EventClass* const eventOnErrorShutdown):
@@ -51,22 +49,21 @@ Statemachine::Statemachine(
 	next_to_be_stopped(nullptr),
     name(pname),
     startTime(0),
-    status_(Status::none),
-    argument_(0),
-	sendSignal_(false),
-	clearSignal_(false),
-    signal_(0),
     pcurrent_state(nullptr),
     entrystate(pentrystate),
-    initializedState(initState),
     abortstate(pabortstate),
-    myEventOnSuccessfulInitialization(eventOnSuccessfulInitialization),
     myEventOnGracefulShutdown(eventOnGracefulShutdown),
     myEventOnErrorShutdown(eventOnErrorShutdown),
     myEventOnGracefulShutdownOverride(nullptr),
     myEventOnErrorShutdownOverride(nullptr),
-    eventqueue_(nullptr)
-{ }
+	eventqueue_(nullptr),
+	status_(Status::none),
+	supressStatechangeDebugMessages(false),
+	sendSignal_(false),
+	clearSignal_(false),
+	signal_(0),
+	argument_(0)
+		{ }
 
 void Statemachine::start(uintptr_t argument, bool supressStatechangeDebugMessages) {
     start(defaultEventqueue_, argument, supressStatechangeDebugMessages);
@@ -84,10 +81,6 @@ void Statemachine::start(EventQueue* eventqueue, uintptr_t argument, bool supres
         turag_criticalf("%s: not added: waiting to be deactivated", name);
     } else if (getStatusInternal() == Status::running) {
         turag_infof("%s: not added: already running", name);
-    } else if(getStatusInternal() == Status::running_and_initialized) {
-        turag_infof("%s: not added: already running", name);
-        // send initialized event but only if we are already initialized
-        emitEvent(myEventOnSuccessfulInitialization);
     } else {
         if (Statemachine::last_to_be_activated_statemachine) {
             previous_to_be_activated = Statemachine::last_to_be_activated_statemachine;
@@ -117,14 +110,14 @@ void Statemachine::stop(void) {
         turag_infof("%s: not added: already in deactivation queue", name);
     } else if (getStatusInternal() == Status::waiting_for_activation) {
         turag_criticalf("%s: not stopped: already in activation queue", name);
-    } else if (getStatusInternal() == Status::running_and_initialized || getStatusInternal() == Status::running) {
+	} else if (getStatusInternal() == Status::running) {
         next_to_be_stopped =  Statemachine::first_to_be_stopped_statemachine;
         Statemachine::first_to_be_stopped_statemachine = this;
         status_ = Status::running_and_waiting_for_deactivation;
     } else {
         turag_infof("%s: not stopped: wasn't running", name);
         // send shutdown event nonetheless
-        emitEvent(myEventOnSuccessfulInitialization);
+		emitEvent(myEventOnGracefulShutdown);
     }
 }
 
@@ -348,11 +341,6 @@ bool Statemachine::change_state(State* next_state, ScopedLock<Mutex> *lock) {
                 }
             }
 
-            if (next_state == initializedState && status_ == Status::running) {
-                emitEvent(myEventOnSuccessfulInitialization);
-                status_ = Status::running_and_initialized;
-            }
-
             pcurrent_state = next_state;
             return true;
         } else {
@@ -380,7 +368,6 @@ void Statemachine::removeFromActiveList(void) {
 
 bool Statemachine::isActiveInternal(void) {
     if (status_ == Status::running ||
-            status_ == Status::running_and_initialized ||
             status_ == Status::waiting_for_activation ||
             status_ == Status::running_and_waiting_for_deactivation) {
         return true;
@@ -391,7 +378,6 @@ bool Statemachine::isActiveInternal(void) {
 
 bool Statemachine::isRunningInternal(void) {
     if (status_ == Status::running ||
-            status_ == Status::running_and_initialized ||
             status_ == Status::running_and_waiting_for_deactivation) {
         return true;
     } else {

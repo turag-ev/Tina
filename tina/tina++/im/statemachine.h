@@ -132,9 +132,8 @@
  * is started. It is also possible to start a statemachine in silent mode, then it will not
  * emit any event.
  *
- * Every statemachine is defined with a set of three standard events, which are emitted
+ * Every statemachine is defined with a set of two standard events, which are emitted
  * automatically:
- * - eventOnSuccessfulInitialization
  * - eventOnGracefulShutdown
  * - eventOnErrorShutdown
  *
@@ -480,7 +479,7 @@ public:
     /**
      * \brief Definiert das Warteverhalten.
      */
-    enum class WaitType {
+	enum class WaitType : uint8_t {
         //! Warten, bis State::hasSignal()==true. Wurde in der Vergangenheit ein Signal empfangen,
         //! wird sofort der nächste State aktiv.
         wait_for_any_signal,
@@ -549,16 +548,13 @@ public:
     /*!
      * \brief Status-type of Statemachine-class.
      */
-    enum class Status {
+	enum class Status : uint8_t {
         //! Initial state after instantiation.
         none,
         //! %Statemachine is part of activation queue.
         waiting_for_activation,
         //! %Statemachine is active and running.
         running,
-        //! %Statemachine is active and running and passed or is in
-        //! its init-state.
-        running_and_initialized,
         //! %Statemachine is active but will stop soon.
         running_and_waiting_for_deactivation,
         //! %Statemachine is not running. Its last execution resulted in an error.
@@ -597,9 +593,6 @@ public:
      * the statemachine's states.
      * \param pname Name of the statemachine.
      * \param pentrystate Initial state of the statemachine.
-     * \param initState Upon the entry of this state the eventOnSuccessfulInitialization-event
-     * is emitted (if there is an eventqueue and the statemachine is not started silently).
-     * \param eventOnSuccessfulInitialization %Event that is emitted upon entry of the initState.
      * \param pabortstate %State to be executed when the statemachin should be stopped.
      * You can use Statemachine::finished if you don't need to supply custom actions prior the shutdown
      * of the statemachine.
@@ -611,8 +604,6 @@ public:
     Statemachine(
             const char* const pname,
             State* const pentrystate,
-            State* const initState = nullptr,
-            const EventClass* const eventOnSuccessfulInitialization = nullptr,
             State* const pabortstate = Statemachine::finished,
             const EventClass* const eventOnGracefulShutdown = nullptr,
             const EventClass* const eventOnErrorShutdown = nullptr);
@@ -685,7 +676,6 @@ public:
      * \details A statemachine is considered active if its status equals one of the following values:
      * - Status::waiting_for_activation
      * - Status::running
-     * - Status::running_and_initialized
      * - Status::running_and_waiting_for_deactivation
      *
      * \return true if active, false otherwise.
@@ -697,7 +687,6 @@ public:
      * \brief Returns whether the statemachine is running.
      * \details A statemachine is considered running if its status equals one of the follwoing values:
      * - Status::running
-     * - Status::running_and_initialized
      * - Status::running_and_waiting_for_deactivation
      *
      * \return true if running, false otherwise.
@@ -776,17 +765,10 @@ private:
 
     const char* const name;
     SystemTime startTime;
-    Status status_;
-	uintptr_t argument_;
-	bool sendSignal_;
-	bool clearSignal_;
-	uintptr_t signal_;
     State* pcurrent_state;
     State * const entrystate;
-    State * const initializedState;
     State * const abortstate;
 
-    const EventClass* const myEventOnSuccessfulInitialization;
     const EventClass* const myEventOnGracefulShutdown;
     const EventClass* const myEventOnErrorShutdown;
 
@@ -796,7 +778,12 @@ private:
     static EventQueue* defaultEventqueue_;
     EventQueue* eventqueue_;
 
-    bool supressStatechangeDebugMessages;
+	Status status_;
+	bool supressStatechangeDebugMessages;
+	bool sendSignal_;
+	bool clearSignal_;
+	uintptr_t signal_;
+	uintptr_t argument_;
 };
 
 
