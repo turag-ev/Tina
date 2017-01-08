@@ -67,11 +67,11 @@ Statemachine::Statemachine(
     eventqueue_(nullptr)
 { }
 
-void Statemachine::start(int32_t argument, bool supressStatechangeDebugMessages) {
+void Statemachine::start(uintptr_t argument, bool supressStatechangeDebugMessages) {
     start(defaultEventqueue_, argument, supressStatechangeDebugMessages);
 }
 
-void Statemachine::start(EventQueue* eventqueue, int32_t argument, bool supressStatechangeDebugMessages_) {
+void Statemachine::start(EventQueue* eventqueue, uintptr_t argument, bool supressStatechangeDebugMessages_) {
     Mutex::Lock lock(interface_mutex);
 
     argument_ = argument;
@@ -124,7 +124,7 @@ void Statemachine::stop(void) {
 }
 
 
-bool Statemachine::sendSignal(int32_t signal) {
+bool Statemachine::sendSignal(uintptr_t signal) {
     Mutex::Lock lock(interface_mutex);
 
     if (isRunningInternal()) {

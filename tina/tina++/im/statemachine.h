@@ -249,14 +249,14 @@ protected:
      * the return value of this function is meanignless.
      * \return Argument of received signal.
      */
-    int32_t getSignal(void) const { return signal_; }
+	uintptr_t getSignal(void) const { return signal_; }
     
     /*!
      * \brief Returns the value of the argument the associated statemachine
      * was started with.
      * \return Value of the statemachine's argument.
      */
-    int32_t getArgument(void) const { return argument_; }
+	uintptr_t getArgument(void) const { return argument_; }
 
     /*!
      * \brief Returns how long this state is already active.
@@ -364,10 +364,10 @@ protected:
 private:
     void setEventQueue(EventQueue* eventqueue) { eventqueue_ = eventqueue; }
 
-    void setSignal(int32_t signal = 0) { signal_ = signal; hasSignal_ = true; }
+	void setSignal(uintptr_t signal = 0) { signal_ = signal; hasSignal_ = true; }
     void clearSignal(void) { hasSignal_ = false; }
 
-    void setArgument(int32_t argument) { argument_ = argument; }
+	void setArgument(uintptr_t argument) { argument_ = argument; }
 
     void setStarttime(SystemTime starttime) { stateStarttime_ = starttime; }
     void setStatemachineStarttime(SystemTime starttime) { statemachineStarttime_ = starttime; }
@@ -384,8 +384,8 @@ private:
     }
 
     bool hasSignal_;
-    int32_t signal_;
-    int32_t argument_;
+	uintptr_t signal_;
+	uintptr_t argument_;
     SystemTime stateStarttime_;
     SystemTime statemachineStarttime_;
 
@@ -568,7 +568,7 @@ public:
      * messages informing about state changes.
      * \remark This function is thread-safe.
      */
-    void start(int32_t argument = 0, bool supressStatechangeDebugMessages = false);
+	void start(uintptr_t argument = 0, bool supressStatechangeDebugMessages = false);
 
     /*!
      * \brief Start the statemachine.
@@ -578,7 +578,7 @@ public:
      * messages informing about state changes.
      * \remark This function is thread-safe.
      */
-    void start(EventQueue* eventqueue, int32_t argument = 0, bool supressStatechangeDebugMessages = false);
+	void start(EventQueue* eventqueue, uintptr_t argument = 0, bool supressStatechangeDebugMessages = false);
 
     /*!
      * \brief Start the statemachine in silent mode (no event will ever be emitted).
@@ -587,7 +587,7 @@ public:
      * messages informing about state changes.
      * \remark This function is thread-safe.
      */
-    void startSilent(int32_t argument = 0, bool supressStatechangeDebugMessages = false) {
+	void startSilent(uintptr_t argument = 0, bool supressStatechangeDebugMessages = false) {
         start(nullptr, argument, supressStatechangeDebugMessages);
     }
 
@@ -606,7 +606,7 @@ public:
      * \return false if the statemachine is not running, true otherwise.
      * \remark This function is thread-safe.
      */
-    bool sendSignal(int32_t signal = 0);
+	bool sendSignal(uintptr_t signal = 0);
 
     /*!
      * \brief Returns whether the statemachine is active.
@@ -705,9 +705,9 @@ private:
     const char* const name;
     SystemTime startTime;
     Status status_;
-    int32_t argument_;
+	uintptr_t argument_;
     bool hasSignal_;
-    int32_t signal_;
+	uintptr_t signal_;
     State* pcurrent_state;
     State * const entrystate;
     State * const initializedState;

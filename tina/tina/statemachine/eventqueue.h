@@ -15,7 +15,9 @@ extern "C" {
 typedef int32_t TuragEventId;
 
 /// Typ für Parameter von Events
-typedef int32_t TuragEventArg;
+// Changed from uint32_t to uintptr_t for compatability with
+// 64 bit systems
+typedef uintptr_t TuragEventArg;
 
 /// Typ für Funktionen die Events verarbeiten
 typedef void (*TuragEventMethod)(TuragEventId id, TuragEventArg data);
