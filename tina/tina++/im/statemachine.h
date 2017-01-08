@@ -233,8 +233,8 @@ public:
      * \param name_ Name of the state.
      */
     State(const char* const name_) :
-        name(name_), hasSignal_(false), signal_(0), eventOnGracefulShutdown(nullptr),
-        eventOnErrorShutdown(nullptr), eventqueue_(nullptr) {}
+		name(name_), hasSignal_(false), signal_(0),
+		eventqueue_(nullptr) {}
 
 protected:
     /*!
@@ -309,45 +309,11 @@ protected:
      *\brief Add an event to the eventqueue.
      * \details Same as above.
      * \param event_class Event class of the event to add.
-     * \param param Parameter object. Needs to be <= 4 bytes.
+	 * \param param Parameter object.
      */
     template<typename T, REQUIRES(!std::is_integral<T>)> _always_inline
     void emitEvent(const EventClass* event_class, T param) const {
       emitEvent(event_class, pack<EventArg>(param));
-    }
-
-    /**
-     * @brief Überschreibt das Event, das beim korrekten Beenden der Statemaschine emittiert wird.
-     * @param eventOnGracefulShutdown_ Zu emittierendes Event.
-     *
-     * Mit dieser Funktion kann das Event, welches automatisch beim erfolgreichen
-     * Beenden der Statemachine emittiert wird, überschrieben werden. Dies gilt für
-     * die aktuelle Ausführung der Statemachine, bei einem erneuten Start der Statemachine
-     * gilt wieder das im Konstruktor übergebene.
-     *
-     * \note Es ist nicht möglich, die Ausgabe des Events zu unterdrücken,
-     * indem nullptr an diese Funktion übergeben wird. Wird nullptr übergeben, tut diese
-     * Funktion nichts.
-     */
-    void overrideEventOnGracefulShutdown(const EventClass*  eventOnGracefulShutdown_) {
-        eventOnGracefulShutdown = eventOnGracefulShutdown_;
-    }
-
-    /**
-     * @brief Überschreibt das Event, das beim Fehler-Abbruch der Statemaschine emittiert wird.
-     * @param eventOnErrorShutdown_ Zu emittierendes Event.
-     *
-     * Mit dieser Funktion kann das Event, welches automatisch beim durch einen Fehler
-     * ausgelösten Abbruch der Statemachine emittiert wird, überschrieben werden. Dies gilt für
-     * die aktuelle Ausführung der Statemachine, bei einem erneuten Start der Statemachine
-     * gilt wieder das im Konstruktor übergebene.
-     *
-     * \note Es ist nicht möglich, die Ausgabe des Events zu unterdrücken,
-     * indem nullptr an diese Funktion übergeben wird. Wird nullptr übergeben, tut diese
-     * Funktion nichts.
-     */
-    void overrideEventOnErrorShutdown(const EventClass*  eventOnErrorShutdown_) {
-        eventOnErrorShutdown = eventOnErrorShutdown_;
     }
 
     /**
@@ -397,26 +363,12 @@ private:
     void setStarttime(SystemTime starttime) { stateStarttime_ = starttime; }
     void setStatemachineStarttime(SystemTime starttime) { statemachineStarttime_ = starttime; }
 
-    const EventClass* getEventOnGracefulShutdownOverride(void) const {
-        return eventOnGracefulShutdown;
-    }
-    const EventClass* getEventOnErrorShutdownOverride(void) const {
-        return eventOnErrorShutdown;
-    }
-    void clearEventOverrides(void) {
-        eventOnGracefulShutdown = nullptr;
-        eventOnErrorShutdown = nullptr;
-    }
-
     bool hasSignal_;
     bool hasNewSignal_;
     uintptr_t signal_;
     uintptr_t argument_;
     SystemTime stateStarttime_;
     SystemTime statemachineStarttime_;
-
-    const EventClass*  eventOnGracefulShutdown;
-    const EventClass*  eventOnErrorShutdown;
 
     EventQueue* eventqueue_;
 
@@ -771,9 +723,6 @@ private:
 
     const EventClass* const myEventOnGracefulShutdown;
     const EventClass* const myEventOnErrorShutdown;
-
-    const EventClass* myEventOnGracefulShutdownOverride;
-    const EventClass* myEventOnErrorShutdownOverride;
 
     static EventQueue* defaultEventqueue_;
     EventQueue* eventqueue_;
