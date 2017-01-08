@@ -16,7 +16,7 @@
  *
  * @section IM-Statemachine
  * This module offers the possibility to define flexible finite statemachines
- * that are able reflect the usual requirements for mechanical state flows.
+ * that are able meet the usual requirements for mechanical state flows.
  *
  * The central idea about the internal mechanics statemachines is to have special
  * IM-thread running that works on the continuous execution of the statemachines.
@@ -40,10 +40,9 @@
  *  - Statemachines can emit specified events to a given eventqueue while being active.
  *  - The execution of a statemachine
  * can be part of the stateflow of another one.
- *  - When started, a statemachine can get an argument, which is valid as long
+ *  - When starting a statemachine you can supply it with an argument, which is valid as long
  * as the execution lasts and is available in all associated states.
- *  - A state can wait for a specific external signal. Signals are only valid
- * in the transition-function of the currently active state.
+ *  - A state can wait for a specific external signal which can hold a value.
  *
  * \subsection defstatemachines Creating statemachines
  * Let's look at how to create a simple statemachine that works with some piece
@@ -89,13 +88,17 @@
  * a special value, leading to the termination of the statemachine.
  * \snippet im_statemachine_states_example.cpp States
  *
- * Now we can implement the behaviour of our statemachine. Each state owns a state-fumction
+ * Now we can implement the behaviour of our statemachine. Each state owns a state-function
  * that is executed once when the state becomes active. Return false in this function
- * to indicate an error and have the whole statemachine cancelled. he second function
+ * to indicate an error and have the whole statemachine cancelled. The second function
  * is the transition-function which is called as long as you return the this-pointer. There
  * are some special return values (see State::transition_function). Keep in mind, that neither
- * the state- nor the transition are allowed to contain code or functions that take an
- * unconsiderable amount of time to finish. Both functions should return quickly.
+ * the state- nor the transition-function are allowed to contain code or functions that take an
+ * unconsiderable amount of time to finish (blocking/synchronous calls). 
+ * Both functions should return quickly.
+ * 
+ * Further you should avoid using static members in your states. This enables you to use your
+ * State classes for more than one instance.
  * \snippet im_statemachine_states_example.cpp Functions
  *
  * Now, as we have complete state classes, we need to define some instances of them and
@@ -103,10 +106,15 @@
  * statemachines that behave the same but work on different hardware, we do this in a
  * separate namespace. Take note of the extern declarations before the actual instantiations.
  * They are necessary to define the states in the correct logical order. Otherwise we would
- * get compiler errors.
+ * get compiler errors (or would need to define them bottom-to-top which is ugly to read).
+ * 
+ * It is extremely important to understand that you must never use the same instance of a
+ * State class twice! Each one is bound to exactly one statemachine instance. In contrast
+ * implementing those state classes flexibly enough to be able to reuse them for more than one
+ * instantiation is encouraged though.
  * \snippet im_statemachine_states_example.cpp Instances
  *
- * Now all tht's left to do is putting our states together into a statemachine. Not all
+ * Now all that's left to do is putting our states together into a statemachine. Not all
  * arguments are required, most are optional. For details see Statemachine::Statemachine.
  * \snippet im_statemachine_states_example.cpp Statemachine
  *
@@ -149,38 +157,39 @@
  * standard events, because the states could still contain emitEvent-calls. This is of course
  * UNLESS you want the statemachine to emit events to the eventqueue, but this practice is
  * highly discouraged.
- * - Statemachines (at least those who emit events) should be exclusive to either one spearate thread
- * or the statemachine thread. Consider the following example: some thread starts statemachine A.
+ * - Statemachine instances (at least those who emit events) should be exclusively started from either one spearate thread
+ * or the statemachine thread. Consider the following example: some thread (e.g. the system control) 
+ * starts statemachine A, which is then like all statemachines executed from within the statemachine thread.
  * %Statemachine A starts statemachine B in the recommended silent mode and runs for a good while.
- * Now the thread that started A suddenly needs to start B which normally emits an initialized-event.
+ * Now the thread that started A also needs to start B. It expects B to respond with an event saying whether
+ *the statemachine could be started or not.
  * But B is already running - in silent mode. So the thread will never know the story about B and
  * probably wait forever. You might say: then A shouldn't start B in silent mode, but that's even worse
  * in the opposite case: now B suddenly emits events which the thread did never expect and it might get
  * totally confused.
  *
  * To wrap it all up: statemachines-in-statemachines is fine and good, but if you use it, start them silent
- * and keep all statemachines separate (unless you can really guarantee that it doesn't emit events and still then
- * there remain some issues).
+ * and keep all statemachine instances bound to one starter-thread (unless you can really guarantee 
+ * that it doesn't emit events and still then there remain some issues).
  *
  *
- * \subsection signalsandarguments Signals and arguments
- * When you start a statemachine, it's possible to pass an argument along. This is an integer value
- * whose meaning depends on the statemachine. You might define some enum and use the argument
- * to customize the behaviour of the statemachine with a few distinct modes or you could use it
- * as a continuous value which might be the angle of the axis of some robot arm. If you need more than
- * what fits into 4 byte, you could supply a pointer but then you have to make sure that the corresponding
- * data doesn't get touched while the statemachine is running.
- *
- * The argument of a statemachine is available in both the state- and the transition-functions of all states
- * that are part of the statemachine.
- *
- * Signals offer a similar functionality with the difference that they only live for the time of the current
- * state still being active. You can only push a signal to a statemachine, once it is running. The signal will then
- * be available only in the transition-function of the currently active state. You can pass an argument along
- * with the signal, but that is optional.
- *
- * A likely use-case of the signals (a state that delays the stateflow until it receives any signal) is
- * readily available for use with the class WaitForSignalState.
+ * \subsection signalsandarguments Signale und Argumente
+ * Beim Start einer %Statemachine kann ein Argument mit übergeben werden. Die Interpretation dessen
+ * hängt von der Implementierung des States ab. Mögliche Einsatzszenarien sind die Übergabe eines
+ * enum-Wertes wodurch einer von mehreren möglichen Ablaufmodi eingestelt wird, oder man übergibt 
+ * den Stellwinkel eines Aktors etc. Sollen größere Datenmengen übergeben werden als in das Argument
+ * passt, kann ein Zeiger benutzt werden. Der Speicher auf den dieser zeigt darf sich dann aber während
+ * der Laufzeit der %Statemachine nicht ändern.
+ * 
+ * Da das Argument nur beim Starten übergeben werden kann, ist es über die gesamte Laufzeit konstant.
+ * Soll die %Statemachine während ihres Betriebs von außen gesteuert werden, kann ein Signal benutzt 
+ * werden. Dieses kann im Gegensatz erst übergeben werden, wenn sie bereits gestartet wurde 
+ * (direkt nach Aufruf von Statemachine::start()). Ein Signal ist im während des Empfangs aktiven
+ * States und in allen folgenden verfügbar, solange es nicht durch Statemachine::clearSignal() gelöscht wird.
+ * Ein Signal kann einen optionalen Wert enthalten.
+ * 
+ * Ein üblicher use-case von Signalen (ein %State der solange wartet bis er ein beliebiges Signal
+ * empfängt) ist in Form der Klasse WaitForSignalState bereits fertig instantiier- und nutzbar.
  *
  */
 
@@ -235,21 +244,37 @@ protected:
     const char* const name;
 
     /*!
-     * \brief Check for the availablility of an external signal.
-     * \details
+     * \brief Gibt zurück, ob ein Signal empfangen wurde.
+     * \details Hat die Statemachine, von deren %State-Folge diese
+     * Instanz Teil ist, ein Signal empfangen, so zeigt diese Funktion das an.
+     * Es ist dabei unerheblich ob das Signal im aktuellen oder in einem vorhergehenden
+     * %State ankam.
      *
-     * \return
+     * \return True, wenn ein Signal empfangen wurde, sonst false.
      */
 	bool hasSignal(void) const { return hasSignal_; }
 
-    /*!
-     * \brief Returns argument value of received signal.
-     * \details Before calling this function you need to check for an
-     * available signal by calling hasSignal(). If there is no signal available,
-     * the return value of this function is meanignless.
-     * \return Argument of received signal.
+	/*!
+     * \brief Gibt zurück, ob ein neues Signal empfangen wurde.
+     * \details Diese Funktion gibt auch true zurück, wenn hasSignal() erstmals
+     * true zurückgibt. Nach einem Aufruf von getSignal() gibt diese Funktion dann
+     * solange false zurück, bis an die Statemachine ein neues Signal gesendet wurde.
+     * Das gilt auch, wenn sich der eigentliche Wert des Signals dabei nicht geändert hat.
+     * 
+     * hasNewSignal()== true impliziert hasSignal()==true, aber nicht umgekehrt.
+     * \return True, wenn ein neues Signal empfangen wurde, sonst false.
      */
-	uintptr_t getSignal(void) const { return signal_; }
+    bool hasNewSignal(void) const { return hasNewSignal_; }
+    
+    /*!
+     * \brief Gibt den Wert des empfangenen Signals zurück.
+     * \details Vor dem Aufruf dieser Funktion muss mit hasSignal() 
+     * geprüft werden, ob ein Signal vorhanden ist. 
+     * Ist dies nicht der Fall, so ist der von dieser Funktion zurückgegebene
+     * Wert nicht definiert.
+     * \return Wert des Signals.
+     */
+	uintptr_t getSignal(void) { hasNewSignal_ = false; return signal_; }
     
     /*!
      * \brief Returns the value of the argument the associated statemachine
@@ -364,8 +389,9 @@ protected:
 private:
     void setEventQueue(EventQueue* eventqueue) { eventqueue_ = eventqueue; }
 
-	void setSignal(uintptr_t signal = 0) { signal_ = signal; hasSignal_ = true; }
-    void clearSignal(void) { hasSignal_ = false; }
+	void sendSignal(uintptr_t signal = 0) { signal_ = signal; hasSignal_ = true; hasNewSignal_ = true;}
+	void setSignal(State* src) {signal_ = src->signal_; hasSignal_ = src->hasSignal_; hasNewSignal_ = src->hasNewSignal_; }
+    void clearSignal(void) { hasSignal_ = false; hasNewSignal_ = false; }
 
 	void setArgument(uintptr_t argument) { argument_ = argument; }
 
@@ -384,8 +410,9 @@ private:
     }
 
     bool hasSignal_;
-	uintptr_t signal_;
-	uintptr_t argument_;
+    bool hasNewSignal_;
+    uintptr_t signal_;
+    uintptr_t argument_;
     SystemTime stateStarttime_;
     SystemTime statemachineStarttime_;
 
@@ -441,33 +468,65 @@ private:
 
 
 /*!
- * \brief Delays until signal was received.
+ * \brief Wartet bis ein (neues) Signal empfangen wird.
  *
- * This state can be used in the stateflow of a statemachine to delay its
- * execution until the statemachine received en external signal (the argument of
- * the received signal is ignored).
+ * Dieser State kann benutzt werden um eine %Statemachine bis zum 
+ * Empfang eines Signals zu verzögern. Der Wert des Signals wird ignoriert.
+ * Über einen Parameter im Konstruktor kann das genaue Verhalten 
+ * eingestellt werden.
  */
 class WaitForSignalState final : public State {
 public:
+    /**
+     * \brief Definiert das Warteverhalten.
+     */
+    enum class WaitType {
+        //! Warten, bis State::hasSignal()==true. Wurde in der Vergangenheit ein Signal empfangen,
+        //! wird sofort der nächste State aktiv.
+        wait_for_any_signal,
+        //! Warten, bis State::hasNewSignal()==true. Wurde in der Vergangenheit ein Signal empfangen
+        //! aber noch nicht gelesen, wird sofort der nächste State aktiv.
+        wait_for_new_signal,
+        //! Wartet solange bis tatsächlich ein neues Signal empfangen wurde, unabhängig von vorher
+        //! empfangenen Signalen.
+        clear_old_signal_and_wait_for_new_one
+    };
+    
     /*!
      * \brief WaitForSignalState-Constructor
-     * \param nextState Pointer to the state that is entered when the signal was received.
+     * \param nextState Zeiger auf den Folge-%State.
+     * \param waitType_ Stellt das Warteverhalten ein.
      */
-    WaitForSignalState(State* const nextState) :
-        State("Wait for signal"), myNextState(nextState) { }
+    WaitForSignalState(State* const nextState, WaitType waitType_ = WaitType::wait_for_any_signal) :
+        State("Wait for signal"), myNextState(nextState), waitType(waitType_) { }
 
 private:
-    State* const myNextState;
-
-    bool state_function(void) { return true; }
+    bool state_function(void) { 
+        if (waitType == WaitType::clear_old_signal_and_wait_for_new_one) {
+            // clears the newSignal flag
+            getSignal();
+        }
+        return true; 
+    }
 
     State* transition_function(void) {
-        if (hasSignal()) {
-            return myNextState;
+        if (waitType == WaitType::wait_for_any_signal) {
+            if (hasSignal()) {
+                return myNextState;
+            } else {
+                return this;
+            }
         } else {
-            return this;
+            if (hasNewSignal()) {
+                return myNextState;
+            } else {
+                return this;
+            }
         }
     }
+    
+    State* const myNextState;
+    WaitType waitType;
 };
 
 
@@ -601,16 +660,29 @@ public:
     void stop(void);
 
     /*!
-     * \brief Sends signal to the currently active state of the running statemachine.
-     * \param signal Optional argument to the signal.
-     * \return false if the statemachine is not running, true otherwise.
-     * \remark This function is thread-safe.
+     * \brief Sendet ein Signal an die laufende Statemachine.
+     * \param signal Optionales Argument des Signals.
+     * \return False wenn die Statemachine nicht läuft, ansonsten true.
+     * \remark Diese Funktion ist thread-safe.
+     * 
+     * Das Signal wird im aktuellen State sichtbar und bleibt bis zum Ablaufende
+     * der Statemachine verfügbar, wenn es nicht vorher durch clearSignal() 
+     * gelöscht wird.
+     * 
+     * \see WaitForSignalState
      */
 	bool sendSignal(uintptr_t signal = 0);
 
     /*!
+     * \brief Löscht ein evt. vorhandenes Signal der Statemachine.
+     * \return False wenn die Statemachine nicht läuft, ansonsten true.
+     * \remark Diese Funktion ist thread-safe.
+     */
+    bool clearSignal(void);
+
+    /*!
      * \brief Returns whether the statemachine is active.
-     * \details A statemachine is considered active if its status equals one of the follwoing values:
+     * \details A statemachine is considered active if its status equals one of the following values:
      * - Status::waiting_for_activation
      * - Status::running
      * - Status::running_and_initialized
@@ -706,7 +778,8 @@ private:
     SystemTime startTime;
     Status status_;
 	uintptr_t argument_;
-    bool hasSignal_;
+	bool sendSignal_;
+	bool clearSignal_;
 	uintptr_t signal_;
     State* pcurrent_state;
     State * const entrystate;

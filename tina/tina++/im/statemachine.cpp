@@ -53,7 +53,8 @@ Statemachine::Statemachine(
     startTime(0),
     status_(Status::none),
     argument_(0),
-    hasSignal_(false),
+	sendSignal_(false),
+	clearSignal_(false),
     signal_(0),
     pcurrent_state(nullptr),
     entrystate(pentrystate),
@@ -101,7 +102,11 @@ void Statemachine::start(EventQueue* eventqueue, uintptr_t argument, bool supres
         // reset event overrides
         myEventOnGracefulShutdownOverride = nullptr;
         myEventOnErrorShutdownOverride = nullptr;
+        
         supressStatechangeDebugMessages = supressStatechangeDebugMessages_;
+        status_ = Status::waiting_for_activation;
+		sendSignal_ = false;
+		clearSignal_ = false;
     }
 }
 
@@ -127,10 +132,23 @@ void Statemachine::stop(void) {
 bool Statemachine::sendSignal(uintptr_t signal) {
     Mutex::Lock lock(interface_mutex);
 
-    if (isRunningInternal()) {
-        hasSignal_ = true;
-        signal_ = signal;
+    if (isActiveInternal()) {
+		sendSignal_ = true;
+		clearSignal_ = false;
+		signal_ = signal;
         return true;
+    } else {
+        return false;
+    }
+}
+
+bool Statemachine::clearSignal(void) {
+    Mutex::Lock lock(interface_mutex);
+
+    if (isActiveInternal()) {
+		sendSignal_ = false;
+		clearSignal_ = true;
+		return true;
     } else {
         return false;
     }
@@ -219,17 +237,20 @@ void Statemachine::doStatemachineProcessing(void) {
     // execute all active state machines
     sm = Statemachine::first_active_statemachine;
     while (sm != nullptr) {
-        // call the transition function of the currently active state.
-        // This will return a pointer to the next state.
-        // we unlock the mutex because this function might take
-        // a longer while
-        // beforehand forward the signal into the state (if available)
-        if (sm->hasSignal_) {
-            sm->pcurrent_state->setSignal(sm->signal_);
-            sm->hasSignal_ = false;
+		// update the signal status of the state
+		if (sm->sendSignal_) {
+			sm->pcurrent_state->sendSignal(sm->signal_);
+			sm->sendSignal_ = false;
+		} else if (sm->clearSignal_){
+            sm->pcurrent_state->clearSignal();
+			sm->clearSignal_ = false;
         }
 
-        lock.unlock();
+		// call the transition function of the currently active state.
+		// This will return a pointer to the next state.
+		// we unlock the mutex because this function might take
+		// a longer while
+		lock.unlock();
         State *state = sm->pcurrent_state->transition_function();
         lock.lock();
 
@@ -299,14 +320,17 @@ bool Statemachine::change_state(State* next_state, ScopedLock<Mutex> *lock) {
     if (!next_state) {
         return false;
     } else {
-        // before calling the state function, we forward argument
-        // and eventqueue arguments into the state
-        // this enables unlocked access to this data
+        // before calling the state function, we forward some
+        // stuff into the state which enables unlocked access to this data
         next_state->setEventQueue(eventqueue_);
         next_state->setArgument(argument_);
-        next_state->clearSignal();
         next_state->setStarttime(SystemTime::now());
         next_state->setStatemachineStarttime(startTime);
+
+		// We also forward the signal status from the current to the new state
+		if (pcurrent_state) {
+			next_state->setSignal(pcurrent_state);
+		}
 
         // now we can safely unlock the mutex. This is good because
         // we don't know anything about this function and it could
