@@ -316,20 +316,6 @@ protected:
       emitEvent(event_class, pack<EventArg>(param));
     }
 
-    /**
-     * \brief State-function modeling the pre-condition of the state.
-     * \details Implement this abstract function with the functionality required to check
-     * whether all preconditions needed to enter the state are fulfilled and all actions that should be
-     * performed once during the activity of the state. This could include things like:
-     * - checking the availibilty of a device
-     * - issuing control commands to a device
-     * - starting a child statemachine
-     *
-     * \return True to proceed normally. False to stop the statemachine due to an
-     * error for whatever reason.
-     */
-    virtual bool state_function(void) = 0;
-
     /** \brief Transition-function choosing the next state.
      * \details Implement this abstract function with the functionality required
      * to decide which state should be entered next.
@@ -348,7 +334,7 @@ protected:
      * result of the normal state flow.
      *  - Statemachine::restartState: request executing the state function once again.
      */
-    virtual State* transition_function(void) = 0;
+	virtual State* transition_function(bool firstRun) = 0;
 
 
 private:
@@ -398,11 +384,11 @@ private:
     State* const myNextState;
     const EventClass* myEvent;
 
-    bool state_function(void) {
-        myStartTime = SystemTime::now();
-        return true;
-    }
-    State* transition_function(void) {
+	State* transition_function(bool firstRun) {
+		if (firstRun) {
+			myStartTime = SystemTime::now();
+		}
+
         // This was necessary to avoid some trouble in the
         // behaviour of SystemTime on chibi.
         if (myDelay <= 2_ms) {
@@ -452,15 +438,14 @@ public:
         State("Wait for signal"), myNextState(nextState), waitType(waitType_) { }
 
 private:
-    bool state_function(void) { 
-        if (waitType == WaitType::clear_old_signal_and_wait_for_new_one) {
-            // clears the newSignal flag
-            getSignal();
-        }
-        return true; 
-    }
+	State* transition_function(bool firstRun) {
+		if (firstRun) {
+			if (waitType == WaitType::clear_old_signal_and_wait_for_new_one) {
+				// clears the newSignal flag
+				getSignal();
+			}
+		}
 
-    State* transition_function(void) {
         if (waitType == WaitType::wait_for_any_signal) {
             if (hasSignal()) {
                 return myNextState;
@@ -543,22 +528,22 @@ public:
      * \details If you supply only nullptr as arguments for the events, the statemachine will not
      * emit any of the three standard events. It is still possible to emit custom events from
      * the statemachine's states.
-     * \param pname Name of the statemachine.
-     * \param pentrystate Initial state of the statemachine.
+	 * \param name Name of the statemachine.
+	 * \param entryState Initial state of the statemachine.
      * \param eventOnGracefulShutdown %Event that is emitted when the statemachine was stopped
      * without an error.
      * \param eventOnErrorShutdown %Event that is emitted when the statemachine was unexpectedly cancelled
      * due to an error.
-	 * \param pabortstate %State to be executed when the statemachin should be stopped.
+	 * \param abortState %State to be executed when the statemachin should be stopped.
 	 * You can use Statemachine::finished if you don't need to supply custom actions prior the shutdown
 	 * of the statemachine.
 	 */
     Statemachine(
-            const char* const pname,
-            State* const pentrystate,
+			const char* const name,
+			State* const entryState,
             const EventClass* const eventOnGracefulShutdown = nullptr,
 			const EventClass* const eventOnErrorShutdown = nullptr,
-			State* const pabortstate = Statemachine::finished);
+			State* const abortState = Statemachine::finished);
 
 
     // thread-safe access functions
@@ -680,7 +665,7 @@ public:
     static void doStatemachineProcessing(void);
 
 private:
-    bool change_state(State* next_state, ScopedLock<Mutex>* lock) ;
+	void change_state(State* next_state) ;
 
     void removeFromActiveList(void);
 
@@ -698,13 +683,13 @@ private:
 
 
     // doubly linked list to manage active statemachines
+	// for fast removal
     static Statemachine* first_active_statemachine;
     Statemachine* next_active;
     Statemachine* last_active;
 
     // doubly linked list for statemachines that should be activated
-    // we need a doubly linked list to enable the activation of
-    // statemachines from within statemachines
+	// (this no longer needs to be a doubly linked list)
     static Statemachine* first_to_be_activated_statemachine;
     static Statemachine* last_to_be_activated_statemachine;
     Statemachine* next_to_be_activated;
@@ -717,7 +702,7 @@ private:
 
     const char* const name;
     SystemTime startTime;
-    State* pcurrent_state;
+	State* current_state;
     State * const entrystate;
     State * const abortstate;
 
@@ -733,29 +718,9 @@ private:
 	bool clearSignal_;
 	uintptr_t signal_;
 	uintptr_t argument_;
+
+	bool enteredNewState_;
 };
-
-
-
-
-#ifndef __DOXYGEN__
-class RedoState final : public State {
-public:
-    RedoState() : State("Error") {}
-protected:
-    bool state_function(void) { return false; }
-    State* transition_function(void) { return nullptr; }
-};
-
-class FinishedState final : public State {
-public:
-    FinishedState() : State("Finished") {}
-protected:
-    bool state_function(void) { return true; }
-    State* transition_function(void) { return Statemachine::finished; }
-};
-
-#endif
 
 
 //!@}
