@@ -545,20 +545,20 @@ public:
      * the statemachine's states.
      * \param pname Name of the statemachine.
      * \param pentrystate Initial state of the statemachine.
-     * \param pabortstate %State to be executed when the statemachin should be stopped.
-     * You can use Statemachine::finished if you don't need to supply custom actions prior the shutdown
-     * of the statemachine.
      * \param eventOnGracefulShutdown %Event that is emitted when the statemachine was stopped
      * without an error.
      * \param eventOnErrorShutdown %Event that is emitted when the statemachine was unexpectedly cancelled
      * due to an error.
-     */
+	 * \param pabortstate %State to be executed when the statemachin should be stopped.
+	 * You can use Statemachine::finished if you don't need to supply custom actions prior the shutdown
+	 * of the statemachine.
+	 */
     Statemachine(
             const char* const pname,
             State* const pentrystate,
-            State* const pabortstate = Statemachine::finished,
             const EventClass* const eventOnGracefulShutdown = nullptr,
-            const EventClass* const eventOnErrorShutdown = nullptr);
+			const EventClass* const eventOnErrorShutdown = nullptr,
+			State* const pabortstate = Statemachine::finished);
 
 
     // thread-safe access functions

@@ -163,9 +163,9 @@ ShutdownHardware shutdownHardware(&rightDevice);
 Statemachine hardwareStatemachineLeft(
 	"Hardware statemachine",
 	&Left::prepareHardware,
-	&Left::shutdownHardware,
 	&hardwareStatemachineLeftFinishEvent,
-	&hardwareStatemachineLeftCancelOnErrorEvent	
+	&hardwareStatemachineLeftCancelOnErrorEvent,
+    &Left::shutdownHardware
 ); 
 //! [Statemachine]
 

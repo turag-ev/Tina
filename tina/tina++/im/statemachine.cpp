@@ -39,9 +39,9 @@ State* const Statemachine::error = nullptr;
 Statemachine::Statemachine(
         const char* const pname,
         State* const pentrystate,
-        State* const pabortstate,
         const EventClass* const eventOnGracefulShutdown,
-        const EventClass* const eventOnErrorShutdown):
+		const EventClass* const eventOnErrorShutdown,
+		State* const pabortstate):
 	next_active(nullptr),
 	last_active(nullptr),
 	next_to_be_activated(nullptr),
