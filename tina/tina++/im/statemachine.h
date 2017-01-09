@@ -25,14 +25,13 @@
  * For that reason the end-user interface is strictly thread-safe and the module was
  * designed to be used in a multi-threaded environment, but that is not a requirement.
  *
- * Statemachines consist of states. States are defined by a state-function that
- * evaluates the state's precondition and a transition-function which evaluates
- * the conditions required to enter the appropriate follow-state. Both functions are virtual
- * functions and part of the interface of an abstract base State-class which have
+ * Statemachines consist of states. States are defined by a transition-function which evaluates
+ * the conditions required to enter the appropriate follow-state. It is a virtual
+ * functions and part of the interface of an abstract base State-class which has
  * to be implemented in inherited State-classes.
  *
- * On details about what state- and transition-functions are and what to keep in mind when implementing
- * them, see: \link State::state_function \endlink and \link State::transition_function \endlink .
+ * On details about what the transition-function is and what to keep in mind when implementing
+ * it, see: \link State::transition_function \endlink .
  *
  * \subsection features Features
  *  - Statemachines can be started and stopped.
@@ -82,20 +81,19 @@
  * \snippet im_statemachine_states_example.cpp Basestate
  *
  * Now we can define the states we need to build our statemachine. Each state has to
- * implement the state- and the transition-function. You should also note that every
+ * implement the transition-function. You should also note that every
  * state owns one or more pointers to its possible follow states with the exception
  * of the last one. The last state doesn't need such a pointer because it will return
  * a special value, leading to the termination of the statemachine.
  * \snippet im_statemachine_states_example.cpp States
  *
- * Now we can implement the behaviour of our statemachine. Each state owns a state-function
- * that is executed once when the state becomes active. Return false in this function
- * to indicate an error and have the whole statemachine cancelled. The second function
- * is the transition-function which is called as long as you return the this-pointer. There
- * are some special return values (see State::transition_function). Keep in mind, that neither
- * the state- nor the transition-function are allowed to contain code or functions that take an
- * unconsiderable amount of time to finish (blocking/synchronous calls). 
- * Both functions should return quickly.
+ * Now we can implement the behaviour of our statemachine. Each state owns a
+ * transition-function which is called as long as you return the this-pointer. There
+ * are some special return values (see State::transition_function). The firstRun
+ * parameter is true when the transition_function is executed for the first time upon
+ * entering the state and false in all following calls. Keep in mind that
+ * the transition-function is not allowed to contain code or functions that take an
+ * unconsiderable amount of time to finish (blocking/synchronous calls) but should return quickly.
  * 
  * Further you should avoid using static members in your states. This enables you to use your
  * State classes for more than one instance.
@@ -317,6 +315,8 @@ protected:
     }
 
     /** \brief Transition-function choosing the next state.
+	 * \param firstRun This argument is set to true if this function is called
+	 * for the first time after entering a new state. Otherwise it is false.
      * \details Implement this abstract function with the functionality required
      * to decide which state should be entered next.
      *
@@ -332,7 +332,7 @@ protected:
      *  - Statemachine::finished: indicate that statemachine handling the
      * current state(s) should be stopped due to an external request or as a
      * result of the normal state flow.
-     *  - Statemachine::restartState: request executing the state function once again.
+	 *  - Statemachine::restartState: change to this state as if it was a new one.
      */
 	virtual State* transition_function(bool firstRun) = 0;
 

@@ -29,8 +29,7 @@ public:
 	PrepareHardware(void* hardware, State* nextState) : 
 		HardwareState("PrepareHardware", hardware), myNextState(nextState) {}
 		
-	bool state_function(void);
-	State* transition_function(void);
+	State* transition_function(bool firstRun) override;
 };
 
 class WorkStep1: public HardwareState {
@@ -40,8 +39,7 @@ public:
 	WorkStep1(void* hardware, State* nextState) : 
 		HardwareState("WorkStep1", hardware), myNextState(nextState) {}
 		
-	bool state_function(void);
-	State* transition_function(void);
+	State* transition_function(bool firstRun) override;
 };
 
 
@@ -53,8 +51,7 @@ public:
 	WorkStep2(void* hardware, State* beginAgainState, State* tidyUpState) : 
 		HardwareState("WorkStep2", hardware), myBeginAgainState(beginAgainState), myTidyUpState(tidyUpState) {}
 		
-	bool state_function(void);
-	State* transition_function(void);
+	State* transition_function(bool firstRun) override;
 };
 
 
@@ -63,8 +60,7 @@ public:
 	ShutdownHardware(void* hardware) :
 		HardwareState("ShutdownHardware", hardware) { }
 		
-	bool state_function(void);
-	State* transition_function(void);
+	State* transition_function(bool firstRun) override;
 };
 //! [States]
 
@@ -72,11 +68,11 @@ public:
 	
 
 //! [Functions]
-bool PrepareHardware::state_function(void) {
-	// do stuff
-	return true;
-}
-State* PrepareHardware::transition_function(void) {
+State* PrepareHardware::transition_function(bool firstRun) {
+    if (firstRun) {
+        // do initializations
+    }
+    
 	if (/* whatever */) {
 		return myNextState;
 	} else {
@@ -85,11 +81,11 @@ State* PrepareHardware::transition_function(void) {
 }
 
 
-bool WorkStep1::state_function(void) {
-	// do stuff	
-	return true;
-}
-State* WorkStep1::transition_function(void) {
+State* WorkStep1::transition_function(bool firstRun) {
+    if (firstRun) {
+        // do initializations
+    }
+    
 	if (/* whatever */) {
 		return myNextState;
 	} else {
@@ -98,11 +94,11 @@ State* WorkStep1::transition_function(void) {
 }
 
 
-bool WorkStep2::state_function(void) {
-	// do stuff
-	return true;
-}
-State* WorkStep2::transition_function(void) {
+State* WorkStep2::transition_function(bool firstRun) {
+    if (firstRun) {
+        // do initializations
+    }
+    
 	if (/* whatever */) {
 		return myBeginAgainState;
 	} else if (/* whatever */) {
@@ -113,11 +109,11 @@ State* WorkStep2::transition_function(void) {
 }
 
 
-bool ShutdownHardware::state_function(void) {
-	// do stuff
-	return true;
-}
-State* ShutdownHardware::transition_function(void) {
+State* ShutdownHardware::transition_function(bool firstRun) {
+    if (firstRun) {
+        // do initializations
+    }
+    
 	if (/* whatever */) {
 		return Statemachine::finished;
 	} else {
