@@ -7,7 +7,6 @@ qtdoc:
 
 doc-gnav:
 	doxygen doxyfile.gnav > /dev/null
-	
 
 clean:
 	rm -rf html
