@@ -13,9 +13,22 @@ Mutex interface_mutex;
 
 namespace {
 
+class RedoState final : public State {
+public:
+	RedoState() : State("Error") {}
+protected:
+	State* transition_function(bool) { return nullptr; }
+};
+
+class FinishedState final : public State {
+public:
+	FinishedState() : State("Finished") {}
+protected:
+	State* transition_function(bool) { return nullptr; }
+};
+
 RedoState redo_state;
 FinishedState finished_state;
-
 
 }
 
@@ -37,41 +50,38 @@ State* const Statemachine::error = nullptr;
 
 
 Statemachine::Statemachine(
-        const char* const pname,
-        State* const pentrystate,
-        State* const initState,
-        const EventClass* const eventOnSuccessfulInitialization,
-        State* const pabortstate,
+		const char* const name_,
+		State* const entrystate_,
         const EventClass* const eventOnGracefulShutdown,
-        const EventClass* const eventOnErrorShutdown):
+		const EventClass* const eventOnErrorShutdown,
+		State* const abortstate_):
 	next_active(nullptr),
 	last_active(nullptr),
 	next_to_be_activated(nullptr),
     previous_to_be_activated(nullptr),
 	next_to_be_stopped(nullptr),
-    name(pname),
+	name(name_),
     startTime(0),
-    status_(Status::none),
-    argument_(0),
-    hasSignal_(false),
-    signal_(0),
-    pcurrent_state(nullptr),
-    entrystate(pentrystate),
-    initializedState(initState),
-    abortstate(pabortstate),
-    myEventOnSuccessfulInitialization(eventOnSuccessfulInitialization),
+	current_state(nullptr),
+	entrystate(entrystate_),
+	abortstate(abortstate_),
     myEventOnGracefulShutdown(eventOnGracefulShutdown),
     myEventOnErrorShutdown(eventOnErrorShutdown),
-    myEventOnGracefulShutdownOverride(nullptr),
-    myEventOnErrorShutdownOverride(nullptr),
-    eventqueue_(nullptr)
-{ }
+	eventqueue_(nullptr),
+	status_(Status::none),
+	supressStatechangeDebugMessages(false),
+	sendSignal_(false),
+	clearSignal_(false),
+	signal_(0),
+	argument_(0),
+	enteredNewState_(false)
+		{ }
 
-void Statemachine::start(int32_t argument, bool supressStatechangeDebugMessages) {
+void Statemachine::start(uintptr_t argument, bool supressStatechangeDebugMessages) {
     start(defaultEventqueue_, argument, supressStatechangeDebugMessages);
 }
 
-void Statemachine::start(EventQueue* eventqueue, int32_t argument, bool supressStatechangeDebugMessages_) {
+void Statemachine::start(EventQueue* eventqueue, uintptr_t argument, bool supressStatechangeDebugMessages_) {
     Mutex::Lock lock(interface_mutex);
 
     argument_ = argument;
@@ -83,10 +93,6 @@ void Statemachine::start(EventQueue* eventqueue, int32_t argument, bool supressS
         turag_criticalf("%s: not added: waiting to be deactivated", name);
     } else if (getStatusInternal() == Status::running) {
         turag_infof("%s: not added: already running", name);
-    } else if(getStatusInternal() == Status::running_and_initialized) {
-        turag_infof("%s: not added: already running", name);
-        // send initialized event but only if we are already initialized
-        emitEvent(myEventOnSuccessfulInitialization);
     } else {
         if (Statemachine::last_to_be_activated_statemachine) {
             previous_to_be_activated = Statemachine::last_to_be_activated_statemachine;
@@ -98,10 +104,10 @@ void Statemachine::start(EventQueue* eventqueue, int32_t argument, bool supressS
         }
         next_to_be_activated = nullptr;
 
-        // reset event overrides
-        myEventOnGracefulShutdownOverride = nullptr;
-        myEventOnErrorShutdownOverride = nullptr;
         supressStatechangeDebugMessages = supressStatechangeDebugMessages_;
+        status_ = Status::waiting_for_activation;
+		sendSignal_ = false;
+		clearSignal_ = false;
     }
 }
 
@@ -112,25 +118,38 @@ void Statemachine::stop(void) {
         turag_infof("%s: not added: already in deactivation queue", name);
     } else if (getStatusInternal() == Status::waiting_for_activation) {
         turag_criticalf("%s: not stopped: already in activation queue", name);
-    } else if (getStatusInternal() == Status::running_and_initialized || getStatusInternal() == Status::running) {
-        next_to_be_stopped =  Statemachine::first_to_be_stopped_statemachine;
+	} else if (getStatusInternal() == Status::running) {
+		next_to_be_stopped = Statemachine::first_to_be_stopped_statemachine;
         Statemachine::first_to_be_stopped_statemachine = this;
         status_ = Status::running_and_waiting_for_deactivation;
     } else {
         turag_infof("%s: not stopped: wasn't running", name);
         // send shutdown event nonetheless
-        emitEvent(myEventOnSuccessfulInitialization);
+		emitEvent(myEventOnGracefulShutdown);
     }
 }
 
 
-bool Statemachine::sendSignal(int32_t signal) {
+bool Statemachine::sendSignal(uintptr_t signal) {
     Mutex::Lock lock(interface_mutex);
 
-    if (isRunningInternal()) {
-        hasSignal_ = true;
-        signal_ = signal;
+    if (isActiveInternal()) {
+		sendSignal_ = true;
+		clearSignal_ = false;
+		signal_ = signal;
         return true;
+    } else {
+        return false;
+    }
+}
+
+bool Statemachine::clearSignal(void) {
+    Mutex::Lock lock(interface_mutex);
+
+    if (isActiveInternal()) {
+		sendSignal_ = false;
+		clearSignal_ = true;
+		return true;
     } else {
         return false;
     }
@@ -173,27 +192,27 @@ void Statemachine::doStatemachineProcessing(void) {
     // activate statemachines that are in activation queue
     Statemachine* sm = Statemachine::first_to_be_activated_statemachine;
     while (sm != nullptr) {
-        if (sm->change_state(sm->entrystate, &lock)) {
-            sm->startTime = SystemTime::now();
-            sm->status_ = Status::running;
+		if (sm->entrystate) {
+			if (!sm->supressStatechangeDebugMessages) {
+				turag_infof("%s activated", sm->name);
+			} else {
+				turag_infof("%s activated; output of state change debug messages supressed", sm->name);
+			}
+			sm->startTime = SystemTime::now();
+			sm->status_ = Status::running;
+			sm->change_state(sm->entrystate);
 
-            sm->next_active = Statemachine::first_active_statemachine;
-            sm->last_active = nullptr;
-            if (sm->next_active != nullptr)
-                sm->next_active->last_active = sm;
-            Statemachine::first_active_statemachine = sm;
+			sm->next_active = Statemachine::first_active_statemachine;
+			sm->last_active = nullptr;
+			if (sm->next_active != nullptr)
+				sm->next_active->last_active = sm;
+			Statemachine::first_active_statemachine = sm;
+		} else {
+			turag_errorf("%s: entry state is nullptr", sm->name);
+			sm->status_ = Status::stopped_on_error;
+			sm->emitEvent(sm->myEventOnErrorShutdown);
+		}
 
-            if (!sm->supressStatechangeDebugMessages) {
-                turag_infof("%s activated", sm->name);
-            } else {
-                turag_infof("%s activated; output of state change debug messages supressed", sm->name);
-            }
-        } else {
-            sm->status_ = Status::stopped_on_error;
-            sm->emitEvent(sm->myEventOnErrorShutdown);
-
-            turag_criticalf("%s: couldn't be activated", sm->name);
-        }
         sm = sm->next_to_be_activated;
     }
     Statemachine::first_to_be_activated_statemachine = nullptr;
@@ -202,16 +221,15 @@ void Statemachine::doStatemachineProcessing(void) {
     // deactivate statemachines that are in deactivation queue
     sm = Statemachine::first_to_be_stopped_statemachine;
     while (sm != nullptr) {
-        if (sm->status_ == Status::running_and_waiting_for_deactivation) {
-            if (!sm->change_state(sm->abortstate, &lock)) {
-                sm->removeFromActiveList();
-                sm->status_ = Status::stopped_on_error;
-                sm->emitEvent(sm->myEventOnErrorShutdown);
-
-                turag_infof("%s: couldn't enter abortstate -> cancelled", sm->name);
-            }
-        }
-        sm = sm->next_to_be_stopped;
+		if (sm->abortstate) {
+			sm->change_state(sm->abortstate);
+		} else {
+			sm->removeFromActiveList();
+			sm->status_ = Status::stopped_on_error;
+			sm->emitEvent(sm->myEventOnErrorShutdown);
+			turag_infof("%s: abort state is nullptr", sm->name);
+		}
+		sm = sm->next_to_be_stopped;
     }
     Statemachine::first_to_be_stopped_statemachine = nullptr;
 
@@ -219,74 +237,47 @@ void Statemachine::doStatemachineProcessing(void) {
     // execute all active state machines
     sm = Statemachine::first_active_statemachine;
     while (sm != nullptr) {
-        // call the transition function of the currently active state.
-        // This will return a pointer to the next state.
-        // we unlock the mutex because this function might take
-        // a longer while
-        // beforehand forward the signal into the state (if available)
-        if (sm->hasSignal_) {
-            sm->pcurrent_state->setSignal(sm->signal_);
-            sm->hasSignal_ = false;
+		// update the signal status of the state
+		if (sm->sendSignal_) {
+			sm->current_state->sendSignal(sm->signal_);
+			sm->sendSignal_ = false;
+		} else if (sm->clearSignal_){
+			sm->current_state->clearSignal();
+			sm->clearSignal_ = false;
         }
 
-        lock.unlock();
-        State *state = sm->pcurrent_state->transition_function();
+		// call the transition function of the currently active state.
+		// This will return a pointer to the next state.
+		// we unlock the mutex because this function might take
+		// a longer while
+		lock.unlock();
+		State *state = sm->current_state->transition_function(sm->enteredNewState_);
         lock.lock();
-
-        // Save event overrides and clear them. This keeps the state instances clean.
-        if (sm->pcurrent_state->getEventOnGracefulShutdownOverride()) {
-            sm->myEventOnGracefulShutdownOverride = sm->pcurrent_state->getEventOnGracefulShutdownOverride();
-        }
-        if (sm->pcurrent_state->getEventOnErrorShutdownOverride()) {
-            sm->myEventOnErrorShutdownOverride = sm->pcurrent_state->getEventOnErrorShutdownOverride();
-        }
-        sm->pcurrent_state->clearEventOverrides();
-
+		sm->enteredNewState_ = false;
 
         // execute appropriate actions, depending on new state
         // don't do anything, if state == sm->pcurrent_state
         if (state == Statemachine::error) {
             sm->removeFromActiveList();
             sm->status_ = Status::stopped_on_error;
-
-            if (sm->myEventOnErrorShutdownOverride) {
-                turag_infof("%s: emitting overriden shutdown on error event", sm->name);
-                sm->emitEvent(sm->myEventOnErrorShutdownOverride);
-            } else {
-                sm->emitEvent(sm->myEventOnErrorShutdown);
-            }
-            turag_infof("%s cancelled on error", sm->name);
+			sm->emitEvent(sm->myEventOnErrorShutdown);
+			turag_infof("%s: cancelled on error", sm->name);
         } else if (state == Statemachine::finished) {
             sm->removeFromActiveList();
             sm->status_ = Status::stopped_gracefully;
-
-            if (sm->myEventOnGracefulShutdownOverride) {
-                turag_infof("%s: emitting overriden graceful shutdown event", sm->name);
-                sm->emitEvent(sm->myEventOnGracefulShutdownOverride);
-            } else {
-                sm->emitEvent(sm->myEventOnGracefulShutdown);
-            }
-            turag_infof("%s finished", sm->name);
+			sm->emitEvent(sm->myEventOnGracefulShutdown);
+			turag_infof("%s: finished", sm->name);
         } else if (state == Statemachine::restartState) {
-            turag_warningf("%s: Do Statefunc again", sm->name);
-            lock.unlock();
-            bool success = sm->pcurrent_state->state_function();
-            lock.lock();
-
-            if (!success) {
+			sm->change_state(sm->current_state);
+		} else if (state != sm->current_state) {
+			if (state) {
+				sm->change_state(state);
+			} else {
                 sm->removeFromActiveList();
                 sm->status_ = Status::stopped_on_error;
                 sm->emitEvent(sm->myEventOnErrorShutdown);
-                turag_infof("%s cancelled on error", sm->name);
+				turag_infof("%s: next state is nullptr", sm->name);
             }
-        } else if (state != sm->pcurrent_state) {
-            if (!sm->change_state(state, &lock)) {
-                sm->removeFromActiveList();
-                sm->status_ = Status::stopped_on_error;
-                sm->emitEvent(sm->myEventOnErrorShutdown);
-                turag_infof("%s cancelled on error", sm->name);
-            }
-
         }
 
         sm = sm->next_active;
@@ -294,48 +285,29 @@ void Statemachine::doStatemachineProcessing(void) {
 }
 
 
+void Statemachine::change_state(State* next_state) {
+	enteredNewState_ = true;
 
-bool Statemachine::change_state(State* next_state, ScopedLock<Mutex> *lock) {
-    if (!next_state) {
-        return false;
-    } else {
-        // before calling the state function, we forward argument
-        // and eventqueue arguments into the state
-        // this enables unlocked access to this data
-        next_state->setEventQueue(eventqueue_);
-        next_state->setArgument(argument_);
-        next_state->clearSignal();
-        next_state->setStarttime(SystemTime::now());
-        next_state->setStatemachineStarttime(startTime);
+	// forward some stuff into the state which enables
+	// unlocked access to this data from within it
+	next_state->setEventQueue(eventqueue_);
+	next_state->setArgument(argument_);
+	next_state->setStarttime(SystemTime::now());
+	next_state->setStatemachineStarttime(startTime);
 
-        // now we can safely unlock the mutex. This is good because
-        // we don't know anything about this function and it could
-        // take a little while to return
-        lock->unlock();
-        bool success = next_state->state_function();
-        lock->lock();
+	// We also forward the signal status from the current to the new state
+	if (current_state) {
+		next_state->setSignal(current_state);
+	}
 
-        if (success) {
-            if (!supressStatechangeDebugMessages) {
-                if (pcurrent_state) {
-                    turag_infof("%s: %s --> %s", name, pcurrent_state->name, next_state->name);
-                } else {
-                    turag_infof("%s: entered initial state: %s", name, next_state->name);
-                }
-            }
-
-            if (next_state == initializedState && status_ == Status::running) {
-                emitEvent(myEventOnSuccessfulInitialization);
-                status_ = Status::running_and_initialized;
-            }
-
-            pcurrent_state = next_state;
-            return true;
-        } else {
-            turag_criticalf("%s: statechange failed", name);
-            return false;
-        }
-    }
+	if (!supressStatechangeDebugMessages) {
+		if (current_state) {
+			turag_infof("%s: %s --> %s", name, current_state->name, next_state->name);
+		} else {
+			turag_infof("%s: entered initial state: %s", name, next_state->name);
+		}
+	}
+	current_state = next_state;
 }
 
 
@@ -351,12 +323,11 @@ void Statemachine::removeFromActiveList(void) {
             next_active->last_active = last_active;
         }
     }
-    pcurrent_state = nullptr;
+	current_state = nullptr;
 }
 
 bool Statemachine::isActiveInternal(void) {
     if (status_ == Status::running ||
-            status_ == Status::running_and_initialized ||
             status_ == Status::waiting_for_activation ||
             status_ == Status::running_and_waiting_for_deactivation) {
         return true;
@@ -367,12 +338,11 @@ bool Statemachine::isActiveInternal(void) {
 
 bool Statemachine::isRunningInternal(void) {
     if (status_ == Status::running ||
-            status_ == Status::running_and_initialized ||
             status_ == Status::running_and_waiting_for_deactivation) {
         return true;
     } else {
         return false;
-    }
+	}
 }
 
 
