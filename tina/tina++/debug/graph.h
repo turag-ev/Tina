@@ -33,9 +33,9 @@ namespace Debug {
  * eingestellt werden. Soll global die Ausgabe unterbunden werden, kann dafür Graph::muteAllGraphOutput()
  * benutzt werden (respektive Graph::releaseAllGraphOutput() zum Aktivieren der Ausgabe). Ob ein %Graph
  * tatsächlich Daten ausgibt, hängt letztendlich von der Und-Verknüpfung der Ausgabeeinstellung der jeweiligen
- * Instanz und der globalen Ausgabeeinstellung ab. Die Funktionen init(), addChannel() und addChannelGroup()
- * werden durch das Aktivieren oder Deaktivieren der Ausgabe nicht beeinflusst. Dies ist notwendig um die
- * Funktion der Grpahenausgabe zu gewährleisten, wenn diese zu anfänglich deaktiviert sind und zu einem
+ * Instanz und der globalen Ausgabeeinstellung ab. Die Funktionen Graph::init(), Graph::addChannelGroup() und Funktionen wie 
+ * GraphAuto::addChannel() werden durch das Aktivieren oder Deaktivieren der Ausgabe nicht beeinflusst. Dies ist notwendig um die
+ * Funktion der Graphenausgabe zu gewährleisten, wenn diese anfänglich deaktiviert sind und zu einem
  * späteren Zeitpunkt aktiviert werden. Das hat zur Folge, dass alle Graphen mindestens einmal in der Ausgabe erscheinen,
  * unabhängig vom Aktivierungszustand der Ausgabe.
  *
