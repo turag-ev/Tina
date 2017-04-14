@@ -364,8 +364,7 @@ public:
     currentstate_(0),
     startstate_(startstate),
     name_(name),
-    child_(0),
-    can_be_added_to_blacklist_(true)
+    child_(0)
   { }
 
   /// \brief Hauptaktion starten
@@ -521,17 +520,6 @@ public:
     return name_;
   }
 
-  /// \brief Aktion kann zur Blacklist hinzugefügt werden
-  ///
-  /// Sagt aus, ob es erlaubt ist die Aktion in die Blacklist des SystemControl
-  /// Troubleshooter's hinzu zu fügen. Dies ist nützlich für Aktionen mit
-  /// dynamischen Einstiegspunkten.
-  /// \sa setCanBeAddedToBlacklist
-  constexpr _always_inline
-  bool canBeAddedToBlacklist() const {
-    return can_be_added_to_blacklist_;
-  }
-
   /// \brief Prüft, ob ein Zustand ausgeführt wird
   ///
   /// \return Es wird \c true zurückgegeben, falls \a current der aktuell
@@ -616,17 +604,6 @@ protected:
   Action* getChildAction() {
     return child_;
   }
-
-  /// \brief Aktion nicht erlauben auf die Blacklist des SystemControl Troubleshooter's
-  ///        gesetzt zu werden.
-  /// \param val Bei \c true, kann Aktion Auf Blacklist gesetzt werden, sonst nicht.
-  ///
-  /// \sa canBeAddedToBlacklist
-  _always_inline
-  void setCanBeAddedToBlacklist(bool val) {
-      can_be_added_to_blacklist_ = val;
-  }
-
 private:
   /// übergeordnete Aktion oder \c nullptr, wenn Aktion nicht aktiv oder keine
   /// übergeordnete Aktion ist vorhanden.
@@ -643,9 +620,6 @@ private:
 
   /// Unteraktion oder \c nullptr, wenn keine vorhanden oder Aktion nicht aktiv
   Action* child_;
-
-  /// Aktion kann auf Blacklist gesetzt werden
-  bool can_be_added_to_blacklist_;
 
   /// Das am weitesten untergeordnete Kindaktion zurückgeben
   Action* getInnermostChild();
@@ -708,11 +682,6 @@ public:
     instance.Action::start(nullptr, data);
   }
 
-  /// \copydoc Action::canBeAddedToBlacklist
-  constexpr _always_inline bool canBeAddedToBlacklist(void) {
-    return instance.Action::canBeAddedToBlacklist();
-  }
-
   /// \copydoc Action::hasChildAction
   static _always_inline bool hasChildAction() {
 	return instance.Action::hasChildAction();
@@ -758,12 +727,6 @@ protected:
   static _always_inline void setChildAction(Action* child, EventArg data = 0) {
 	instance.Action::setChildAction(child, data);
   }
-
-  /// \copydoc Action::setCanBeAddedToBlacklist
-  static _always_inline void setCanBeAddedToBlacklist(bool val) {
-    instance.Action::setCanBeAddedToBlacklist(val);
-  }
-
 private:
   /// Singleton Instanz von Aktion
   static A instance;
