@@ -101,23 +101,27 @@ public:
   self_type& operator=(const ArrayBuffer& other)
   {
 	  copy(other);
+      return *this;
   }
 
   template<typename U, std::size_t M>
   self_type& operator=(const ArrayBuffer<U, M>& other)
   {
 	  copy(other);
+      return *this;
   }
 
   self_type& operator=(ArrayBuffer&& other)
   {
 	  move(std::move(other));
+      return *this;
   }
 
   template<typename U, std::size_t M>
   self_type& operator=(ArrayBuffer<U, M>&& other)
   {
 	  move(std::move(other));
+      return *this;
   }
 
   // iterators
