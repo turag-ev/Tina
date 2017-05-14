@@ -534,7 +534,7 @@ public:
      * without an error.
      * \param eventOnErrorShutdown %Event that is emitted when the statemachine was unexpectedly cancelled
      * due to an error.
-	 * \param abortState %State to be executed when the statemachin should be stopped.
+     * \param abortState %State to be executed when the statemachine should be stopped.
 	 * You can use Statemachine::finished if you don't need to supply custom actions prior the shutdown
 	 * of the statemachine.
 	 */
