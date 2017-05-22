@@ -222,6 +222,12 @@ void Statemachine::doStatemachineProcessing(void) {
     sm = Statemachine::first_to_be_stopped_statemachine;
     while (sm != nullptr) {
 		if (sm->abortstate) {
+            if(sm->abortstate == Statemachine::finished) {
+                sm->removeFromActiveList();
+                sm->status_ = Status::stopped_gracefully;
+                sm->emitEvent(sm->myEventOnGracefulShutdown);
+                turag_infof("%s: stopped", sm->name);
+            }
 			sm->change_state(sm->abortstate);
 		} else {
 			sm->removeFromActiveList();
