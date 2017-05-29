@@ -543,7 +543,7 @@ public:
 			State* const entryState,
             const EventClass* const eventOnGracefulShutdown = nullptr,
 			const EventClass* const eventOnErrorShutdown = nullptr,
-			State* const abortState = Statemachine::finished);
+            State* const abortState = Statemachine::finished);
 
 
     // thread-safe access functions
@@ -553,9 +553,10 @@ public:
      * \param argument Optional argument to execute the statemachine with.
      * \param supressStatechangeDebugMessages Supress the automatic output of debug
      * messages informing about state changes.
+     * \param resultCallback Callback function to handle emitted events (not including events emitted from states)
      * \remark This function is thread-safe.
      */
-	void start(uintptr_t argument = 0, bool supressStatechangeDebugMessages = false);
+    void start(uintptr_t argument = 0, bool supressStatechangeDebugMessages = false, EventMethod resultCallback = nullptr);
 
     /*!
      * \brief Start the statemachine.
@@ -565,13 +566,14 @@ public:
      * messages informing about state changes.
      * \remark This function is thread-safe.
      */
-	void start(EventQueue* eventqueue, uintptr_t argument = 0, bool supressStatechangeDebugMessages = false);
+    void start(EventQueue* eventqueue, uintptr_t argument = 0, bool supressStatechangeDebugMessages = false, EventMethod resultCallback = nullptr);
 
     /*!
      * \brief Start the statemachine in silent mode (no event will ever be emitted).
      * \param argument Optional argument to execute the statemachine with.
      * \param supressStatechangeDebugMessages Supress the automatic output of debug
      * messages informing about state changes.
+     * \param resultCallback Callback function to handle emitted events (not including events emitted from states)
      * \remark This function is thread-safe.
      */
 	void startSilent(uintptr_t argument = 0, bool supressStatechangeDebugMessages = false) {
@@ -674,7 +676,7 @@ private:
     Status getStatusInternal(void) { return status_; }
 
     void emitEvent(const EventClass* event_class, EventArg params = 0) const {
-        if (eventqueue_ && event_class && event_class->id != EventQueue::event_null) eventqueue_->push(event_class, params);
+        if (eventqueue_ && event_class && event_class->id != EventQueue::event_null) eventqueue_->push(event_class, params, resultCallback_);
     }
     template<typename T, REQUIRES(!std::is_integral<T>)> _always_inline
     void push(const EventClass* event_class, T param) const {
@@ -705,6 +707,8 @@ private:
 	State* current_state;
     State * const entrystate;
     State * const abortstate;
+
+    EventMethod resultCallback_;
 
     const EventClass* const myEventOnGracefulShutdown;
     const EventClass* const myEventOnErrorShutdown;

@@ -49,12 +49,11 @@ State* const Statemachine::finished = &finished_state;
 State* const Statemachine::error = nullptr;
 
 
-Statemachine::Statemachine(
-		const char* const name_,
-		State* const entrystate_,
+Statemachine::Statemachine(const char* const name_,
+        State* const entrystate_,
         const EventClass* const eventOnGracefulShutdown,
-		const EventClass* const eventOnErrorShutdown,
-		State* const abortstate_):
+        const EventClass* const eventOnErrorShutdown,
+        State* const abortstate_):
 	next_active(nullptr),
 	last_active(nullptr),
 	next_to_be_activated(nullptr),
@@ -65,6 +64,7 @@ Statemachine::Statemachine(
 	current_state(nullptr),
 	entrystate(entrystate_),
 	abortstate(abortstate_),
+    resultCallback_(nullptr),
     myEventOnGracefulShutdown(eventOnGracefulShutdown),
     myEventOnErrorShutdown(eventOnErrorShutdown),
 	eventqueue_(nullptr),
@@ -77,15 +77,16 @@ Statemachine::Statemachine(
 	enteredNewState_(false)
 		{ }
 
-void Statemachine::start(uintptr_t argument, bool supressStatechangeDebugMessages) {
-    start(defaultEventqueue_, argument, supressStatechangeDebugMessages);
+void Statemachine::start(uintptr_t argument, bool supressStatechangeDebugMessages, EventMethod resultCallback) {
+    start(defaultEventqueue_, argument, supressStatechangeDebugMessages, resultCallback);
 }
 
-void Statemachine::start(EventQueue* eventqueue, uintptr_t argument, bool supressStatechangeDebugMessages_) {
+void Statemachine::start(EventQueue* eventqueue, uintptr_t argument, bool supressStatechangeDebugMessages_, EventMethod resultCallback) {
     Mutex::Lock lock(interface_mutex);
 
     argument_ = argument;
     eventqueue_ = eventqueue;
+    resultCallback_ = resultCallback;
 
     if (getStatusInternal() == Status::waiting_for_activation) {
         turag_infof("%s: not added: already in activation queue", name);
