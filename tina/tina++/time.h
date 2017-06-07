@@ -61,6 +61,12 @@ public:
         return turag_s_to_ticks(s);
     }
 
+    /// Systemzeit aus \p s Sekunden in Double erstellen (wird in us umgewandelt und dann konvertiert)
+    constexpr
+    static SystemTime fromSecDouble(double s) {
+        return turag_us_to_ticks((double)1e6*s);
+    }
+
     /// gespeicherte Systemzeit auf \p us Mikrosekunden setzen
     void assignFromUsec(unsigned us) {
         *this = turag_us_to_ticks(us);
