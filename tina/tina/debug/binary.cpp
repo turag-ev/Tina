@@ -16,7 +16,7 @@ using namespace TURAG;
 extern "C"
 void _turag_binary_send(char source, char object_id, const void* object, size_t size) {
 	constexpr std::size_t newline_size = length(TURAG_DEBUG_NEWLINE) - 1;
-	static_assert(newline_size == 1 || newline_size == 2, "");
+	static_assert(newline_size == 0 || newline_size == 1 || newline_size == 2, "");
 
 	const std::size_t elen = Base64::encodeLength(size);
 	std::uint8_t paket[4 + elen + newline_size + 1];
@@ -31,11 +31,16 @@ void _turag_binary_send(char source, char object_id, const void* object, size_t 
 	turag_base64_encode(static_cast<const std::uint8_t*>(object), size, paket+4);
 
 	// end
-	if (newline_size == 1) {
-		paket[elen+4] = TURAG_DEBUG_NEWLINE[0];
-	} else {
-		paket[elen+4] = TURAG_DEBUG_NEWLINE[0];
-		paket[elen+4+1] = TURAG_DEBUG_NEWLINE[1];
+	switch(newline_size) {
+	case 0:
+	    break;
+	case 1:
+	    paket[elen+4] = TURAG_DEBUG_NEWLINE[0];
+	    break;
+	case 2:
+	    paket[elen+4] = TURAG_DEBUG_NEWLINE[0];
+	    paket[elen+4+1] = TURAG_DEBUG_NEWLINE[1];
+	    break;
 	}
 	paket[elen+4+newline_size] = '\0';
 
