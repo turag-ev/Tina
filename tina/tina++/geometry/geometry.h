@@ -91,6 +91,12 @@ struct Point {
         return Point(x + rhs.x, y + rhs.y);
     }
 
+    /// Punkt und Vektor subtrahieren (nur Punkt-Vektor, nicht Vektor-Punkt)
+    constexpr
+    Point operator-(const Vector<Length>& rhs) const {
+        return Point(x - rhs.x, y - rhs.y);
+    }
+
 	/// relativer Vektor zwischen zwei Punkte erhalten
 	constexpr
     Vector<Length> operator-(const Point& other) const {
