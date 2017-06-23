@@ -51,7 +51,8 @@ HEADERS  += \
     $$PWD/tina++/units/units.h \
     $$PWD/tina++/units/mechanics.h \
     $$PWD/tina++/units/electronics.h \
-    $$PWD/tina++/units.h
+    $$PWD/tina++/units.h \
+    $$PWD/tina++/helper/instance_list.h
 
 DISTR_FILES += $$PWD/tina.pri
 
