@@ -77,7 +77,7 @@ public:
     }
 
 private:
-        friend class iterator;
+    friend class iterator;
     static own_type* first_;
     static own_type* last_;
     own_type* next_;

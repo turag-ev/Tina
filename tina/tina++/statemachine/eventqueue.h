@@ -207,8 +207,8 @@ namespace TURAG {
 /// Ereignisverarbeitung
 class EventQueue {
 public:
-  /// Typ für Funktion zur Verärbeitung von Ereignis
-  typedef bool (*EventHandler)(EventId id, EventArg data);
+  /// Typ für Funktion zur Verarbeitung von Ereignis
+  typedef void (*EventHandler)(EventId id, EventArg data);
 
   /// Typ für Tick-Funktion
   typedef void (*TickHandler)();
@@ -228,8 +228,8 @@ public:
   /// Ereignis direkt ohne Pufferung verarbeiten
   /// \param id Id von Ereignis
   /// \param param Argument von Ereignis, sonst Null
-  /// \param callback explizite Angabe der Ereignisverarbeitungsfunktion, sonst <code>nullptr</code>
-  bool processEvent(EventId id, EventArg param, EventMethod callback);
+  /// \param callback explizite Angabe der Ereignisverarbeitungsfunktion, sonst <code>nullptr</code>, in diesem Fall Verarbeitung durch \ref handler_
+  void processEvent(EventId id, EventArg param, EventMethod callback);
 
   /// Push quit event (\a EventQueue::event_quit) to front of event queue.
   /**
