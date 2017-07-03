@@ -157,18 +157,11 @@ void EventQueue::main(EventHandler handler, TickHandler tick) {
   }
 }
 
-bool EventQueue::processEvent(EventId id, EventArg param, EventMethod callback) {
-  if (handler_ != nullptr) {
-    if (callback != nullptr) {
-      (*callback)(id, param);
-      return false;
-
-    } else {
-      return handler_(id, param);
-    }
-  }
-
-  return false;
+void EventQueue::processEvent(EventId id, EventArg param, EventMethod callback) {
+    if (callback != nullptr)
+        (*callback)(id, param);
+    else if(handler_ != nullptr)
+        handler_(id, param);
 }
 
 void EventQueue::push(const EventClass* event_class, EventArg param, EventMethod method) {
