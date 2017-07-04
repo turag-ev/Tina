@@ -147,7 +147,7 @@ void EventQueue::main(EventHandler handler, TickHandler tick) {
       }
 
       print_debug_info(event);
-
+      tick();
       if (event.method != nullptr) {
           (*event.method)(event.event_class->id, event.param);
       } else {
