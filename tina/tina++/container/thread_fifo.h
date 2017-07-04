@@ -257,6 +257,19 @@ public:
 
     }
 
+    /*!
+     * \brief Gibt ohne zu blockieren an, ob Elemente im FIFO sind.
+     * \return True wenn mindestens ein Element vorhanden ist.
+     *
+     * \warning Diese Funktion sollte nur benutzt werden, wenn es nur einen Consumer-Thread gibt,
+     *          weil ansonsten vor dem nächsten fetch() ein anderer Thread das Element entfernen kann.
+     */
+    bool empty() {
+        ConditionVariable::Lock lock(element_queued_);
+
+        return buffer_.empty();
+    }
+
 };
 	
 }
