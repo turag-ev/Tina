@@ -64,7 +64,7 @@ public:
     bool post(const T& mail, SystemTime time, size_t leaveSpace = 0) {
         ConditionVariable::Lock lock(element_removed_);
 
-        if (buffer_.size() >= buffer_.capacity() - leaveSpace) {
+        if (time != SystemTime(0) && buffer_.size() >= buffer_.capacity() - leaveSpace) {
             lock.waitFor(time);
         }
         if (buffer_.size() < buffer_.capacity() - leaveSpace) {
@@ -139,7 +139,7 @@ public:
             return true;
         }
 
-        if (buffer_.size() >= buffer_.capacity() - leaveSpace) {
+        if (time != SystemTime(0) && buffer_.size() >= buffer_.capacity() - leaveSpace) {
             lock.waitFor(time);
 
             // after locking the mutex again we can't know whether the element is in the
@@ -168,7 +168,7 @@ public:
     bool fetch(T* mail, SystemTime time) {
         ConditionVariable::Lock lock(element_queued_);
 
-        if (buffer_.empty()) {
+        if (buffer_.empty() && time != SystemTime(0)) {
             lock.waitFor(time);
         }
         if (!buffer_.empty()) {
@@ -243,7 +243,7 @@ public:
     bool  wait(T* mail, SystemTime time) {
         ConditionVariable::Lock lock(element_queued_);
 
-        if (buffer_.empty()) {
+        if (time != SystemTime(0) && buffer_.empty()) {
             lock.waitFor(time);
         }
         if (!buffer_.empty()) {
