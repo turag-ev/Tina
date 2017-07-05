@@ -36,9 +36,53 @@ extern "C" {
 #endif
 
 #include <stdarg.h>
+    
+/**
+ * @defgroup mini-printf Mini-Printf
+ * @ingroup Utils
+ * 
+ * Dieses Modul stellt minimale Funktionen zur grundlegenden 
+ * formatierten Ausgabe in Puffer angegebener Länge bereit.
 
+ * Die folgenden Format-Spezifizierer werden unterstützt:
+ *  - u, d
+ *  - x, X
+ *  - c
+ *  - s
+ */
+    
+/**
+ * @addtogroup mini-printf
+ * @{
+ */
+ 
+
+/**
+ * @brief Minimale printf-Implementierung.
+ * @param[out] buffer Puffer, in den der formatierte String geschrieben wird.
+ * @param[in] buffer_len Länge von buffer.
+ * @param[in] fmt Format-String. 
+ * @param[in] va Argument-Liste.
+ * 
+ * Diese Form kann zur Implementierung eigener printf-Funktionen genutzt werden.
+ */
 int mini_vsnprintf(char* buffer, unsigned int buffer_len, const char *fmt, va_list va);
+
+/**
+ * @brief Minimale printf-Implementierung.
+ * @param[out] buffer Puffer, in den der formatierte String geschrieben wird.
+ * @param[in] buffer_len Länge von buffer.
+ * @param[in] fmt Format-String. 
+ * 
+ * Diese Form ist zur direkten Verwendung vorgesehen.
+ */
 int mini_snprintf(char* buffer, unsigned int buffer_len, const char *fmt, ...);
+
+
+/**
+ * @}
+ */
+
 
 #ifdef __cplusplus
 }

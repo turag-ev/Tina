@@ -564,6 +564,7 @@ public:
      * \param argument Optional argument to execute the statemachine with.
      * \param supressStatechangeDebugMessages Supress the automatic output of debug
      * messages informing about state changes.
+     * \param resultCallback Callback function to handle emitted events (not including events emitted from states)
      * \remark This function is thread-safe.
      */
     void start(EventQueue* eventqueue, uintptr_t argument = 0, bool supressStatechangeDebugMessages = false, EventMethod resultCallback = nullptr);
@@ -573,7 +574,6 @@ public:
      * \param argument Optional argument to execute the statemachine with.
      * \param supressStatechangeDebugMessages Supress the automatic output of debug
      * messages informing about state changes.
-     * \param resultCallback Callback function to handle emitted events (not including events emitted from states)
      * \remark This function is thread-safe.
      */
 	void startSilent(uintptr_t argument = 0, bool supressStatechangeDebugMessages = false) {
