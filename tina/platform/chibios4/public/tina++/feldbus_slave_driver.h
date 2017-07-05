@@ -32,10 +32,10 @@ namespace Slave {
 // device on one board, all static functions
 // could be replaced with normal ones.
 /**
- * @brief Feldbus-Slave Treiber für ChibiOS 3.
+ * @brief Feldbus-Slave Treiber für ChibiOS RT 4.
  * 
  * Dieser Treiber implementiert den plattform-abhängigen Teil des Feldbus-Slave
- * Treibers für die ChibiOS 3-Plattform.
+ * Treibers für die ChibiOS RT 4-Plattform.
  */
 class Driver {
 public:
