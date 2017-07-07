@@ -8,13 +8,16 @@
 
 #if __cplusplus >= 201100L
 std::size_t su_get_stack_usage(const char* stack, std::size_t stack_size) {
-    const char* begin = stack + stack_size;
-    const char* end = reinterpret_cast<char*>(reinterpret_cast<const Thread*>(static_cast<const void*>(stack))->p_stklimit);
+    // FIXME!
+    
+    /*const char* begin = stack + stack_size;
+    const char* end = reinterpret_cast<char*>(reinterpret_cast<const thread_t*>(static_cast<const void*>(stack))->p_stklimit);
     for (const char* ptr = end; ptr != begin; ptr++) {
         if (*ptr != 0x55) {
             return (begin - ptr) * sizeof(char);
         }
     }
+    */
     return 0;
 }
 #endif // __cplusplus >= 201100L
