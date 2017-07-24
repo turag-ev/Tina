@@ -52,7 +52,8 @@ HEADERS  += \
     $$PWD/tina++/units/mechanics.h \
     $$PWD/tina++/units/electronics.h \
     $$PWD/tina++/units.h \
-    $$PWD/tina++/helper/instance_list.h
+    $$PWD/tina++/helper/instance_list.h \
+    $$PWD/tina++/statemachine/action.h
 
 DISTR_FILES += $$PWD/tina.pri
 
@@ -151,13 +152,11 @@ contains(TINA, extra) {
 
 contains(TINA, statemachine) {
   SOURCES += \
-      $$PWD/tina++/statemachine/eventqueue.cpp \
-      $$PWD/tina++/statemachine/state.cpp
+      $$PWD/tina++/statemachine/eventqueue.cpp
 
   HEADERS  += \
       $$PWD/tina/statemachine/eventqueue.h \
       $$PWD/tina++/statemachine/eventqueue.h \
-      $$PWD/tina++/statemachine/state.h \
       $$PWD/tina++/statemachine/types.h \
       $$PWD/tina++/statemachine.h
 }
@@ -237,6 +236,12 @@ contains(TINA, bluetooth) {
   HEADERS  += \
       $$PWD/tina++/bluetooth/bluetooth_base.h
 }
+
+SOURCES += \
+    $$PWD/tina++/statemachine/action.cpp
+
+DISTFILES += \
+    $$PWD/tina.cmake
 
 
 

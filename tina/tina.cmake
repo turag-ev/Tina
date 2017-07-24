@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.8.3)
 set(TINA_INCLUDE_DIRS .)
 
 set(TINA_SRC
-  tina++/statemachine/state.cpp
+  tina++/statemachine/action.cpp
   tina++/statemachine/eventqueue.cpp
   tina++/feldbus/host/dcmotor_tina.cpp
   tina++/feldbus/host/servo_tina.cpp

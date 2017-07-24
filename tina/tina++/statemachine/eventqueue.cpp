@@ -20,7 +20,7 @@
 #include "../container/circular_buffer.h"
 #include "../range/algorithm.h"
 #include "eventqueue.h"
-#include "state.h"
+#include "action.h"
 
 #ifdef NDEBUG
 # undef EVENTQUEUE_USAGE_MEASUREMENT
