@@ -24,7 +24,8 @@ Action::Action(const char* name):
 void Action::exit(EventId eid)
 {
     if (!isActive()) {
-        turag_criticalf("Cannot exit inactive action %s.", name_);
+        turag_criticalf("Cannot exit inactive action %s.",
+                        name_);
 		return;
 	}
 
@@ -47,8 +48,8 @@ void Action::exit(EventId eid)
 
         // inform parent
         if (!parent->handleEvent(Action::event_return, eid) ) {
-			turag_warningf("Beenden von Aktion %s wurde nicht behandelt.",
-						   name_);
+            turag_warningf("Return of action %s was not handled.",
+                           name_);
 		}
 	}
 }
@@ -56,8 +57,8 @@ void Action::exit(EventId eid)
 void Action::cancel(EventArg arg)
 {
 	if (!isActive()) {
-		turag_criticalf("Inaktive Aktion %s kann nicht abgebrochen werden.",
-						name_);
+        turag_criticalf("Cannot cancel inactive action %s.",
+                        name_);
 	}
 
 	turag_infof("##### CANCEL %s", name_);
@@ -111,7 +112,7 @@ void Action::start(Action *parent, EventArg data)
 
 	if (parent) {
 		if (!parent->isActive()) {
-            turag_criticalf("Inactive parent action %s is inactive and cannot accept new child %s.",
+            turag_criticalf("Inactive parent action %s cannot accept new child %s.",
 							parent->name_, name_);
 			return;
 		}
