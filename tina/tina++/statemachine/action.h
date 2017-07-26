@@ -114,12 +114,10 @@ public:
         state(id, arg);
     }
 
-    static A* getPointer() __attribute_deprecated__ {
+    //TODO remove singleton design?
+    static A* getPointer() /*__attribute_deprecated__*/ {
         return &instance;
     }
-    /*static A& get() __attribute_deprecated__ {
-        return instance;
-    }*/
 private:
     _always_inline bool state(EventId id, EventArg arg) {
         static_assert(std::is_base_of<StateAction<A>, A>::value, "");
