@@ -128,7 +128,7 @@ void Action::start(Action *parent, EventArg data)
 	}
 
 	child_ = nullptr;
-
+    active_ = true;
     onStart(data);
 }
 

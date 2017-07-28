@@ -121,7 +121,7 @@ public:
 private:
     _always_inline bool state(EventId id, EventArg arg) {
         static_assert(std::is_base_of<StateAction<A>, A>::value, "");
-        return (reinterpret_cast<A*>(this)->*currentstate_)(id, arg);
+        return (static_cast<A*>(this)->*currentstate_)(id, arg);
     }
 
     State currentstate_;
