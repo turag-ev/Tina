@@ -81,7 +81,7 @@ void Action::cancel(EventArg arg)
 
 void Action::kill()
 {
-    if(isActive()) {
+    if(!isActive()) {
         turag_criticalf("Cannot kill inactive action %s.", name_);
         return;
     }
