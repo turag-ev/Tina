@@ -3,6 +3,7 @@
 
 #include <tina/statemachine/eventqueue.h>
 #include <tina++/time.h>
+#include <functional>
 
 namespace TURAG {
 
@@ -15,11 +16,22 @@ namespace TURAG {
 /// Typ für Event-IDs
 typedef TuragEventId EventId;
 
-/// Typ für Funktionen, die Events verarbeiten
-typedef TuragEventMethod EventMethod;
-
 /// Typ für Event-spezifische Parameter
 typedef TuragEventArg EventArg;
+
+/// Typ für Funktionen, die Events verarbeiten
+#if TURAG_USE_STD_FUNCTION != 0 || defined(__DOXYGEN__)
+typedef std::function<void(EventId,EventArg)> EventMethod;
+#else
+typedef TuragEventMethod EventMethod;
+#endif
+
+#define NONCONSTEXPR_COPY_MOVABLE(ClassName) \
+    ClassName(const ClassName&) = default; \
+    ClassName& operator=(const ClassName&) = default; \
+    ClassName(ClassName&&) = default; \
+    ClassName& operator=(ClassName&&) = default
+
 
 /// \brief Erstellt Namesraum für Event-Ids
 /// Die Funktion erstellt aus drei ASCII-Zeichen einen Namesraum für eine Event-ID
@@ -127,24 +139,18 @@ struct Event {
   /// \brief Ereignis aus Ereignisklasse erstellen
   /// \note Ereignis sollte nie selber erstellt werden, sondern die Funktionen der
   /// \ref TURAG::EventQueue "EventQueue" benutzt werden.
-  constexpr
   Event(const EventClass* event_class, EventArg param, EventMethod method) :
 	event_class(event_class), param(param), method(method)
   { }
 
-  /// Instanzen von Klasse sind verschiebbar.
-  MOVABLE(Event);
-
-  /// Instanzen von Klasse sind kopierbar.
-  COPYABLE(Event);
+  NONCONSTEXPR_COPY_MOVABLE(Event);
 };
 
 /// \brief zeitverzögertes Ereignis
 struct TimeEvent {
-  MOVABLE(TimeEvent);
-  COPYABLE(TimeEvent);
+    NONCONSTEXPR_COPY_MOVABLE(TimeEvent);
 
-  /// \brief zugehöriges Ereignis was ausgelöst werden soll.
+    /// \brief zugehöriges Ereignis was ausgelöst werden soll.
   Event     event;
 
   /// \brief absolute Zeit bei der Ereignis ausgeführt werden soll.
@@ -153,7 +159,6 @@ struct TimeEvent {
   /// zeitverzögertes Ereignis erstellen
   /// \note Ereignis sollte nie selber erstellt werden, sondern die Funktionen der
   /// \ref TURAG::EventQueue "EventQueue" benutzt werden.
-  constexpr
   TimeEvent(const Event& event, SystemTime time) :
 	event(event), time(time)
   { }
@@ -161,7 +166,6 @@ struct TimeEvent {
   /// zeitverzögertes Ereignis erstellen
   /// \note Ereignis sollte nie selber erstellt werden, sondern die Funktionen der
   /// \ref TURAG::EventQueue "EventQueue" benutzt werden.
-  constexpr
   TimeEvent(const EventClass* event_class, EventArg param, EventMethod method, SystemTime time) :
 	event(event_class, param, method), time(time)
   { }

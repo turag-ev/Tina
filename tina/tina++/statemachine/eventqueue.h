@@ -274,12 +274,6 @@ public:
    */
   void removeEvent(EventId id);
 
-  /// Remove all events with specific callback.
-  /**
-   * \param method event function that is searched
-   */
-  void removeCallback(EventMethod method);
-
   /// \brief alle gespeicherten Ereignisse löschen
   ///
   /// Löscht Ereignisse von allen eingegangenen wartenden Ereignissen, die

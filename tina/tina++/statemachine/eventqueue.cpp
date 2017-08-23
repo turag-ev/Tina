@@ -48,20 +48,20 @@ void print_debug_info(const Event& e) {
       // erstes Zeichen ist Null -> nicht loggen
       if ((id >> 24) == 0) return;
 
-	  turag_infof("Event: %s (id: %c%c%c%u param: %" TURAG_d32 " method: 0x%" TURAG_xPTR ")",
-          name,
-          static_cast<char>(id >> 24),
-          static_cast<char>(id >> 16),
-          static_cast<char>(id >> 8),
-          static_cast<unsigned>(id & 0xFF),
-		  (int)e.param,
-          reinterpret_cast<std::size_t>(e.method));
+      turag_infof("Event: %s (id: %c%c%c%u param: %" TURAG_d32 " has method: %s)",
+                  name,
+                  static_cast<char>(id >> 24),
+                  static_cast<char>(id >> 16),
+                  static_cast<char>(id >> 8),
+                  static_cast<unsigned>(id & 0xFF),
+                  (int)e.param,
+                  e.method ? "yes":"no");
   } else {
-	turag_infof("Event: %s (id: %u param: %" TURAG_d32 " method: 0x%" TURAG_xPTR ")",
-          name,
-          static_cast<unsigned>(id),
-		  (int)e.param,
-          reinterpret_cast<std::size_t>(e.method));
+    turag_infof("Event: %s (id: %u param: %" TURAG_d32 " has method: %s",
+                name,
+                static_cast<unsigned>(id),
+                (int)e.param,
+                e.method ? "yes":"no");
   }
 #endif
 }
@@ -149,7 +149,11 @@ void EventQueue::main(EventHandler handler, TickHandler tick) {
       print_debug_info(event);
       tick();
       if (event.method != nullptr) {
+#if TURAG_USE_STD_FUNCTION != 0
+          event.method(event.event_class->id, event.param);
+#else
           (*event.method)(event.event_class->id, event.param);
+#endif
       } else {
           handler_(event.event_class->id, event.param);
       }
@@ -159,7 +163,11 @@ void EventQueue::main(EventHandler handler, TickHandler tick) {
 
 void EventQueue::processEvent(EventId id, EventArg param, EventMethod callback) {
     if (callback != nullptr)
+#if TURAG_USE_STD_FUNCTION != 0
+        callback(id,param);
+#else
         (*callback)(id, param);
+#endif
     else if(handler_ != nullptr)
         handler_(id, param);
 }
@@ -230,16 +238,6 @@ void EventQueue::removeEvent(EventId id) {
   });
 }
 
-void EventQueue::removeCallback(EventMethod method) {
-  Mutex::Lock lock(mutex_);
-
-  for (auto& event : queue_) {
-    if (event.method == method) event.event_class = nullptr;
-  }
-
-  remove_if(timequeue_, [&](const TimeEvent& tevent) { return tevent.event.method == method;});
-}
-
 DEFINE_EVENT_CLASS(EventQuit, EventQueue::event_quit);
 
 void EventQueue::quit() {
@@ -258,13 +256,13 @@ void EventQueue::printTimeQueue() {
             if (tevent.event.event_class) {
                 EventId id = tevent.event.event_class->id;
 
-				turag_infof("  @%u ms %c%c%c%u %" TURAG_xPTR "\n",
+                turag_infof("  @%u ms %c%c%c%u %sn",
                             tevent.time.toMsec(),
                             static_cast<char>(id >> 24),
                             static_cast<char>(id >> 16),
                             static_cast<char>(id >> 8),
                             static_cast<unsigned>(id & 0xFF),
-                            reinterpret_cast<ptrdiff_t>(tevent.event.method));
+                            tevent.event.method?"has method":"no method");
             }
         }
     } else {
