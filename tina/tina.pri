@@ -53,7 +53,8 @@ HEADERS  += \
     $$PWD/tina++/units/electronics.h \
     $$PWD/tina++/units.h \
     $$PWD/tina++/helper/instance_list.h \
-    $$PWD/tina++/statemachine/action.h
+    $$PWD/tina++/statemachine/action.h \
+    $$PWD/tina/feldbus/protocol/bldc_protocol.h
 
 DISTR_FILES += $$PWD/tina.pri
 
