@@ -39,79 +39,72 @@ struct Vector {
 	constexpr
 	Vector(U x_corr, U y_corr) :
 		x(x_corr), y(y_corr)
-	{ }
+    { }
 
-    /// Vektor skalieren
+    /// Nullvektor erstellen
+    constexpr
+    Vector() :
+        x(0), y(0)
+    { }
+
+    /// Kopierkonstruktor
+    constexpr
+    Vector(const Vector& p) = default;
+
+    /// zwei Vektoren addieren
+    constexpr
+    Vector operator+(const Vector<U>& other) const {
+        return Vector(x + other.x, y + other.y);
+    }
+
+    /// zwei Vektoren subtrahieren.
+    /// Sonderfall Ortsvektor: Relativen Vektor erhalten
+    constexpr
+    Vector operator-(const Vector<U>& other) const {
+        return Vector(x - other.x, y - other.y);
+    }
+
+    /// zwei Punkte vergleichen
+    constexpr
+    bool operator==(const Vector<U>& other) const {
+        return (x == other.x) && (y == other.y);
+    }
+
+    /// zwei Punkte vergleichen
+    constexpr
+    bool operator!=(const Vector<U>& other) const {
+        return (x != other.x) || (y != other.y);
+    }
+
+    /// Vektor skalar multiplizieren
     /// \param rhs Faktor
-    constexpr
-    Vector operator*(float rhs) const {
-        return Vector<U>(x*rhs, y*rhs);
+    template<typename U2> constexpr
+    Vector operator*(U2 rhs) const {
+        return Vector(x*rhs, y*rhs);
     }
 
-	/// \{
-	/// Kopieroperator
-	Vector(const Vector& p) = default;
-	Vector() = default;
-	/// \}
-    ///
+    /// Vektor skalar dividieren
+    /// \param rhs Quotient
+    template<typename U2> constexpr
+    Vector operator/(U2 rhs) const {
+        return Vector(x/rhs, y/rhs);
+    }
+
+    /// Betrag des Vektors ausgeben
+    constexpr inline
+    U magnitude() const {
+        return U(::hypot(x.value, y.value));
+    }
 };
 
-/// zweidimensionaler kartesischer Punkt
-struct Point {
-	/// x - Koordinate
-	Length x;
+/// Ortsvektor
+typedef Vector<Units::Length> Point;
 
-	/// y - Koordinate
-	Length y;
-
-	/// Punkt aus zwei kartesischen Korrdinaten erstellen
-	constexpr
-	Point(Length x_corr, Length y_corr) :
-		x(x_corr), y(y_corr)
-	{ }
-
-	/// Kopierkonstruktor
-	constexpr
-	Point(const Point& p) = default;
-
-	/// Nullpunkt erstellen
-	constexpr
-	Point() :
-		x(0), y(0)
-	{ }
-
-	/// zwei Punkte addieren
-	constexpr
-    Point operator+(const Point& other) const {
-		return Point(x + other.x, y + other.y);
-	}
-    /// Punkt und Vektor addieren (nur Punkt+Vektor, nicht Vektor+Punkt)
-    constexpr
-    Point operator+(const Vector<Length>& rhs) const {
-        return Point(x + rhs.x, y + rhs.y);
-    }
-
-    /// Punkt und Vektor subtrahieren (nur Punkt-Vektor, nicht Vektor-Punkt)
-    constexpr
-    Point operator-(const Vector<Length>& rhs) const {
-        return Point(x - rhs.x, y - rhs.y);
-    }
-
-	/// relativer Vektor zwischen zwei Punkte erhalten
-	constexpr
-    Vector<Length> operator-(const Point& other) const {
-		return Vector<Length>(x - other.x, y - other.y);
-	}
-
-	/// zwei Punkte vergleichen
-	constexpr
-    bool operator!=(const Point& other) const {
-		return (x != other.x) || (y != other.y);
-	}
-};
-
-/// robot velocity in x and y
+/// Geschwindigkeitsvektor
 typedef Vector<Units::Velocity> PositionVelocity;
+
+/// Beschleunigungsvektor
+typedef Vector<Units::Acceleration> PositionAcceleration;
 
 /// Darstellung für zweidimensionalen Polarvektor
 ///
@@ -140,6 +133,79 @@ struct VectorPolar {
 	VectorPolar() :
 		r(0), phi(0)
 	{ }
+};
+
+/// \brief Darstellung für gerichtete Objekte im zweidimensionalen Raum
+///
+/// Datentyp mit einer linearen Vektorkomponente und einer Angularen Komponente.
+/// Geeignet für Posen und deren zeitlichen Ableitungen.
+///
+/// Eigentlich sollte der Datentyp 'GenericPose' heißen. Eine ausgiebige Diskussion
+/// um 2 Uhr nachts zwischen Lukas M. und Hermann mit ausreichend Captain Grand
+/// ergab, dass eine Pose eigentlich nur den Spezialfall der stationären Pose
+/// beschreibt. Der Generische Datentyp beschreibt eine Komposition aus linearen
+/// und angularen Datentypen im zweidimensionalen Raum und lässt beliebige
+/// Zeitableitungen zu.
+template<typename U1 = Length, typename U2 = Angle>
+struct LinearAngular2d {
+    /// Lineare Komponente
+    Vector<U1> p;
+
+    /// Aliase für Vektormember
+    U1 &x = p.x;
+    U1 &y = p.y;
+
+    /// Angulare Komponente
+    U2 phi;
+
+    /// Aus linearem Vektor und angularer Komponente erstellen
+    explicit constexpr
+    LinearAngular2d(const Vector<U1>& p_, U2 a_ = Units::null) :
+        p(p_), phi(a_)
+    { }
+
+    /// Aus zwei linearen und einer angularen Komponente erstellen
+    constexpr
+    LinearAngular2d(U1 x_, U1 y_, U2 phi_) :
+        p(x_, y_), phi(phi_)
+    { }
+
+    /// Kopierkonstruktor
+    constexpr
+    LinearAngular2d(const LinearAngular2d<U1, U2>& other) :
+        p(other.p), phi(other.phi)
+    { }
+
+    /// Standardkonstruktor
+    constexpr
+    LinearAngular2d() :
+        p()
+    { }
+
+    /// Zuweisung
+    LinearAngular2d& operator=(const LinearAngular2d<U1, U2>& other) {
+        p = other.p;
+        phi = other.phi;
+        return *this;
+    }
+
+    /// Lineare Komponenten aus Vektor übernehmen. Angulare Komponente wird nicht geändert.
+    /// TODO: Obsolet, da Vektor Klassenmember?
+    void assign(const Vector<U1>& p_) {
+        p = p_;
+    }
+
+    /// zugehörigen Vektor zurückgeben
+    /// TODO: Obsolet, da Vektor Klassenmember?
+    constexpr Vector<U1> toVector() const {
+        return p;
+    }
+
+    /// Betrag der linearen Komponenten bilden
+    constexpr inline
+    U1 magnitude() const {
+        return p.magnitude();
+    }
 };
 
 /// \brief Pose im zweidimensionalen Raum
@@ -267,8 +333,9 @@ struct Pose {
     }
 };
 
-/// robot velocity in translation and rotation
-typedef VectorPolar<Units::Velocity, Units::AngularVelocity> PoseVelocity;
+/// robot velocity/acceleration in translation and rotation
+typedef LinearAngular2d<Units::Velocity, Units::AngularVelocity> PoseVelocity;
+typedef LinearAngular2d<Units::Acceleration, Units::AngularAcceleration> PoseAcceleration;
 
 ////////////////////////////////////////////////////////////////////////////////
 

@@ -238,6 +238,14 @@ contains(TINA, bluetooth) {
       $$PWD/tina++/bluetooth/bluetooth_base.h
 }
 
+#
+# ros
+
+contains(TINA, ros) {
+  HEADERS  += \
+    $$PWD/tina++/ros/pose.h
+}
+
 SOURCES += \
     $$PWD/tina++/statemachine/action.cpp
 
