@@ -476,6 +476,9 @@ typedef Quantity<MassDimension> Mass;
 /// Typ für Stromvariablen
 typedef Quantity<CurrentDimension> Current;
 
+/// Typ für Spannungsvariablen
+typedef Quantity<VoltageDimension> Voltage;
+
 // TODO: weitere Typen einführen
 
 /// \}
