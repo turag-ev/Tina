@@ -56,6 +56,21 @@ void convert(const geometry_msgs::Accel& in, PoseAcceleration& out) {
     out.phi = in.angular.z * (Units::rad/Units::s/Units::s);
 }
 
+///
+/// \brief Wrapper für convert-Funktionen, der den Ausgabewert zurückgibt anstatt ihn in einen Buffer zu schreiben
+/// 
+/// Benutzung: 
+/// ros::geometry_msgs::Pose2D in;
+/// TURAG::Pose out = convert<TURAG::Pose>(in);
+///
+template<typename Out, typename In>
+inline
+Out convert(const In& in) {
+    Out out;
+    convert(in, out);
+    return out;
+}
+
 }
 
 #endif // TINA_ROS_POSE_H
