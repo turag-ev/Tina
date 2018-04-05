@@ -90,8 +90,6 @@ void Statemachine::start(EventQueue* eventqueue, uintptr_t argument, bool supres
 
     if (getStatusInternal() == Status::waiting_for_activation) {
         turag_infof("%s: not added: already in activation queue", name);
-    } else if (getStatusInternal() == Status::running_and_waiting_for_deactivation) {
-        turag_criticalf("%s: not added: waiting to be deactivated", name);
     } else if (getStatusInternal() == Status::running) {
         turag_infof("%s: not added: already running", name);
     } else {
@@ -190,34 +188,50 @@ void Statemachine::setDefaultEventqueue(EventQueue* eventqueue) {
 void Statemachine::doStatemachineProcessing(void) {
     ScopedLock<Mutex> lock(interface_mutex);
 
+    Statemachine* sm;
     // activate statemachines that are in activation queue
-    Statemachine* sm = Statemachine::first_to_be_activated_statemachine;
-    while (sm != nullptr) {
-		if (sm->entrystate) {
-			if (!sm->supressStatechangeDebugMessages) {
-				turag_infof("%s activated", sm->name);
-			} else {
-				turag_infof("%s activated; output of state change debug messages supressed", sm->name);
-			}
-			sm->startTime = SystemTime::now();
-			sm->status_ = Status::running;
-			sm->change_state(sm->entrystate);
-
-			sm->next_active = Statemachine::first_active_statemachine;
-			sm->last_active = nullptr;
-			if (sm->next_active != nullptr)
-				sm->next_active->last_active = sm;
-			Statemachine::first_active_statemachine = sm;
-		} else {
+    for (sm = Statemachine::first_to_be_activated_statemachine;
+         sm != nullptr;
+         sm = sm->next_to_be_activated)
+    {
+        if (sm->status_ == Status::running) {
+            turag_criticalf("%s not activated: Still running", sm->name);
+            continue;
+        }
+        if (sm->status_ == Status::running_and_waiting_for_deactivation) {
+            turag_infof("%s not activated: Still running and waiting for deactivation", sm->name);
+            continue;
+        }
+		if (!sm->entrystate) {
 			turag_errorf("%s: entry state is nullptr", sm->name);
 			sm->status_ = Status::stopped_on_error;
 			sm->emitEvent(sm->myEventOnErrorShutdown);
-		}
+            continue;
+        }
+        if (!sm->supressStatechangeDebugMessages) {
+            turag_infof("%s activated", sm->name);
+        } else {
+            turag_infof("%s activated; output of state change debug messages supressed", sm->name);
+        }
+        sm->startTime = SystemTime::now();
+        sm->status_ = Status::running;
+        sm->change_state(sm->entrystate);
 
-        sm = sm->next_to_be_activated;
+        sm->next_active = Statemachine::first_active_statemachine;
+        sm->last_active = nullptr;
+        if (sm->next_active != nullptr)
+            sm->next_active->last_active = sm;
+        Statemachine::first_active_statemachine = sm;
+        
+        if (sm->next_to_be_activated)
+            sm->next_to_be_activated->previous_to_be_activated = sm->previous_to_be_activated;
+        if (sm->previous_to_be_activated)
+            sm->previous_to_be_activated->next_to_be_activated = sm->next_to_be_activated;
+        if (Statemachine::first_to_be_activated_statemachine == sm)
+            Statemachine::first_to_be_activated_statemachine = sm->next_to_be_activated;
+        if (Statemachine::last_to_be_activated_statemachine == sm)
+            Statemachine::last_to_be_activated_statemachine = sm->previous_to_be_activated;
     }
-    Statemachine::first_to_be_activated_statemachine = nullptr;
-    Statemachine::last_to_be_activated_statemachine = nullptr;
 
     // deactivate statemachines that are in deactivation queue
     sm = Statemachine::first_to_be_stopped_statemachine;
