@@ -212,13 +212,13 @@ public:
   }
 
   /// Gibt \a N zurück
-  constexpr
-  size_type capacity() const {
+  static constexpr
+  size_type capacity() {
 	return N;
   }
   /// Gibt \a N zurück
-  constexpr
-  size_type max_size() const {
+  static constexpr
+  size_type max_size() {
 	return capacity();
   }
 
