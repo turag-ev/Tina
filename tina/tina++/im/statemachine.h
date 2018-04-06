@@ -556,9 +556,11 @@ public:
      * \param supressStatechangeDebugMessages Supress the automatic output of debug
      * messages informing about state changes.
      * \param resultCallback Callback function to handle emitted events (not including events emitted from states)
+     * \param reset If running, set state to initial state, start machine otherwise
      * \remark This function is thread-safe.
      */
-    void start(uintptr_t argument = 0, bool supressStatechangeDebugMessages = false, EventMethod resultCallback = nullptr);
+    void start(uintptr_t argument = 0, bool supressStatechangeDebugMessages = false,
+               EventMethod resultCallback = nullptr, bool reset = false);
 
     /*!
      * \brief Start the statemachine.
@@ -567,9 +569,11 @@ public:
      * \param supressStatechangeDebugMessages Supress the automatic output of debug
      * messages informing about state changes.
      * \param resultCallback Callback function to handle emitted events (not including events emitted from states)
+     * \param reset If running, set state to initial state, start machine otherwise
      * \remark This function is thread-safe.
      */
-    void start(EventQueue* eventqueue, uintptr_t argument = 0, bool supressStatechangeDebugMessages = false, EventMethod resultCallback = nullptr);
+    void start(EventQueue* eventqueue, uintptr_t argument = 0, bool supressStatechangeDebugMessages = false,
+               EventMethod resultCallback = nullptr, bool reset = false);
 
     /*!
      * \brief Start the statemachine in silent mode (no event will ever be emitted).
@@ -592,7 +596,7 @@ public:
     void stop(void);
     
     /*!
-     * \brief Reset the statemachine.
+     * \brief Reset the statemachine to initial state or start if not running
      * \details The started statemachine will use the default eventqueue to emit events.
      * \param argument Optional argument to execute the statemachine with.
      * \param supressStatechangeDebugMessages Supress the automatic output of debug
@@ -600,10 +604,11 @@ public:
      * \param resultCallback Callback function to handle emitted events (not including events emitted from states)
      * \remark This function is thread-safe.
      */
-    void reset(uintptr_t argument = 0, bool supressStatechangeDebugMessages = false, EventMethod resultCallback = nullptr);
+    void reset(uintptr_t argument = 0, bool supressStatechangeDebugMessages = false,
+               EventMethod resultCallback = nullptr);
 
     /*!
-     * \brief Reset the statemachine.
+     * \brief Reset the statemachine to initial state or start if not running
      * \param eventqueue Eventqueue the statemachine should use for emitting events.
      * \param argument Optional argument to execute the statemachine with.
      * \param supressStatechangeDebugMessages Supress the automatic output of debug
@@ -611,7 +616,8 @@ public:
      * \param resultCallback Callback function to handle emitted events (not including events emitted from states)
      * \remark This function is thread-safe.
      */
-    void reset(EventQueue* eventqueue, uintptr_t argument = 0, bool supressStatechangeDebugMessages = false, EventMethod resultCallback = nullptr);
+    void reset(EventQueue* eventqueue, uintptr_t argument = 0, bool supressStatechangeDebugMessages = false,
+               EventMethod resultCallback = nullptr);
 
     /*!
      * \brief Sendet ein Signal an die laufende Statemachine.
