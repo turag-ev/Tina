@@ -83,18 +83,21 @@ void Statemachine::start(uintptr_t argument, bool supressStatechangeDebugMessage
 
 void Statemachine::start(EventQueue* eventqueue, uintptr_t argument, bool supressStatechangeDebugMessages_, EventMethod resultCallback) {
     Mutex::Lock lock(interface_mutex);
-
-    argument_ = argument;
-    eventqueue_ = eventqueue;
-    resultCallback_ = resultCallback;
-
-    if (getStatusInternal() == Status::waiting_for_activation) {
+    
+    switch (getStatusInternal()) {
+    case Status::waiting_for_activation:
         turag_infof("%s: not added: already in activation queue", name);
-    } else if (getStatusInternal() == Status::running_and_waiting_for_deactivation) {
+        break;
+    case Status::waiting_for_reset:
+        turag_infof("%s: not added: already waiting for reset", name);
+        break;
+    case Status::running_and_waiting_for_deactivation:
         turag_criticalf("%s: not added: waiting to be deactivated", name);
-    } else if (getStatusInternal() == Status::running) {
+        break;
+    case Status::running:
         turag_infof("%s: not added: already running", name);
-    } else {
+        break;
+    default:
         if (Statemachine::last_to_be_activated_statemachine) {
             previous_to_be_activated = Statemachine::last_to_be_activated_statemachine;
             previous_to_be_activated->next_to_be_activated = this;
@@ -105,31 +108,80 @@ void Statemachine::start(EventQueue* eventqueue, uintptr_t argument, bool supres
         }
         next_to_be_activated = nullptr;
 
+        argument_ = argument;
+        eventqueue_ = eventqueue;
+        resultCallback_ = resultCallback;
         supressStatechangeDebugMessages = supressStatechangeDebugMessages_;
         status_ = Status::waiting_for_activation;
 		sendSignal_ = false;
 		clearSignal_ = false;
+        break;
     }
 }
 
 void Statemachine::stop(void) {
     Mutex::Lock lock(interface_mutex);
 
-    if (getStatusInternal() == Status::running_and_waiting_for_deactivation) {
-        turag_infof("%s: not added: already in deactivation queue", name);
-    } else if (getStatusInternal() == Status::waiting_for_activation) {
+    switch (getStatusInternal()) {
+    case Status::running_and_waiting_for_deactivation:
+        turag_infof("%s: not stopped: already in deactivation queue", name);
+        break;
+    case Status::waiting_for_activation:
         turag_criticalf("%s: not stopped: already in activation queue", name);
-	} else if (getStatusInternal() == Status::running) {
+        break;
+    case Status::waiting_for_reset:
+        turag_infof("%s: not stopped: already waiting for reset", name);
+        break;
+	case Status::running:
 		next_to_be_stopped = Statemachine::first_to_be_stopped_statemachine;
         Statemachine::first_to_be_stopped_statemachine = this;
         status_ = Status::running_and_waiting_for_deactivation;
-    } else {
+        break;
+    default:
         turag_infof("%s: not stopped: wasn't running", name);
         // send shutdown event nonetheless
 		emitEvent(myEventOnGracefulShutdown);
+        break;
     }
 }
 
+void Statemachine::reset(uintptr_t argument, bool supressStatechangeDebugMessages, EventMethod resultCallback) {
+    reset(Statemachine::defaultEventqueue_, argument, supressStatechangeDebugMessages, resultCallback);
+}
+
+void Statemachine::reset(EventQueue *eventqueue, uintptr_t argument, bool supressStatechangeDebugMessages_, EventMethod resultCallback) {
+    Mutex::Lock lock(interface_mutex);
+    
+    switch (getStatusInternal()) {
+    case Status::waiting_for_activation:
+        turag_infof("%s: will not reset, state is in activation queue!", name);
+        break;
+    case Status::running:
+    case Status::running_and_waiting_for_deactivation:
+        turag_infof("%s: will reset!", name);
+        
+        argument_ = argument;
+        eventqueue_ = eventqueue;
+        resultCallback_ = resultCallback;
+        supressStatechangeDebugMessages = supressStatechangeDebugMessages_;
+        status_ = Status::waiting_for_reset;
+		sendSignal_ = false;
+		clearSignal_ = false;
+        
+        break;
+    case Status::none:
+    case Status::stopped_gracefully:
+    case Status::stopped_on_error:
+        turag_infof("%s: not running, will start", name);
+        lock.unlock();
+        start(eventqueue, argument, supressStatechangeDebugMessages_, resultCallback);
+        lock.lock();
+        break;
+    case Status::waiting_for_reset:
+        turag_infof("%s: already waiting for reset, will not reset", name);
+        break;
+    }
+}
 
 bool Statemachine::sendSignal(uintptr_t signal) {
     Mutex::Lock lock(interface_mutex);
@@ -199,15 +251,20 @@ void Statemachine::doStatemachineProcessing(void) {
 			} else {
 				turag_infof("%s activated; output of state change debug messages supressed", sm->name);
 			}
+            
+            // Do nothing for statemachine reset
+            if (sm->status_ == Status::waiting_for_activation) {
+                sm->next_active = Statemachine::first_active_statemachine;
+                sm->last_active = nullptr;
+                if (sm->next_active != nullptr)
+                    sm->next_active->last_active = sm;
+                Statemachine::first_active_statemachine = sm;
+            }
+            
 			sm->startTime = SystemTime::now();
 			sm->status_ = Status::running;
 			sm->change_state(sm->entrystate);
 
-			sm->next_active = Statemachine::first_active_statemachine;
-			sm->last_active = nullptr;
-			if (sm->next_active != nullptr)
-				sm->next_active->last_active = sm;
-			Statemachine::first_active_statemachine = sm;
 		} else {
 			turag_errorf("%s: entry state is nullptr", sm->name);
 			sm->status_ = Status::stopped_on_error;

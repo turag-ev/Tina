@@ -490,6 +490,8 @@ public:
         none,
         //! %Statemachine is part of activation queue.
         waiting_for_activation,
+        //! %Statemachine is part of reset queue.
+        waiting_for_reset,
         //! %Statemachine is active and running.
         running,
         //! %Statemachine is active but will stop soon.
@@ -588,6 +590,28 @@ public:
      * \remark This function is thread-safe.
      */
     void stop(void);
+    
+    /*!
+     * \brief Reset the statemachine.
+     * \details The started statemachine will use the default eventqueue to emit events.
+     * \param argument Optional argument to execute the statemachine with.
+     * \param supressStatechangeDebugMessages Supress the automatic output of debug
+     * messages informing about state changes.
+     * \param resultCallback Callback function to handle emitted events (not including events emitted from states)
+     * \remark This function is thread-safe.
+     */
+    void reset(uintptr_t argument = 0, bool supressStatechangeDebugMessages = false, EventMethod resultCallback = nullptr);
+
+    /*!
+     * \brief Reset the statemachine.
+     * \param eventqueue Eventqueue the statemachine should use for emitting events.
+     * \param argument Optional argument to execute the statemachine with.
+     * \param supressStatechangeDebugMessages Supress the automatic output of debug
+     * messages informing about state changes.
+     * \param resultCallback Callback function to handle emitted events (not including events emitted from states)
+     * \remark This function is thread-safe.
+     */
+    void reset(EventQueue* eventqueue, uintptr_t argument = 0, bool supressStatechangeDebugMessages = false, EventMethod resultCallback = nullptr);
 
     /*!
      * \brief Sendet ein Signal an die laufende Statemachine.
