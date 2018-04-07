@@ -19,17 +19,17 @@ public:
     SystemTime(TuragSystemTicks ticks = 0) :
         value(ticks)
     { }
+    
+    /// explizit aus Einheitentyp erstellen
+    constexpr explicit
+    SystemTime(Units::Time time) :
+        value(turag_ms_to_ticks(time.toInt(Units::ms)).value)
+    { }
 
     /// implizit Systemzeit aus äquivalenten C-Typ erstellen
     constexpr
     SystemTime(TuragSystemTime time) :
         value(time.value)
-    { }
-    
-    /// implizit aus Einheitentyp erstellen
-    constexpr
-    SystemTime(Units::Time time) :
-        SystemTime(SystemTime::fromMsec(time.toInt(Units::us)))
     { }
 
     /// Kopierkonstruktor
@@ -73,6 +73,12 @@ public:
     static SystemTime fromSecDouble(double s) {
         return turag_us_to_ticks((double)1e6*s);
     }
+    
+    /// Systemzeit aus Zeiteinheit \p time erstellen
+    constexpr
+    static SystemTime fromTime(Units::Time time) {
+        return SystemTime(time);
+    }
 
     /// gespeicherte Systemzeit auf \p us Mikrosekunden setzen
     void assignFromUsec(unsigned us) {
@@ -87,6 +93,11 @@ public:
     /// gespeicherte Systemzeit auf \p s Sekunden setzen
     void assignFromSec(unsigned s) {
         *this = turag_s_to_ticks(s);
+    }
+    
+    /// gespeicherte Systemzeit auf angegebene Zeit setzen
+    void assignFromTime(Units::Time time) {
+        assignFromMsec(time.toInt(Units::ms));
     }
 
     /// gespeicherte Systemzeit in Mikrosekunden
@@ -107,10 +118,16 @@ public:
         return turag_ticks_to_s(TuragSystemTime{value});
     }
 
-    /// gespeicherte Systemzeit plattformabhängigen Ticks
+    /// gespeicherte Systemzeit in plattformabhängigen Ticks
     constexpr
     TuragSystemTicks toTicks() const {
         return value;
+    }
+    
+    /// gespeicherte Systemzeit in Zeiteinheiten
+    constexpr
+    Units::Time toTime() const {
+        return toUsec() * Units::us;
     }
 
     /// aktuelle Systemzeit
