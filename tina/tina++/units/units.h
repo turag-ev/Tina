@@ -40,6 +40,9 @@ constexpr Unit<TimeDimension>  s(FROM_SI_CONVERT_FACTOR_TIME);
 /// Definition für Millisekunden
 constexpr Unit<TimeDimension> ms(FROM_SI_CONVERT_FACTOR_TIME / 1000.f);
 
+/// Definition für Milkrosekunden
+constexpr Unit<TimeDimension> us(FROM_SI_CONVERT_FACTOR_TIME / 1000000.f);
+
 /// Definition für Gramm
 constexpr Mass::UnitType g(FROM_SI_CONVERT_FACTOR_MASS / 1000.f);
 

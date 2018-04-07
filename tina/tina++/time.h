@@ -3,6 +3,7 @@
 
 #include <tina/time.h>
 #include <tina++/tina.h>
+#include <tina++/units.h>
 
 namespace TURAG {
 
@@ -23,6 +24,12 @@ public:
     constexpr
     SystemTime(TuragSystemTime time) :
         value(time.value)
+    { }
+    
+    /// implizit aus Einheitentyp erstellen
+    constexpr
+    SystemTime(Units::Time time) :
+        SystemTime(SystemTime::fromMsec(time.toInt(Units::us)))
     { }
 
     /// Kopierkonstruktor
