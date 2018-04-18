@@ -45,4 +45,31 @@ bool intersect(const Circle& one, const Circle& two, std::array<Point, 2>& resul
   return true;
 }
 
+bool intersect(const Circle &zero, const Circle &one, const Circle &two, std::array<Point, 3> &results) {
+  // get intersection points between each 2 circles
+  std::array<Point, 2> in01, in12, in20;
+  const bool ok01 = intersect(zero,  one, in01);
+  const bool ok12 = intersect( one,  two, in12);
+  const bool ok20 = intersect( two, zero, in20);
+
+  if (!ok01 || !ok12 || !ok20) {
+      return false;
+  }
+
+  // get intersection points that lie in all circles
+  unsigned intersections = 0;
+  for (const Point &candidate: {in01[0], in01[1], in12[0], in12[1], in20[0], in20[1]}) {
+      if (in_range(candidate, zero, 0*mm) && in_range(candidate, one, 0*mm) && in_range(candidate, two, 0*mm)) {
+          results[intersections++] = candidate;
+      }
+  }
+
+  if (intersections != 3) {
+      results[0] = results[1] = results[2] = {};
+      return false;
+  }
+
+  return true;
+}
+
 } // namespace TURAG

@@ -42,6 +42,16 @@ struct Circle {
 /// \retval false es existiert kein Schnittpunkt zwischen den beiden Kreisen oder beide Kreise sind gleich (unendlich viele Schnittpunkte)
 bool intersect(const Circle& one, const Circle& two, std::array<Point, 2>& results);
 
+/// Schnittpunkte zwischen drei Kreisen zurückgeben.
+/// \relates Circle
+///
+/// \param one,two,three Kreise
+/// \param[out] results Schnittpunkte, wenn Rückgabewert \a true
+///
+/// \retval true es existiert endliche Anzahl an Schnittpunkten, die in allen Kreisen liegen. Werden in \a results gespeichert.
+/// \retval false es existiert kein Schnittpunkt zwischen den Kreisen oder zwei Kreise sind gleich (unendlich viele Schnittpunkte)
+bool intersect(const Circle& zero, const Circle& one, const Circle& two, std::array<Point, 3>& results);
+
 _always_inline
 bool in_range(const Circle& one, const Circle& two, Length radius) {
 	return in_range(one.m, two.m, one.r + two.r + radius);
