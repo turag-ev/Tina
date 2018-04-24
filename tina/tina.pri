@@ -54,7 +54,9 @@ HEADERS  += \
     $$PWD/tina++/units.h \
     $$PWD/tina++/helper/instance_list.h \
     $$PWD/tina++/statemachine/action.h \
-    $$PWD/tina/feldbus/protocol/bldc_protocol.h
+    $$PWD/tina/feldbus/protocol/bldc_protocol.h \
+    $$PWD/tina++/ros/time.h \
+    $$PWD/tina++/ros/convert.h
 
 DISTR_FILES += $$PWD/tina.pri
 
