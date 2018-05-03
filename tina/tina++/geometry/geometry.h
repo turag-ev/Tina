@@ -23,6 +23,11 @@ typedef Units::Length Length;
 /// Normiert einen Winkel auf das Intervall \f$ [\pi, -\pi) \f$
 Angle norm_angle(Angle x);
 
+// Forward declaration wegen getTurnedPoseTowards
+template<typename T1, typename T2>
+constexpr _always_inline
+Angle angle_between(const T1& a, const T2& b);
+
 /// Darstellung für zweidimensionalen, kartesischen Vektor
 ///
 /// \tparam U Typ der Koordinaten (Standardmäßig \ref TURAG::Length)
@@ -280,6 +285,11 @@ struct Pose {
 	Pose getTurnedPose(Angle a) const {
 		return Pose(x, y, norm_angle(phi + a));
 	}
+
+    /// neue Pose erstellen, deren Winkel in Richtung des angegebenen Punkts zeigt.
+    Pose getTurnedPoseTowards(Point p) const {
+        return Pose(x, y, angle_between(toPoint(), p));
+    }
 
 	/// neuen in Blickrichtung verschobenen Punkt erstellen
 	/// \param trans Länge, um den die Position in Winkelrichtung verschoben ist.
