@@ -37,7 +37,8 @@ SOURCES += \
     circular_buffer_tests.cpp \
     bit_macros_tests.cpp \
     array_buffer_tests.cpp \
-    helper/variant_class_tests.cpp
+    helper/variant_class_tests.cpp \
+    riemanangle_tests.cpp
 
 HEADERS += \
     container_test.h \

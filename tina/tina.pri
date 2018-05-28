@@ -56,7 +56,8 @@ HEADERS  += \
     $$PWD/tina++/statemachine/action.h \
     $$PWD/tina/feldbus/protocol/bldc_protocol.h \
     $$PWD/tina++/ros/time.h \
-    $$PWD/tina++/ros/convert.h
+    $$PWD/tina++/ros/convert.h \
+    $$PWD/tina++/geometry/riemanangle.h
 
 DISTR_FILES += $$PWD/tina.pri
 
@@ -249,7 +250,8 @@ contains(TINA, ros) {
 }
 
 SOURCES += \
-    $$PWD/tina++/statemachine/action.cpp
+    $$PWD/tina++/statemachine/action.cpp \
+    $$PWD/tina++/geometry/riemanangle.cpp
 
 DISTFILES += \
     $$PWD/tina.cmake
