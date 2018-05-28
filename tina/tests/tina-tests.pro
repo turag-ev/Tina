@@ -47,6 +47,6 @@ INCLUDEPATH += \
 
 TINA += debug statemachine geometry base64
 
-include(../../src/common/TURAG-common.pri)
+include(../../common/TURAG-common.pri)
 include(../tina.pri)
 include(../platform/desktop/tina-desktop.pri)
