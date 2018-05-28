@@ -204,29 +204,29 @@ BOOST_AUTO_TEST_CASE( action ) {
   BOOST_CHECK(action->start_called == true);
   
   BOOST_CHECK(action->event1_called == false);
-  retval = action->handleEvent(event_test1, 67890);
+  retval = action->func(event_test1, 67890);
   BOOST_CHECK(action->event1_called == true);
   BOOST_CHECK(retval == true);
   
-  retval = action->handleEvent(event_test2, 0);
+  retval = action->func(event_test2, 0);
   BOOST_CHECK(retval == false);
   
-  retval = action->handleEvent(event_test3, 0);
+  retval = action->func(event_test3, 0);
   BOOST_CHECK(retval == true);
   
-  retval = action->handleEvent(event_test4, 7980);
+  retval = action->func(event_test4, 7980);
   BOOST_CHECK(retval == true);
   
-  retval = action->handleEvent(event_test5, 5);
+  retval = action->func(event_test5, 5);
   BOOST_CHECK(retval == true);
   
-  retval = action->handleEvent(event_test6, 6);
+  retval = action->func(event_test6, 6);
   BOOST_CHECK(retval == true);
   
-  retval = action->handleEvent(event_test7, 7);
+  retval = action->func(event_test7, 7);
   BOOST_CHECK(retval == true);
   
-  retval = action->handleEvent(event_test8, 0);
+  retval = action->func(event_test8, 0);
   BOOST_CHECK(retval == true);
 }
 
