@@ -110,4 +110,60 @@ BOOST_AUTO_TEST_CASE(ComparisonsLessGreater) {
     BOOST_CHECK(!(d <= a));
 }
 
+BOOST_AUTO_TEST_CASE(Add) {
+    // Angle only + angle only
+    RiemanAngle a(60*deg);
+    RiemanAngle b(40*deg);
+
+    RiemanAngle c = a + b;
+    BOOST_CHECK_EQUAL(c.angle.to(deg), 100.f);
+    BOOST_CHECK_EQUAL(c.rieman, 0);
+
+    // Implicit Angle to RiemanAngle conversion
+    RiemanAngle d = a + 10*deg;
+    BOOST_CHECK_EQUAL(d.angle.to(deg), 70.f);
+    BOOST_CHECK_EQUAL(d.rieman, 0);
+
+    // Would this be intended behavior?
+    //RiemanAngle e = 10*deg + a;
+    //BOOST_CHECK_EQUAL(e.angle.to(deg), 70.f);
+    //BOOST_CHECK_EQUAL(e.rieman, 0);
+
+    // Angle with rieman + angle with rieman
+    RiemanAngle f(20*deg, 2);
+    RiemanAngle g(30*deg, 3);
+    RiemanAngle h = f + g;
+    BOOST_CHECK_EQUAL(h.angle.to(deg), 50.f);
+    BOOST_CHECK_EQUAL(h.rieman, 5);
+
+    // Increment rieman level
+    RiemanAngle i(170*deg);
+    RiemanAngle j = i + 180*deg;
+    BOOST_CHECK_CLOSE(j.angle.to(deg), -10.f, FLOAT_EQ_TOL);
+    BOOST_CHECK_EQUAL(j.rieman, 1);
+}
+
+BOOST_AUTO_TEST_CASE(Sub) {
+    RiemanAngle a(60*deg);
+    RiemanAngle b(40*deg);
+
+    RiemanAngle c = a - b;
+    BOOST_CHECK_CLOSE(c.angle.to(deg), 20.f, FLOAT_EQ_TOL);
+    BOOST_CHECK_EQUAL(c.rieman, 0);
+
+    RiemanAngle d = a - 10*deg;
+    BOOST_CHECK_CLOSE(d.angle.to(deg), 50.f, FLOAT_EQ_TOL);
+    BOOST_CHECK_EQUAL(d.rieman, 0);
+
+    RiemanAngle e(20*deg, 2);
+    RiemanAngle f(30*deg, 3);
+    RiemanAngle g = e - f;
+    BOOST_CHECK_CLOSE(g.angle.to(deg), -10.f, FLOAT_EQ_TOL);
+    BOOST_CHECK_EQUAL(g.rieman, -1);
+
+    RiemanAngle h = e - 360*deg;
+    BOOST_CHECK_CLOSE(h.angle.to(deg), 20.f, FLOAT_EQ_TOL);
+    BOOST_CHECK_EQUAL(h.rieman, 1);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

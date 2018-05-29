@@ -17,6 +17,8 @@ struct RiemanAngle {
     bool operator <=(const RiemanAngle other) const;
     bool operator >=(const RiemanAngle other) const;
 
+    RiemanAngle operator +(const RiemanAngle other) const;
+    RiemanAngle operator -(const RiemanAngle other) const;
 
     const Units::Angle& angle = angle_;
     const int& rieman = rieman_;

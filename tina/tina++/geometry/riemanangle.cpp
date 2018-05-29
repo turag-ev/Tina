@@ -56,4 +56,14 @@ bool RiemanAngle::operator >=(const RiemanAngle other) const
     return rieman_ == other.rieman_ ? angle_ >= other.angle_ : rieman_ >= other.rieman_;
 }
 
+RiemanAngle RiemanAngle::operator +(const RiemanAngle other) const
+{
+    return RiemanAngle(angle_ + other.angle_, rieman_ + other.rieman_);
+}
+
+RiemanAngle RiemanAngle::operator -(const RiemanAngle other) const
+{
+    return RiemanAngle(angle_ - other.angle_, rieman_ - other.rieman_);
+}
+
 }
