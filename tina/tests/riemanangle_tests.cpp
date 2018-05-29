@@ -6,8 +6,7 @@
 using namespace TURAG;
 using namespace Units;
 
-// Float is unprecise, normal tests would fail.
-#define TURAG_CHECK_FLOAT_EQ(lhs, rhs) BOOST_CHECK_LE(fabsf(lhs - rhs), std::numeric_limits<float>::epsilon())
+static constexpr float FLOAT_EQ_TOL = 0.001;
 
 BOOST_AUTO_TEST_SUITE(RiemanAngleTests)
 
@@ -29,7 +28,7 @@ BOOST_AUTO_TEST_CASE(Constructors) {
 
     // Huge angle
     const RiemanAngle e(360*deg + 90*deg);
-    TURAG_CHECK_FLOAT_EQ(e.angle.to(rad), M_PI_2f);
+    BOOST_CHECK_CLOSE(e.angle.to(rad), M_PI_2f, FLOAT_EQ_TOL);
     BOOST_CHECK_EQUAL(e.rieman, 1);
 
     // Huge neg. angle
@@ -39,7 +38,7 @@ BOOST_AUTO_TEST_CASE(Constructors) {
 
     // Huge anlge + rieman
     const RiemanAngle g(360*deg + 90*deg, 1);
-    TURAG_CHECK_FLOAT_EQ(g.angle.to(rad), M_PI_2f);
+    BOOST_CHECK_CLOSE(g.angle.to(rad), M_PI_2f, FLOAT_EQ_TOL);
     BOOST_CHECK_EQUAL(g.rieman, 2);
 
     // Copy constructor
