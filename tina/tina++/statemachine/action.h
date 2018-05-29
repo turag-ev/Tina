@@ -111,7 +111,7 @@ public:
     bool handleEvent(EventId id, EventArg arg) override {
         if(!currentstate_) //TODO error
             return false;
-        state(id, arg);
+        return state(id, arg);
     }
 
     //TODO remove singleton design?
