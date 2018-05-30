@@ -66,4 +66,14 @@ RiemanAngle RiemanAngle::operator -(const RiemanAngle other) const
     return RiemanAngle(angle_ - other.angle_, rieman_ - other.rieman_);
 }
 
+Angle RiemanAngle::norm_angle() const
+{
+    return angle_;
+}
+
+Angle RiemanAngle::full_angle() const
+{
+    return rieman_*angle_pi*2.f + angle_;
+}
+
 }

@@ -166,4 +166,44 @@ BOOST_AUTO_TEST_CASE(Sub) {
     BOOST_CHECK_EQUAL(h.rieman, 1);
 }
 
+BOOST_AUTO_TEST_CASE(NormAngle) {
+    RiemanAngle a(0*deg);
+    BOOST_CHECK_CLOSE(a.norm_angle().to(deg), 0.f, FLOAT_EQ_TOL);
+
+    RiemanAngle b(45*deg);
+    BOOST_CHECK_CLOSE(b.norm_angle().to(deg), 45.f, FLOAT_EQ_TOL);
+
+    RiemanAngle c(360*deg);
+    BOOST_CHECK_CLOSE(c.norm_angle().to(deg), 0.f, FLOAT_EQ_TOL);
+
+    RiemanAngle d(180*deg+30*deg);
+    BOOST_CHECK_CLOSE(d.norm_angle().to(deg), -150.f, FLOAT_EQ_TOL);
+
+    RiemanAngle e(-190*deg);
+    BOOST_CHECK_CLOSE(e.norm_angle().to(deg), 170.f, FLOAT_EQ_TOL);
+
+    RiemanAngle f(45*deg, 2);
+    BOOST_CHECK_CLOSE(f.norm_angle().to(deg), 45.f, FLOAT_EQ_TOL);
+}
+
+BOOST_AUTO_TEST_CASE(FullAngle) {
+    RiemanAngle a(0*deg);
+    BOOST_CHECK_CLOSE(a.full_angle().to(deg), 0.f, FLOAT_EQ_TOL);
+
+    RiemanAngle b(45*deg);
+    BOOST_CHECK_CLOSE(b.full_angle().to(deg), 45.f, FLOAT_EQ_TOL);
+
+    RiemanAngle c(360*deg);
+    BOOST_CHECK_CLOSE(c.full_angle().to(deg), 360.f, FLOAT_EQ_TOL);
+
+    RiemanAngle d(180*deg+30*deg);
+    BOOST_CHECK_CLOSE(d.full_angle().to(deg), 210.f, FLOAT_EQ_TOL);
+
+    RiemanAngle e(-190*deg);
+    BOOST_CHECK_CLOSE(e.full_angle().to(deg), -190.f, FLOAT_EQ_TOL);
+
+    RiemanAngle f(45*deg, 2);
+    BOOST_CHECK_CLOSE(f.full_angle().to(deg), 2.f*360.f+45.f, FLOAT_EQ_TOL);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
