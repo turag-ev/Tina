@@ -170,7 +170,7 @@ public:
 		      return condvar_.wait();
 		  }
 
-#ifdef CH_USE_CONDVARS_TIMEOUT
+#if defined(CH_USE_CONDVARS_TIMEOUT) || defined(CH_CFG_USE_CONDVARS_TIMEOUT)
 
 		  _always_inline bool waitFor(SystemTime timeout) {
               return condvar_.waitFor(timeout);
@@ -196,7 +196,7 @@ public:
     return chCondWait(&cond_) != 0;
   }
 
-#ifdef CH_USE_CONDVARS_TIMEOUT
+#if defined(CH_USE_CONDVARS_TIMEOUT) || defined(CH_CFG_USE_CONDVARS_TIMEOUT)
 
 // as opposed to the posix pthread_cond_timedwait-function the chibi function "chCondWaitTimeout"
 // does not reaquire the associated mutex when returning due to timeout thus requiring us to do
@@ -209,7 +209,7 @@ public:
   }
 
   bool waitUntil(SystemTime timeout) {
-	  msg_t result = chCondWaitTimeout(&cond_, timeout.toTicks() - chTimeNow());
+      msg_t result = chCondWaitTimeout(&cond_, (timeout - SystemTime::now()).toTicks());
 	  if (result == MSG_TIMEOUT) mutex_->lock();
 	  return result != MSG_TIMEOUT;
   }

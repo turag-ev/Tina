@@ -3,6 +3,10 @@
 
 #include <ch.h>
 
+#if CH_KERNEL_MAJOR > 2
+#define CH_FREQUENCY CH_CFG_ST_FREQUENCY
+#endif
+
 #include <tina/tina.h>
 #include "timetype.h"
 
@@ -75,6 +79,10 @@ unsigned turag_get_systick_frequency(void) {
 
 #ifdef __cplusplus
 } // extern "C"
+#endif
+
+#if CH_KERNEL_MAJOR > 2
+#undef CH_FREQUENCY
 #endif
 
 #endif // TINA_CHIBIOS_TIME_H

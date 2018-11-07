@@ -3,8 +3,9 @@
 #include "public/tina/thread.h"
 #include <cstdint>
 
-//#include <tina/debug.h>
+#if defined(CH_DBG_FILL_THREADS) && CH_DBG_FILL_THREADS == TRUE
 #include <stackusage.h>
+#endif // CH_DBG_FILL_THREADS
 
 namespace TURAG {
 
@@ -17,7 +18,7 @@ void _turag_thread_entry(void* data) {
   chThdExit(1);
 }
 
-#ifdef CH_DBG_FILL_THREADS
+#if defined(CH_DBG_FILL_THREADS) && CH_DBG_FILL_THREADS == TRUE
 
 std::size_t ThreadImpl::getStackUsage() const {
     return su_get_stack_usage(static_cast<char*>(working_area_), stack_size_);
@@ -36,7 +37,8 @@ std::size_t ThreadImpl::getStackUsage() const {
 
 extern "C"
 size_t turag_thread_get_stack_usage(const TuragThread* thread) {
-  return 0;
+    UNUSED(thread);
+    return 0;
 }
 
 #endif // CH_DBG_FILL_THREADS
