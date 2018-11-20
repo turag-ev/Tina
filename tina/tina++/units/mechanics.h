@@ -41,6 +41,9 @@ constexpr Force::UnitType N(kg*m/(s*s));
 /// Definition für Newtonmeter
 constexpr Torque::UnitType Nm(N*m);
 
+/// Definition für RPM
+constexpr AngularVelocity::UnitType rpm(round/minute);
+
 } } // namespace TURAG::Units
 
 #endif // TINAPP_UNITS_MECHANICS_H

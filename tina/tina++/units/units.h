@@ -34,6 +34,12 @@ constexpr Unit<AngleDimension>  rad(FROM_SI_CONVERT_FACTOR_ANGLE);
 /// Definition für Grad (360° = 2 * Pi rad)
 constexpr Unit<AngleDimension>  deg(FROM_SI_CONVERT_FACTOR_ANGLE * float(M_PI)/180.f);
 
+/// Definition für Umdrehung (360°)
+constexpr Unit<AngleDimension> round(FROM_SI_CONVERT_FACTOR_ANGLE * 2.f * float(M_PI));
+
+/// Definition für Minuten
+constexpr Unit<TimeDimension> minute(FROM_SI_CONVERT_FACTOR_TIME * 60.f);
+
 /// Definition für Sekunden
 constexpr Unit<TimeDimension>  s(FROM_SI_CONVERT_FACTOR_TIME);
 
