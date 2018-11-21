@@ -16,10 +16,6 @@ namespace Units {
 
 #ifndef __DOXYGEN__
 
-typedef std::ratio<0> RationalNull;
-typedef std::ratio<1> RationalOne;
-typedef std::ratio<2> RationalTwo;
-
 template<typename Length, typename Angle, typename Time, typename Mass, typename Current>
 struct Dimension {
   typedef Length length;
@@ -29,15 +25,16 @@ struct Dimension {
   typedef Current ampere;
 };
 
-typedef Dimension<RationalNull, RationalNull, RationalNull, RationalNull, RationalNull> DimensionlessDimension;
-typedef Dimension<RationalOne,  RationalNull, RationalNull, RationalNull, RationalNull> LengthDimension;
-typedef Dimension<RationalNull, RationalOne,  RationalNull, RationalNull, RationalNull> AngleDimension;
-typedef Dimension<RationalNull, RationalNull, RationalOne , RationalNull, RationalNull> TimeDimension;
-typedef Dimension<RationalNull, RationalNull, RationalTwo , RationalNull, RationalNull> QuadTimeDimension;
-typedef Dimension<RationalNull, RationalNull, RationalNull, RationalOne , RationalNull> MassDimension;
-typedef Dimension<RationalNull, RationalNull, RationalNull, RationalNull, RationalOne > CurrentDimension;
-typedef Dimension<RationalOne, RationalNull, std::ratio<-2>, RationalOne, RationalNull> ForceDimension;
-typedef Dimension<RationalTwo, RationalNull, std::ratio<-3>, RationalOne, std::ratio<-1>> VoltageDimension;
+typedef Dimension<std::ratio< 0>, std::ratio< 0>, std::ratio< 0>, std::ratio< 0>, std::ratio< 0>> DimensionlessDimension;
+typedef Dimension<std::ratio< 1>, std::ratio< 0>, std::ratio< 0>, std::ratio< 0>, std::ratio< 0>> LengthDimension;
+typedef Dimension<std::ratio< 0>, std::ratio< 1>, std::ratio< 0>, std::ratio< 0>, std::ratio< 0>> AngleDimension;
+typedef Dimension<std::ratio< 0>, std::ratio< 0>, std::ratio< 1>, std::ratio< 0>, std::ratio< 0>> TimeDimension;
+typedef Dimension<std::ratio< 0>, std::ratio< 0>, std::ratio< 2>, std::ratio< 0>, std::ratio< 0>> QuadTimeDimension;
+typedef Dimension<std::ratio< 0>, std::ratio< 0>, std::ratio< 0>, std::ratio< 1>, std::ratio< 0>> MassDimension;
+typedef Dimension<std::ratio< 0>, std::ratio< 0>, std::ratio< 0>, std::ratio< 0>, std::ratio< 1>> CurrentDimension;
+typedef Dimension<std::ratio< 1>, std::ratio< 0>, std::ratio<-2>, std::ratio< 1>, std::ratio< 0>> ForceDimension;
+typedef Dimension<std::ratio< 2>, std::ratio< 0>, std::ratio<-3>, std::ratio< 1>, std::ratio<-1>> VoltageDimension;
+typedef Dimension<std::ratio< 1>, std::ratio<-1>, std::ratio< 0>, std::ratio< 0>, std::ratio< 0>> RadiusDimension;
 
 template<typename LhsDimension, typename RhsDimension>
 using dim_mul =
@@ -478,6 +475,9 @@ typedef Quantity<CurrentDimension> Current;
 
 /// Typ für Spannungsvariablen
 typedef Quantity<VoltageDimension> Voltage;
+
+/// Typ für Radien (Zusammenhang zwischen Winkel und Strecke auf dem Kreisbogen)
+typedef Quantity<RadiusDimension> Radius;
 
 // TODO: weitere Typen einführen
 
