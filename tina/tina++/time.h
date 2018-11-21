@@ -46,7 +46,7 @@ public:
 
     /// implizit in äquivalenten C-Typ umwandeln
     constexpr
-    operator TuragSystemTime () {
+    operator TuragSystemTime () const {
         return TuragSystemTime{value};
     }
 
