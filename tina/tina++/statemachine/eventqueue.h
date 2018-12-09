@@ -349,6 +349,8 @@ private:
 /// \}
 /// \}
 
+extern const EventClass EventQuit;
+
 } // namespace TURAG
 
 #endif // TINAPP_STATEMACHINE_EVENTQUEUE_H
