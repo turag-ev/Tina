@@ -213,9 +213,11 @@
 #else
 
 # ifdef __cplusplus
+#  define TURAG_C_API extern "C"
 #  define TURAG_C_API_BEGIN extern "C" {
 #  define TURAG_C_API_END }
 #else
+#  define TURAG_C_API
 #  define TURAG_C_API_BEGIN
 #  define TURAG_C_API_END
 #endif

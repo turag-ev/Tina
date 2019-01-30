@@ -63,6 +63,8 @@ void print_debug_info(const Event& e) {
                 (int)e.param,
                 e.method ? "yes":"no");
   }
+#else
+  UNUSED(e);
 #endif
 }
 
