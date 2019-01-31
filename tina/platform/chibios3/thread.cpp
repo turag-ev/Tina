@@ -1,13 +1,10 @@
 #define TURAG_DEBUG_LOG_SOURCE "_"
+#include <ch.h>
+#include <cstdint>
 #include "public/tina++/thread.h"
 #include "public/tina/thread.h"
-#include <cstdint>
-
-//#include <tina/debug.h>
-#include <stackusage.h>
 
 namespace TURAG {
-
 
 extern "C"
 void _turag_thread_entry(void* data) {
@@ -19,14 +16,24 @@ void _turag_thread_entry(void* data) {
 
 #ifdef CH_DBG_FILL_THREADS
 
+std::size_t get_stack_usage(thread_t* t, std::size_t stack_size) {
+    const char* end = reinterpret_cast<const char*>(t->wabase);
+    const char* begin = end + stack_size;
+    for (const char* ptr = end; ptr != begin; ptr++) {
+        if (*ptr != 0x55) { // ChibiOS fills stack with 0x55 on initialization
+            return (begin - ptr) * sizeof(char);
+        }
+    }
+    return 0;
+}
+
 std::size_t ThreadImpl::getStackUsage() const {
-    return su_get_stack_usage(static_cast<char*>(working_area_), stack_size_);
+    return get_stack_usage(thread_, stack_size_);
 }
 
 extern "C"
 size_t turag_thread_get_stack_usage(const TuragThread* thread) {
-  return su_get_stack_usage(static_cast<const char*>(thread->stack),
-                            thread->stack_size);
+  return get_stack_usage(thread->thread, thread->stack_size);
 }
 #else // CH_DBG_FILL_THREADS
 
