@@ -62,11 +62,11 @@ void turag_thread_set_name(const char* name) {
 
 typedef mutex_t TuragMutex;
 
-#define turag_mutex_init            chMtxInit
+#define turag_mutex_init            chMtxObjectInit
 #define turag_mutex_destroy(mutex)
 #define turag_mutex_lock            chMtxLock
 #define turag_mutex_try_lock        chMtxTryLock
-#define turag_mutex_unlock(mutex)   chMtxUnlock()
+#define turag_mutex_unlock          chMtxUnlock
 
 
 ////////////////////////////////////////////////////////////////////////////////

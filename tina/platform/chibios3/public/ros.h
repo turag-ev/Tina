@@ -40,7 +40,7 @@ class ChibiOSHardware {
 
         unsigned long time()
         {
-            return chTimeNow();
+            return chVTGetSystemTimeX();
         }
 
     protected:
