@@ -135,16 +135,26 @@ protected:
   friend class ScopedLock<Mutex>;
   friend class ConditionVariable;
 
+  // "lock", "tryLock" and "unlock" check for chThdGetSelfX() != 0,
+  // to avoid triggering assertions when being run from static initializer code,
+  // because in that case, there won't be a thread to assign the mutex to.
+  // The proper solution would be to not use mutexes from initialization code,
+  // but ¯\_(ツ)_/¯
   _always_inline void lock() {
-    chMtxLock(&mut_);
+    if(chThdGetSelfX())
+      chMtxLock(&mut_);
   }
 
   _always_inline bool tryLock() {
-    return chMtxTryLock(&mut_) == TRUE;
+    if(chThdGetSelfX())
+      return chMtxTryLock(&mut_) == TRUE;
+    else
+      return true;
   }
 
   _always_inline void unlock() {
-    chMtxUnlock(&mut_);
+    if(chThdGetSelfX())
+      chMtxUnlock(&mut_);
   }
 
 private:
