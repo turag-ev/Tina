@@ -1,24 +1,14 @@
-#ifndef TINA_SIM_DEBUGPRINT_H
-#define TINA_SIM_DEBUGPRINT_H
+#ifndef TINA_CHIBIOS_DEBUGPRINT_H
+#define TINA_CHIBIOS_DEBUGPRINT_H
 
 #include <stdarg.h>
+#include <tina/helper/macros.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+TURAG_C_API_BEGIN
 
-#warning stub for debugprint.h
+void turag_debug_puts(const char* s);
+void turag_debug_vprintf(const char* fmt, va_list vargs);
 
-inline void turag_debug_puts(const char* s) {
-    (void)s;
-}
-inline void turag_debug_vprintf(const char* fmt, va_list vargs) {
-    (void)fmt;
-    (void)vargs;
-}
+TURAG_C_API_END
 
-#ifdef __cplusplus
-} // extern "C"
-#endif
-
-#endif // TINA_SIM_DEBUGPRINT_H
+#endif // TINA_CHIBIOS_DEBUGPRINT_H
