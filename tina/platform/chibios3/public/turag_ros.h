@@ -1,6 +1,7 @@
 #ifndef ROS_LIB_TURAG_H_
 #define ROS_LIB_TURAG_H_
 #include <ros.h>
+#include <tina++/container/thread_fifo.h>
 
 namespace TURAG {
 
@@ -9,35 +10,65 @@ template<class MsgT>
 class Publisher: public ros::Publisher {
 public:
     constexpr Publisher(const char* name, int endpoint = rosserial_msgs::TopicInfo::ID_PUBLISHER):
-        ros::Publisher(name, &msg_, endpoint)
+        ros::Publisher(name, &msg, endpoint)
     { }
 
     constexpr Publisher(const char* ns, const char* name, int endpoint = rosserial_msgs::TopicInfo::ID_PUBLISHER):
-        ros::Publisher(ns, name, &msg_, endpoint)
+        ros::Publisher(ns, name, &msg, endpoint)
     { }
 
     /**
-     * @brief publishes internal msg_
+     * @brief publishes internal msg
      */
     int publish() {
-        return ros::Publisher::publish(&msg_);
+        return ros::Publisher::publish(&msg);
     }
 
-    // publishes msg given in argument
+    /// publishes msg given in argument
     using ros::Publisher::publish;
 
-    MsgT msg_;  ///> public, so that it can be used and the memory isn't wasted
+    MsgT msg;  ///> public, so that it can be used and the memory isn't wasted
 };
 
-/// make ros classes available in TURAG namespace
-template<class... T>
-using Subscriber = ros::Subscriber<T...>;
+template<class MsgT, size_t length>
+class FifoPublisher :
+        public Publisher<MsgT>,
+        public ThreadFifo<MsgT, length> {
+public:
+    using MessageType = MsgT;
+    using PublisherType = Publisher<MsgT>;
+    using FifoType = ThreadFifo<MsgT, length>;
+    static constexpr size_t LENGTH = length;
 
-/// Wrapper for less verbose service server declaration
-template<typename SrvT>
-using ServiceServer = ros::ServiceServer<typename SrvT::Request, typename SrvT::Response>;
+    // Export constructor
+    // ThreadFifo is default-constructible
+    using PublisherType::Publisher;
 
-typedef ros::NodeHandle NodeHandle;
+    // Export publisher API
+    using PublisherType::getEndpointType;
+    using PublisherType::topic_;
+    using PublisherType::msg_;
+    using PublisherType::id_;
+    using PublisherType::nh_;
+    using PublisherType::msg;
+
+    // Export ThreadFifo API
+    using FifoType::post;
+    using FifoType::postUnique;
+    using FifoType::empty;
+
+    void fetch() {
+        FifoType::fetch(&msg);
+    }
+
+    bool fetch(SystemTime time) {
+        return FifoType::fetch(&msg, time);
+    }
+
+    int publish() {
+        return PublisherType::publish();
+    }
+};
 
 } // namespace TURAG
 
