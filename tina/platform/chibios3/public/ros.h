@@ -7,11 +7,10 @@
 
 namespace ros {
 
+template<typename T, T* io>
 class ChibiOSHardware {
     public:
-        void init(char* io) {
-            iostream = reinterpret_cast<BaseChannel *>(io);
-        }
+        void init() { }
 
         int read() {
             return chnGetTimeout(iostream, TIME_IMMEDIATE);
@@ -26,17 +25,10 @@ class ChibiOSHardware {
         }
 
     protected:
-        BaseChannel* iostream = nullptr;
+        BaseChannel* iostream = reinterpret_cast<BaseChannel*>(io);
 };
 
-class NodeHandle : public NodeHandle_<ChibiOSHardware, 50, 50, 1024, 1024> {
-public:
-    void initNode(BaseChannel* io) {
-        NodeHandle_::initNode(reinterpret_cast<char *>(io));
-    }
-private:
-    using NodeHandle_::initNode;
-};
+using NodeHandle = NodeHandle_<ChibiOSHardware<SerialUSBDriver, &SDU1>, 50, 50, 1024, 1024>;
 
 } // namespace ros
 
