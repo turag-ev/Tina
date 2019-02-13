@@ -2,6 +2,7 @@
 #define TINA_ROS_POSE_H
 
 #include <tina++/geometry.h>
+#include <geometry_msgs/Pose.h>
 #include <geometry_msgs/Pose2D.h>
 #include <geometry_msgs/Twist.h>
 #include <geometry_msgs/Accel.h>
@@ -20,6 +21,26 @@ void convert(const geometry_msgs::Pose2D& in, Pose& out) {
     out.x = in.x * Units::m;
     out.y = in.y * Units::m;
     out.phi = in.theta * Units::rad;
+}
+
+inline
+void convert(const Pose& in, geometry_msgs::Pose& out) {
+    out.position.x = in.x.to(Units::m);
+    out.position.y = in.y.to(Units::m);
+    out.position.z = 0;
+    out.orientation.x = 0;
+    out.orientation.y = 0;
+    out.orientation.z = sin(in.phi * 0.5);
+    out.orientation.w = cos(in.phi * 0.5);
+}
+
+inline
+void convert(const geometry_msgs::Pose& in, Pose& out) {
+    auto& q = in.orientation;
+    out.x = in.position.x * Units::m;
+    out.y = in.position.y * Units::m;
+    out.phi = std::atan2(2 * (q.w * q.z + q.x + q.y),
+                         1 - 2 * (q.y * q.y + q.z * q.z)) * Units::rad;
 }
 
 inline

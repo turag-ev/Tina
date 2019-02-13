@@ -5,54 +5,31 @@
 #include "hal.h"
 #include "ros/node_handle.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-extern SerialUSBDriver SDU1;
-
 namespace ros {
 
+template<typename T, T* io>
 class ChibiOSHardware {
     public:
-        ChibiOSHardware(BaseChannel* io)
-        {
-            iostream = io;
-        }
-        ChibiOSHardware()
-        {
-            iostream = (BaseChannel *)&SDU1;
-        }
+        void init() { }
 
-        void init()
-        {
-        }
-
-        int read()
-        {
+        int read() {
             return chnGetTimeout(iostream, TIME_IMMEDIATE);
-        };
+        }
 
-        void write(uint8_t* data, int length)
-        {
+        void write(uint8_t* data, int length) {
             chnWrite(iostream, data, length);
         }
 
-        unsigned long time()
-        {
+        unsigned long time() {
             return chVTGetSystemTimeX();
         }
 
     protected:
-        BaseChannel* iostream;
+        BaseChannel* iostream = reinterpret_cast<BaseChannel*>(io);
 };
 
-typedef NodeHandle_<ChibiOSHardware, 50, 50, 1024, 1024> NodeHandle;
+using NodeHandle = NodeHandle_<ChibiOSHardware<SerialUSBDriver, &SDU1>, 50, 50, 1024, 1024>;
 
 } // namespace ros
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* ROS_H */
