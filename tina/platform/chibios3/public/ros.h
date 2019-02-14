@@ -5,6 +5,8 @@
 #include "hal.h"
 #include "ros/node_handle.h"
 
+extern SerialUSBDriver SDU1;
+
 namespace ros {
 
 template<typename T, T* io>
