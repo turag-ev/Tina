@@ -216,12 +216,18 @@
 #  define TURAG_C_API extern "C"
 #  define TURAG_C_API_BEGIN extern "C" {
 #  define TURAG_C_API_END }
-#else
+# else
 #  define TURAG_C_API
 #  define TURAG_C_API_BEGIN
 #  define TURAG_C_API_END
+# endif
+
 #endif
 
+#ifdef __GNUC__
+# define TURAG_DEPRECATED(msg) __attribute__((deprecated(msg)))
+#else
+# define TURAG_DEPRECATED()
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
