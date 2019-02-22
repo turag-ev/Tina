@@ -22,8 +22,8 @@
 # define turag_internal_warning(msg) \
     turag_debug_puts_impl(TURAG_DEBUG_LINE_PREFIX TURAG_INTERNAL_LOG_SOURCE TURAG_DEBUG_WARN_PREFIX msg TURAG_DEBUG_NEWLINE)
 #else
-# define turag_warningf(format, args...) TURAG_MACRO_NOOP
-# define turag_warning(msg) TURAG_MACRO_NOOP
+# define turag_internal_warningf(format, args...) TURAG_MACRO_NOOP
+# define turag_internal_warning(msg) TURAG_MACRO_NOOP
 #endif
 
 #define _turag_print_error(msg) \
