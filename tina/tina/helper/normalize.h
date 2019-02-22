@@ -156,6 +156,8 @@
 
 #define _unused __attribute__ ((unused))
 
+#define _deprecated(msg) __attribute__((deprecated(msg)))
+
 /// \}
 
 #endif // TINA_HELPER_NORMALIZE_H

@@ -224,12 +224,6 @@
 
 #endif
 
-#ifdef __GNUC__
-# define TURAG_DEPRECATED(msg) __attribute__((deprecated(msg)))
-#else
-# define TURAG_DEPRECATED()
-#endif
-
 ////////////////////////////////////////////////////////////////////////////////
 // INITIALIZATION and FINALIZATION
 
