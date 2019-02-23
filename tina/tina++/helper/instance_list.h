@@ -1,6 +1,8 @@
 #ifndef INSTANCE_LIST
 #define INSTANCE_LIST
+
 #include <type_traits>
+#include <tina++/tina.h>
 
 namespace TURAG {
 
