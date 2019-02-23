@@ -136,6 +136,10 @@ TuragSystemTime turag_debug_system_gametime_get()
 	return TURAG::SystemTime::now();
 }
 
+void turag_log_puts(const char* s) { UNUSED(s); };
+void turag_log_printf(const char* fmt, ...) { UNUSED(fmt); }
+void turag_debug_printf(const char* fmt, ...) { UNUSED(fmt); }
+
 #endif
 
 TURAG_C_API_END
