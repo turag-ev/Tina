@@ -56,7 +56,10 @@ public:
         }
     }
 
-    virtual ~InstanceList() {
+#if TURAG_USE_LIBSUPCPP_RUNTIME_SUPPORT
+    virtual
+#endif
+    ~InstanceList() {
         //update endpoints
         if(this == last_)
             last_ = prev_;
