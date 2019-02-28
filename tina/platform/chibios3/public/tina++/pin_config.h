@@ -2,28 +2,28 @@
 #define PIN_CONFIG_H_
 #include <config_tina.h>
 
-#define PINCONFIG_INPUT(port, pin, pupdr) \
-	PINCONFIG(port, pin, Mode::INPUT, OutputData::HIGH, OutputType::PUSHPULL, OutputSpeed::HIGH, pupdr, 0)
+#define PINCONFIG_INPUT(port, pin, pulluppulldown) \
+	PINCONFIG(port, pin, Mode::INPUT, OutputData::HIGH, OutputType::PUSHPULL, OutputSpeed::HIGH, pulluppulldown, 0)
 
-#define PINCONFIG_OUTPUT(port, pin, odr, otype, ospeed, pupdr) \
-	PINCONFIG(port, pin, Mode::OUTPUT, OutputData::HIGH, otype, ospeed, pupdr, 0)
+#define PINCONFIG_OUTPUT(port, pin, outputdata, outputtype, outputspeed, pulluppulldown) \
+	PINCONFIG(port, pin, Mode::OUTPUT, outputdata, outputtype, outputspeed, pulluppulldown, 0)
 
 #define PINCONFIG_ANALOG(port, pin) \
 	PINCONFIG(port, pin, Mode::ANALOG, OutputData::HIGH, OutputType::PUSHPULL, OutputSpeed::HIGH, PullupPulldown::NONE, 0)
 
-#define PINCONFIG_ALTERNATE(port, pin, otype, pupdr, af) \
-	PINCONFIG(port, pin, Mode::ALTERNATE, OutputData::HIGH, otype, OutputSpeed::HIGH, pupdr, af)
+#define PINCONFIG_ALTERNATE(port, pin, outputtype, pulluppulldown, alternate_function) \
+	PINCONFIG(port, pin, Mode::ALTERNATE, OutputData::HIGH, outputtype, OutputSpeed::HIGH, pulluppulldown, alternate_function)
 
 //generate default settings for all pins
 #define DEFAULT_PINCONFIG(mode_, od_, otype_, ospeed_, pupd_, af_) \
-	template<Port, unsigned> struct Pin { \
+	template<uintptr_t, unsigned> struct Pin { \
 		using cfg = PinConfig<mode_,od_,otype_,ospeed_,pupd_,af_>; \
 	}
 
 //override default settings for a specific pin. DEFAULT_PINCONFIG must be used before this
 #define PINCONFIG(port, pin, mode_, od_, otype_, ospeed_, pupd_, af_) \
-	template<> struct Pin<Port::port, pin> { \
-			using cfg = PinConfig<mode_,od_,otype_,ospeed_,pupd_,af_>; \
+	template<> struct Pin<uintptr_t(port), pin> { \
+		using cfg = PinConfig<mode_,od_,otype_,ospeed_,pupd_,af_>; \
 	}
 
 enum class Mode {
@@ -53,8 +53,6 @@ enum class PullupPulldown {
 	PULLDOWN = 2
 };
 
-enum class Port { A, B, C, D, E, F, G, H, I};
-
 //template that stores parameters
 template<Mode mode_, OutputData od_, OutputType otype_, OutputSpeed ospeed_, PullupPulldown pupd_, unsigned af_>
 struct PinConfig {
@@ -68,17 +66,17 @@ struct PinConfig {
 
 //convert configuration structures to bits in GPIO configuration registers
 #define MODER_BITS(port, pin) \
-	(static_cast<unsigned>(Pin<Port::port, pin>::cfg::mode) << ((pin) * 2U))
+	(static_cast<unsigned>(Pin<port, pin>::cfg::mode) << ((pin) * 2U))
 #define ODR_BITS(port, pin) \
-	(static_cast<unsigned>(Pin<Port::port, pin>::cfg::od) << (pin))
+	(static_cast<unsigned>(Pin<port, pin>::cfg::od) << (pin))
 #define OTYPER_BITS(port, pin) \
-	(static_cast<unsigned>(Pin<Port::port, pin>::cfg::otype) << (pin))
+	(static_cast<unsigned>(Pin<port, pin>::cfg::otype) << (pin))
 #define OSPEEDR_BITS(port, pin) \
-	(static_cast<unsigned>(Pin<Port::port, pin>::cfg::ospeed) << ((pin) * 2U))
+	(static_cast<unsigned>(Pin<port, pin>::cfg::ospeed) << ((pin) * 2U))
 #define PUPDR_BITS(port, pin) \
-	(static_cast<unsigned>(Pin<Port::port, pin>::cfg::pupd) << ((pin) * 2U))
+	(static_cast<unsigned>(Pin<port, pin>::cfg::pupd) << ((pin) * 2U))
 #define AFR_BITS(port, pin) \
-	((Pin<Port::port,pin>::cfg::af) << (((pin) % 8U) * 4U))
+	((Pin<port,pin>::cfg::af) << (((pin) % 8U) * 4U))
 
 //combine the values of x for pins 0 to 7 on a given port
 #define PORTL_VAL(port, x) \
@@ -97,8 +95,8 @@ struct PinConfig {
 	//all pins floating input
 	DEFAULT_PINCONFIG(Mode::INPUT, OutputData::HIGH, OutputType::PUSHPULL, OutputSpeed::HIGH, PullupPulldown::NONE, 0);
 	// PA13 and PA14 are SWDIO and SWCLK programming pins on all known STM32
-	PINCONFIG_ALTERNATE(A, 13, OutputType::PUSHPULL, PullupPulldown::PULLUP, 0); //SWDIO
-	PINCONFIG_ALTERNATE(A, 14, OutputType::PUSHPULL, PullupPulldown::PULLDOWN, 0); // SWCLK
+	PINCONFIG_ALTERNATE(GPIOA, 13, OutputType::PUSHPULL, PullupPulldown::PULLUP, 0); //SWDIO
+	PINCONFIG_ALTERNATE(GPIOA, 14, OutputType::PUSHPULL, PullupPulldown::PULLDOWN, 0); // SWCLK
 #endif // TURAG_NO_DEFAULT_PINCONFIG
 
 /*
@@ -107,8 +105,24 @@ struct PinConfig {
 //detect ChibiOS PAL, this requires ChibiOS' hal.h to be included beforehand
 #if HAL_USE_PAL 
 
+//macros using ioline_t
+#define LINECONFIG_INPUT(line, pulluppulldown) \
+	PINCONFIG_INPUT(PAL_PORT(line), PAL_PAD(line), pulluppulldown)
+
+#define LINECONFIG_OUTPUT(line, outputdata, outputtype, outputspeed, pulluppulldown) \
+	PINCONFIG_OUTPUT(PAL_PORT(line, PAL_PAD(line), outputdata, outputtype, outputspeed, pulluppulldown, 0)
+
+#define LINECONFIG_ANALOG(line) \
+	PINCONFIG_ANALOG(PAL_PORT(line), PAL_PAD(line))
+
+#define LINECONFIG_ALTERNATE(line, outputtype, pulluppulldown, alternate_function) \
+	PINCONFIG_ALTERNATE(PAL_PORT(line), PAL_PIN(line), outputtype, pulluppulldown, alternate_function)
+
 //generate part of ChibiOS' PALConfig structure for a given port
-#define PORT_CONFIG_CHIBIOS(port) {\
+#define PORT_CONFIG_CHIBIOS(port) \
+	_PORT_CONFIG_CHIBIOS((uintptr_t(port)))
+
+#define _PORT_CONFIG_CHIBIOS(port) {\
 	PORT_VAL(port, MODER_BITS), \
 	PORT_VAL(port, OTYPER_BITS), \
 	PORT_VAL(port, OSPEEDR_BITS), \
@@ -117,49 +131,50 @@ struct PinConfig {
 	PORTL_VAL(port, AFR_BITS), \
 	PORTH_VAL(port, AFR_BITS)	}
 
+
 //define PORTCFG_* for ports wich exist on the device and empty placeholders for ports wich don't
 #if STM32_HAS_GPIOA
-# define PORTCFG_A PORT_CONFIG_CHIBIOS(A),
+# define PORTCFG_A PORT_CONFIG_CHIBIOS(GPIOA),
 #else
 # define PORTCFG_A
 #endif // STM32_HAS_GPIOA
 #if STM32_HAS_GPIOB
-# define PORTCFG_B PORT_CONFIG_CHIBIOS(B),
+# define PORTCFG_B PORT_CONFIG_CHIBIOS(GPIOB),
 #else
 # define PORTCFG_B
 #endif // STM32_HAS_GPIOB
 #if STM32_HAS_GPIOC
-# define PORTCFG_C PORT_CONFIG_CHIBIOS(C),
+# define PORTCFG_C PORT_CONFIG_CHIBIOS(GPIOC),
 #else
 # define PORTCFG_C
 #endif // STM32_HAS_GPIOC
 #if STM32_HAS_GPIOD
-# define PORTCFG_D PORT_CONFIG_CHIBIOS(D),
+# define PORTCFG_D PORT_CONFIG_CHIBIOS(GPIOD),
 #else
 # define PORTCFG_D
 #endif // STM32_HAS_GPIOD
 #if STM32_HAS_GPIOE
-# define PORTCFG_E PORT_CONFIG_CHIBIOS(E),
+# define PORTCFG_E PORT_CONFIG_CHIBIOS(GPIOE),
 #else
 # define PORTCFG_E
 #endif // STM32_HAS_GPIOE
 #if STM32_HAS_GPIOF
-# define PORTCFG_F PORT_CONFIG_CHIBIOS(F),
+# define PORTCFG_F PORT_CONFIG_CHIBIOS(GPIOF),
 #else
 # define PORTCFG_F
 #endif // STM32_HAS_GPIOF
 #if STM32_HAS_GPIOG
-# define PORTCFG_G PORT_CONFIG_CHIBIOS(G),
+# define PORTCFG_G PORT_CONFIG_CHIBIOS(GPIOG),
 #else
 # define PORTCFG_G
 #endif // STM32_HAS_GPIOG
 #if STM32_HAS_GPIOH
-# define PORTCFG_H PORT_CONFIG_CHIBIOS(H),
+# define PORTCFG_H PORT_CONFIG_CHIBIOS(GPIOH),
 #else
 # define PORTCFG_H
 #endif // STM32_HAS_GPIOH
 #if STM32_HAS_GPIOI
-# define PORTCFG_I PORT_CONFIG_CHIBIOS(I)
+# define PORTCFG_I PORT_CONFIG_CHIBIOS(GPIOI)
 #else
 # define PORTCFG_I
 #endif // STM32_HAS_GPIOI
