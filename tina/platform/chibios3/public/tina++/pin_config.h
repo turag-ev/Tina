@@ -116,7 +116,7 @@ struct PinConfig {
 	PINCONFIG_ANALOG(PAL_PORT(line), PAL_PAD(line))
 
 #define LINECONFIG_ALTERNATE(line, outputtype, pulluppulldown, alternate_function) \
-	PINCONFIG_ALTERNATE(PAL_PORT(line), PAL_PIN(line), outputtype, pulluppulldown, alternate_function)
+	PINCONFIG_ALTERNATE(PAL_PORT(line), PAL_PAD(line), outputtype, pulluppulldown, alternate_function)
 
 //generate part of ChibiOS' PALConfig structure for a given port
 #define PORT_CONFIG_CHIBIOS(port) \
