@@ -110,7 +110,7 @@ struct PinConfig {
 	PINCONFIG_INPUT(PAL_PORT(line), PAL_PAD(line), pulluppulldown)
 
 #define LINECONFIG_OUTPUT(line, outputdata, outputtype, outputspeed, pulluppulldown) \
-	PINCONFIG_OUTPUT(PAL_PORT(line, PAL_PAD(line), outputdata, outputtype, outputspeed, pulluppulldown, 0)
+	PINCONFIG_OUTPUT(PAL_PORT(line), PAL_PAD(line), outputdata, outputtype, outputspeed, pulluppulldown)
 
 #define LINECONFIG_ANALOG(line) \
 	PINCONFIG_ANALOG(PAL_PORT(line), PAL_PAD(line))
