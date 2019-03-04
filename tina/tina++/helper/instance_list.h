@@ -55,8 +55,10 @@ public:
             prev_ = nullptr;
         }
     }
-
-    virtual ~InstanceList() {
+#if defined(TURAG_USE_LIBSUPCPP_RUNTIME_SUPPORT) && TURAG_USE_LIBSUPCPP_RUNTIME_SUPPORT
+    virtual 
+#endif
+    ~InstanceList() {
         //update endpoints
         if(this == last_)
             last_ = prev_;
