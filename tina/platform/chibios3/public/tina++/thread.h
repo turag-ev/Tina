@@ -49,7 +49,6 @@ public:
 
     /// returns maximal used stack size in bytes
     std::size_t getStackUsage() const;
-    
 private:
     void* working_area_;
     size_t stack_size_;
@@ -82,6 +81,9 @@ private:
     THD_WORKING_AREA(working_area_, size);
 };
 
+/// returns usage of main and process stacks on ARM Cortex-M
+std::size_t getMainStackUsage();
+std::size_t getProcessStackUsage();
 
 struct CurrentThread {
 private:
@@ -89,9 +91,9 @@ private:
   CurrentThread();
 
 public:
-  /// lets the current thread sleeps for a time of ecos ticks
-  static _always_inline void delay(SystemTime ticks) {
-    chThdSleep(ticks.toTicks());
+  /// lets the current thread sleep for a specified time
+  static _always_inline void delay(SystemTime time) {
+    chThdSleep(time.toTicks());
   }
 
   static _always_inline void setName(const char *name) {
@@ -103,7 +105,9 @@ public:
   }
 };
 
+
 /// lets the current thread sleeps for a time of ecos ticks
+[[deprecated("Use CurrentThread::delay")]]
 _always_inline void Thread_delay(SystemTime ticks) {
   chThdSleep(ticks.toTicks());
 }

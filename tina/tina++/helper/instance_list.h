@@ -15,8 +15,8 @@ public:
         iterator(own_type* it):
             it_(it)
         { }
-        T& operator*() { return *reinterpret_cast<T*>(it_); }
-        T* operator->() { return reinterpret_cast<T*>(it_); }
+        T& operator*() { return *static_cast<T*>(it_); }
+        T* operator->() { return static_cast<T*>(it_); }
 
         bool operator==(const iterator& rhs) const { return it_ == rhs.it_; }
         bool operator!=(const iterator& rhs) const { return it_ != rhs.it_; }
@@ -57,9 +57,8 @@ public:
             prev_ = nullptr;
         }
     }
-
-#if TURAG_USE_LIBSUPCPP_RUNTIME_SUPPORT
-    virtual
+#if defined(TURAG_USE_LIBSUPCPP_RUNTIME_SUPPORT) && TURAG_USE_LIBSUPCPP_RUNTIME_SUPPORT
+    virtual 
 #endif
     ~InstanceList() {
         //update endpoints
@@ -90,10 +89,10 @@ private:
 };
 
 template<class T>
-InstanceList<T>* InstanceList<T>::first_;
+InstanceList<T>* InstanceList<T>::first_ = nullptr;
 
 template<class T>
-InstanceList<T>* InstanceList<T>::last_;
+InstanceList<T>* InstanceList<T>::last_ = nullptr;
 
 } // namespace TURAG
 
