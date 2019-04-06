@@ -13,6 +13,7 @@ set(TINA_SRC
   tina++/feldbus/host/feldbusabstraction.cpp
   tina++/feldbus/host/aseb_tina.cpp
   tina++/feldbus/host/farbsensor_tina.cpp
+  tina++/feldbus/host/stellantriebedevice.cpp
   tina++/feldbus/dynamixel/dxl_hal.cpp
   tina++/feldbus/dynamixel/dynamixeldevice.cpp
   tina++/feldbus/dynamixel/dynamixel.c
