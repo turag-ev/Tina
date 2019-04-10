@@ -307,7 +307,7 @@ void HighResDelayTimerPrivate::doWait(uint32_t us, bool block) {
             // if we can't produce the requested delay, fallback to systick delay
             waitUntil = SystemTime::now() + SystemTime::fromUsec(us);
             if (block) {
-                Thread_delay(SystemTime::fromUsec(us));
+                CurrentThread::delay(SystemTime::fromUsec(us));
             }
         } else {
             uint16_t ticks = static_cast<uint16_t>(us) * factor;
@@ -327,7 +327,7 @@ void HighResDelayTimerPrivate::doWait(uint32_t us, bool block) {
         // next full systick.
         waitUntil = SystemTime::now() + SystemTime::fromUsec(us);
         if (block) {
-            Thread_delay(SystemTime::fromUsec(us));
+            CurrentThread::delay(SystemTime::fromUsec(us));
         }
     }
 }
