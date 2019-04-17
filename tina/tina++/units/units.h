@@ -28,7 +28,7 @@ constexpr Unit<LengthDimension>  m(FROM_SI_CONVERT_FACTOR_LENGTH);
 /// Definition für Milliradiand
 constexpr Unit<AngleDimension> mrad(FROM_SI_CONVERT_FACTOR_ANGLE / 1000.f);
 
-/// Definition für Radiand (3.41 rad = 180°)
+/// Definition für Radiand (Pi rad = 180°)
 constexpr Unit<AngleDimension>  rad(FROM_SI_CONVERT_FACTOR_ANGLE);
 
 /// Definition für Grad (360° = 2 * Pi rad)
