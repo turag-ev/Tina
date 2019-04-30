@@ -3,8 +3,8 @@
 
 #include "tina++/tina.h"
 #include "geometry.h"
-
 #include <global/global.h>
+#include <cmath>
 
 namespace TURAG {
 
@@ -42,19 +42,15 @@ public:
   /// Feldposition aus einzelnen Koordinaten erstellen
   constexpr explicit
   FieldPose(Length x, Length y, Angle phi, bool mirror_phi=true) :
-	left_(-x, y, (mirror_phi && (phi != 4 * Units::rad))
+    left_(-x, y, (mirror_phi && (!std::isnan(phi.to(Units::rad)))
                   ? (phi >= Units::null ? Units::angle_pi - phi : -Units::angle_pi - phi)
-                  : phi),
+                  : phi)),
     right_(x, y, phi)
   { }
 
   /// Feldposition aus Pose erstellen
   constexpr explicit
-  FieldPose(const Pose& pose) :
-	left_(-pose.x, pose.y, (pose.phi != 4 * Units::rad)
-                            ? (pose.phi >= Units::null ? Units::angle_pi - pose.phi : -Units::angle_pi - pose.phi)
-                            : pose.phi),
-    right_(pose)
+  FieldPose(const Pose& pose) : FieldPose(pose.x, pose.y, pose.phi)
   { }
 
   /// Feldposition aus zwei Posen für die jeweilige Teamfarbe erstellen (wenn Roboter asymmentrisch ist)
