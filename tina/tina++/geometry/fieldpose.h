@@ -42,9 +42,7 @@ public:
   /// Feldposition aus einzelnen Koordinaten erstellen
   constexpr explicit
   FieldPose(Length x, Length y, Angle phi, bool mirror_phi=true) :
-    left_(-x, y, (mirror_phi && (!std::isnan(phi.to(Units::rad)))
-                  ? (phi >= Units::null ? Units::angle_pi - phi : -Units::angle_pi - phi)
-                  : phi)),
+    left_(-x, y, mirror_phi ? mirrorPhi(phi) : phi),
     right_(x, y, phi)
   { }
 
@@ -111,6 +109,12 @@ public:
   }
 
 private:
+  inline constexpr static Angle mirrorPhi(Angle phi) {
+      return (std::isnan(phi.to(Units::rad))) ?
+                  phi
+                : (phi >= Units::null ? Units::angle_pi - phi : -Units::angle_pi - phi);
+  }
+
   /// Pose für linke Teamfarbe
   Pose left_;
 
