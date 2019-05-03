@@ -140,7 +140,7 @@
 #define _section(s) __attribute__((section("." s)))
 
 /// \brief attribute for a struct to remove any padding in it.
-/// \warning can infulence performance and thread-safety
+/// \warning can influence performance and thread-safety
 #define _packed __attribute__ ((packed))
 
 /// \brief GCC does not produce a warning for this variable.
