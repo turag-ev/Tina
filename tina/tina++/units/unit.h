@@ -34,7 +34,6 @@ typedef Dimension<std::ratio< 0>, std::ratio< 0>, std::ratio< 0>, std::ratio< 1>
 typedef Dimension<std::ratio< 0>, std::ratio< 0>, std::ratio< 0>, std::ratio< 0>, std::ratio< 1>> CurrentDimension;
 typedef Dimension<std::ratio< 1>, std::ratio< 0>, std::ratio<-2>, std::ratio< 1>, std::ratio< 0>> ForceDimension;
 typedef Dimension<std::ratio< 2>, std::ratio< 0>, std::ratio<-3>, std::ratio< 1>, std::ratio<-1>> VoltageDimension;
-typedef Dimension<std::ratio< 1>, std::ratio<-1>, std::ratio< 0>, std::ratio< 0>, std::ratio< 0>> RadiusDimension;
 
 template<typename LhsDimension, typename RhsDimension>
 using dim_mul =
@@ -475,9 +474,6 @@ typedef Quantity<CurrentDimension> Current;
 
 /// Typ für Spannungsvariablen
 typedef Quantity<VoltageDimension> Voltage;
-
-/// Typ für Radien (Zusammenhang zwischen Winkel und Strecke auf dem Kreisbogen)
-typedef Quantity<RadiusDimension> Radius;
 
 // TODO: weitere Typen einführen
 
