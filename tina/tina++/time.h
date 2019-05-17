@@ -127,7 +127,7 @@ public:
     /// gespeicherte Systemzeit in Zeiteinheiten
     constexpr
     Units::Time toTime() const {
-        return toUsec() * Units::us;
+        return Units::Real(value) / Units::Real(frequency()) * Units::s;
     }
 
     /// aktuelle Systemzeit
