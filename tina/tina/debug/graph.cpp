@@ -10,6 +10,9 @@
 namespace TURAG {
 namespace Debug {
 
+static constexpr size_t SIZE_FLOAT_RAW = sizeof(float);
+static constexpr size_t SIZE_FLOAT_ENC = Base64::encodeLength(sizeof(float));
+
 std::atomic<unsigned> Graph::graphCount{1};
 bool Graph::allEnabled{TURAG_DEBUG_ENABLE_GRAPH_DEFAULT ? true : false};
 
@@ -40,28 +43,26 @@ void Graph::startNewDiagram(void) {
 void Graph::plot(float time, float* data, size_t count) {
 	if (!isInitialized()) {
         turag_internal_error("tried to call Graph::plot prior to initialization");
-	} else if (count > channels) {
+	} else if (count > channels || count > TURAG_DEBUG_GRAPH_MAX_CHANNELS) {
 		turag_internal_errorf("GraphBase::plot: got %d elements, but only %d channels are defined", static_cast<int>(count), channels);
 	} else if (enabled && allEnabled) {
 		if (startNewDiagramOnTimeOverflow && time < lastTime) {
 			startNewDiagram();
 		}
 		lastTime = time;
+        
+        uint8_t encoded[SIZE_FLOAT_ENC * (TURAG_DEBUG_GRAPH_MAX_CHANNELS + 1) + 1] = {0};
 
-		turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_GRAPH_DATA TURAG_DEBUG_GRAPH_PREFIX "%u ", index);
-
-		uint8_t encoded[7] = {0};
-
-		turag_base64_encode(reinterpret_cast<uint8_t*>(&time), 4, encoded);
-		turag_debug_puts(reinterpret_cast<const char*>(encoded));
-
+		turag_base64_encode(reinterpret_cast<uint8_t*>(&time),
+                            SIZE_FLOAT_RAW, encoded);
 		for ( unsigned i = 0; i < count; ++i ) {
-			turag_base64_encode(reinterpret_cast<uint8_t*>(data), 4, encoded);
-			turag_debug_puts(reinterpret_cast<const char*>(encoded));
-			++data;
+			turag_base64_encode(reinterpret_cast<uint8_t*>(&data[i]),
+                                SIZE_FLOAT_RAW, encoded + (i+1) * SIZE_FLOAT_ENC);
 		}
 
-		turag_debug_puts(TURAG_DEBUG_NEWLINE);
+		turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_GRAPH_DATA
+                           TURAG_DEBUG_GRAPH_PREFIX "%u %s" TURAG_DEBUG_NEWLINE,
+                           index, reinterpret_cast<char*>(encoded));
 	}
 }
 
@@ -71,16 +72,14 @@ void Graph::plot2D(unsigned channelIndex, float x, float y) {
 	} else if (channelIndex > channels) {
         turag_internal_errorf("GraphBase::plot2D: channel with index %u not defined", channelIndex);
 	} else if (enabled && allEnabled) {
-		turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_GRAPH_DATA2D TURAG_DEBUG_GRAPH_PREFIX "%u %u ", index, channelIndex);
 
-		uint8_t encoded[7] = {0};
-
-		turag_base64_encode(reinterpret_cast<uint8_t*>(&x), 4, encoded);
-		turag_debug_puts(reinterpret_cast<char*>(encoded));
-		turag_base64_encode(reinterpret_cast<uint8_t*>(&y), 4, encoded);
-		turag_debug_puts(reinterpret_cast<char*>(encoded));
+		uint8_t encoded[2 * SIZE_FLOAT_ENC + 1] = {0};
+		turag_base64_encode(reinterpret_cast<uint8_t*>(&x), SIZE_FLOAT_RAW, encoded);
+		turag_base64_encode(reinterpret_cast<uint8_t*>(&y), SIZE_FLOAT_RAW, encoded + SIZE_FLOAT_ENC);
 		
-		turag_debug_puts(TURAG_DEBUG_NEWLINE);
+        turag_debug_printf(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_GRAPH_DATA2D
+                           TURAG_DEBUG_GRAPH_PREFIX "%u %u %s" TURAG_DEBUG_NEWLINE,
+                           index, channelIndex, reinterpret_cast<char*>(encoded));
 	}
 }
 

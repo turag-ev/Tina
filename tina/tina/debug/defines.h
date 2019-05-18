@@ -210,7 +210,10 @@
 
 #endif // __DOXYGEN__
 
-
+#ifndef TURAG_DEBUG_GRAPH_MAX_CHANNELS
+/// Maximale Anzahl an Graph-Kanälen
+#define TURAG_DEBUG_GRAPH_MAX_CHANNELS  (64)
+#endif
 
 # if __WORDSIZE == 64
 #  define TURAG_32_PREFIX
