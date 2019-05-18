@@ -3,16 +3,15 @@
 
 #include <ch.h>
 
-#if CH_KERNEL_MAJOR > 2
-#define CH_FREQUENCY CH_CFG_ST_FREQUENCY
-#endif
-
 #include <tina/tina.h>
 #include "timetype.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#define TURAG_TIME_INFINITE_TICKS   TIME_INFINITE
+#define TURAG_TIME_INFINITE         _turag_ticks_to_time(TIME_INFINITE)
 
 typedef struct {
   TuragSystemTicks value;
@@ -26,6 +25,16 @@ TuragSystemTime _turag_ticks_to_time(TuragSystemTicks ticks) {
   return result;
 #else
   return {ticks};
+#endif
+}
+
+/// Frequenz der plattformabhängigen Ticks
+static _always_inline _constexpr_func
+unsigned turag_get_systick_frequency(void) {
+#if CH_KERNEL_MAJOR > 2
+    return CH_CFG_ST_FREQUENCY;
+#else
+    return CH_FREQUENCY;
 #endif
 }
 
@@ -46,43 +55,27 @@ TuragSystemTime turag_us_to_ticks(int us) {
 
 static _always_inline _constexpr_func
 unsigned turag_ticks_to_s(TuragSystemTime time) {
-  return (time.value / CH_FREQUENCY);
+    return (time.value / turag_get_systick_frequency());
 }
 
 static _always_inline _constexpr_func
 unsigned turag_ticks_to_ms(TuragSystemTime time) {
-	return time.value == 0 ? 0 : (((time.value - 1L) * 1000L) / CH_FREQUENCY + 1L);
+	return time.value == 0 ? 0 : (((time.value - 1L) * 1000L) / turag_get_systick_frequency() + 1L);
 }
 
 static _always_inline _constexpr_func
 unsigned turag_ticks_to_us(TuragSystemTime time) {
-	return time.value == 0 ? 0 : (((time.value - 1L) * 1000000L) / CH_FREQUENCY + 1L);
+	return time.value == 0 ? 0 : (((time.value - 1L) * 1000000L) / turag_get_systick_frequency() + 1L);
 }
 
-#define TURAG_TIME_INFINITE_TICKS TIME_INFINITE
-#define TURAG_TIME_INFINITE _turag_ticks_to_time(TIME_INFINITE)
-
 /// Get number of sys ticks since system start
-/**
- * \return sys ticks
- */
 static _always_inline
 TuragSystemTime turag_get_current_tick(void) { // [tick]
   return _turag_ticks_to_time(chVTGetSystemTime());
 }
 
-/// Frequenz der plattformabhängigen Ticks
-static _always_inline _constexpr_func
-unsigned turag_get_systick_frequency(void) {
-    return CH_FREQUENCY;
-}
-
 #ifdef __cplusplus
 } // extern "C"
-#endif
-
-#if CH_KERNEL_MAJOR > 2
-#undef CH_FREQUENCY
 #endif
 
 #endif // TINA_CHIBIOS_TIME_H
