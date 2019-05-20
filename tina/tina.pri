@@ -66,10 +66,10 @@ DISTR_FILES += $$PWD/tina.pri
 
 contains(TINA, debug) {
   SOURCES += \
+      $$PWD/tina++/debug/graph.cpp \
       $$PWD/tina++/debug/errorlogger.cpp \
       $$PWD/tina++/debug/errorobserver.cpp \
       $$PWD/tina/debug/binary.cpp \
-      $$PWD/tina/debug/graph.cpp \
       $$PWD/tina/debug/print.cpp \
       $$PWD/tina/debug/image.c
 

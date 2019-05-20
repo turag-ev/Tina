@@ -3,12 +3,12 @@ cmake_minimum_required(VERSION 2.8.3)
 set(TINA_INCLUDE_DIRS .)
 
 set(TINA_SRC
+  tina++/debug/graph.cpp
   tina++/geometry/circle.cpp
   tina++/geometry/geometry.cpp
   tina++/geometry/spline.cpp
   tina++/geometry/rect.cpp
   tina++/geometry/pie.cpp
-  tina/debug/graph.cpp
   tina/debug/print.cpp
   tina/debug/binary.cpp
   tina/crc/crc_checksum.c

@@ -25,10 +25,10 @@ set(TINA_SRC
   tina++/geometry/pie.cpp
   tina++/debug/errorobserver.cpp
   tina++/debug/errorlogger.cpp
+  tina++/debug/graph.cpp
   tina++/bluetooth/bluetooth_base.cpp
   tina++/utils/cost.cpp
   tina++/im/statemachine.cpp
-  tina/debug/graph.cpp
   tina/debug/print.cpp
   tina/debug/binary.cpp
   tina/crc/crc_checksum.c
