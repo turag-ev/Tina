@@ -15,12 +15,16 @@ void _turag_thread_entry(void* data) {
 }
 
 #ifdef CH_DBG_FILL_THREADS
+#if !defined(CH_DBG_ENABLE_STACK_CHECK) && !defined(CH_CFG_USE_DYNAMIC)
+// Both defines activate the wa_base member of the thread_t struct.
+#error CH_DBG_FILL_THREADS enabled without CH_DBG_ENABLE_STACK_CHECK or CH_CFG_USE_DYNAMIC!
+#endif
 
 std::size_t get_stack_usage(const char* working_area_base, std::size_t stack_size) {
     const char* end = working_area_base;
     const char* begin = end + stack_size;
     for (const char* ptr = end; ptr != begin; ptr++) {
-        if (*ptr != 0x55) { // ChibiOS fills stack with 0x55 on initialization
+        if (*ptr != CH_DBG_STACK_FILL_VALUE) { // ChibiOS fills stack with 0x55 on initialization
             return (begin - ptr) * sizeof(char);
         }
     }

@@ -3,7 +3,6 @@
 
 #include <ch.h>
 #include <cstddef>
-//#include <os_turag.h>
 
 #include <tina++/tina.h>
 #include <tina++/time.h>
