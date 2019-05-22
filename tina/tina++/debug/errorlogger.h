@@ -62,13 +62,13 @@ public:
 	/// \bug Prozentzeichen in \p message müssen gedoppelt werden (wie in printf).
 	///
 	/// \sa ERROR_LOGGER, ErrorObserver::ErrorObserver
-	ErrorLogger(char log_level, char log_source, const char* message, SystemTime min_interval, unsigned min_errors = 5);
+    ErrorLogger(char log_level, char log_source, const char* message, SystemTime min_interval, uint16_t min_errors = 5);
 
 	///
 	/// \brief	Fehlerzähler für Fehlermeldungen erstellen
 	///
 	/// entspricht dem Aufruf mit dem ersten Parameter als `TURAG_DEBUG_ERROR_PREFIX[0]`.
-	ErrorLogger(char log_source, const char* message, SystemTime min_interval, unsigned min_errors = 5) :
+    ErrorLogger(char log_source, const char* message, SystemTime min_interval, uint16_t min_errors = 5) :
 		ErrorLogger(TURAG_DEBUG_ERROR_PREFIX[0], log_source, message, min_interval, min_errors)
 	{ }
 
