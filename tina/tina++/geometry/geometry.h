@@ -419,9 +419,9 @@ math_constexpr inline Length distance(const Pose&  a, const Pose&  b) { return h
 
 /// Schauen ob Punkt \a a in einem maximalen Radius \a r zu Punkt \a b liegt.
 /// \returns \f$ (x_a - x_b)^2 + (y_a - y_b)^2 \leq r^2 \f$
-template<typename T1, typename T2>
+template<typename T1, typename T2, typename T3>
 constexpr
-bool in_range(const T1& a, const T2& b, Length r) {
+bool in_range(const T1& a, const T2& b, T3 r) {
   // Umgestellt um vor Overflow zu schützen
   return sqr(a.x - b.x) <= sqr(r) - sqr(a.y - b.y);
 }
