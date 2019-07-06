@@ -368,6 +368,8 @@ bool operator >= (Quantity<Dim> lhs, Quantity<Dim> rhs)
   return lhs.value >= rhs.value;
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-equal"
 /// zwei Variablen mit Einheit vergleichen
 template<typename Dim> constexpr
 bool operator == (Quantity<Dim> lhs, Quantity<Dim> rhs)
@@ -381,6 +383,7 @@ bool operator != (Quantity<Dim> lhs, Quantity<Dim> rhs)
 {
   return lhs.value != rhs.value;
 }
+#pragma GCC diagnostic pop
 
 /// zwei Variablen mit Einheit vergleichen
 template<typename Dim> constexpr

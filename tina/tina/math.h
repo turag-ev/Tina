@@ -125,13 +125,11 @@ TURAG_INLINE float cbcf(float x) {
 }
 
 TURAG_INLINE float sgnf(float x) {
-  return (x==0.0f) ? 0.0f :
-                   ((x > 0.0f) ? 1.0f : -1.0f);
+  return (x > 0.0f) ? 1.0f : (x < 0.0f) ? -1.0f : 0.0f;
 }
 
 TURAG_INLINE int sgn(int x) {
-  return (x==0) ? 0 :
-                   ((x > 0) ? 1 : -1);
+  return (x > 0) ? 1 : (x < 0) ? -1 : 0;
 }
 
 #ifdef __cplusplus
