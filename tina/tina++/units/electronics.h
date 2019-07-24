@@ -3,6 +3,7 @@
 
 #include "unit.h"
 #include "units.h"
+#include "mechanics.h"
 
 namespace TURAG {
 namespace Units {
@@ -31,10 +32,10 @@ constexpr Voltage::UnitType V(N*m/(A*s));
 /// Definition für Millivolt
 constexpr Voltage::UnitType mV(V.factor / 1000.f);
 
-/// Definition für Walt
+/// Definition für Watt
 constexpr Power::UnitType W(A * V);
 
-/// Definition für Milliwalt
+/// Definition für Milliwatt
 constexpr Power::UnitType mW(mA * V);
 
 /// Definition für Ohm
