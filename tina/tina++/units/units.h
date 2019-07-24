@@ -65,7 +65,7 @@ constexpr Current::UnitType mA(FROM_SI_CONVERT_FACTOR_CURRENT / 1000.f);
 
 } // namespace Units
 
-#if GCC_VERSION > 40700
+#if __cplusplus >= 201103L
 
 inline namespace Literals {
 inline namespace UnitsLiterals {
