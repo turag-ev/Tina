@@ -41,14 +41,18 @@ size_t turag_thread_get_stack_usage(const TuragThread* thread) {
 }
 
 
-extern "C" const char __main_stack_base__, __main_stack_end__;
+extern "C" uint32_t __main_stack_base__, __main_stack_end__;
 std::size_t getMainStackUsage() { 
-    return get_stack_usage(&__main_stack_base__, (&__main_stack_end__) - (&__main_stack_base__));
+    return get_stack_usage(reinterpret_cast<const char*>(&__main_stack_base__),
+                           reinterpret_cast<const char*>(&__main_stack_end__)
+                           - reinterpret_cast<const char*>(&__main_stack_base__));
 }
 
-extern "C" const char __process_stack_base__, __process_stack_end__;
+extern "C" uint32_t __process_stack_base__, __process_stack_end__;
 std::size_t getProcessStackUsage() {
-    return get_stack_usage(&__process_stack_base__, (&__process_stack_end__) - (&__process_stack_base__));
+    return get_stack_usage(reinterpret_cast<const char*>(&__process_stack_base__),
+                           reinterpret_cast<const char*>(&__process_stack_end__)
+                           - reinterpret_cast<const char*>(&__process_stack_base__));
 }
 
 #else // CH_DBG_FILL_THREADS
