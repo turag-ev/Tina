@@ -4,18 +4,6 @@ namespace TURAG {
 
 using namespace Units;
 
-Angle norm_angle(Angle x) {
-  while (x <= -angle_pi) {
-    x += angle_pi * 2.f;
-  }
-
-  while (x > angle_pi) {
-    x -= angle_pi * 2.f;
-  }
-
-  return x;
-}
-
 Point Pose::getRelativePoint(Length trans) const {
   return Point(x + trans * cos(phi),
                y + trans * sin(phi));

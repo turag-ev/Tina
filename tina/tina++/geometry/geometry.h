@@ -21,7 +21,14 @@ typedef Units::Angle Angle;
 typedef Units::Length Length;
 
 /// Normiert einen Winkel auf das Intervall \f$ [\pi, -\pi) \f$
-Angle norm_angle(Angle x);
+constexpr
+Angle norm_angle(Angle x) {
+    return (x <= -Units::angle_pi)
+            ? norm_angle(x + 2 * Units::angle_pi)
+            : ( x > Units::angle_pi)
+              ? norm_angle(x - 2 * Units::angle_pi)
+              : x;
+}
 
 // Forward declaration wegen getTurnedPoseTowards
 template<typename T1, typename T2>

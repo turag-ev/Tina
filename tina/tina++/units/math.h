@@ -233,7 +233,7 @@ constexpr _always_inline
 int
 sgn(Units::Quantity<Dim> x) {
 	using namespace Units;
-  return (x > null) ? 1 : ((x == null) ? 0 : -1);
+  return (x > null) ? 1 : (x < null) ? -1 : 0;
 }
 
 /// Sinus berechnen
