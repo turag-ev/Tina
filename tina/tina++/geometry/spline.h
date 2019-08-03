@@ -154,8 +154,8 @@ public:
 	constexpr Length getDirectDist() const { return direct_dist; }
 	constexpr unsigned getOrder() const    { return order; }
 
-	Pose getPoseStep(float t);
-	float getBendingStep(float t);
+	Pose getPoseStep(float t) const;
+	float getBendingStep(float t) const;
 
 private:
 

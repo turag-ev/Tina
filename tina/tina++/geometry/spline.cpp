@@ -51,7 +51,7 @@ bool SplineOrder<order>::calculate(Pose *poses, unsigned pose_index,
 }
 
 template<std::size_t order>
-Pose SplineOrder<order>::getPoseStep(float t)
+Pose SplineOrder<order>::getPoseStep(float t) const
 {
 	Pose p;
 
@@ -74,7 +74,7 @@ Pose SplineOrder<order>::getPoseStep(float t)
 }
 
 template<std::size_t order>
-float SplineOrder<order>::getBendingStep(float t)
+float SplineOrder<order>::getBendingStep(float t) const
 {
 	// Wert der 1. Ableitung an Stelle t
 	float dx = c.x.template val<1>(t);
