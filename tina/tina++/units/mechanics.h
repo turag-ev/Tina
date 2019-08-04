@@ -10,13 +10,16 @@ namespace Units {
 // Größe
 
 /// Typ für Kraftvariablen
-typedef Quantity<ForceDimension> Force;
+typedef Quantity< dim_div<EnergyDimension, LengthDimension> > Force;
 
 /// Typ für Moment
-typedef Quantity<dim_mul<ForceDimension, LengthDimension>> Torque;
+typedef Quantity< dim_div<EnergyDimension, AngleDimension> > Torque;
 
 /// Typ für Flächen
 typedef Quantity< dim_mul<LengthDimension, LengthDimension> > Area;
+
+/// Typ für Krümmung
+typedef Quantity< dim_div<AngleDimension, LengthDimension> > Curvature;
 
 /// Typen für Geschwindigkeit
 typedef Quantity< dim_div<LengthDimension, TimeDimension> > Velocity;
@@ -39,7 +42,7 @@ typedef Quantity< dim_div<AngleDimension, QuadTimeDimension> > AngularAccelerati
 constexpr Force::UnitType N(kg*m/(s*s));
 
 /// Definition für Newtonmeter
-constexpr Torque::UnitType Nm(N*m);
+constexpr Torque::UnitType Nm(N*m/rad);
 
 /// Definition für RPM
 constexpr AngularVelocity::UnitType rpm(round/minute);
