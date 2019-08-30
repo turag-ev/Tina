@@ -12,6 +12,16 @@ extern "C" {
 
 #define TURAG_TIME_INFINITE_TICKS   TIME_INFINITE
 #define TURAG_TIME_INFINITE         _turag_ticks_to_time(TIME_INFINITE)
+/* Wrapper defines for ChibiOS 19 */
+#ifndef S2ST
+#define S2ST TIME_S2I
+#endif
+#ifndef MS2ST
+#define MS2ST TIME_MS2I
+#endif
+#ifndef US2ST
+#define US2ST TIME_US2I
+#endif
 
 typedef struct {
   TuragSystemTicks value;
