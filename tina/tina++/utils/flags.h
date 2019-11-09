@@ -221,6 +221,9 @@ private:
   typename unsigned_integer_least_bits<Bits>::type i;
 };
 
+template<typename Enum, std::size_t Bits>
+constexpr Flags<Enum, Bits> Flags<Enum, Bits>::NOTHING;
+
 #define DEFINE_FLAGS(flags_, enum_) \
   typedef Flags<enum_> flags_;
 
