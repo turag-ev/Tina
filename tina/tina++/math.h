@@ -23,9 +23,10 @@ T sqr(T x) {
 /// \retval 1.0f \f$ x > 0 \f$
 /// \retval 0.0f \f$ x = 0 \f$
 /// \retval -1.0f \f$ x < 0 \f$
-_always_inline constexpr
-int sgn(float x) {
-  return (x > 0.f) ? 1 : (x < 0.f) ? -1 : 0;
+template<typename T>
+constexpr _always_inline
+int sgn(T x) {
+  return (x > T(0)) ? 1 : (x < T(0)) ? -1 : 0;
 }
 
 /// \brief Gibt die Dreieckszahl für n zurück.
