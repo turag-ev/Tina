@@ -348,6 +348,10 @@ struct Pose {
     constexpr Pose overwritePhi(const Angle new_phi) const {
         return Pose(x, y, new_phi);
     }
+    /// Winkel, um den rotiert werden muss, um auf Punkst p zu zeigen
+    constexpr Angle getAngleToPoint(const Point& p) const {
+        return norm_angle(angle_between(*this, p) - phi);
+    }
 };
 
 /// robot velocity/acceleration in translation and rotation
