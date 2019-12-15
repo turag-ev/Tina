@@ -289,12 +289,12 @@ struct Pose {
 	Pose& translate(const Pose& other);
 
 	/// neue Pose mit zusätzlichen Winkel erstellen
-	Pose getTurnedPose(Angle a) const {
+    constexpr Pose getTurnedPose(Angle a) const {
 		return Pose(x, y, norm_angle(phi + a));
 	}
 
     /// neue Pose erstellen, deren Winkel in Richtung des angegebenen Punkts zeigt.
-    Pose getTurnedPoseTowards(Point p) const {
+    constexpr Pose getTurnedPoseTowards(Point p) const {
         return Pose(x, y, angle_between(toPoint(), p));
     }
 
