@@ -56,8 +56,8 @@ void turag_system_print(const char* msg);
 
 #else // __DOXYGEN__
 
-#define turag_system_printf(format, args...) \
-	turag_debug_printf_impl(TURAG_DEBUG_LINE_PREFIX ";;" format TURAG_DEBUG_NEWLINE, ##args)
+#define turag_system_printf(format, ...) \
+    turag_debug_printf_impl(TURAG_DEBUG_LINE_PREFIX ";;" format TURAG_DEBUG_NEWLINE, ##__VA_ARGS__)
 #define turag_system_print(msg)   \
 	turag_debug_puts_impl(TURAG_DEBUG_LINE_PREFIX ";;" msg TURAG_DEBUG_NEWLINE)
 
@@ -84,8 +84,8 @@ void turag_error(const char* msg);
 
 #else // __DOXYGEN__
 
-#define turag_errorf(format, args...) \
-	turag_debug_printf_impl(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_ERROR_PREFIX format TURAG_DEBUG_NEWLINE, ##args)
+#define turag_errorf(format, ...) \
+    turag_debug_printf_impl(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_ERROR_PREFIX format TURAG_DEBUG_NEWLINE, ##__VA_ARGS__)
 #define turag_error(msg) \
 	turag_debug_puts_impl(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_ERROR_PREFIX msg TURAG_DEBUG_NEWLINE)
 
@@ -113,12 +113,12 @@ void turag_critical(const char* msg);
 #else // __DOXYGEN__
 
 #if TURAG_DEBUG_LEVEL > 1
-# define turag_criticalf(format, args...) \
-	turag_debug_printf_impl(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_CRITICAL_PREFIX format TURAG_DEBUG_NEWLINE, ##args)
+# define turag_criticalf(format, ...) \
+    turag_debug_printf_impl(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_CRITICAL_PREFIX format TURAG_DEBUG_NEWLINE, ##__VA_ARGS__)
 # define turag_critical(msg) \
 	turag_debug_puts_impl(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_CRITICAL_PREFIX msg TURAG_DEBUG_NEWLINE)
 #else
-# define turag_criticalf(format, args...) TURAG_MACRO_NOOP
+# define turag_criticalf(format, ...) TURAG_MACRO_NOOP
 # define turag_critical(msg) TURAG_MACRO_NOOP
 #endif
 
@@ -146,12 +146,12 @@ void turag_warning(const char* msg);
 #else // __DOXYGEN__
 
 #if TURAG_DEBUG_LEVEL > 2
-# define turag_warningf(format, args...) \
-    turag_debug_printf_impl(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_WARN_PREFIX format TURAG_DEBUG_NEWLINE,  ##args)
+# define turag_warningf(format, ...) \
+    turag_debug_printf_impl(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_WARN_PREFIX format TURAG_DEBUG_NEWLINE,  ##__VA_ARGS__)
 # define turag_warning(msg) \
     turag_debug_puts_impl(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_WARN_PREFIX msg TURAG_DEBUG_NEWLINE)
 #else
-# define turag_warningf(format, args...) TURAG_MACRO_NOOP
+# define turag_warningf(format, ...) TURAG_MACRO_NOOP
 # define turag_warning(msg) TURAG_MACRO_NOOP
 #endif
 
@@ -179,12 +179,12 @@ void turag_info(const char* msg);
 #else // __DOXYGEN__
 
 #if TURAG_DEBUG_LEVEL > 3
-# define turag_infof(format, args...) \
-	turag_debug_printf_impl(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_INFO_PREFIX format TURAG_DEBUG_NEWLINE, ##args)
+# define turag_infof(format, ...) \
+    turag_debug_printf_impl(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_INFO_PREFIX format TURAG_DEBUG_NEWLINE, ##__VA_ARGS__)
 # define turag_info(msg) \
 	turag_debug_puts_impl(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_INFO_PREFIX msg TURAG_DEBUG_NEWLINE)
 #else
-# define turag_infof(format, args...) TURAG_MACRO_NOOP
+# define turag_infof(format, ...) TURAG_MACRO_NOOP
 # define turag_info(msg) TURAG_MACRO_NOOP
 #endif
 
@@ -220,12 +220,12 @@ void turag_debug(const char* msg);
 #else // __DOXYGEN__
 
 #if TURAG_DEBUG_LEVEL > 4
-# define turag_debugf(format, args...) \
-	turag_debug_printf_impl(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_DEBUG_PREFIX format TURAG_DEBUG_NEWLINE, ##args)
+# define turag_debugf(format, ...) \
+    turag_debug_printf_impl(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_DEBUG_PREFIX format TURAG_DEBUG_NEWLINE, ##__VA_ARGS__)
 # define turag_debug(msg) \
 	turag_debug_puts_impl(TURAG_DEBUG_LINE_PREFIX TURAG_DEBUG_LOG_SOURCE TURAG_DEBUG_DEBUG_PREFIX msg TURAG_DEBUG_NEWLINE)
 #else
-# define turag_debugf(format, args...) TURAG_MACRO_NOOP
+# define turag_debugf(format, ...) TURAG_MACRO_NOOP
 # define turag_debug(msg) TURAG_MACRO_NOOP
 #endif
 

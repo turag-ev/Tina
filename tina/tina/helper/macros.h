@@ -13,7 +13,7 @@
 
 // Interna
 
-#define __NARG__(args...)  __NARG_I_(,##args,__RSEQ_N())
+#define __NARG__(...)  __NARG_I_(,##__VA_ARGS__,__RSEQ_N())
 #define __NARG_I_(...) __ARG_N(__VA_ARGS__)
 #define __ARG_N( \
       _0, _1, _2, _3, _4, _5, _6, _7, _8, _9,_10, \
