@@ -15,6 +15,7 @@ public:
   typedef Enum enum_type;
   static constexpr std::size_t bits = Bits;
 
+  // FIXME: This is not conform to standard C++. static constexpr members must have a complete type.
   static constexpr Flags NOTHING{};
 
   static constexpr _always_inline int bit(Enum b) {
