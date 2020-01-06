@@ -30,10 +30,12 @@ Angle norm_angle(Angle x) {
               : x;
 }
 
-// Forward declaration wegen getTurnedPoseTowards
+/// Winkel zwischen zwei Punkten berechnen
 template<typename T1, typename T2>
 constexpr _always_inline
-Angle angle_between(const T1& a, const T2& b);
+Angle angle_between(const T1& a, const T2& b) {
+  return atan2(b.y - a.y, b.x - a.x);
+}
 
 /// Darstellung für zweidimensionalen, kartesischen Vektor
 ///
@@ -435,13 +437,6 @@ constexpr
 bool in_range(const T1& a, const T2& b, T3 r) {
   // Umgestellt um vor Overflow zu schützen
   return sqr(a.x - b.x) <= sqr(r) - sqr(a.y - b.y);
-}
-
-/// Winkel zwischen zwei Punkten berechnen
-template<typename T1, typename T2>
-constexpr _always_inline
-Angle angle_between(const T1& a, const T2& b) {
-  return atan2(b.y - a.y, b.x - a.x);
 }
 
 /// \}
