@@ -315,13 +315,13 @@ struct Pose {
 
 	/// neuen, in Blickrichtung verschobenen Punkt erstellen
 	/// \param trans Länge, um den die Position in Winkelrichtung verschoben ist.
-	constexpr Pose getRelativePose(Length trans) const {
+	math_constexpr Pose getRelativePose(Length trans) const {
 		return Pose(x + trans * cos(phi), y + trans * sin(phi), phi);
 	}
 
 	/// neuen, in Blickrichtung verschobene Punkt erstellen
 	/// \param other Vektor, um den die Position in Winkelrichtung verschoben ist.
-	constexpr Pose getRelativePose(const Point& other) const {
+	math_constexpr Pose getRelativePose(const Point& other) const {
 		return Pose(x + other.x * cos(phi) - other.y * sin(phi),
 					y + other.x * sin(phi) + other.y * cos(phi),
 					phi);
