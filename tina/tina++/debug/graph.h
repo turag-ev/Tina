@@ -193,7 +193,7 @@ public:
 	 *
 	 * count darf maximal so groß sein wie die Anzahl der Channels des Graphen.
 	 */
-	void plot(float time, float* data, size_t count);
+	void plot(float time, const float* data, size_t count);
 
 	/**
 	 * @brief Fügt jedem Channel einen Datensatz hinzu.
@@ -203,7 +203,7 @@ public:
 	 * data darf maximal so viele Elemente haben wie der Graph Channels hat.
 	 */
 	template <size_t N>
-	void plot(float time, float (&data)[N]) {
+	void plot(float time, const float (&data)[N]) {
 		plot(time, data, N);
     }
 

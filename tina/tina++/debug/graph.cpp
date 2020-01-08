@@ -40,7 +40,7 @@ void Graph::startNewDiagram(void) {
 	}
 }
 
-void Graph::plot(float time, float* data, size_t count) {
+void Graph::plot(float time, const float* data, size_t count) {
 	if (!isInitialized()) {
         turag_internal_error("tried to call Graph::plot prior to initialization");
 	} else if (count > channels || count > TURAG_DEBUG_GRAPH_MAX_CHANNELS) {
@@ -53,10 +53,10 @@ void Graph::plot(float time, float* data, size_t count) {
         
         uint8_t encoded[SIZE_FLOAT_ENC * (TURAG_DEBUG_GRAPH_MAX_CHANNELS + 1) + 1] = {0};
 
-		turag_base64_encode(reinterpret_cast<uint8_t*>(&time),
+		turag_base64_encode(reinterpret_cast<const uint8_t*>(&time),
                             SIZE_FLOAT_RAW, encoded);
 		for ( unsigned i = 0; i < count; ++i ) {
-			turag_base64_encode(reinterpret_cast<uint8_t*>(&data[i]),
+			turag_base64_encode(reinterpret_cast<const uint8_t*>(&data[i]),
                                 SIZE_FLOAT_RAW, encoded + (i+1) * SIZE_FLOAT_ENC);
 		}
 
