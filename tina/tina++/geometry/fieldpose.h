@@ -110,7 +110,7 @@ public:
 
 private:
   inline constexpr static Angle mirrorPhi(Angle phi) {
-      return (isNaN(phi.to(Units::rad))) ?
+      return (isnan(phi)) ?
                   phi
                 : (phi >= Units::null ? Units::angle_pi - phi : -Units::angle_pi - phi);
   }

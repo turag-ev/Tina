@@ -273,7 +273,7 @@ Units::Length hypot(Units::Length x, Units::Length y) {
 
 /// Is value not a Number (NaN)
 template<typename Dim>
-math_constexpr _always_inline
+constexpr _always_inline
 bool isnan(Units::Quantity<Dim> arg) {
 	return std::isnan(arg.value);
 }
@@ -281,7 +281,7 @@ bool isnan(Units::Quantity<Dim> arg) {
 struct NaN {
 	template<typename Dim>
 	explicit operator Units::Quantity<Dim>() {
-		return Units::Quantity<Dim>(__builtin_nanf(""), Units::unsafe);
+		return Units::Quantity<Dim>(std::numeric_limits<Units::Value>::quiet_NaN(), Units::unsafe);
 	}
 };
 
