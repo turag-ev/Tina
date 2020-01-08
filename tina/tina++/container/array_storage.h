@@ -8,7 +8,7 @@
 #include "../helper/construct.h"
 #include "../helper/traits_algorithms.h"
 
-#if GCC_VERSION < 50000
+#if GCC_VERSION < 50000 && !defined(__clang__)
 namespace std {
 template<std::size_t Len, typename... Types>
 struct aligned_union {
