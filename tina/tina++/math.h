@@ -44,7 +44,17 @@ unsigned int gcd(int a, int b) {
 }
 
 /// \brief silent not-a-number of float type
-constexpr float NaNf = __builtin_nanf("");
+constexpr float NaNf = std::numeric_limits<float>::quiet_NaN();
+
+/// \brief Prüft, ob Wert NaN ist.
+/// 
+/// Im Gegensatz zu std::isnan ist unsere Funktion constexpr.
+/// https://en.cppreference.com/w/cpp/numeric/math/isnan
+template<typename T>
+constexpr
+bool isNaN(const T x) {
+    return x != x;
+}
 
 /// \brief Prüfen ob zwei floats innerhalb der Toleranz Epsilon identisch sind
 static inline bool float_equal(float a, float b) {
