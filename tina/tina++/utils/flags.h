@@ -15,8 +15,13 @@ public:
   typedef Enum enum_type;
   static constexpr std::size_t bits = Bits;
 
-  // FIXME: This is not conform to standard C++. static constexpr members must have a complete type.
-  static constexpr Flags NOTHING{};
+  /*
+   * Note: There used to be 'static constexpr Flags NOTHING{}' which is not standard compliant.
+   * Static class members must have a complete type if they are constexpr.
+   * (GCC does not care, but clang does.)
+   * 
+   * Use the default constructor instead.
+   */
 
   static constexpr _always_inline int bit(Enum b) {
     return 1 << static_cast<int>(b);
@@ -221,9 +226,6 @@ public:
 private:
   typename unsigned_integer_least_bits<Bits>::type i;
 };
-
-template<typename Enum, std::size_t Bits>
-constexpr Flags<Enum, Bits> Flags<Enum, Bits>::NOTHING;
 
 #define DEFINE_FLAGS(flags_, enum_) \
   typedef Flags<enum_> flags_;
