@@ -104,29 +104,32 @@ mini_vsnprintf(char *buffer, unsigned int buffer_len, const char *fmt, va_list v
 	char bf[24];
 	char ch;
 
-    int _putc(char c)
-	{
-		if ((unsigned int)((pbuffer - buffer) + 1) >= buffer_len)
-			return 0;
-        *(pbuffer++) = c;
-		*(pbuffer) = '\0';
-		return 1;
-	}
+    // (formerly nested function)
+#define _putc(c) \
+	do { \
+		if ((unsigned int)((pbuffer - buffer) + 1) >= buffer_len) \
+			break; \
+        *(pbuffer++) = (c); \
+		*(pbuffer) = '\0'; \
+		break; \
+	} while (0)
 
-	int _puts(char *s, unsigned int len)
-	{
-		unsigned int i;
-
-		if (buffer_len - (pbuffer - buffer) - 1 < len)
-			len = buffer_len - (pbuffer - buffer) - 1;
-
-		/* Copy to buffer */
-		for (i = 0; i < len; i++)
-			*(pbuffer++) = s[i];
-		*(pbuffer) = '\0';
-
-		return len;
-	}
+    // (formerly nested function)
+#define _puts(s, len) \
+	do { \
+		unsigned int i; \
+        unsigned int len_ = (len); \
+        \
+		if (buffer_len - (pbuffer - buffer) - 1 < len_) \
+			len_ = buffer_len - (pbuffer - buffer) - 1; \
+        \
+		/* Copy to buffer */ \
+		for (i = 0; i < len_; i++) \
+			*(pbuffer++) = (s)[i]; \
+		*(pbuffer) = '\0'; \
+        \
+		break; \
+	} while (0)
 
 	while ((ch=*(fmt++))) {
 		if ((unsigned int)((pbuffer - buffer) + 1) >= buffer_len)
