@@ -62,6 +62,13 @@ constexpr
 bool float_lte(float a, float b) {
   return static_cast<float>(b - a) > -std::numeric_limits<float>::epsilon();
 }
+
+/// \brief x zwischen min und max begrenzen
+template<typename T>
+constexpr
+T clamp(T x, T min, T max) {
+  return x < min ? min : x > max ? max : x;
+}
 /// \}
 
 } // namespace TURAG
