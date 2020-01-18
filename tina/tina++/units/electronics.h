@@ -30,7 +30,7 @@ typedef decltype(Mass() / (Current() * Time() * Time())) MagneticField;
 constexpr Voltage::UnitType V(N*m/(A*s));
 
 /// Definition für Millivolt
-constexpr Voltage::UnitType mV(V.factor / 1000.f);
+constexpr Voltage::UnitType mV(V.factor / UnitFactor(1000));
 
 /// Definition für Watt
 constexpr Power::UnitType W(A * V);

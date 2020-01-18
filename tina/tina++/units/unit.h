@@ -401,29 +401,29 @@ bool operator >  (Quantity<Dim> lhs, Quantity<Dim> rhs)
 }
 
 /// Variable mit Einheit mit Null vergleichen
-template<typename Dim> constexpr bool operator <= (Quantity<Dim> lhs, null_t) { return lhs.value <= 0.f; }
+template<typename Dim> constexpr bool operator <= (Quantity<Dim> lhs, null_t) { return lhs.value <= 0; }
 /// Variable mit Einheit mit Null vergleichen
-template<typename Dim> constexpr bool operator <= (null_t, Quantity<Dim> rhs) { return 0.f <= rhs.value; }
+template<typename Dim> constexpr bool operator <= (null_t, Quantity<Dim> rhs) { return 0 <= rhs.value; }
 /// Variable mit Einheit mit Null vergleichen
-template<typename Dim> constexpr bool operator >= (Quantity<Dim> lhs, null_t) { return lhs.value >= 0.f; }
+template<typename Dim> constexpr bool operator >= (Quantity<Dim> lhs, null_t) { return lhs.value >= 0; }
 /// Variable mit Einheit mit Null vergleichen
-template<typename Dim> constexpr bool operator >= (null_t, Quantity<Dim> rhs) { return 0.f >= rhs.value; }
+template<typename Dim> constexpr bool operator >= (null_t, Quantity<Dim> rhs) { return 0 >= rhs.value; }
 /// Variable mit Einheit mit Null vergleichen
-template<typename Dim> constexpr bool operator == (Quantity<Dim> lhs, null_t) { return lhs.value == 0.f; }
+template<typename Dim> constexpr bool operator == (Quantity<Dim> lhs, null_t) { return lhs.value == 0; }
 /// Variable mit Einheit mit Null vergleichen
-template<typename Dim> constexpr bool operator == (null_t, Quantity<Dim> rhs) { return 0.f == rhs.value; }
+template<typename Dim> constexpr bool operator == (null_t, Quantity<Dim> rhs) { return 0 == rhs.value; }
 /// Variable mit Einheit mit Null vergleichen
-template<typename Dim> constexpr bool operator != (Quantity<Dim> lhs, null_t) { return lhs.value != 0.f; }
+template<typename Dim> constexpr bool operator != (Quantity<Dim> lhs, null_t) { return lhs.value != 0; }
 /// Variable mit Einheit mit Null vergleichen
-template<typename Dim> constexpr bool operator != (null_t, Quantity<Dim> rhs) { return 0.f != rhs.value; }
+template<typename Dim> constexpr bool operator != (null_t, Quantity<Dim> rhs) { return 0 != rhs.value; }
 /// Variable mit Einheit mit Null vergleichen
-template<typename Dim> constexpr bool operator <  (Quantity<Dim> lhs, null_t) { return lhs.value < 0.f; }
+template<typename Dim> constexpr bool operator <  (Quantity<Dim> lhs, null_t) { return lhs.value < 0; }
 /// Variable mit Einheit mit Null vergleichen
-template<typename Dim> constexpr bool operator <  (null_t, Quantity<Dim> rhs) { return 0.f < rhs.value; }
+template<typename Dim> constexpr bool operator <  (null_t, Quantity<Dim> rhs) { return 0 < rhs.value; }
 /// Variable mit Einheit mit Null vergleichen
-template<typename Dim> constexpr bool operator >  (Quantity<Dim> lhs, null_t) { return lhs.value > 0.f; }
+template<typename Dim> constexpr bool operator >  (Quantity<Dim> lhs, null_t) { return lhs.value > 0; }
 /// Variable mit Einheit mit Null vergleichen
-template<typename Dim> constexpr bool operator >  (null_t, Quantity<Dim> rhs) { return 0.f > rhs.value; }
+template<typename Dim> constexpr bool operator >  (null_t, Quantity<Dim> rhs) { return 0 > rhs.value; }
 
 /// Variable mit Einheit vervielfachen
 template<typename Dim> constexpr
