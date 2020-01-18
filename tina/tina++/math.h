@@ -47,20 +47,24 @@ unsigned int gcd(int a, int b) {
 constexpr float NaNf = std::numeric_limits<float>::quiet_NaN();
 
 /// \brief Prüfen ob zwei floats innerhalb der Toleranz Epsilon identisch sind
-static inline bool float_equal(float a, float b) {
-  return fabsf(a - b) < std::numeric_limits<float>::epsilon();
+template<typename T>
+math_constexpr
+bool float_equal(T a, T b) {
+  return std::abs(a - b) < std::numeric_limits<T>::epsilon();
 }
 
 /// \brief Prüfen ob a >= b mit Berückrichtigung von Epsilon
+template<typename T>
 constexpr
-bool float_gte(float a, float b) {
-  return static_cast<float>(a - b) > -std::numeric_limits<float>::epsilon();
+bool float_gte(T a, T b) {
+  return (a - b) > -std::numeric_limits<T>::epsilon();
 }
 
 /// \brief Prüfen ob a <= b mit Berückrichtigung von Epsilon
+template<typename T>
 constexpr
-bool float_lte(float a, float b) {
-  return static_cast<float>(b - a) > -std::numeric_limits<float>::epsilon();
+bool float_lte(T a, T b) {
+  return (b - a) > -std::numeric_limits<T>::epsilon();
 }
 
 /// \brief x zwischen min und max begrenzen
