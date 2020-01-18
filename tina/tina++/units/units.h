@@ -14,43 +14,43 @@ namespace Units {
 /// \{
 
 /// Definition für Millimeter
-constexpr Unit<LengthDimension> mm(FROM_SI_CONVERT_FACTOR_LENGTH / 1000.f);
+constexpr Unit<LengthDimension> mm(FROM_SI_CONVERT_FACTOR_LENGTH / UnitFactor(1000));
 
 /// Definition für Centimeter
-constexpr Unit<LengthDimension> cm(FROM_SI_CONVERT_FACTOR_LENGTH / 100.f);
+constexpr Unit<LengthDimension> cm(FROM_SI_CONVERT_FACTOR_LENGTH / UnitFactor(100));
 
 /// Definition für Dezimeter
-constexpr Unit<LengthDimension> dm(FROM_SI_CONVERT_FACTOR_LENGTH / 10.f);
+constexpr Unit<LengthDimension> dm(FROM_SI_CONVERT_FACTOR_LENGTH / UnitFactor(10));
 
 /// Definition für Meter
 constexpr Unit<LengthDimension>  m(FROM_SI_CONVERT_FACTOR_LENGTH);
 
 /// Definition für Milliradiand
-constexpr Unit<AngleDimension> mrad(FROM_SI_CONVERT_FACTOR_ANGLE / 1000.f);
+constexpr Unit<AngleDimension> mrad(FROM_SI_CONVERT_FACTOR_ANGLE / UnitFactor(1000));
 
 /// Definition für Radiand (Pi rad = 180°)
 constexpr Unit<AngleDimension>  rad(FROM_SI_CONVERT_FACTOR_ANGLE);
 
 /// Definition für Grad (360° = 2 * Pi rad)
-constexpr Unit<AngleDimension>  deg(FROM_SI_CONVERT_FACTOR_ANGLE * float(M_PI)/180.f);
+constexpr Unit<AngleDimension>  deg(FROM_SI_CONVERT_FACTOR_ANGLE * UnitFactor(M_PI)/UnitFactor(180));
 
 /// Definition für Umdrehung (360°)
-constexpr Unit<AngleDimension> round(FROM_SI_CONVERT_FACTOR_ANGLE * 2.f * float(M_PI));
+constexpr Unit<AngleDimension> round(FROM_SI_CONVERT_FACTOR_ANGLE * UnitFactor(2) * UnitFactor(M_PI));
 
 /// Definition für Minuten
-constexpr Unit<TimeDimension> minute(FROM_SI_CONVERT_FACTOR_TIME * 60.f);
+constexpr Unit<TimeDimension> minute(FROM_SI_CONVERT_FACTOR_TIME * UnitFactor(60));
 
 /// Definition für Sekunden
 constexpr Unit<TimeDimension>  s(FROM_SI_CONVERT_FACTOR_TIME);
 
 /// Definition für Millisekunden
-constexpr Unit<TimeDimension> ms(FROM_SI_CONVERT_FACTOR_TIME / 1000.f);
+constexpr Unit<TimeDimension> ms(FROM_SI_CONVERT_FACTOR_TIME / UnitFactor(1000));
 
 /// Definition für Mikrosekunden
-constexpr Unit<TimeDimension> us(FROM_SI_CONVERT_FACTOR_TIME / 1000000.f);
+constexpr Unit<TimeDimension> us(FROM_SI_CONVERT_FACTOR_TIME / UnitFactor(1000000));
 
 /// Definition für Gramm
-constexpr Mass::UnitType g(FROM_SI_CONVERT_FACTOR_MASS / 1000.f);
+constexpr Mass::UnitType g(FROM_SI_CONVERT_FACTOR_MASS / UnitFactor(1000));
 
 /// Definition für Kilogramm
 constexpr Mass::UnitType kg(FROM_SI_CONVERT_FACTOR_MASS);
@@ -59,7 +59,7 @@ constexpr Mass::UnitType kg(FROM_SI_CONVERT_FACTOR_MASS);
 constexpr Current::UnitType A(FROM_SI_CONVERT_FACTOR_CURRENT);
 
 /// Definition für Milliampere
-constexpr Current::UnitType mA(FROM_SI_CONVERT_FACTOR_CURRENT / 1000.f);
+constexpr Current::UnitType mA(FROM_SI_CONVERT_FACTOR_CURRENT / UnitFactor(1000));
 
 /// \}
 
