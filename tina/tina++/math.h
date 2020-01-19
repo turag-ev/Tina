@@ -18,6 +18,13 @@ T sqr(T x) {
   return x * x;
 }
 
+/// Würfel bilden
+template<typename T>
+constexpr _always_inline
+T cbc(T x) {
+  return x * x * x;
+}
+
 /// \brief \c sgn Funktion
 /// \param x Wert
 /// \retval 1.0f \f$ x > 0 \f$
