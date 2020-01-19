@@ -23,7 +23,7 @@ bool intersect(const Circle& one, const Circle& two, std::array<Point, 2>& resul
   // centers.
 
   // Determine the distance from point 0 to point 2.
-  Length a = (sqr(one.r) - sqr(two.r) + sqr(d)) / (2.f * d);
+  Length a = (sqr(one.r) - sqr(two.r) + sqr(d)) / (2 * d);
 
   /* Determine the coordinates of point 2. */
   Length x2 = one.m.x + (diff.x * a/d);

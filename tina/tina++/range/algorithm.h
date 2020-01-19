@@ -28,7 +28,7 @@ struct is_equal_predicate {
   { }
 
   constexpr
-  bool operator() (const T& t) {
+  bool operator() (const T& t) const {
     return t == value;
   }
 

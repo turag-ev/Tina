@@ -20,7 +20,7 @@ struct Circle {
 	/// unintialisierten Kreis erstellen (Radius ist negativ)
 	constexpr explicit
 	Circle() :
-		m(), r(-1.f*Units::mm)
+		m(), r(-1*Units::mm)
 	{ }
 
 	constexpr Point getCenter() const { return m; }

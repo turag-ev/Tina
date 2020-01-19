@@ -98,7 +98,7 @@ public:
         startstate_(startstate)
     { }
 
-    void onStart(EventArg arg) {
+    void onStart(EventArg arg) override {
         currentstate_ = startstate_;
         state(Action::event_start, arg);
     }

@@ -32,7 +32,7 @@ public:
 
 	/// \brief Mittelpunkt von Rechteck bestimmen
 	constexpr Point getCenter() const {
-		return Point((lb_.x + rt_.x)/2.f, (lb_.y + rt_.y)/2.f);
+		return Point((lb_.x + rt_.x)/2, (lb_.y + rt_.y)/2);
 	}
 
 	constexpr Length getLeft() const { return lb_.x; }

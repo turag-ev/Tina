@@ -21,7 +21,7 @@ public:
 	// value & derivation
 
 	template<std::size_t derivation = 0>
-	inline RealType val(RealType t) const { return 0; }
+	inline RealType val(RealType) const { return 0; }
 
 	// item access
 
@@ -125,7 +125,7 @@ protected:
 
 	static inline bool isAngleDontCare(Units::Angle a)
 	{
-		return (abs(a - mc_no_angle) < 0.001f * Units::rad) || isnan(a);
+		return (abs(a - mc_no_angle) < RealType(0.001) * Units::rad) || isnan(a);
 	}
 
 	/**

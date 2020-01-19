@@ -208,7 +208,7 @@ inline namespace SystemTimeLiterals {
 
 /// \relates SystemTime
 /// \brief Systemzeit aus Sekundenangabe erstellen
-constexpr SystemTime operator"" _s(long double a) { return SystemTime::fromMsec(a / 1000.0); }
+constexpr SystemTime operator"" _s(long double a) { return SystemTime::fromMsec(a / 1000.0L); }
 /// \relates SystemTime
 /// \brief Systemzeit aus Sekundenangabe erstellen
 constexpr SystemTime operator"" _s(unsigned long long a) { return SystemTime::fromSec(a); }
