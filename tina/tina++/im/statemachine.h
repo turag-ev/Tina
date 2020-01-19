@@ -233,6 +233,9 @@ public:
     State(const char* const name_) :
 		name(name_), hasSignal_(false), signal_(0),
 		eventqueue_(nullptr) {}
+#if TURAG_USE_LIBSUPCPP_RUNTIME_SUPPORT
+    virtual ~State() = default;
+#endif
 
 protected:
     /*!
