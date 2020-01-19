@@ -434,7 +434,10 @@ math_constexpr inline Length distance(const Pose&  a, const Pose&  b) { return h
 /// \returns \f$ (x_a - x_b)^2 + (y_a - y_b)^2 \leq r^2 \f$
 template<typename T1, typename T2, typename T3>
 constexpr
-bool in_range(const T1& a, const T2& b, T3 r) {
+auto in_range(const T1& a, const T2& b, T3 r)
+// Trailing return type für SFINAE.
+// Nur, wenn (a.x-b.x) sowie (a.y-b.y) definiert sind, kann diese Funktion verwendet werden.
+-> decltype ((a.x - b.x), (a.y - b.y), false ) {
   // Umgestellt um vor Overflow zu schützen
   return sqr(a.x - b.x) <= sqr(r) - sqr(a.y - b.y);
 }
