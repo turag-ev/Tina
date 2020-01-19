@@ -170,7 +170,7 @@ template<typename Dim>
 constexpr _always_inline
 Units::Quantity<Dim>
 abs(Units::Quantity<Dim> arg) {
-    return Units::Quantity<Dim>(std::fabs(arg.value));
+    return Units::Quantity<Dim>(std::abs(arg.value));
 }
 
 /// Den größeren Wert zurückgeben
