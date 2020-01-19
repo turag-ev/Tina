@@ -251,8 +251,5 @@ contains(TINA, ros) {
 SOURCES += \
     $$PWD/tina++/statemachine/action.cpp
 
-DISTFILES += \
-    $$PWD/tina.cmake
-
 
 
