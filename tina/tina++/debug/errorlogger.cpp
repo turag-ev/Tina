@@ -1,6 +1,5 @@
 #include "errorlogger.h"
 
-#include <cstring>
 #include <tina++/algorithm.h>
 
 namespace TURAG {
@@ -13,7 +12,6 @@ ErrorLogger::ErrorLogger(char log_level,
         uint16_t min_errors)
 	:
 	observer_(min_interval, min_errors),
-	message_length_(std::strlen(message)),
 	message_(message),
 	log_level_(log_level),
 	log_source_(log_source)
@@ -33,7 +31,7 @@ bool ErrorLogger::logResult(bool result)
 
 CheapErrorLogger::CheapErrorLogger(char log_level, char log_source, const char *message, SystemTime min_interval) :
 	message_(message), last_error_message_ms_(0), failuresSinceLastOutput_(0),
-	message_length_(static_cast<uint16_t>(std::strlen(message))), log_level_(log_level), log_source_(log_source)
+	log_level_(log_level), log_source_(log_source)
 {
 	interval_ms_ = static_cast<uint16_t>(std::min(min_interval.toMsec(), 0xffffU));
 }

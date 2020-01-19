@@ -95,9 +95,6 @@ private:
 	/// der ErrorObserver, der benutzt wird, für die richtige Arbeit
 	ErrorObserver observer_;
 
-	/// Länge der Fehlermeldung
-	std::size_t message_length_;
-
 	/// Fehlermeldung
 	const char* message_;
 
@@ -209,8 +206,6 @@ private:
 
 	/// Fehlerzähler
 	uint16_t failuresSinceLastOutput_;
-
-	uint16_t message_length_;
 
 	/// Loglevel
 	char log_level_;
