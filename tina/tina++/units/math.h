@@ -278,6 +278,12 @@ bool isnan(Units::Quantity<Dim> arg) {
 	return std::isnan(arg.value);
 }
 
+template<typename Dim>
+math_constexpr _always_inline
+bool isfinite(Units::Quantity<Dim> arg) {
+    return std::isfinite(arg.value);
+}
+
 struct NaN {
 	template<typename Dim>
 	explicit operator Units::Quantity<Dim>() {
