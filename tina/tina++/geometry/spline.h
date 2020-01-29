@@ -158,6 +158,7 @@ public:
 	constexpr unsigned getOrder() const    { return order; }
 
 	Pose getPoseStep(RealType t) const;
+	RealType getVelocityStep(RealType t) const;
 	RealType getBendingStep(RealType t) const;
 
 private:

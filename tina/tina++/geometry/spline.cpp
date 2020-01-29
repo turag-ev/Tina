@@ -77,6 +77,16 @@ Pose SplineOrder<order>::getPoseStep(RealType t) const
 }
 
 template<std::size_t order>
+RealType SplineOrder<order>::getVelocityStep(RealType t) const
+{
+	// Wert der 1. Ableitung an Stelle t
+	RealType dx = c.x.template val<1>(t);
+	RealType dy = c.y.template val<1>(t);
+
+	return std::hypot(dx, dy);
+}
+
+template<std::size_t order>
 RealType SplineOrder<order>::getBendingStep(RealType t) const
 {
 	// Wert der 1. Ableitung an Stelle t
