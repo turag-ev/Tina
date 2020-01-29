@@ -34,6 +34,9 @@ typedef Quantity< dim_div<LengthDimension, QuadTimeDimension> > Acceleration;
 /// Typ für Winkelbeschleunigung
 typedef Quantity< dim_div<AngleDimension, QuadTimeDimension> > AngularAcceleration;
 
+/// Typ für Motorkonstante
+typedef decltype(Torque() / Current()) MotorConstant;
+
 // TODO: Trägheitsmoment, ...
 
 // Einheiten
