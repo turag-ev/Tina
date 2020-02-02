@@ -175,22 +175,23 @@ bool in_range(const Line& l1, const Line& l2, const Length r) {
 /// \return 
 ///
 inline
-bool in_range(const Line& l, const Rect& q, const Length r) {
-    // Check if any boundary point of the rect is in range of line
-    return in_range(l, q.getLeftTop(), r) || in_range(l, q.getRightTop(), r)
-            || in_range(l, q.getLeftBottom(), r) || in_range(l, q.getRightBottom(), r)
+bool in_range(const Line& line, const Rect& rect, const Length r) {
+    return located_in(rect, line.p) || located_in(rect, line.q)
+            // Check if any boundary point of the rect is in range of line
+            || in_range(line, rect.getLeftTop(), r) || in_range(line, rect.getRightTop(), r)
+            || in_range(line, rect.getLeftBottom(), r) || in_range(line, rect.getRightBottom(), r)
             // Check if line endpoints are in range of rect top line
-            || in_range({q.getLeftTop(), q.getRightTop()}, l.p, r)
-            || in_range({q.getLeftTop(), q.getRightTop()}, l.q, r)
+            || in_range({rect.getLeftTop(), rect.getRightTop()}, line.p, r)
+            || in_range({rect.getLeftTop(), rect.getRightTop()}, line.q, r)
             // Check if line endpoints are in range of rect right line
-            || in_range({q.getRightTop(), q.getRightBottom()}, l.p, r)
-            || in_range({q.getRightTop(), q.getRightBottom()}, l.q, r)
+            || in_range({rect.getRightTop(), rect.getRightBottom()}, line.p, r)
+            || in_range({rect.getRightTop(), rect.getRightBottom()}, line.q, r)
             // Check if line endpoints are in range of rect bottom line
-            || in_range({q.getRightBottom(), q.getLeftBottom()}, l.p, r)
-            || in_range({q.getRightBottom(), q.getLeftBottom()}, l.q, r)
+            || in_range({rect.getRightBottom(), rect.getLeftBottom()}, line.p, r)
+            || in_range({rect.getRightBottom(), rect.getLeftBottom()}, line.q, r)
             // Check if line endpoints are in range of rect left line
-            || in_range({q.getLeftBottom(), q.getLeftTop()}, l.p, r)
-            || in_range({q.getLeftBottom(), q.getLeftTop()}, l.q, r);
+            || in_range({rect.getLeftBottom(), rect.getLeftTop()}, line.p, r)
+            || in_range({rect.getLeftBottom(), rect.getLeftTop()}, line.q, r);
 }
 
 } // namespace TURAG
