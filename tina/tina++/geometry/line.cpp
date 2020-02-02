@@ -2,6 +2,8 @@
 
 namespace TURAG {
 
+using namespace Units;
+
 namespace {
     enum class Orientation {
         CLOCKWISE,
@@ -11,10 +13,11 @@ namespace {
     
     Orientation getOrientation(const Point& a, const Point& b, const Point& c) {
         // https://www.geeksforgeeks.org/orientation-3-ordered-points/
-        const auto slope = (b.y - a.y) * (c.x - b.x) - (b.x - a.x) * (c.y - b.y);
-        return slope == Units::null ? Orientation::COLINEAR :
-               slope > Units::null ? Orientation::CLOCKWISE :
-                                     Orientation::COUNTERCLOCKWISE;
+        static constexpr Area NO_SLOPE{1e-6};
+        const Area slope = (b.y - a.y) * (c.x - b.x) - (b.x - a.x) * (c.y - b.y);
+        return slope > NO_SLOPE ? Orientation::CLOCKWISE :
+                                  slope < -NO_SLOPE ? Orientation::COUNTERCLOCKWISE : 
+                                                      Orientation::COLINEAR;
     }
     
     constexpr bool pointIsOnLine(const Point& p, const Line& l) {
@@ -23,7 +26,7 @@ namespace {
                 && p.y <= l.getTop() && p.y >= l.getBottom();
     }
     
-    constexpr Units::Area squaredProjectionDistance(const Line& l, const Point& p) {
+    constexpr Area squaredProjectionDistance(const Line& l, const Point& p) {
         // https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line#Line_defined_by_two_points
         return sqr((l.q.y - l.p.y) * p.x - (l.q.x - l.p.x) * p.y + l.q.x * l.p.y - l.q.y * l.p.x) / l.getSquaredLength();
     }
@@ -55,9 +58,7 @@ bool intersect(const Line& a, const Line& b) {
     return false;
 }
 
-Units::Area distance_sqr(const Line& l, const Point& r) {
-    using Units::Area;
-    
+Area distance_sqr(const Line& l, const Point& r) {
     // s ist Projektionspunkt von r auf Gerade durch p und q
     const Area sr = squaredProjectionDistance(l, r);
     
