@@ -32,7 +32,7 @@ Angle norm_angle(Angle x) {
 
 /// Winkel zwischen zwei Punkten berechnen
 template<typename T1, typename T2>
-constexpr _always_inline
+math_constexpr _always_inline
 Angle angle_between(const T1& a, const T2& b) {
   return atan2(b.y - a.y, b.x - a.x);
 }
@@ -105,9 +105,9 @@ struct Vector {
     }
 
     /// Betrag des Vektors ausgeben
-    constexpr inline
+    math_constexpr inline
     U magnitude() const {
-        return U(::hypot(x.value, y.value));
+        return hypot(x, y);
     }
 };
 
@@ -296,7 +296,7 @@ struct Pose {
 	}
 
     /// neue Pose erstellen, deren Winkel in Richtung des angegebenen Punkts zeigt.
-    constexpr Pose getTurnedPoseTowards(Point p) const {
+    math_constexpr Pose getTurnedPoseTowards(Point p) const {
         return Pose(x, y, angle_between(toPoint(), p));
     }
 
@@ -351,7 +351,7 @@ struct Pose {
         return Pose(x, y, new_phi);
     }
     /// Winkel, um den rotiert werden muss, um auf Punkst p zu zeigen
-    constexpr Angle getAngleToPoint(const Point& p) const {
+    math_constexpr Angle getAngleToPoint(const Point& p) const {
         return norm_angle(angle_between(*this, p) - phi);
     }
 };
@@ -405,7 +405,7 @@ Units::Area distance_sqr(const T1& a, const T2& b) {
 /// allgemeine Implementation um den einfachen Abstand zwischen zwei
 /// kartesischen Punkten zubestimmen.
 ///
-/// \warning Zur Berechnung muss, die Wurzel gezogen werden, was rechentechnisch
+/// \warning Zur Berechnung muss die Wurzel gezogen werden, was rechentechnisch
 ///     aufwendig ist (vor allem bei der Benutzung von Ganzzahlen),
 ///     meistens ist es besser die quatratischen Abstand zu vergleichen.
 ///     Will man wissen, ob zwei Punkte in einem bestimmten Radius zueinander liegen.
@@ -413,7 +413,7 @@ Units::Area distance_sqr(const T1& a, const T2& b) {
 ///     und besser gegen Integer-Overflow schützt.
 ///
 template<typename T1, typename T2>
-constexpr _always_inline
+math_constexpr _always_inline
 Length distance(const T1& a, const T2& b) {
   return sqrt(distance_sqr(a, b));
 }
