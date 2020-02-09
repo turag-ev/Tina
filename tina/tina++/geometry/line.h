@@ -176,22 +176,31 @@ bool in_range(const Line& l1, const Line& l2, const Length r) {
 ///
 inline
 bool in_range(const Line& line, const Rect& rect, const Length r) {
+    const Line top(rect.getLeftTop(), rect.getRightTop());
+    const Line right(rect.getRightTop(), rect.getRightBottom());
+    const Line bottom(rect.getRightBottom(), rect.getLeftBottom());
+    const Line left(rect.getLeftBottom(), rect.getLeftTop());
+    
     return located_in(rect, line.p) || located_in(rect, line.q)
             // Check if any boundary point of the rect is in range of line
             || in_range(line, rect.getLeftTop(), r) || in_range(line, rect.getRightTop(), r)
             || in_range(line, rect.getLeftBottom(), r) || in_range(line, rect.getRightBottom(), r)
             // Check if line endpoints are in range of rect top line
-            || in_range({rect.getLeftTop(), rect.getRightTop()}, line.p, r)
-            || in_range({rect.getLeftTop(), rect.getRightTop()}, line.q, r)
+            || in_range(top, line.p, r)
+            || in_range(top, line.q, r)
+            || intersect(top, line)
             // Check if line endpoints are in range of rect right line
-            || in_range({rect.getRightTop(), rect.getRightBottom()}, line.p, r)
-            || in_range({rect.getRightTop(), rect.getRightBottom()}, line.q, r)
+            || in_range(right, line.p, r)
+            || in_range(right, line.q, r)
+            || intersect(right, line)
             // Check if line endpoints are in range of rect bottom line
-            || in_range({rect.getRightBottom(), rect.getLeftBottom()}, line.p, r)
-            || in_range({rect.getRightBottom(), rect.getLeftBottom()}, line.q, r)
+            || in_range(bottom, line.p, r)
+            || in_range(bottom, line.q, r)
+            || intersect(bottom, line)
             // Check if line endpoints are in range of rect left line
-            || in_range({rect.getLeftBottom(), rect.getLeftTop()}, line.p, r)
-            || in_range({rect.getLeftBottom(), rect.getLeftTop()}, line.q, r);
+            || in_range(left, line.p, r)
+            || in_range(left, line.q, r)
+            || intersect(left, line);
 }
 
 } // namespace TURAG
