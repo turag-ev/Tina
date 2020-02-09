@@ -181,25 +181,12 @@ bool in_range(const Line& line, const Rect& rect, const Length r) {
     const Line bottom(rect.getRightBottom(), rect.getLeftBottom());
     const Line left(rect.getLeftBottom(), rect.getLeftTop());
     
-    return located_in(rect, line.p) || located_in(rect, line.q)
-            // Check if any boundary point of the rect is in range of line
+    return in_range(line.p, rect, r) || in_range(line.q, rect, r)
             || in_range(line, rect.getLeftTop(), r) || in_range(line, rect.getRightTop(), r)
             || in_range(line, rect.getLeftBottom(), r) || in_range(line, rect.getRightBottom(), r)
-            // Check if line endpoints are in range of rect top line
-            || in_range(top, line.p, r)
-            || in_range(top, line.q, r)
             || intersect(top, line)
-            // Check if line endpoints are in range of rect right line
-            || in_range(right, line.p, r)
-            || in_range(right, line.q, r)
             || intersect(right, line)
-            // Check if line endpoints are in range of rect bottom line
-            || in_range(bottom, line.p, r)
-            || in_range(bottom, line.q, r)
             || intersect(bottom, line)
-            // Check if line endpoints are in range of rect left line
-            || in_range(left, line.p, r)
-            || in_range(left, line.q, r)
             || intersect(left, line);
 }
 
