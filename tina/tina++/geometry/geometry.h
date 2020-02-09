@@ -238,7 +238,7 @@ struct Pose {
 	/// Pose aus zwei kartesischen Korrdinaten und Winkel erstellen
 	constexpr
 	Pose(Length x_, Length y_, Angle phi_) :
-		x(x_), y(y_), phi(phi_)
+		x(x_), y(y_), phi(norm_angle(phi_))
 	{ }
 
 	/// Kopierkonstruktor
@@ -256,7 +256,7 @@ struct Pose {
 	/// Pose aus kartesischen Punkt und Winkel erstellen
 	explicit constexpr
 	Pose(const Point& p, Angle a = Units::null) :
-		x(p.x), y(p.y), phi(a)
+		x(p.x), y(p.y), phi(norm_angle(a))
 	{ }
 
 	/// Position aus kartesischen Punkt übernehmen. Winkel wird nicht geändert.
