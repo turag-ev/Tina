@@ -30,12 +30,12 @@ struct Line
     
     ///
     /// \brief Line aus Startpunkt und Richtungsvektor erstellen
-    /// \param p Startpunkt
+    /// \param a Startpunkt
     /// \param dx X-Komponente des Richtungsvektors
     /// \param dy Y-Komponente des Richtungsvektors
     ///
-    constexpr Line(const Point& p, const Length dx, const Length dy) :
-        p(p), q(p.x + dx, p.y + dy)
+    constexpr Line(const Point& a, const Length dx, const Length dy) :
+        p(a), q(a.x + dx, a.y + dy)
     { }
     
     ///
