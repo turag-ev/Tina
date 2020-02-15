@@ -7,6 +7,16 @@ void QuadEncoder::init()
 {
     osalSysLock();
 
+#if STM32_HAS_TIM1
+    if (config_.timer == STM32_TIM1) {
+#ifdef STM32_TIM1_IS_USED
+        turag_warning("QuadEncoder::init(): Timer 1 is already used!");
+#endif // STM32_TIM1_IS_USED
+        rccEnableTIM1(FALSE);
+        rccResetTIM1();
+    }
+#endif // STM32_HAS_TIM1
+
 #if STM32_HAS_TIM2
     if (config_.timer == STM32_TIM2) {
 #ifdef STM32_TIM2_IS_USED
@@ -46,6 +56,16 @@ void QuadEncoder::init()
         rccResetTIM5();
     }
 #endif // STM32_HAS_TIM5
+
+#if STM32_HAS_TIM8
+    if (config_.timer == STM32_TIM8) {
+#ifdef STM32_TIM8_IS_USED
+        turag_warning("QuadEncoder::init(): Timer 8 is already used!");
+#endif // STM32_TIM8_IS_USED
+        rccEnableTIM8(FALSE);
+        rccResetTIM8();
+    }
+#endif // STM32_HAS_TIM8
 
     config_.timer->CR1  = 0;
     config_.timer->CR2  = 0;
