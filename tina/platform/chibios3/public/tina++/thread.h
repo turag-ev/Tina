@@ -2,25 +2,28 @@
 #define TINAPP_CHIBIOS_THREAD_H
 
 #include <ch.h>
+
 #include <cstddef>
+#include <atomic>
 
 #include <tina++/tina.h>
 #include <tina++/time.h>
 #include <tina++/helper/scoped_lock.h>
 
-#include <atomic>
-
-
 namespace TURAG {
 
 ////////////////////////////////////////////////////////////////////////////////
 // Thread
-extern "C" void _turag_thread_entry(void* data);
 
+class Runnable {
+public:
+    virtual void run() = 0;
+};
 
 class ThreadImpl
 {
     NOT_COPYABLE(ThreadImpl);
+    NOT_MOVABLE(ThreadImpl);
 
 protected:
     // should only be created through Thread
@@ -29,14 +32,21 @@ protected:
         thread_(nullptr), terminate_request_(false) { }
 
 public:
-    ~ThreadImpl() {}
+    using EntryFunction = void(*)();
 
-    void start(int priority, void (*entry) ()) {
-        thread_ = chThdCreateStatic(working_area_, stack_size_,
-                                NORMALPRIO + priority,
-                                (tfunc_t)_turag_thread_entry,
-                                (void*)entry);
-    }
+    ///
+    /// \brief Start thread using a C style function
+    /// \param priority Thread priority
+    /// \param entry C style function pointer
+    ///
+    void start(int priority, EntryFunction entry);
+
+    ///
+    /// \brief Start thread using a C++ object
+    /// \param priority Thread priority
+    /// \param runnable Pointer to object implementing the Runnable interface
+    ///
+    void start(int priority, Runnable* runnable);
 
     void terminate() {
       terminate_request_ = true;
@@ -56,9 +66,8 @@ private:
 
     std::atomic<bool> terminate_request_;
 };    
-    
-    
-    
+
+
 /**
  * \class Thread
  * \brief Plattform independent thread
@@ -67,8 +76,6 @@ private:
  */
 template<size_t size>
 class Thread : public ThreadImpl {
-    NOT_COPYABLE(Thread);
-
 public:
     explicit Thread() :
         ThreadImpl(working_area_, size) { }
@@ -103,14 +110,6 @@ public:
       chThdSleepUntil(time.toTicks());
   }
 };
-
-
-/// lets the current thread sleeps for a time of ecos ticks
-[[deprecated("Use CurrentThread::delay")]]
-_always_inline void Thread_delay(SystemTime ticks) {
-  chThdSleep(ticks.toTicks());
-}
-
 
 
 ////////////////////////////////////////////////////////////////////////////////

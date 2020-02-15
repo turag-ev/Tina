@@ -6,11 +6,15 @@
 
 namespace TURAG {
 
-extern "C"
-void _turag_thread_entry(void* data) {
-  void (*entry)(void) = (void (*)(void))data;
+static void turag_thread_cstyle_entry(void* data) {
+  ThreadImpl::EntryFunction entry = reinterpret_cast<ThreadImpl::EntryFunction>(data);
   entry();
+  chThdExit(1);
+}
 
+static void turag_thread_runnable_entry(void* data) {
+  Runnable* runnable = static_cast<Runnable*>(data);
+  runnable->run();
   chThdExit(1);
 }
 
@@ -31,15 +35,19 @@ std::size_t get_stack_usage(const char* working_area_base, std::size_t stack_siz
     return stack_size; //stack full
 }
 
+void ThreadImpl::start(int priority, EntryFunction entry) {
+    thread_ = chThdCreateStatic(working_area_, stack_size_, NORMALPRIO + priority,
+                                turag_thread_cstyle_entry, (void*)entry);
+}
+
+void ThreadImpl::start(int priority, Runnable* runnable) {
+    thread_ = chThdCreateStatic(working_area_, stack_size_, NORMALPRIO + priority,
+                                turag_thread_runnable_entry, static_cast<void*>(runnable));
+}
+
 std::size_t ThreadImpl::getStackUsage() const {
     return get_stack_usage(reinterpret_cast<const char*>(thread_->wabase), stack_size_);
 }
-
-extern "C"
-size_t turag_thread_get_stack_usage(const TuragThread* thread) {
-  return get_stack_usage(reinterpret_cast<const char*>(thread->thread->wabase), thread->stack_size);
-}
-
 
 extern "C" uint32_t __main_stack_base__, __main_stack_end__;
 std::size_t getMainStackUsage() { 
@@ -58,7 +66,6 @@ std::size_t getProcessStackUsage() {
 #else // CH_DBG_FILL_THREADS
 
 std::size_t ThreadImpl::getStackUsage() const { return 0; }
-extern "C" size_t turag_thread_get_stack_usage(const TuragThread* thread) { return 0; }
 
 std::size_t getMainStackUsage() { return 0; }
 std::size_t getProcessStackUsage() { return 0; }
