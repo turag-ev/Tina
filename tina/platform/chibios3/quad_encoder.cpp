@@ -7,35 +7,45 @@ void QuadEncoder::init()
 {
     osalSysLock();
 
+#if STM32_HAS_TIM2
     if (config_.timer == STM32_TIM2) {
 #ifdef STM32_TIM2_IS_USED
         turag_warning("QuadEncoder::init(): Timer 2 is already used!");
-#endif
+#endif // STM32_TIM2_IS_USED
         rccEnableTIM2(FALSE);
         rccResetTIM2();
-    } else if (config_.timer == STM32_TIM3) {
+    }
+#endif // STM32_HAS_TIM2
+
+#if STM32_HAS_TIM3
+    if (config_.timer == STM32_TIM3) {
 #ifdef STM32_TIM3_IS_USED
         turag_warning("QuadEncoder::init(): Timer 3 is already used!");
-#endif
+#endif // STM32_TIM3_IS_USED
         rccEnableTIM3(FALSE);
         rccResetTIM3();
-    } else if (config_.timer == STM32_TIM4) {
+    }
+#endif // STM32_HAS_TIM3
+
+#if STM32_HAS_TIM4
+    if (config_.timer == STM32_TIM4) {
 #ifdef STM32_TIM4_IS_USED
         turag_warning("QuadEncoder::init(): Timer 4 is already used!");
-#endif
+#endif // STM32_TIM4_IS_USED
         rccEnableTIM4(FALSE);
         rccResetTIM4();
-    } else if (config_.timer == STM32_TIM5) {
+    }
+#endif // STM32_HAS_TIM4
+
+#if STM32_HAS_TIM5
+    if (config_.timer == STM32_TIM5) {
 #ifdef STM32_TIM5_IS_USED
         turag_warning("QuadEncoder::init(): Timer 5 is already used!");
-#endif
+#endif // STM32_TIM5_IS_USED
         rccEnableTIM5(FALSE);
         rccResetTIM5();
-    } else {
-        osalSysUnlock();
-        turag_error("QuadEncoder::init(): Selected Timer is not supported!");
-        return;
     }
+#endif // STM32_HAS_TIM5
 
     config_.timer->CR1  = 0;
     config_.timer->CR2  = 0;
