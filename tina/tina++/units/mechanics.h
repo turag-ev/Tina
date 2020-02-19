@@ -37,7 +37,7 @@ typedef Quantity< dim_div<AngleDimension, QuadTimeDimension> > AngularAccelerati
 /// Typ für Motorkonstante
 typedef decltype(Torque() / Current()) MotorConstant;
 
-// TODO: Trägheitsmoment, ...
+typedef decltype(Torque() / AngularAcceleration()) MomentOfInertia;
 
 // Einheiten
 
