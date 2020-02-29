@@ -41,11 +41,7 @@ TuragSystemTime _turag_ticks_to_time(TuragSystemTicks ticks) {
 /// Frequenz der plattformabhängigen Ticks
 static _always_inline _constexpr_func
 unsigned turag_get_systick_frequency(void) {
-#if CH_KERNEL_MAJOR > 2
     return CH_CFG_ST_FREQUENCY;
-#else
-    return CH_FREQUENCY;
-#endif
 }
 
 static _always_inline _constexpr_func

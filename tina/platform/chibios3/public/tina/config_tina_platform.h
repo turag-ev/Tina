@@ -1,1 +1,12 @@
-#include "../../../chibios/public/tina/config_tina_platform.h"
+#ifndef TINA_CONFIG_TINA_PLATFORM_H
+#define TINA_CONFIG_TINA_PLATFORM_H
+
+/// ASCII-Zeichen für neue Zeile für Debugausgaben
+#define TURAG_DEBUG_NEWLINE "\n"
+
+#define __WORDSIZE 32
+
+#define TURAG_ATTR_SECTION_CCMDATA ATTR_SECTION_CCMDATA
+
+
+#endif // TINA_CONFIG_TINA_PLATFORM_H
