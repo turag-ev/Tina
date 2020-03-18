@@ -68,6 +68,12 @@ public:
     int publish() {
         return PublisherType::publish();
     }
+    
+    void publish_pending() {
+        if (fetch(SystemTime{0})) {
+            publish();
+        }
+    }
 };
 
 } // namespace TURAG
