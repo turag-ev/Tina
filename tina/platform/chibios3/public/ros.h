@@ -16,7 +16,10 @@ class ChibiOSHardware {
 
         template<typename StreamType>
         void setChannel(StreamType* channel) {
-            // TODO: Verify correct StreamType by comparing VMT
+            static_assert(std::is_same<decltype(channel_->vmt->gett), decltype(channel->vmt->gett)>::value,
+                          "channel must have a valid BaseChannel VMT!");
+            static_assert(std::is_same<decltype(channel_->vmt->write), decltype(channel->vmt->write)>::value,
+                          "channel must have a valid BaseChannel VMT!");
             channel_ = reinterpret_cast<BaseChannel*>(channel);
         }
 
