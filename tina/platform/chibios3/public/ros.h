@@ -1,36 +1,42 @@
 #ifndef ROS_H
 #define ROS_H
 
-#include "ch.h"
-#include "hal.h"
-#include "ros/node_handle.h"
+#include <type_traits>
 
-extern SerialUSBDriver SDU1;
+#include <ch.h>
+#include <hal.h>
+
+#include <ros/node_handle.h>
 
 namespace ros {
 
-template<typename T, T* io>
 class ChibiOSHardware {
     public:
         void init() { }
 
+        template<typename StreamType>
+        void setChannel(StreamType* channel) {
+            // TODO: Verify correct StreamType by comparing VMT
+            channel_ = reinterpret_cast<BaseChannel*>(channel);
+        }
+
         int read() {
-            return chnGetTimeout(iostream, TIME_IMMEDIATE);
+            return chnGetTimeout(channel_, TIME_IMMEDIATE);
         }
 
         void write(uint8_t* data, int length) {
-            chnWrite(iostream, data, length);
+            chnWrite(channel_, data, length);
         }
 
         unsigned long time() {
-            return chVTGetSystemTimeX();
+            return TIME_I2MS(chVTGetSystemTimeX());
         }
 
     protected:
-        BaseChannel* iostream = reinterpret_cast<BaseChannel*>(io);
+        BaseChannel* channel_ = nullptr;
 };
 
-using NodeHandle = NodeHandle_<ChibiOSHardware<SerialUSBDriver, &SDU1>, 50, 50, 1024, 1024>;
+using NodeHandle = NodeHandle_<ChibiOSHardware, 50, 50, 1024, 1024>;
 
 } // namespace ros
 
