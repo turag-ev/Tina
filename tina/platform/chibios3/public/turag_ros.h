@@ -70,7 +70,7 @@ public:
     }
     
     void publish_pending() {
-        if (fetch(SystemTime{0})) {
+        while (fetch(SystemTime{0})) {
             publish();
         }
     }
