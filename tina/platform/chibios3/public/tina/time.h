@@ -10,6 +10,9 @@
 extern "C" {
 #endif
 
+#define TURAG_TIME_IMMEDIATE_TICKS   TIME_IMMEDIATE
+#define TURAG_TIME_IMMEDIATE         _turag_ticks_to_time(TIME_IMMEDIATE)
+
 #define TURAG_TIME_INFINITE_TICKS   TIME_INFINITE
 #define TURAG_TIME_INFINITE         _turag_ticks_to_time(TIME_INFINITE)
 /* Wrapper defines for ChibiOS 19 */

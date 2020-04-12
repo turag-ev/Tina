@@ -57,6 +57,9 @@ unsigned turag_ticks_to_us(TuragSystemTime time) {
 	return time.value == 0 ? 0 : (((time.value - 1L) * 1000000L) / CH_FREQUENCY + 1L);
 }
 
+#define TURAG_TIME_IMMEDIATE_TICKS TIME_IMMEDIATE
+#define TURAG_TIME_IMMEDIATE _turag_ticks_to_time(TIME_IMMEDIATE)
+
 #define TURAG_TIME_INFINITE_TICKS TIME_INFINITE
 #define TURAG_TIME_INFINITE _turag_ticks_to_time(TIME_INFINITE)
 
