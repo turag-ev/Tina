@@ -172,7 +172,6 @@ contains(TINA, feldbus-host) {
       $$PWD/tina++/feldbus/host/legacystellantriebedevice.cpp \
       $$PWD/tina++/feldbus/host/aseb_tina.cpp \
       $$PWD/tina++/feldbus/host/bootloader_tina.cpp \
-      $$PWD/tina++/feldbus/host/dcmotor_tina.cpp \
       $$PWD/tina++/feldbus/host/device_tina.cpp \
       $$PWD/tina++/feldbus/host/feldbusabstraction.cpp
 
@@ -180,7 +179,6 @@ contains(TINA, feldbus-host) {
       $$PWD/tina++/feldbus/host/legacystellantriebedevice.h \
       $$PWD/tina++/feldbus/host/aseb.h \
       $$PWD/tina++/feldbus/host/bootloader.h \
-      $$PWD/tina++/feldbus/host/dcmotor.h \
       $$PWD/tina++/feldbus/host/device.h \
       $$PWD/tina++/feldbus/host/feldbusabstraction.h
 }
