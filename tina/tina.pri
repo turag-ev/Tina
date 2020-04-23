@@ -169,7 +169,7 @@ contains(TINA, statemachine) {
 
 contains(TINA, feldbus-host) {
   SOURCES += \
-      $$PWD/tina++/feldbus/host/aktor_tina.cpp \
+      $$PWD/tina++/feldbus/host/legacystellantriebedevice.cpp \
       $$PWD/tina++/feldbus/host/aseb_tina.cpp \
       $$PWD/tina++/feldbus/host/bootloader_tina.cpp \
       $$PWD/tina++/feldbus/host/dcmotor_tina.cpp \
@@ -177,7 +177,7 @@ contains(TINA, feldbus-host) {
       $$PWD/tina++/feldbus/host/feldbusabstraction.cpp
 
   HEADERS  += \
-      $$PWD/tina++/feldbus/host/aktor.h \
+      $$PWD/tina++/feldbus/host/legacystellantriebedevice.h \
       $$PWD/tina++/feldbus/host/aseb.h \
       $$PWD/tina++/feldbus/host/bootloader.h \
       $$PWD/tina++/feldbus/host/dcmotor.h \
