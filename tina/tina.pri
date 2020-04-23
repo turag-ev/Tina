@@ -174,8 +174,6 @@ contains(TINA, feldbus-host) {
       $$PWD/tina++/feldbus/host/bootloader_tina.cpp \
       $$PWD/tina++/feldbus/host/dcmotor_tina.cpp \
       $$PWD/tina++/feldbus/host/device_tina.cpp \
-      $$PWD/tina++/feldbus/host/farbsensor_tina.cpp \
-      $$PWD/tina++/feldbus/host/servo_tina.cpp \
       $$PWD/tina++/feldbus/host/feldbusabstraction.cpp
 
   HEADERS  += \
@@ -184,9 +182,6 @@ contains(TINA, feldbus-host) {
       $$PWD/tina++/feldbus/host/bootloader.h \
       $$PWD/tina++/feldbus/host/dcmotor.h \
       $$PWD/tina++/feldbus/host/device.h \
-      $$PWD/tina++/feldbus/host/farbsensor.h \
-      $$PWD/tina++/feldbus/host/sensor.h \
-      $$PWD/tina++/feldbus/host/servo.h \
       $$PWD/tina++/feldbus/host/feldbusabstraction.h
 }
 
