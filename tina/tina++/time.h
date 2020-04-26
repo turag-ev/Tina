@@ -135,6 +135,12 @@ public:
         return turag_get_current_tick();
     }
 
+    /// keine Zeit (sofort) für Parameter
+    const
+    static SystemTime immediate() {
+        return SystemTime(TURAG_TIME_IMMEDIATE_TICKS);
+    }
+
     /// unendliche Zeit für Parameter
     constexpr
     static SystemTime infinite() {

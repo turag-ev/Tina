@@ -149,7 +149,7 @@ protected:
 
   _always_inline bool tryLock() {
     if(chThdGetSelfX())
-      return chMtxTryLock(&mut_) == TRUE;
+      return chMtxTryLock(&mut_);
     else
       return true;
   }

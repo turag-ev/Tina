@@ -1,7 +1,7 @@
 #ifndef STELLANTRIEBEDEVICE_H
 #define STELLANTRIEBEDEVICE_H
 #include <tina++/feldbus/host/device.h>
-#include <tina++/feldbus/host/aktor.h>
+#include <tina++/feldbus/host/legacystellantriebedevice.h>
 #include <type_traits>
 #include <cstring>
 
@@ -18,8 +18,8 @@ public:
     { }
 
     bool init();
-    using WriteAccess = Feldbus::Aktor::Command_t::WriteAccess;
-    using CommandLength = Feldbus::Aktor::Command_t::CommandLength;
+    using WriteAccess = Feldbus::LegacyStellantriebeDevice::Command_t::WriteAccess;
+    using CommandLength = Feldbus::LegacyStellantriebeDevice::Command_t::CommandLength;
     enum class CommandType {
         real, control
     };
@@ -60,6 +60,8 @@ protected:
     struct TypeCommandLength<int16_t,dummy> { static constexpr auto value = CommandLength::length_short; };
     template<typename dummy>
     struct TypeCommandLength<int32_t,dummy> { static constexpr auto value = CommandLength::length_long; };
+    template<typename dummy>
+    struct TypeCommandLength<float,dummy>   { static constexpr auto value = CommandLength::length_float; };
 
     class CommandBase {
     public:

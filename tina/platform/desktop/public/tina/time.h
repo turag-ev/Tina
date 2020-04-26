@@ -63,6 +63,9 @@ unsigned turag_ticks_to_us(TuragSystemTime time) {
 #define UINT64_MAX     18446744073709551615ULL
 #endif
 
+#define TURAG_TIME_IMMEDIATE_TICKS 0ULL
+#define TURAG_TIME_IMMEDIATE _turag_ticks_to_time(0ULL)
+
 #define TURAG_TIME_INFINITE_TICKS UINT64_MAX
 #define TURAG_TIME_INFINITE _turag_ticks_to_time(UINT64_MAX)
 
