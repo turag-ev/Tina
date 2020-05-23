@@ -262,6 +262,9 @@ unsigned ticks_to_s(SystemTime time) {
     return turag_ticks_to_s(time);
 }
 
+static_assert(SystemTime::fromSecDouble(1.234567) == SystemTime::fromUsec(1234567),
+              "System::fromSecDouble does not work correctly!");
+
 } // namespace TURAG
 
 #endif // TINAPP_SIM_TIME_H
