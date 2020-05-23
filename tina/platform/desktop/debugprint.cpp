@@ -7,8 +7,7 @@
 
 extern "C"
 void turag_debug_vprintf(const char* fmt, va_list vargs) {
-    QString buffer;
-    buffer.vsprintf(fmt, vargs);
+    QString buffer = QString::vasprintf(fmt, vargs);
     va_end(vargs);
 
     qDebug().noquote() << buffer.mid(3, buffer.length() - 4).toLocal8Bit();

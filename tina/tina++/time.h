@@ -71,7 +71,7 @@ public:
     /// Systemzeit aus \p s Sekunden in Double erstellen (wird in us umgewandelt und dann konvertiert)
     constexpr
     static SystemTime fromSecDouble(double s) {
-        return turag_us_to_ticks((double)1e6*s);
+        return turag_us_to_ticks(1e6*s);
     }
     
     /// Systemzeit aus Zeiteinheit \p time erstellen
