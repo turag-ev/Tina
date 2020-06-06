@@ -78,6 +78,18 @@ struct Vector {
         return Vector(x - other.x, y - other.y);
     }
 
+    /// Vektor invertieren
+    constexpr
+    Vector operator-() const {
+        return Vector(-x, -y);
+    }
+
+    /// Vektor um Winkel rotieren
+    math_constexpr
+    Vector rotate(Angle a) const {
+        return Vector(x * cos(a) - y * sin(a), x * sin(a) + y * cos(a));
+    }
+
     /// zwei Punkte vergleichen
     constexpr
     bool operator==(const Vector<U>& other) const {
