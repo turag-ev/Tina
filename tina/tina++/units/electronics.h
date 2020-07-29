@@ -65,8 +65,8 @@ constexpr Frequency::UnitType MHz(UnitFactor(1000) * kHz.factor);
 
 #if __cplusplus >= 201103L
 
-inline namespace MyLiterals {
-inline namespace MyUnitsLiterals {
+inline namespace Literals {
+inline namespace UnitsLiterals {
 
 /// \ingroup UnitsDefs
 /// \{
@@ -102,7 +102,7 @@ constexpr Units::Frequency operator"" _MHz(long long unsigned x) { return x * Un
 } // inline namespace Literals
 
 namespace Units {
-    using namespace MyLiterals::MyUnitsLiterals;
+    using namespace Literals::UnitsLiterals;
 } // namespace Units
 
 #endif
