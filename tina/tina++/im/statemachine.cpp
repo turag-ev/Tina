@@ -17,14 +17,14 @@ class RedoState final : public State {
 public:
 	RedoState() : State("Error") {}
 protected:
-	State* transition_function(bool) { return nullptr; }
+	State* transition_function(bool) { return this; }
 };
 
 class FinishedState final : public State {
 public:
 	FinishedState() : State("Finished") {}
 protected:
-	State* transition_function(bool) { return nullptr; }
+	State* transition_function(bool) { return this; }
 };
 
 RedoState redo_state;

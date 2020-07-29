@@ -71,7 +71,7 @@ public:
     /// Systemzeit aus \p s Sekunden in Double erstellen (wird in us umgewandelt und dann konvertiert)
     constexpr
     static SystemTime fromSecDouble(double s) {
-        return turag_us_to_ticks((double)1e6*s);
+        return turag_us_to_ticks(1e6*s);
     }
     
     /// Systemzeit aus Zeiteinheit \p time erstellen
@@ -261,6 +261,9 @@ constexpr _always_inline
 unsigned ticks_to_s(SystemTime time) {
     return turag_ticks_to_s(time);
 }
+
+static_assert(SystemTime::fromSecDouble(1.234567) == SystemTime::fromUsec(1234567),
+              "System::fromSecDouble does not work correctly!");
 
 } // namespace TURAG
 

@@ -144,8 +144,7 @@
  * @{
  */
 #define RS485_STELLANTRIEBE_DC_KEY_SWITCH_STATUS (0x11)
-#define RS485_STELLANTRIEBE_DC_KEY_RETURN_TO_HOME (0x12) // requests the slave to return to some defined position where it adjusts \
-                                                         // its current angle appropriately, takes velocity as argument
+#define RS485_STELLANTRIEBE_DC_KEY_RETURN_TO_HOME (0x12) // requests the slave to return to some defined position where it adjusts its current angle appropriately, takes velocity as argument
 ///@}
 
 /**
@@ -209,7 +208,8 @@
 #define TURAG_FELDBUS_STELLANTRIEBE_SERVO_MAX_CURRENT "maxCurrent"
 #define TURAG_FELDBUS_STELLANTRIEBE_SERVO_CTR_MODE "ctrMode"
 #define TURAG_FELDBUS_STELLANTRIEBE_SERVO_ENABLE "enable"
-#define TURAG_FLEDBUD_STELLANTRIEBE_SERVO_INVERT "inversionFactor"
+#define TURAG_FLEDBUS_STELLANTRIEBE_SERVO_INVERT "inversionFactor"
+#define TURAG_FELDBUS_STELLANTRIEBE_SERVO_HAS_POSITION_REACHED "hasReached"
 ///@}
 
 /**
