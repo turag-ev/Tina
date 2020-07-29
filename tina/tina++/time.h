@@ -23,7 +23,7 @@ public:
     /// explizit aus Einheitentyp erstellen
     constexpr explicit
     SystemTime(Units::Time time) :
-        value(turag_ms_to_ticks(time.toInt(Units::ms)).value)
+        value(turag_us_to_ticks(time.toInt(Units::us)).value)
     { }
 
     /// implizit Systemzeit aus äquivalenten C-Typ erstellen
