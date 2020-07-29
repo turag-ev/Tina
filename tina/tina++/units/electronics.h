@@ -71,30 +71,30 @@ inline namespace UnitsLiterals {
 /// \ingroup UnitsDefs
 /// \{
 
-constexpr Units::Voltage operator"" _V(long double x) { return x * Units::V; }
-constexpr Units::Voltage operator"" _V(long long unsigned x) { return x * Units::V; }
-constexpr Units::Voltage operator"" _mV(long double x) { return x * Units::mV; }
-constexpr Units::Voltage operator"" _mV(long long unsigned x) { return x * Units::mV; }
+constexpr Units::Voltage operator""_V(long double x) { return x * Units::V; }
+constexpr Units::Voltage operator""_V(long long unsigned x) { return x * Units::V; }
+constexpr Units::Voltage operator""_mV(long double x) { return x * Units::mV; }
+constexpr Units::Voltage operator""_mV(long long unsigned x) { return x * Units::mV; }
 
-constexpr Units::Power operator"" _W(long double x) { return x * Units::W; }
-constexpr Units::Power operator"" _W(long long unsigned x) { return x * Units::W; }
-constexpr Units::Power operator"" _mW(long double x) { return x * Units::mW; }
-constexpr Units::Power operator"" _mW(long long unsigned x) { return x * Units::mW; }
+constexpr Units::Power operator""_W(long double x) { return x * Units::W; }
+constexpr Units::Power operator""_W(long long unsigned x) { return x * Units::W; }
+constexpr Units::Power operator""_mW(long double x) { return x * Units::mW; }
+constexpr Units::Power operator""_mW(long long unsigned x) { return x * Units::mW; }
 
-constexpr Units::Resistance operator"" _Ohm(long double x) { return x * Units::Ohm; }
-constexpr Units::Resistance operator"" _Ohm(long long unsigned x) { return x * Units::Ohm; }
-constexpr Units::Resistance operator"" _mOhm(long double x) { return x * Units::mOhm; }
-constexpr Units::Resistance operator"" _mOhm(long long unsigned x) { return x * Units::mOhm; }
+constexpr Units::Resistance operator""_Ohm(long double x) { return x * Units::Ohm; }
+constexpr Units::Resistance operator""_Ohm(long long unsigned x) { return x * Units::Ohm; }
+constexpr Units::Resistance operator""_mOhm(long double x) { return x * Units::mOhm; }
+constexpr Units::Resistance operator""_mOhm(long long unsigned x) { return x * Units::mOhm; }
 
-constexpr Units::MagneticField operator"" _T(long double x) { return x * Units::T; }
-constexpr Units::MagneticField operator"" _T(long long unsigned x) { return x * Units::T; }
+constexpr Units::MagneticField operator""_T(long double x) { return x * Units::T; }
+constexpr Units::MagneticField operator""_T(long long unsigned x) { return x * Units::T; }
 
-constexpr Units::Frequency operator"" _Hz(long double x) { return x * Units::Hz; }
-constexpr Units::Frequency operator"" _Hz(long long unsigned x) { return x * Units::Hz; }
-constexpr Units::Frequency operator"" _kHz(long double x) { return x * Units::kHz; }
-constexpr Units::Frequency operator"" _kHz(long long unsigned x) { return x * Units::kHz; }
-constexpr Units::Frequency operator"" _MHz(long double x) { return x * Units::MHz; }
-constexpr Units::Frequency operator"" _MHz(long long unsigned x) { return x * Units::MHz; }
+constexpr Units::Frequency operator""_Hz(long double x) { return x * Units::Hz; }
+constexpr Units::Frequency operator""_Hz(long long unsigned x) { return x * Units::Hz; }
+constexpr Units::Frequency operator""_kHz(long double x) { return x * Units::kHz; }
+constexpr Units::Frequency operator""_kHz(long long unsigned x) { return x * Units::kHz; }
+constexpr Units::Frequency operator""_MHz(long double x) { return x * Units::MHz; }
+constexpr Units::Frequency operator""_MHz(long long unsigned x) { return x * Units::MHz; }
 
 /// \}
 
