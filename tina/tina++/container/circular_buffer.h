@@ -64,13 +64,6 @@ public:
     queue_(other.queue_), pos_(other.pos_)
   { }
 
-  CircularBufferIterator& operator=(const CircularBufferIterator &other)
-  {
-      queue_ = other.queue_;
-      pos_ = other.pos_;
-      return *this;
-  }
-
   template<typename OtherContainer>
   CircularBufferIterator& operator=(const CircularBufferIterator<OtherContainer> &other)
   {
