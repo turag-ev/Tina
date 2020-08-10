@@ -14,9 +14,6 @@
 
 namespace TURAG {
 
-template<typename... _Cond>
-using Require = typename std::enable_if<std::__and_<_Cond...>::value>::type;
-
 template<typename Container, class Enable = void>
 struct container_traits { };
 
