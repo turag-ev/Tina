@@ -24,6 +24,14 @@
 # include <tina/utils/mini-printf.h>
 #endif
 
+//board reset broadcast enabled per default
+#ifndef TURAG_FELDBUS_SLAVE_DISABLE_BOARD_RESET_BROADCAST
+#define TURAG_FELDBUS_SLAVE_DISABLE_BOARD_RESET_BROADCAST 0
+#endif
+
+#if TURAG_FELDBUS_SLAVE_DISABLE_BOARD_RESET_BROADCAST == 0
+#include <tina/feldbus/protocol/turag_feldbus_fuer_bootloader.h>
+#endif
 
 namespace TURAG {
 namespace Feldbus {
@@ -236,10 +244,18 @@ FeldbusSize_t Base::processPacket(const uint8_t* message, FeldbusSize_t length, 
 		response[responseLength-1] = CRC8::calculate(response, responseLength-1);
 #endif
 		return responseLength;
-
 	// not every device protocol requires broadcasts, so we can save a few bytes here
 #if TURAG_FELDBUS_SLAVE_BROADCASTS_AVAILABLE
 	} else {
+#if TURAG_FELDBUS_SLAVE_DISABLE_BOARD_RESET_BROADCAST == 0
+		//check for enter bootloader broadcast
+		if(length == (2+1+1+1) && // address(2, because bootloader protocol) + protocol(1) + command(1) + checksum(1)
+			message[1] == TURAG_FELDBUS_BROADCAST_ADDR &&
+			message[2] == TURAG_FELDBUS_DEVICE_PROTOCOL_BOOTLOADER &&
+			message[3] == TURAG_FELDBUS_BOOTLOADER_COMMAND_ENTER_BOOTLOADER) {
+				Driver::resetBoard();
+		}
+#endif		
 		if (broadcastProcessor) {
 			if (length == 1 + TURAG_FELDBUS_SLAVE_CONFIG_ADDRESS_LENGTH) {
 				// compatibility mode to support deprecated Broadcasts without protocol-ID

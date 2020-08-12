@@ -79,6 +79,13 @@ public:
     static void start(ThreadImpl* thread, int prio);
 
     /**
+     * @brief Resettet den Mikrocontroller
+     * 
+     */
+    static void resetBoard() {
+        NVIC_SystemReset();
+    }
+    /**
      * @brief Schaltet die konfigurierte LED um.
      * 
      * Diese Funktion schaltet den Zustand der in init() konfigurierten LED um.
