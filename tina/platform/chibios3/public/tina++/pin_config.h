@@ -1,199 +1,214 @@
 #ifndef PIN_CONFIG_H_
 #define PIN_CONFIG_H_
+#include <utility>
+#include <cstddef>
+#include <hal.h>
 #include <config_tina.h>
 
-#define PINCONFIG_INPUT(port, pin, pulluppulldown) \
-	PINCONFIG(port, pin, Mode::INPUT, OutputData::HIGH, OutputType::PUSHPULL, OutputSpeed::HIGH, pulluppulldown, 0)
-
-#define PINCONFIG_OUTPUT(port, pin, outputdata, outputtype, outputspeed, pulluppulldown) \
-	PINCONFIG(port, pin, Mode::OUTPUT, outputdata, outputtype, outputspeed, pulluppulldown, 0)
-
-#define PINCONFIG_ANALOG(port, pin) \
-	PINCONFIG(port, pin, Mode::ANALOG, OutputData::HIGH, OutputType::PUSHPULL, OutputSpeed::HIGH, PullupPulldown::NONE, 0)
-
-#define PINCONFIG_ALTERNATE(port, pin, outputtype, pulluppulldown, alternate_function) \
-	PINCONFIG(port, pin, Mode::ALTERNATE, OutputData::HIGH, outputtype, OutputSpeed::HIGH, pulluppulldown, alternate_function)
-
-//generate default settings for all pins
-#define DEFAULT_PINCONFIG(mode_, od_, otype_, ospeed_, pupd_, af_) \
-	template<uintptr_t, unsigned> struct Pin { \
-		using cfg = PinConfig<mode_,od_,otype_,ospeed_,pupd_,af_>; \
-	}
-
-//override default settings for a specific pin. DEFAULT_PINCONFIG must be used before this
-#define PINCONFIG(port, pin, mode_, od_, otype_, ospeed_, pupd_, af_) \
-	template<> struct Pin<uintptr_t(port), pin> { \
-		using cfg = PinConfig<mode_,od_,otype_,ospeed_,pupd_,af_>; \
-	}
-
-enum class Mode {
-	INPUT = 0,
-	OUTPUT = 1,
-	ALTERNATE = 2,
-	ANALOG = 3
+enum class Port : uint8_t {
+    A,
+    B,
+    C,
+    D,
+    E,
+    F,
+    G,
+    H,
+    I,
+    J,
+    K
 };
 
-enum class OutputData {
-	LOW = 0,
-	HIGH = 1
-};
-enum class OutputType {
-	PUSHPULL = 0,
-	OPENDRAIN = 1
-};
-enum class OutputSpeed {
-	VERYLOW = 0,
-	LOW = 1, 
-	MEDIUM = 2,
-	HIGH = 3
-};
-enum class PullupPulldown {
-	NONE = 0,
-	PULLUP = 1,
-	PULLDOWN = 2
+enum class Mode : uint8_t {
+    INPUT = 0,
+    OUTPUT = 1,
+    ALTERNATE = 2,
+    ANALOG = 3
 };
 
-//template that stores parameters
-template<Mode mode_, OutputData od_, OutputType otype_, OutputSpeed ospeed_, PullupPulldown pupd_, unsigned af_>
+enum class OutputData : uint8_t {
+    LOW = 0,
+    HIGH = 1
+};
+
+enum class OutputType : uint8_t {
+    PUSHPULL = 0,
+    OPENDRAIN = 1
+};
+
+enum class OutputSpeed : uint8_t {
+    VERYLOW = 0,
+    LOW = 1,
+    MEDIUM = 2,
+    HIGH = 3
+};
+
+enum class PullupPulldown : uint8_t {
+    NONE = 0,
+    PULLUP = 1,
+    PULLDOWN = 2
+};
+
+
 struct PinConfig {
-	static constexpr Mode mode = mode_;
-	static constexpr OutputData od = od_;
-	static constexpr OutputType otype = otype_;
-	static constexpr OutputSpeed ospeed = ospeed_;
-	static constexpr PullupPulldown pupd = pupd_;
-	static constexpr unsigned af = af_;
+    constexpr PinConfig(Mode mode_, OutputData odata_, OutputType otype_, OutputSpeed ospeed_, PullupPulldown pupd_, uint8_t af_):
+        mode(static_cast<uint32_t>(mode_)),
+        odata(static_cast<uint32_t>(odata_)),
+        otype(static_cast<uint32_t>(otype_)),
+        ospeed(static_cast<uint32_t>(ospeed_)),
+        pupd(static_cast<uint32_t>(pupd_)),
+        af(af_)
+    { }
+    uint32_t mode;
+    uint32_t odata;
+    uint32_t otype;
+    uint32_t ospeed;
+    uint32_t pupd;
+    uint32_t af;
 };
 
-//convert configuration structures to bits in GPIO configuration registers
-#define MODER_BITS(port, pin) \
-	(static_cast<unsigned>(Pin<port, pin>::cfg::mode) << ((pin) * 2U))
-#define ODR_BITS(port, pin) \
-	(static_cast<unsigned>(Pin<port, pin>::cfg::od) << (pin))
-#define OTYPER_BITS(port, pin) \
-	(static_cast<unsigned>(Pin<port, pin>::cfg::otype) << (pin))
-#define OSPEEDR_BITS(port, pin) \
-	(static_cast<unsigned>(Pin<port, pin>::cfg::ospeed) << ((pin) * 2U))
-#define PUPDR_BITS(port, pin) \
-	(static_cast<unsigned>(Pin<port, pin>::cfg::pupd) << ((pin) * 2U))
-#define AFR_BITS(port, pin) \
-	((Pin<port,pin>::cfg::af) << (((pin) % 8U) * 4U))
+constexpr PinConfig InputPin(PullupPulldown pupd) {
+    return PinConfig(Mode::INPUT, OutputData::HIGH, OutputType::PUSHPULL, OutputSpeed::HIGH, pupd, 0);
+}
 
-//combine the values of x for pins 0 to 7 on a given port
-#define PORTL_VAL(port, x) \
- (x(port,0) | 	x(port,1) | 	x(port,2) | 	x(port,3) | \
-	x(port,4) | 	x(port,5) | 	x(port,6) | 	x(port,7))
-//combine the values of x for pins 8 to 15 on a given port
-#define PORTH_VAL(port, x) \
- (x(port,8) | 	x(port,9) | 	x(port,10)| 	x(port,11)| \
-	x(port,12)| 	x(port,13)| 	x(port,14)| 	x(port,15))
-//combine the values of x for all pins (0 to 15) on a given port
-#define PORT_VAL(port, x) \
-	(PORTL_VAL(port,x) | PORTH_VAL(port,x))
+constexpr PinConfig OutputPin(OutputData od, OutputType otype, OutputSpeed ospeed, PullupPulldown pupd) {
+    return PinConfig(Mode::OUTPUT, od, otype, ospeed, pupd, 0);
+}
 
-//generate sensible default pin configuration (should be identical to configuration on reset)
-#if !defined(TURAG_NO_DEFAULT_PINCONFIG) || (TURAG_NO_DEFAULT_PINCONFIG != 1)
-	//all pins floating input
-	DEFAULT_PINCONFIG(Mode::INPUT, OutputData::HIGH, OutputType::PUSHPULL, OutputSpeed::HIGH, PullupPulldown::NONE, 0);
-	// PA13 and PA14 are SWDIO and SWCLK programming pins on all known STM32
-	PINCONFIG_ALTERNATE(GPIOA, 13, OutputType::PUSHPULL, PullupPulldown::PULLUP, 0); //SWDIO
-	PINCONFIG_ALTERNATE(GPIOA, 14, OutputType::PUSHPULL, PullupPulldown::PULLDOWN, 0); // SWCLK
-#endif // TURAG_NO_DEFAULT_PINCONFIG
+constexpr PinConfig AnalogPin() {
+    return PinConfig(Mode::ANALOG, OutputData::HIGH, OutputType::PUSHPULL, OutputSpeed::HIGH, PullupPulldown::NONE, 0);
+}
 
-/*
-	ChibiOS PAL specific part
-*/
-//detect ChibiOS PAL, this requires ChibiOS' hal.h to be included beforehand
-#if HAL_USE_PAL 
+constexpr PinConfig AlternatePin(OutputType otype, PullupPulldown pupd, uint8_t af) {
+    return PinConfig(Mode::ALTERNATE, OutputData::HIGH, otype, OutputSpeed::HIGH, pupd, af);
+}
 
-//macros using ioline_t
-#define LINECONFIG_INPUT(line, pulluppulldown) \
-	PINCONFIG_INPUT(PAL_PORT(line), PAL_PAD(line), pulluppulldown)
+namespace {
+struct Pin {
+    explicit constexpr Pin(Port port, unsigned pin):
+        v((static_cast<unsigned>(port) << 8) | pin)
+    { }
+    constexpr operator uint32_t() const { return v; }
+private:
+    uint32_t v;
+};
+}
 
-#define LINECONFIG_OUTPUT(line, outputdata, outputtype, outputspeed, pulluppulldown) \
-	PINCONFIG_OUTPUT(PAL_PORT(line), PAL_PAD(line), outputdata, outputtype, outputspeed, pulluppulldown)
+static constexpr uint32_t bitwise_or() {
+    return 0;
+}
 
-#define LINECONFIG_ANALOG(line) \
-	PINCONFIG_ANALOG(PAL_PORT(line), PAL_PAD(line))
+template <typename... Ts>
+static constexpr uint32_t bitwise_or(uint32_t first, Ts... next) {
+    return first | bitwise_or(next...);
+}
 
-#define LINECONFIG_ALTERNATE(line, outputtype, pulluppulldown, alternate_function) \
-	PINCONFIG_ALTERNATE(PAL_PORT(line), PAL_PAD(line), outputtype, pulluppulldown, alternate_function)
+template <PinConfig (*pin_cfg)(Pin), Port port, std::size_t... pins>
+static constexpr uint32_t all_mode_bits(std::index_sequence<pins...>) {
+    return bitwise_or(pin_cfg(Pin(port,pins)).mode << (pins * 2U)...);
+}
 
-//generate part of ChibiOS' PALConfig structure for a given port
-#define PORT_CONFIG_CHIBIOS(port) \
-	_PORT_CONFIG_CHIBIOS((uintptr_t(port)))
+template <PinConfig (*pin_cfg)(Pin), Port port, std::size_t... pins>
+static constexpr uint32_t all_output_data_bits(std::index_sequence<pins...>) {
+    return bitwise_or(pin_cfg(Pin(port,pins)).odata << (pins * 1U)...);
+}
 
-#define _PORT_CONFIG_CHIBIOS(port) {\
-	PORT_VAL(port, MODER_BITS), \
-	PORT_VAL(port, OTYPER_BITS), \
-	PORT_VAL(port, OSPEEDR_BITS), \
-	PORT_VAL(port, PUPDR_BITS), \
-	PORT_VAL(port, ODR_BITS), \
-	PORTL_VAL(port, AFR_BITS), \
-	PORTH_VAL(port, AFR_BITS)	}
+template <PinConfig (*pin_cfg)(Pin), Port port, std::size_t... pins>
+static constexpr uint32_t all_output_type_bits(std::index_sequence<pins...>) {
+    return bitwise_or(pin_cfg(Pin(port,pins)).otype << (pins * 1U)...);
+}
+
+template <PinConfig (*pin_cfg)(Pin), Port port, std::size_t... pins>
+static constexpr uint32_t all_output_speed_bits(std::index_sequence<pins...>) {
+    return bitwise_or(pin_cfg(Pin(port,pins)).ospeed << (pins * 2U)...);
+}
+
+template <PinConfig (*pin_cfg)(Pin), Port port, std::size_t... pins>
+static constexpr uint32_t all_pullup_pulldown_bits(std::index_sequence<pins...>) {
+    return bitwise_or(pin_cfg(Pin(port,pins)).pupd << (pins * 2U)...);
+}
+
+template <PinConfig (*pin_cfg)(Pin), Port port, std::size_t... pins>
+static constexpr uint32_t low_alternate_function_bits(std::index_sequence<pins...>) {
+    return bitwise_or(pin_cfg(Pin(port,pins)).af << (pins * 4U)...);
+}
+
+template <PinConfig (*pin_cfg)(Pin), Port port, std::size_t... pins>
+static constexpr uint32_t high_alternate_function_bits(std::index_sequence<pins...>) {
+    return bitwise_or(pin_cfg(Pin(port,pins + 8)).af << (pins * 4U)...);
+}
 
 
-//define PORTCFG_* for ports wich exist on the device and empty placeholders for ports wich don't
+//having the values as template parameters enforces computation of bitfields at compile-time
+template<uint32_t mode_bits, uint32_t odr, uint32_t otyper, uint32_t ospeedr, uint32_t pupdr, uint32_t afrl, uint32_t afrh>
+static void configure_port(stm32_gpio_t* gpio) {
+    gpio->MODER = mode_bits;
+    gpio->ODR = odr;
+    gpio->OTYPER = otyper;
+    gpio->OSPEEDR = ospeedr;
+    gpio->PUPDR = pupdr;
+    gpio->AFRL = afrl;
+    gpio->AFRH = afrh;
+}
+
+template <PinConfig (*pin_cfg)(Pin), Port port>
+static void configure_port(stm32_gpio_t* gpio) {
+    configure_port<
+        all_mode_bits<pin_cfg, port>(std::make_index_sequence<16>{}),
+        all_output_data_bits<pin_cfg, port>(std::make_index_sequence<16>{}),
+        all_output_type_bits<pin_cfg, port>(std::make_index_sequence<16>{}),
+        all_output_speed_bits<pin_cfg, port>(std::make_index_sequence<16>{}),
+        all_pullup_pulldown_bits<pin_cfg, port>(std::make_index_sequence<16>{}),
+        low_alternate_function_bits<pin_cfg, port>(std::make_index_sequence<8>{}),
+        high_alternate_function_bits<pin_cfg, port>(std::make_index_sequence<8>{})>(gpio);
+}
+
+// function to be called by initialization code
+template <PinConfig (*pin_cfg)(Pin)>
+static void configure_gpio() {
 #if STM32_HAS_GPIOA
-# define PORTCFG_A PORT_CONFIG_CHIBIOS(GPIOA),
-#else
-# define PORTCFG_A
-#endif // STM32_HAS_GPIOA
+    configure_port<pin_cfg, Port::A>(GPIOA);
+#endif
 #if STM32_HAS_GPIOB
-# define PORTCFG_B PORT_CONFIG_CHIBIOS(GPIOB),
-#else
-# define PORTCFG_B
-#endif // STM32_HAS_GPIOB
+    configure_port<pin_cfg, Port::B>(GPIOB);
+#endif
 #if STM32_HAS_GPIOC
-# define PORTCFG_C PORT_CONFIG_CHIBIOS(GPIOC),
-#else
-# define PORTCFG_C
-#endif // STM32_HAS_GPIOC
+    configure_port<pin_cfg, Port::C>(GPIOC);
+#endif
 #if STM32_HAS_GPIOD
-# define PORTCFG_D PORT_CONFIG_CHIBIOS(GPIOD),
-#else
-# define PORTCFG_D
-#endif // STM32_HAS_GPIOD
+    configre_port<pin_cfg, Port::D>(GPIOD);
+#endif
 #if STM32_HAS_GPIOE
-# define PORTCFG_E PORT_CONFIG_CHIBIOS(GPIOE),
-#else
-# define PORTCFG_E
-#endif // STM32_HAS_GPIOE
+    configure_port<pin_cfg, Port::E>(GPIOE);
+#endif
 #if STM32_HAS_GPIOF
-# define PORTCFG_F PORT_CONFIG_CHIBIOS(GPIOF),
-#else
-# define PORTCFG_F
-#endif // STM32_HAS_GPIOF
+    configure_port<pin_cfg, Port::F>(GPIOF);
+#endif
 #if STM32_HAS_GPIOG
-# define PORTCFG_G PORT_CONFIG_CHIBIOS(GPIOG),
-#else
-# define PORTCFG_G
-#endif // STM32_HAS_GPIOG
+    configure_port<pin_cfg, Port::G>(GPIOG);
+#endif
 #if STM32_HAS_GPIOH
-# define PORTCFG_H PORT_CONFIG_CHIBIOS(GPIOH),
-#else
-# define PORTCFG_H
-#endif // STM32_HAS_GPIOH
+    configure_port<pin_cfg, Port::H>(GPIOH);
+#endif
 #if STM32_HAS_GPIOI
-# define PORTCFG_I PORT_CONFIG_CHIBIOS(GPIOI),
-#else
-# define PORTCFG_I
-#endif // STM32_HAS_GPIOI
+    configure_port<pin_cfg, Port::I>(GPIOI);
+#endif
 #if STM32_HAS_GPIOJ
-# define PORTCFG_J PORT_CONFIG_CHIBIOS(GPIOJ),
-#else
-# define PORTCFG_J
-#endif // STM32_HAS_GPIOJ
+    configure_port<pin_cfg, Port::J>(GPIOJ);
+#endif
 #if STM32_HAS_GPIOK
-# define PORTCFG_K PORT_CONFIG_CHIBIOS(GPIOK)
-#else
-# define PORTCFG_K
-#endif // STM32_HAS_GPIOK
+    configure_port<pin_cfg, Port::K>(GPIOK);
+#endif
+}
 
-#define DEFINE_PAL_CONFIG() const PALConfig pal_default_config = { \
-	PORTCFG_A PORTCFG_B PORTCFG_C PORTCFG_D PORTCFG_E \
-	PORTCFG_F PORTCFG_G PORTCFG_H PORTCFG_I PORTCFG_J \
-	PORTCFG_K }
-
-#endif // HAL_USE_PAL
+// sensible default pin config for all known STM32
+static constexpr PinConfig default_pin_cfg(Pin pin) {
+    switch(pin) {
+        case Pin(Port::A,13): return AlternatePin(OutputType::PUSHPULL, PullupPulldown::PULLDOWN, 0);
+        case Pin(Port::A,14): return AlternatePin(OutputType::PUSHPULL, PullupPulldown::PULLDOWN, 0);
+    default:
+        return InputPin(PullupPulldown::NONE);
+    }
+}
 
 #endif // PIN_CONFIG_H_
