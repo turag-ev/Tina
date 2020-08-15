@@ -176,7 +176,7 @@ static void configure_gpio() {
     configure_port<pin_cfg, Port::C>(GPIOC);
 #endif
 #if STM32_HAS_GPIOD
-    configre_port<pin_cfg, Port::D>(GPIOD);
+    configure_port<pin_cfg, Port::D>(GPIOD);
 #endif
 #if STM32_HAS_GPIOE
     configure_port<pin_cfg, Port::E>(GPIOE);
@@ -204,10 +204,9 @@ static void configure_gpio() {
 // sensible default pin config for all known STM32
 static constexpr PinConfig default_pin_cfg(Pin pin) {
     switch(pin) {
-        case Pin(Port::A,13): return AlternatePin(OutputType::PUSHPULL, PullupPulldown::PULLDOWN, 0);
-        case Pin(Port::A,14): return AlternatePin(OutputType::PUSHPULL, PullupPulldown::PULLDOWN, 0);
-    default:
-        return InputPin(PullupPulldown::NONE);
+    case Pin(Port::A,13): return AlternatePin(OutputType::PUSHPULL, PullupPulldown::PULLDOWN, 0);
+    case Pin(Port::A,14): return AlternatePin(OutputType::PUSHPULL, PullupPulldown::PULLDOWN, 0);
+    default: return InputPin(PullupPulldown::NONE);
     }
 }
 
