@@ -114,10 +114,10 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////
 // Mutex
+#if CH_CFG_USE_MUTEXES
 /**
  * NOTE: use ScopedLock to automatic unlock mutex.
  */
-
 class Mutex {
   NOT_COPYABLE(Mutex);
 
@@ -162,11 +162,12 @@ protected:
 private:
   mutex_t mut_;
 };
+#endif
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // ConditionVariable
-
+#if CH_CFG_USE_CONDVARS
 class ConditionVariable {
   NOT_COPYABLE(ConditionVariable);
 
@@ -244,13 +245,12 @@ private:
    condition_variable_t cond_;
   Mutex* mutex_;
 };
-
+#endif
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Mailbox
-#ifdef CH_USE_MAILBOXES
-
+#if CH_CFG_USE_MAILBOXES
 template<std::size_t size>
 class Mailbox {
 
@@ -293,14 +293,12 @@ public:
 
 };
 
-#endif // CH_USE_MAILBOXES
-
+#endif // CH_CFG_USE_MAILBOXES
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Semaphore
-
-
+#if CH_CFG_USE_SEMAPHORES
 class Semaphore {
   NOT_COPYABLE(Semaphore);
 
@@ -315,12 +313,12 @@ public:
   bool wait(SystemTime time);
   void signal(void) { chSemSignal(&sem_); }
 };
-
+#endif
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // BinarySemaphore
-
+#if CH_CFG_USE_SEMAPHORES
 class BinarySemaphore {
   NOT_COPYABLE(BinarySemaphore);
 
@@ -335,7 +333,7 @@ public:
   bool wait(SystemTime time);
   void signal(void) { chBSemSignal(&sem_); }
 };
-
+#endif
 
 
 } // namespace TURAG

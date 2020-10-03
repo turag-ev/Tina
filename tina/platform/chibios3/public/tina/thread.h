@@ -60,6 +60,7 @@ void turag_thread_set_name(const char* name) {
 ////////////////////////////////////////////////////////////////////////////////
 // C Interface Mutex
 
+#if CH_CFG_USE_MUTEXES
 typedef mutex_t TuragMutex;
 
 #define turag_mutex_init            chMtxObjectInit
@@ -67,11 +68,13 @@ typedef mutex_t TuragMutex;
 #define turag_mutex_lock            chMtxLock
 #define turag_mutex_try_lock        chMtxTryLock
 #define turag_mutex_unlock          chMtxUnlock
+#endif
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // C Interface Semaphore
 
+#if CH_CFG_USE_SEMAPHORES
 typedef semaphore_t TuragSemaphore;
 
 static inline void turag_semaphore_init(TuragSemaphore* sem, int32_t n) {
@@ -101,12 +104,13 @@ static inline bool turag_semaphore_try_wait(TuragSemaphore* sem) {
 static inline void turag_semaphore_signal(TuragSemaphore* sem) {
 	chSemSignal(sem);
 }
-
+#endif
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // C Interface Binary Semaphore
 
+#if CH_CFG_USE_SEMAPHORES
 typedef binary_semaphore_t TuragBinarySemaphore;
 
 static inline void turag_binary_semaphore_init(TuragBinarySemaphore* sem, bool taken) {
@@ -136,10 +140,13 @@ static inline bool turag_binary_semaphore_try_wait(TuragBinarySemaphore* sem) {
 static inline void turag_binary_semaphore_signal(TuragBinarySemaphore* sem) {
 	chBSemSignal(sem);
 }
+#endif
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // C Interface Condition Variable
+
+#if CH_CFG_USE_CONDVARS
 typedef struct {
 	condition_variable_t condvar;
 	TuragMutex* mutex;
@@ -167,6 +174,7 @@ static inline void turag_condition_variable_signal(TuragConditionVariable* cond)
 static inline void turag_condition_variable_broadcast(TuragConditionVariable* cond) {
 	chCondBroadcast(&cond->condvar);
 }
+#endif
 
 
 #ifdef __cplusplus
