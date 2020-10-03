@@ -263,7 +263,7 @@ public:
         mailbox_(_MAILBOX_DATA(mailbox_, pointer_buffer_, size)) { }
 
     bool post(void* msg, SystemTime time) {
-        if (chMBPost(&mailbox_, static_cast<msg_t>(msg), time.value) == MSG_OK) {
+        if (chMBPostTimeout(&mailbox_, static_cast<msg_t>(msg), time.value) == MSG_OK) {
             return true;
         } else {
             return false;
@@ -272,7 +272,7 @@ public:
     bool post(void* msg) { return post(msg, TIME_INFINITE); }
 
     bool postAhead(void* msg, SystemTime time) {
-        if (chMBPostAhead(&mailbox_, static_cast<msg_t>(msg), time.value) == MSG_OK) {
+        if (chMBPostAheadTimeout(&mailbox_, static_cast<msg_t>(msg), time.value) == MSG_OK) {
             return true;
         } else {
             return false;
@@ -283,7 +283,7 @@ public:
     void* fetch(SystemTime time) {
         msg_t msg;
 
-        if (chMBFetch(&mailbox_, &msg, time.value) == MSG_OK) {
+        if (chMBFetchTimeout(&mailbox_, &msg, time.value) == MSG_OK) {
             return static_cast<void*>(msg);
         } else {
             return nullptr;
