@@ -235,8 +235,8 @@
  * 
  */
 
-#ifndef TINA_FELDBUS_SLAVE_FELDBUS_AVR_H_
-#define TINA_FELDBUS_SLAVE_FELDBUS_AVR_H_
+#ifndef TINA_FELDBUS_SLAVE_AVR_FELDBUS_BASE_H
+#define TINA_FELDBUS_SLAVE_AVR_FELDBUS_BASE_H
 
 #include <tina/tina.h>
 #include <tina/helper/static_assert.h>
@@ -1074,4 +1074,4 @@ TURAG_INLINE void turag_feldbus_do_processing(void) {
 #endif
 
 
-#endif /* TINA_FELDBUS_SLAVE_FELDBUS_AVR_H_ */
+#endif // TINA_FELDBUS_SLAVE_AVR_FELDBUS_BASE_H

@@ -1,5 +1,5 @@
-#ifndef STELLANTRIEBEDEVICE_H
-#define STELLANTRIEBEDEVICE_H
+#ifndef TINAPP_FELDBUS_HOST_STELLANTRIEBEDEVICE_H
+#define TINAPP_FELDBUS_HOST_STELLANTRIEBEDEVICE_H
 #include <tina++/feldbus/host/device.h>
 #include <tina++/feldbus/host/legacystellantriebedevice.h>
 #include <type_traits>
@@ -165,7 +165,7 @@ private:
         struct Data {
             uint8_t key;
             T value;
-        } _packed;
+        } TURAG_PACKED;
         Request<Data> req;
         req.data.key = key;
         req.data.value = value; //assumes host is little-endian
@@ -177,4 +177,4 @@ private:
 } // namespace Feldbus
 } // namespace TURAG
 
-#endif // STELLANTRIEBEDEVICE_H
+#endif // TINAPP_FELDBUS_HOST_STELLANTRIEBEDEVICE_H

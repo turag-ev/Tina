@@ -1,5 +1,5 @@
-#ifndef TINA_ARRAY_H
-#define TINA_ARRAY_H
+#ifndef TINAPP_CONTAINER_ARRAY_BUFFER_H
+#define TINAPP_CONTAINER_ARRAY_BUFFER_H
 
 #include <iterator>
 #include <cassert>
@@ -293,7 +293,7 @@ public:
   /// // array = { 1 }
   /// \endcode
   void pop_back() {
-	if (unlikely(empty())) return;
+	if (TURAG_UNLIKELY(empty())) return;
 
 	length_--;
 	bytes_.erase(length_);
@@ -307,7 +307,7 @@ public:
   /// // array = {1, 2}
   /// \endcode
   void push_back(const value_type& val) {
-	if (unlikely(is_full())) return;
+	if (TURAG_UNLIKELY(is_full())) return;
 
 	bytes_.construct(length_, val);
 	length_++;
@@ -338,9 +338,9 @@ public:
   /// // array = { {x: 1, y: 2}, {x: 3, y: 4} }
   /// \endcode
   /// \param args Argumente für einen Konstruktor von Typ \a T um Element zu erstellen
-  template<class... Args> _always_inline
+  template<class... Args> TURAG_ALWAYS_INLINE
   void emplace_back(Args&&... args) {
-	if (unlikely(is_full())) return;
+	if (TURAG_UNLIKELY(is_full())) return;
 
 	bytes_.construct(length_, std::forward<Args>(args)...);
 	length_++;
@@ -360,7 +360,7 @@ public:
   /// Wie ArrayBuffer::emplace_back wird Element vorne angefügt. Dadurch müssen
   /// alle folgenden Elemente verschoben werden, was entsprechend Zeit kostet.
   /// \param args Argumente für einen Konstruktor von Typ \a T um Element zu erstellen
-  template<class... Args> _always_inline
+  template<class... Args> TURAG_ALWAYS_INLINE
   void emplace_front(Args&&... args) {
 	emplace(begin(), std::forward<Args>(args)...);
   }
@@ -397,7 +397,7 @@ public:
   /// \param val einzufügendes Element
   void insert(iterator position, const value_type& val)
   {
-	if (unlikely(is_full()))
+	if (TURAG_UNLIKELY(is_full()))
 	{
 	  turag_internal_error("ArrayBuffer overflow!");
 	  return;
@@ -454,9 +454,9 @@ public:
   /// \endcode
   /// \param position Iterator auf Element in Array an das Element eingefügt werden soll
   /// \param args Argumente für einen Konstruktor von Typ \a T um Element zu erstellen
-  template<class... Args> _always_inline
+  template<class... Args> TURAG_ALWAYS_INLINE
   void emplace(iterator position, Args&&... args) {
-	  if (unlikely(is_full()))
+	  if (TURAG_UNLIKELY(is_full()))
 	  {
 		turag_internal_error("ArrayBuffer overflow!");
 		return;
@@ -532,7 +532,7 @@ private:
   ArrayStorage<T, N> bytes_;
 
   bool is_full() {
-	  if (unlikely(size() == capacity())) {
+	  if (TURAG_UNLIKELY(size() == capacity())) {
 		turag_internal_error("ArrayBuffer overflow!");
 		return true;
 	  }
@@ -541,7 +541,7 @@ private:
 
   template<typename U, std::size_t M>
   void copy(const ArrayBuffer<U, M>& other) {
-	  if (unlikely(this == &other)) return;
+	  if (TURAG_UNLIKELY(this == &other)) return;
 
 	  std::size_t new_size = other.size();
 	  if (M > N) {
@@ -565,7 +565,7 @@ private:
 
   template<typename U, std::size_t M>
   void move(ArrayBuffer<U, M>&& other) {
-	  if (unlikely(this == &other)) return;
+	  if (TURAG_UNLIKELY(this == &other)) return;
 
 	  std::size_t new_size = other.size();
 	  if (M > N) {
@@ -606,4 +606,4 @@ static ArrayBuffer<size_t, N> sort_indexes(const ArrayBuffer<T, N> &v) {
 
 } // namespace TURAG
 
-#endif // TINA_ARRAY_H
+#endif // TINAPP_CONTAINER_ARRAY_BUFFER_H

@@ -1,5 +1,5 @@
-#ifndef TESTS_EXTENTIONS_H_
-#define TESTS_EXTENTIONS_H_
+#ifndef TESTS_EXTENTIONS_H
+#define TESTS_EXTENTIONS_H
 
 #include <iostream>
 
@@ -9,4 +9,4 @@ std::basic_ostream<C, T>& operator<<(std::basic_ostream<C, T>& os, std::nullptr_
   return os << (void*) nullptr;
 }
 
-#endif /* TESTS_EXTENTIONS_H_ */
+#endif // TESTS_EXTENTIONS_H

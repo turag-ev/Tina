@@ -6,8 +6,6 @@
 #include <cstring>
 
 #include "normalize.h"
-#include "normalize_type_traits.h"
-#include "macros.h"
 
 namespace TURAG {
 
@@ -19,25 +17,25 @@ namespace TURAG {
 /// \param args Argumente für Konstuktor
 /// \warning Nur verwenden, wenn C++ Instanz nicht selber verwaltet, weil
 /// zum Beispiel ein Bytepuffer verwendet wird.
-template<typename T, typename ...Args> _always_inline
+template<typename T, typename ...Args> TURAG_ALWAYS_INLINE
 void construct(T* ptr, Args&&... args) {
   ::new(ptr) T(std::forward<Args>(args)...);
 }
 
 #ifndef __DOXYGEN__
 
-template<typename T, REQUIRES(std::is_trivially_destructible<T>)> _always_inline
+template<typename T, typename std::enable_if<std::is_trivially_destructible<T>::value, bool>::type = false> TURAG_ALWAYS_INLINE
 void destruct(T*) { }
 
-template<typename T, REQUIRES(!std::is_trivially_destructible<T>)> _always_inline
+template<typename T, typename std::enable_if<!std::is_trivially_destructible<T>::value, bool>::type = false> TURAG_ALWAYS_INLINE
 void destruct(T* ptr) {
   ptr->~T();
 }
 
-template<typename ForwardIterator, REQUIRES(std::is_trivially_destructible<typename std::iterator_traits<ForwardIterator>::value_type>)> _always_inline
+template<typename ForwardIterator, typename std::enable_if<std::is_trivially_destructible<typename std::iterator_traits<ForwardIterator>::value_type>::value, bool>::type = false> TURAG_ALWAYS_INLINE
 void destruct(ForwardIterator, ForwardIterator) { }
 
-template<typename ForwardIterator, REQUIRES(!std::is_trivially_destructible<typename std::iterator_traits<ForwardIterator>::value_type>)>
+template<typename ForwardIterator, typename std::enable_if<!std::is_trivially_destructible<typename std::iterator_traits<ForwardIterator>::value_type>::value, bool>::type = false>
 void destruct(ForwardIterator first, ForwardIterator last) {
   for (; first != last; ++first) {
     destruct(std::addressof(*first));
@@ -188,8 +186,8 @@ struct copy_move_backward
 	}
 };
 
-template<typename _Category>
-struct copy_move_backward<true, false, _Category>
+template<typename Category>
+struct copy_move_backward<true, false, Category>
 {
 	template<typename BI1, typename BI2>
 	static BI2 copy_move_b(BI1 first, BI1 last, BI2 result)
@@ -403,8 +401,8 @@ struct uninitialized_copy_move_backward
 	}
 };
 
-template<typename _Category>
-struct uninitialized_copy_move_backward<true, false, _Category>
+template<typename Category>
+struct uninitialized_copy_move_backward<true, false, Category>
 {
 	template<typename BI1, typename BI2>
 	static BI2 copy_move_b(BI1 first, BI1 last, BI2 result)

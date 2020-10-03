@@ -1,5 +1,5 @@
-#ifndef TINA_FELDBUS_DYNAMIXEL_HEADER
-#define TINA_FELDBUS_DYNAMIXEL_HEADER
+#ifndef TINAPP_FELDBUS_DYNAMIXEL_DYNAMIXEL_H
+#define TINAPP_FELDBUS_DYNAMIXEL_DYNAMIXEL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -88,4 +88,4 @@ int turag_dxl_get_rxpacket_error(int errbit);
 }
 #endif
 
-#endif // TINA_FELDBUS_DYNAMIXEL_HEADER
+#endif // TINAPP_FELDBUS_DYNAMIXEL_DYNAMIXEL_H

@@ -45,11 +45,11 @@ typedef struct {
 } TuragTimeEvent;
 
 #ifndef __DOXYGEN__
-struct _TuragEventQueue;
+struct TuragEventQueue_s;
 #endif
 
 /// C-Dummy-Typ für Event-Schlangen
-typedef struct _TuragEventQueue TuragEventQueue;
+typedef struct TuragEventQueue_s TuragEventQueue;
 
 ////////////////////////////////////////////////////////////////////////////////
 //     EventQueue

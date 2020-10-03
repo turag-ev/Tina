@@ -1,5 +1,5 @@
-#ifndef TINA_CONCURRENT_LOCKED_H
-#define TINA_CONCURRENT_LOCKED_H
+#ifndef TINAPP_HELPER_LOCKED_H
+#define TINAPP_HELPER_LOCKED_H
 
 #include "scoped_lock.h"
 #include <tina++/thread.h>
@@ -70,4 +70,4 @@ private:
 
 } // namespace TURAG
 
-#endif // TINA_CONCURRENT_LOCKED_H
+#endif // TINAPP_HELPER_LOCKED_H

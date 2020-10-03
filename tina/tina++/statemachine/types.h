@@ -26,12 +26,6 @@ typedef std::function<void(EventId,EventArg)> EventMethod;
 typedef TuragEventMethod EventMethod;
 #endif
 
-#define NONCONSTEXPR_COPY_MOVABLE(ClassName) \
-    ClassName(const ClassName&) = default; \
-    ClassName& operator=(const ClassName&) = default; \
-    ClassName(ClassName&&) = default; \
-    ClassName& operator=(ClassName&&) = default
-
 
 /// \brief Erstellt Namesraum für Event-Ids
 /// Die Funktion erstellt aus drei ASCII-Zeichen einen Namesraum für eine Event-ID
@@ -142,14 +136,10 @@ struct Event {
   Event(const EventClass* event_class, EventArg param, EventMethod method) :
 	event_class(event_class), param(param), method(method)
   { }
-
-  NONCONSTEXPR_COPY_MOVABLE(Event);
 };
 
 /// \brief zeitverzögertes Ereignis
 struct TimeEvent {
-    NONCONSTEXPR_COPY_MOVABLE(TimeEvent);
-
     /// \brief zugehöriges Ereignis was ausgelöst werden soll.
   Event     event;
 

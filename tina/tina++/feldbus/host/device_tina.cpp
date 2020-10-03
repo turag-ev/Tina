@@ -36,7 +36,7 @@ struct DeviceInfoInternal {
     uint8_t nameLength;
     uint8_t versioninfoLength;
     uint16_t uptimeFrequency;
-} _packed;
+} TURAG_PACKED;
 
 }
 
@@ -378,7 +378,7 @@ bool Device::receiveErrorCount(uint8_t command, uint32_t* buffer) {
 	// this seems to be required for proper alignment
 	struct Value {
 		uint32_t value;
-	} _packed;
+	} TURAG_PACKED;
 
 	Response<Value> response;
 	
@@ -410,7 +410,7 @@ bool Device::receiveAllSlaveErrorCount(uint32_t* counts) {
 		uint32_t overflowCount;
 		uint32_t lostPackagesCount;
 		uint32_t checksumErrorCount;
-	} _packed;
+	} TURAG_PACKED;
 
 	Response<Value> response;
 	

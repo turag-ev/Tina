@@ -13,14 +13,14 @@ namespace TURAG {
 
 /// Quadrat bilden
 template<typename T>
-constexpr _always_inline
+constexpr TURAG_ALWAYS_INLINE
 T sqr(T x) {
   return x * x;
 }
 
 /// Würfel bilden
 template<typename T>
-constexpr _always_inline
+constexpr TURAG_ALWAYS_INLINE
 T cbc(T x) {
   return x * x * x;
 }
@@ -31,14 +31,14 @@ T cbc(T x) {
 /// \retval 0.0f \f$ x = 0 \f$
 /// \retval -1.0f \f$ x < 0 \f$
 template<typename T>
-constexpr _always_inline
+constexpr TURAG_ALWAYS_INLINE
 int sgn(T x) {
   return (x > T(0)) ? 1 : (x < T(0)) ? -1 : 0;
 }
 
 /// \brief Gibt die Dreieckszahl für n zurück.
 /// https://de.wikipedia.org/wiki/Dreieckszahl
-constexpr _always_inline
+constexpr TURAG_ALWAYS_INLINE
 unsigned int triangular_number(unsigned int n) {
   return (n*(n+1))/2;
 }
@@ -55,7 +55,7 @@ constexpr float NaNf = std::numeric_limits<float>::quiet_NaN();
 
 /// \brief Prüfen ob zwei floats innerhalb der Toleranz Epsilon identisch sind
 template<typename T>
-math_constexpr
+TURAG_MATH_CONSTEXPR
 bool float_equal(T a, T b) {
   return std::abs(a - b) < std::numeric_limits<T>::epsilon();
 }

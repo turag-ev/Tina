@@ -1,5 +1,5 @@
-#ifndef INSTANCE_LIST
-#define INSTANCE_LIST
+#ifndef TINAPP_HELPER_INSTANCE_LIST_H
+#define TINAPP_HELPER_INSTANCE_LIST_H
 
 #include <type_traits>
 #include <tina++/tina.h>
@@ -96,5 +96,5 @@ InstanceList<T>* InstanceList<T>::last_ = nullptr;
 
 } // namespace TURAG
 
-#endif // INSTANCE_LIST
+#endif // TINAPP_HELPER_INSTANCE_LIST_H
 

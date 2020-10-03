@@ -6,8 +6,8 @@
  */
 
 
-#ifndef TINA_UTIL_XOR_CHECKSUM_H_
-#define TINA_UTIL_XOR_CHECKSUM_H_
+#ifndef TINA_CRC_XOR_CHECKSUM_H
+#define TINA_CRC_XOR_CHECKSUM_H
 
 
 #include <tina/tina.h>
@@ -66,4 +66,4 @@ TURAG_INLINE bool xor_checksum_check(const void* data, unsigned size, uint8_t ch
 #endif
 
 
-#endif /* TINA_UTIL_XOR_CHECKSUM_H_ */
+#endif // TINA_CRC_XOR_CHECKSUM_H

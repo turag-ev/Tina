@@ -32,7 +32,7 @@ Angle norm_angle(Angle x) {
 
 /// Winkel zwischen zwei Punkten berechnen
 template<typename T1, typename T2>
-math_constexpr _always_inline
+TURAG_MATH_CONSTEXPR TURAG_ALWAYS_INLINE
 Angle angle_between(const T1& a, const T2& b) {
   return atan2(b.y - a.y, b.x - a.x);
 }
@@ -85,7 +85,7 @@ struct Vector {
     }
 
     /// Vektor um Winkel rotieren
-    math_constexpr
+    TURAG_MATH_CONSTEXPR
     Vector rotate(Angle a) const {
         return Vector(x * cos(a) - y * sin(a), x * sin(a) + y * cos(a));
     }
@@ -117,7 +117,7 @@ struct Vector {
     }
 
     /// Betrag des Vektors ausgeben
-    math_constexpr inline
+    TURAG_MATH_CONSTEXPR inline
     U magnitude() const {
         return hypot(x, y);
     }
@@ -308,7 +308,7 @@ struct Pose {
 	}
 
     /// neue Pose erstellen, deren Winkel in Richtung des angegebenen Punkts zeigt.
-    math_constexpr Pose getTurnedPoseTowards(Point p) const {
+    TURAG_MATH_CONSTEXPR Pose getTurnedPoseTowards(Point p) const {
         return Pose(x, y, angle_between(toPoint(), p));
     }
 
@@ -327,13 +327,13 @@ struct Pose {
 
 	/// neuen, in Blickrichtung verschobenen Punkt erstellen
 	/// \param trans Länge, um den die Position in Winkelrichtung verschoben ist.
-	math_constexpr Pose getRelativePose(Length trans) const {
+	TURAG_MATH_CONSTEXPR Pose getRelativePose(Length trans) const {
 		return Pose(x + trans * cos(phi), y + trans * sin(phi), phi);
 	}
 
 	/// neuen, in Blickrichtung verschobene Punkt erstellen
 	/// \param other Vektor, um den die Position in Winkelrichtung verschoben ist.
-	math_constexpr Pose getRelativePose(const Point& other) const {
+	TURAG_MATH_CONSTEXPR Pose getRelativePose(const Point& other) const {
 		return Pose(x + other.x * cos(phi) - other.y * sin(phi),
 					y + other.x * sin(phi) + other.y * cos(phi),
 					phi);
@@ -363,7 +363,7 @@ struct Pose {
         return Pose(x, y, new_phi);
     }
     /// Winkel, um den rotiert werden muss, um auf Punkst p zu zeigen
-    math_constexpr Angle getAngleToPoint(const Point& p) const {
+    TURAG_MATH_CONSTEXPR Angle getAngleToPoint(const Point& p) const {
         return norm_angle(angle_between(*this, p) - phi);
     }
 };
@@ -380,7 +380,7 @@ typedef LinearAngular2d<Units::Acceleration, Units::AngularAcceleration> PoseAcc
 /// weil es immer zu Abweichungen kommt, deswegen sorgsam verwenden! Wenn zwei
 /// Posen vergliechen werden sollen, ist fast immer \ref TURAG::in_range besser geeignet.
 ///
-constexpr _always_inline
+constexpr TURAG_ALWAYS_INLINE
 bool operator==(const Pose& l, const Pose& r) {
   return (l.x == r.x) && (l.y == r.y) && (l.phi == r.phi);
 }
@@ -391,7 +391,7 @@ bool operator==(const Pose& l, const Pose& r) {
 /// weil es immer zu Abweichungen kommt, deswegen sorgsam verwenden! Wenn zwei
 /// Punkte vergliechen werden sollen, ist fast immer \ref TURAG::in_range besser geeignet.
 ///
-constexpr _always_inline
+constexpr TURAG_ALWAYS_INLINE
 bool operator==(const Point& l, const Point& r) {
   return (l.x == r.x) && (l.y == r.y);
 }
@@ -409,7 +409,7 @@ bool operator==(const Point& l, const Point& r) {
 /// }
 /// \endcode
 template<typename T1, typename T2>
-constexpr _always_inline
+constexpr TURAG_ALWAYS_INLINE
 Units::Area distance_sqr(const T1& a, const T2& b) {
   return sqr(a.x - b.x)  + sqr(a.y - b.y);
 }
@@ -425,22 +425,22 @@ Units::Area distance_sqr(const T1& a, const T2& b) {
 ///     und besser gegen Integer-Overflow schützt.
 ///
 template<typename T1, typename T2>
-math_constexpr _always_inline
+TURAG_MATH_CONSTEXPR TURAG_ALWAYS_INLINE
 Length distance(const T1& a, const T2& b) {
   return sqrt(distance_sqr(a, b));
 }
 
 /// einfachen Abstand zwischen zwei kartesischen Punkten zubestimmen.
-math_constexpr inline Length distance(const Point& a, const Point& b) { return hypot(b.x - a.x, b.y - a.y); }
+TURAG_MATH_CONSTEXPR inline Length distance(const Point& a, const Point& b) { return hypot(b.x - a.x, b.y - a.y); }
 
 /// einfachen Abstand zwischen zwei kartesischen Punkten zubestimmen.
-math_constexpr inline Length distance(const Pose&  a, const Point& b) { return hypot(b.x - a.x, b.y - a.y); }
+TURAG_MATH_CONSTEXPR inline Length distance(const Pose&  a, const Point& b) { return hypot(b.x - a.x, b.y - a.y); }
 
 /// einfachen Abstand zwischen zwei kartesischen Punkten zubestimmen.
-math_constexpr inline Length distance(const Point& a, const Pose&  b) { return hypot(b.x - a.x, b.y - a.y); }
+TURAG_MATH_CONSTEXPR inline Length distance(const Point& a, const Pose&  b) { return hypot(b.x - a.x, b.y - a.y); }
 
 /// einfachen Abstand zwischen zwei kartesischen Punkten zubestimmen.
-math_constexpr inline Length distance(const Pose&  a, const Pose&  b) { return hypot(b.x - a.x, b.y - a.y); }
+TURAG_MATH_CONSTEXPR inline Length distance(const Pose&  a, const Pose&  b) { return hypot(b.x - a.x, b.y - a.y); }
 
 /// Schauen ob Punkt \a a in einem maximalen Radius \a r zu Punkt \a b liegt.
 /// \returns \f$ (x_a - x_b)^2 + (y_a - y_b)^2 \leq r^2 \f$

@@ -40,7 +40,7 @@ extern "C" {
 ///   uint8_t version;
 ///   int16_t x;
 ///   int16_t y;
-/// } _packed;
+/// } TURAG_PACKED;
 ///
 /// //
 /// // Code
@@ -61,7 +61,7 @@ extern "C" {
 ///
 /// Da es dem Compiler freisteht zwischen den Einträgen in der Objektstruktur
 /// Leerräume zu erstellen (um z.B. die Performance zu steigern), sollte der
-/// Compiler angewiesen werden, auf diese Leerräume zu verzichten (\ref _packed).
+/// Compiler angewiesen werden, auf diese Leerräume zu verzichten (\ref TURAG_PACKED).
 /// Wird dies vergessen, kann es vorkommen, dass unter unterschiedlichen Compilern
 /// die Struktur eine andere Größe hat und damit die Binärdaten von der Endstelle nicht
 /// interpretiert werden können.
@@ -100,7 +100,7 @@ extern "C" {
 
 #ifndef __DOXYGEN__
 
-void _turag_binary_send(char source, char object_id, const void* object, size_t size);
+void turag_binary_send_impl(char source, char object_id, const void* object, size_t size);
 
 #endif // __DOXYGEN__
 
@@ -109,7 +109,7 @@ void _turag_binary_send(char source, char object_id, const void* object, size_t 
 /// \param object_id ein Zeichen als zuordnenbare Objekt-ID von Objekt aus Logquelle
 /// \param object Objektinstanz
 #define turag_binary_send(object_id, object) \
-	_turag_binary_send( \
+	turag_binary_send_impl( \
 	  TURAG_DEBUG_LOG_SOURCE[0], \
 	  object_id, \
 	  &object, sizeof(object))

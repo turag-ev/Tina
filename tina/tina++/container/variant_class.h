@@ -1,5 +1,5 @@
-#ifndef TINA_CONTAINER_VARIANT_CLASS_H
-#define TINA_CONTAINER_VARIANT_CLASS_H
+#ifndef TINAPP_CONTAINER_VARIANT_CLASS_H
+#define TINAPP_CONTAINER_VARIANT_CLASS_H
 
 #include <cassert>
 #include <type_traits>
@@ -211,16 +211,10 @@ public:
 	}
 
 private:
-#if GCC_VERSION < 40800
-	// some strange f*** compiler bug evaluates the wrong union size, when Variants...
-	// get passed through UnionStorage... ?!?
-	typename std::aligned_union<max_value(sizeof(Variants)...), Variants...>::type data_;
-#else
 	UnionStorage<Variants...> data_;
-#endif
     std::size_t active_idx_;
 };
 
 } // namespace TURAG
 
-#endif // TINA_CONTAINER_VARIANT_CLASS_H
+#endif // TINAPP_CONTAINER_VARIANT_CLASS_H

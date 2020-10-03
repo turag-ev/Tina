@@ -1,5 +1,5 @@
-#ifndef TINA_SIM_THREAD_H
-#define TINA_SIM_THREAD_H
+#ifndef PLATFORM_DESKTOP_PUBLIC_TINA_THREAD_H
+#define PLATFORM_DESKTOP_PUBLIC_TINA_THREAD_H
 
 #include <pthread.h>
 #include <unistd.h>
@@ -41,12 +41,12 @@ void turag_thread_delay(TuragSystemTime d);
 
 typedef pthread_mutex_t TuragMutex;
 
-static _always_inline void
+static TURAG_ALWAYS_INLINE void
 turag_mutex_init(TuragMutex* mutex) {
   pthread_mutex_init(mutex, NULL);
 }
 
-static _always_inline bool
+static TURAG_ALWAYS_INLINE bool
 turag_mutex_try_lock(TuragMutex* mutex) {
   return pthread_mutex_trylock(mutex) == 0;
 }
@@ -59,4 +59,4 @@ turag_mutex_try_lock(TuragMutex* mutex) {
 } // extern "C"
 #endif
 
-#endif // TINA_SIM_THREAD_H
+#endif // PLATFORM_DESKTOP_PUBLIC_TINA_THREAD_H

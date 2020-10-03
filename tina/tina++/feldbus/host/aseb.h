@@ -7,8 +7,8 @@
  */
 
 
-#ifndef TURAGFELDBUSASEB_H_
-#define TURAGFELDBUSASEB_H_
+#ifndef TINAPP_FELDBUS_HOST_ASEB_H
+#define TINAPP_FELDBUS_HOST_ASEB_H
 
 #include "device.h"
 #include <tina++/tina.h>
@@ -398,4 +398,4 @@ private:
 } // namespace Feldbus
 } // namespace TURAG
 
-#endif /* TURAGFELDBUSASEB_H_ */
+#endif // TINAPP_FELDBUS_HOST_ASEB_H

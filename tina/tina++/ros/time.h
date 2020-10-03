@@ -1,5 +1,5 @@
-#ifndef TIME_H
-#define TIME_H
+#ifndef TINAPP_ROS_TIME_H
+#define TINAPP_ROS_TIME_H
 
 #include <tina++/units.h>
 #include <tina++/time.h>
@@ -25,4 +25,4 @@ void convert(const ros::Time& in, Units::Time& out) {
 
 } // TURAG
 
-#endif // TIME_H
+#endif // TINAPP_ROS_TIME_H

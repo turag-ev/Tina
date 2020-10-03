@@ -30,53 +30,53 @@ namespace Feldbus {
 
 struct AktorGetShort {
     int16_t value;
-} _packed;
+} TURAG_PACKED;
 
 struct AktorGetLong {
     int32_t value;
-} _packed;
+} TURAG_PACKED;
 
 struct AktorGetFloat {
     float value;
-} _packed;
+} TURAG_PACKED;
 
 struct AktorSetChar {
     uint8_t key;
     int8_t value;
-} _packed;
+} TURAG_PACKED;
 
 struct AktorSetShort {
     uint8_t key;
     int16_t value;
-} _packed;
+} TURAG_PACKED;
 
 struct AktorSetLong {
     uint8_t key;
     int32_t value;
-} _packed;
+} TURAG_PACKED;
 
 struct AktorSetFloat {
     uint8_t key;
     float value;
-} _packed;
+} TURAG_PACKED;
 
 struct AktorGetCommandInfo {
     uint8_t key;
     uint8_t cmd0;
     uint8_t cmd1;
     uint8_t cmd2;
-} _packed;
+} TURAG_PACKED;
 
 struct AktorGetCommandInfoResponse {
     LegacyStellantriebeDevice::Command_t::WriteAccess writeAccess;
     LegacyStellantriebeDevice::Command_t::CommandLength length;
     float factor;
-} _packed;
+} TURAG_PACKED;
 
 struct AktorGetStructuredOutputControl {
     uint8_t key;
     uint8_t cmd;
-} _packed;
+} TURAG_PACKED;
 
 unsigned int LegacyStellantriebeDevice::getCommandsetLength(void) {
     if (commandSetPopulated) {

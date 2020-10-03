@@ -207,33 +207,29 @@ constexpr bool operator <  (SystemTime lhs, SystemTime rhs) { return lhs.toTicks
 /// \brief Systemzeit vergleichen
 constexpr bool operator >  (SystemTime lhs, SystemTime rhs) { return lhs.toTicks() >  rhs.toTicks();  }
 
-#if GCC_VERSION >= 40700 || defined(__DOXYGEN__)
-
 inline namespace Literals {
 inline namespace SystemTimeLiterals {
 
 /// \relates SystemTime
 /// \brief Systemzeit aus Sekundenangabe erstellen
-constexpr SystemTime operator"" _s(long double a) { return SystemTime::fromMsec(a / 1000.0L); }
+constexpr SystemTime operator""_s(long double a) { return SystemTime::fromMsec(a / 1000.0L); }
 /// \relates SystemTime
 /// \brief Systemzeit aus Sekundenangabe erstellen
-constexpr SystemTime operator"" _s(unsigned long long a) { return SystemTime::fromSec(a); }
+constexpr SystemTime operator""_s(unsigned long long a) { return SystemTime::fromSec(a); }
 
 /// \relates SystemTime
 /// \brief Systemzeit aus Millisekundenangabe erstellen
-constexpr SystemTime operator"" _ms(unsigned long long a) { return SystemTime::fromMsec(a); }
+constexpr SystemTime operator""_ms(unsigned long long a) { return SystemTime::fromMsec(a); }
 
 } // inline namespace SystemTimeLiterals
 } // inline namespace Literals
-
-#endif
 
 // alte Versionen:
 
 /// \relates SystemTime
 /// Systemzeit aus \p ms Millisekunden erstellen
 /// \deprecated benutze SystemTime::fromMsec
-constexpr _always_inline
+constexpr TURAG_ALWAYS_INLINE
 static SystemTime ms_to_ticks(unsigned ms) {
 	return turag_ms_to_ticks(ms);
 }
@@ -241,7 +237,7 @@ static SystemTime ms_to_ticks(unsigned ms) {
 /// Systemzeit aus \p s Sekunden erstellen
 /// \relates SystemTime
 /// \deprecated benutze SystemTime::fromSec
-constexpr _always_inline
+constexpr TURAG_ALWAYS_INLINE
 static SystemTime s_to_ticks(unsigned s) {
     return turag_s_to_ticks(s);
 }
@@ -249,7 +245,7 @@ static SystemTime s_to_ticks(unsigned s) {
 /// gespeicherte Systemzeit in Millisekunden
 /// \relates SystemTime
 /// \deprecated benutze SystemTime::toMsec
-constexpr _always_inline
+constexpr TURAG_ALWAYS_INLINE
 unsigned ticks_to_ms(SystemTime time) {
     return turag_ticks_to_ms(time);
 }
@@ -257,7 +253,7 @@ unsigned ticks_to_ms(SystemTime time) {
 /// gespeicherte Systemzeit in Sekunden
 /// \relates SystemTime
 /// \deprecated benutze SystemTime::toMsec
-constexpr _always_inline
+constexpr TURAG_ALWAYS_INLINE
 unsigned ticks_to_s(SystemTime time) {
     return turag_ticks_to_s(time);
 }
@@ -267,4 +263,4 @@ static_assert(SystemTime::fromSecDouble(1.234567) == SystemTime::fromUsec(123456
 
 } // namespace TURAG
 
-#endif // TINAPP_SIM_TIME_H
+#endif // TINAPP_TIME_H

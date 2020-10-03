@@ -7,8 +7,8 @@
  */
 
 
-#ifndef TINAPP_BLUETOOTH_BLUETOOTHBASE_H
-#define TINAPP_BLUETOOTH_BLUETOOTHBASE_H
+#ifndef TINAPP_BLUETOOTH_BLUETOOTH_BASE_H
+#define TINAPP_BLUETOOTH_BLUETOOTH_BASE_H
 
 #include <tina++/tina.h>
 #include <tina++/thread.h>
@@ -194,7 +194,7 @@ public:
      * @note Never access the given struct directly. It is used exclusively by
      * the bluetooth-thread.
      */
-    template<typename T> _always_inline bool addDataSink(uint8_t data_sink_id, SinkData<T>* storage_buffer, DataSinkNotificationHandler handler = nullptr) {
+    template<typename T> TURAG_ALWAYS_INLINE bool addDataSink(uint8_t data_sink_id, SinkData<T>* storage_buffer, DataSinkNotificationHandler handler = nullptr) {
         return addDataSink(data_sink_id, reinterpret_cast<uint8_t*>(storage_buffer), sizeof(*storage_buffer), handler);
     }
 
@@ -204,7 +204,7 @@ public:
      * @param[out] buffer Pointer to memory where the data sink's data will be copied to.
      * @return False if index was invalid, true otherwise.
      */
-    template<typename T> _always_inline bool getData(uint8_t data_sink_id, SinkData<T>* buffer) {
+    template<typename T> TURAG_ALWAYS_INLINE bool getData(uint8_t data_sink_id, SinkData<T>* buffer) {
         return getData(data_sink_id, reinterpret_cast<uint8_t*>(buffer), sizeof(*buffer));
     }
 
@@ -220,7 +220,7 @@ public:
      * @note Never access the given struct directly. It is used exclusively by
      * the bluetooth-thread.
      */
-    template<typename T> _always_inline bool addDataProvider(uint8_t destination, uint8_t data_provider_id, PushData<T>* storage_buffer) {
+    template<typename T> TURAG_ALWAYS_INLINE bool addDataProvider(uint8_t destination, uint8_t data_provider_id, PushData<T>* storage_buffer) {
         return addDataProvider(destination, data_provider_id, reinterpret_cast<uint8_t*>(storage_buffer), sizeof(*storage_buffer));
     }
 
@@ -235,7 +235,7 @@ public:
      *
      * This function will fail if the remote peer is disabled.
      */
-    template<typename T> _always_inline bool pushData(uint8_t destination, uint8_t data_provider_id, const PushData<T>& data) {
+    template<typename T> TURAG_ALWAYS_INLINE bool pushData(uint8_t destination, uint8_t data_provider_id, const PushData<T>& data) {
         return pushData(destination, data_provider_id, reinterpret_cast<const uint8_t*>(&data), sizeof(data));
     }
 
@@ -254,7 +254,7 @@ public:
      * only once, for example when pushing to the first peer. The remaining peers can be updated with this
      * version of pushData.
      */
-    template<typename T> _always_inline bool pushData(uint8_t destination, uint8_t data_provider_id) {
+    template<typename T> TURAG_ALWAYS_INLINE bool pushData(uint8_t destination, uint8_t data_provider_id) {
         return pushData(destination, data_provider_id);
     }
 
@@ -376,7 +376,7 @@ private:
     struct RpcData {
         uint8_t rpc_id;
         uint64_t param;
-    } _packed;
+    } TURAG_PACKED;
 
 
     struct InBuffer {
@@ -490,4 +490,4 @@ private:
 
 
 
-#endif // TINAPP_BLUETOOTH_BLUETOOTHBASE_H
+#endif // TINAPP_BLUETOOTH_BLUETOOTH_BASE_H

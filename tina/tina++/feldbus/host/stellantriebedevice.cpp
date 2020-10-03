@@ -14,13 +14,13 @@ struct GetCommandInfo {
     uint8_t cmd0;
     uint8_t cmd1;
     uint8_t cmd2;
-} _packed;
+} TURAG_PACKED;
 
 struct GetCommandInfoResponse {
     LegacyStellantriebeDevice::Command_t::WriteAccess writeAccess;
     LegacyStellantriebeDevice::Command_t::CommandLength length;
     float factor;
-} _packed;
+} TURAG_PACKED;
 
 bool StellantriebeDevice::init() {
     //query size of command set

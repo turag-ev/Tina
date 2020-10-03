@@ -10,7 +10,7 @@
 namespace TURAG {
 
 template<typename T, class Enable = void>
-struct _packed DebugObject
+struct TURAG_PACKED DebugObject
 {
 	DebugObject() = default;
 
@@ -25,7 +25,7 @@ struct _packed DebugObject
 
 // with empty data type
 template<typename T>
-struct _packed DebugObject<T, typename std::enable_if<std::is_empty<T>::value>::type>
+struct TURAG_PACKED DebugObject<T, typename std::enable_if<std::is_empty<T>::value>::type>
 {
 	unsigned char version;
 };

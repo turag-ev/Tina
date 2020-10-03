@@ -1,5 +1,5 @@
-#ifndef TINAPP_CONTAINER_THREADFIFO_H 
-#define TINAPP_CONTAINER_THREADFIFO_H
+#ifndef TINAPP_CONTAINER_THREAD_FIFO_H
+#define TINAPP_CONTAINER_THREAD_FIFO_H
 
 #include <tina++/tina.h>
 #include <tina++/thread.h>
@@ -15,7 +15,8 @@ namespace TURAG {
 /// beliebig vielen Producern und Consumern.
 template <typename T, std::size_t size>
 class ThreadFifo {
-	NOT_COPYABLE(ThreadFifo);
+	ThreadFifo(const ThreadFifo&) = delete;
+	ThreadFifo& operator=(const ThreadFifo&) = delete;
 
 private:
 	CircularBuffer<T, size> buffer_;
@@ -274,4 +275,4 @@ public:
 	
 }
 
-#endif // TINAPP_CONTAINER_THREADFIFO_H
+#endif // TINAPP_CONTAINER_THREAD_FIFO_H

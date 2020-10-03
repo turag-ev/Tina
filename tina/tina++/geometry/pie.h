@@ -1,5 +1,5 @@
-#ifndef PIE_H
-#define PIE_H
+#ifndef TINAPP_GEOMETRY_PIE_H
+#define TINAPP_GEOMETRY_PIE_H
 
 #include <array>
 #include <tina++/geometry/circle.h>
@@ -50,4 +50,4 @@ bool intersect(const Pie& pie, const Circle& circle);
 
 } // namespace TURAG
 
-#endif // PIE_H
+#endif // TINAPP_GEOMETRY_PIE_H

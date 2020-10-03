@@ -1,5 +1,5 @@
-#ifndef TINA_SIM_CAN_H
-#define TINA_SIM_CAN_H
+#ifndef PLATFORM_DESKTOP_PUBLIC_TINA_CAN_H
+#define PLATFORM_DESKTOP_PUBLIC_TINA_CAN_H
 
 // C Interface
 
@@ -23,4 +23,4 @@ TuragCanErrorCode turag_can_read_blackboard(const TuragCanBlackboard* object, vo
 } // extern "C"
 #endif
 
-#endif // TINA_SIM_CAN_H
+#endif // PLATFORM_DESKTOP_PUBLIC_TINA_CAN_H

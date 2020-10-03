@@ -1,5 +1,5 @@
-#ifndef TINA_SIM_DEBUGPRINT_H
-#define TINA_SIM_DEBUGPRINT_H
+#ifndef PLATFORM_DESKTOP_PUBLIC_TINA_DEBUGPRINT_H
+#define PLATFORM_DESKTOP_PUBLIC_TINA_DEBUGPRINT_H
 
 
 #ifdef QT_CORE_LIB
@@ -27,4 +27,4 @@ void turag_debug_vprintf(const char* fmt, va_list vargs);
 #endif // #ifdef QT_CORE_LIB
 
 
-#endif // TINA_SIM_DEBUGPRINT_H
+#endif // PLATFORM_DESKTOP_PUBLIC_TINA_DEBUGPRINT_H

@@ -23,33 +23,33 @@ namespace Feldbus {
 struct AsebGetInfo {
     uint8_t command;
     uint8_t index;
-} _packed;
+} TURAG_PACKED;
 
 struct AsebSet {
     uint8_t index;
     uint16_t value;
-} _packed;
+} TURAG_PACKED;
 
 struct AsebSetDigital {
     uint8_t index;
     uint8_t value;
-} _packed;
+} TURAG_PACKED;
 
 struct AsebGetAnalogFactor {
     float factor;
-} _packed;
+} TURAG_PACKED;
 
 struct AsebGetPwmMaxValue {
     uint16_t maxValue;
-} _packed;
+} TURAG_PACKED;
 
 struct AsebGetPwmValue {
     uint16_t value;
-} _packed;
+} TURAG_PACKED;
 
 struct AsebGetPwmFrequency {
     uint32_t frequency;
-} _packed;
+} TURAG_PACKED;
 
 
 bool ASEBBase::initialize(uint8_t* sync_buffer, unsigned sync_buffer_size,

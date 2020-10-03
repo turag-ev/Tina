@@ -1,5 +1,5 @@
-#ifndef TINAPP_HELPER_TRAITS_ALGORITHMS_H_
-#define TINAPP_HELPER_TRAITS_ALGORITHMS_H_
+#ifndef TINAPP_HELPER_TRAITS_ALGORITHMS_H
+#define TINAPP_HELPER_TRAITS_ALGORITHMS_H
 
 #include <type_traits>
 #include <utility>
@@ -100,4 +100,4 @@ struct min_integral_constant : std::integral_constant<
 
 } // namespace TURAG
 
-#endif /* TINAPP_HELPER_TRAITS_ALGORITHMS_H_ */
+#endif // TINAPP_HELPER_TRAITS_ALGORITHMS_H

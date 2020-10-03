@@ -1,5 +1,5 @@
-#ifndef TINAPP_CHIBIOS_THREAD_H
-#define TINAPP_CHIBIOS_THREAD_H
+#ifndef PLATFORM_CHIBIOS3_PUBLIC_TINAPP_THREAD_H
+#define PLATFORM_CHIBIOS3_PUBLIC_TINAPP_THREAD_H
 
 #include <ch.h>
 
@@ -22,8 +22,10 @@ public:
 
 class ThreadImpl
 {
-    NOT_COPYABLE(ThreadImpl);
-    NOT_MOVABLE(ThreadImpl);
+    ThreadImpl(const ThreadImpl&) = delete;
+    ThreadImpl& operator=(const ThreadImpl&) = delete;
+    ThreadImpl(ThreadImpl&&) = delete;
+    ThreadImpl& operator=(ThreadImpl&&) = delete;
 
 protected:
     // should only be created through Thread
@@ -98,15 +100,15 @@ private:
 
 public:
   /// lets the current thread sleep for a specified time
-  static _always_inline void delay(SystemTime time) {
+  static TURAG_ALWAYS_INLINE void delay(SystemTime time) {
     chThdSleep(time.toTicks());
   }
 
-  static _always_inline void setName(const char *name) {
+  static TURAG_ALWAYS_INLINE void setName(const char *name) {
     chRegSetThreadName(name);
   }
 
-  static _always_inline void delayUntil(SystemTime time) {
+  static TURAG_ALWAYS_INLINE void delayUntil(SystemTime time) {
       chThdSleepUntil(time.toTicks());
   }
 };
@@ -119,12 +121,13 @@ public:
  * NOTE: use ScopedLock to automatic unlock mutex.
  */
 class Mutex {
-  NOT_COPYABLE(Mutex);
+  Mutex(const Mutex&) = delete;
+  Mutex& operator=(const Mutex&) = delete;
 
 public:
   typedef ScopedLock<Mutex> Lock;
 
-  constexpr _always_inline
+  constexpr TURAG_ALWAYS_INLINE
   Mutex() :
     mut_(_MUTEX_DATA(mut_))
   { }
@@ -142,19 +145,19 @@ protected:
   // because in that case, there won't be a thread to assign the mutex to.
   // The proper solution would be to not use mutexes from initialization code,
   // but ¯\_(ツ)_/¯
-  _always_inline void lock() {
+  TURAG_ALWAYS_INLINE void lock() {
     if(chThdGetSelfX())
       chMtxLock(&mut_);
   }
 
-  _always_inline bool tryLock() {
+  TURAG_ALWAYS_INLINE bool tryLock() {
     if(chThdGetSelfX())
       return chMtxTryLock(&mut_);
     else
       return true;
   }
 
-  _always_inline void unlock() {
+  TURAG_ALWAYS_INLINE void unlock() {
     if(chThdGetSelfX())
       chMtxUnlock(&mut_);
   }
@@ -169,7 +172,8 @@ private:
 // ConditionVariable
 #if CH_CFG_USE_CONDVARS
 class ConditionVariable {
-  NOT_COPYABLE(ConditionVariable);
+  ConditionVariable(const ConditionVariable&) = delete;
+  ConditionVariable& operator=(const ConditionVariable&) = delete;
 
 public:
 	class Lock : public ScopedLock<Mutex> {
@@ -179,17 +183,17 @@ public:
 		      condvar_(condvar)
 		  { }
 
-		  _always_inline bool wait() {
+		  TURAG_ALWAYS_INLINE bool wait() {
 		      return condvar_.wait();
 		  }
 
 #if defined(CH_USE_CONDVARS_TIMEOUT) || defined(CH_CFG_USE_CONDVARS_TIMEOUT)
 
-		  _always_inline bool waitFor(SystemTime timeout) {
+		  TURAG_ALWAYS_INLINE bool waitFor(SystemTime timeout) {
               return condvar_.waitFor(timeout);
 		  }
 
-		  _always_inline bool waitUntil(SystemTime timeout) {
+		  TURAG_ALWAYS_INLINE bool waitUntil(SystemTime timeout) {
               return condvar_.waitUntil(timeout);
 		  }
 
@@ -200,12 +204,12 @@ public:
 	};
 
 public:
-  constexpr _always_inline
+  constexpr TURAG_ALWAYS_INLINE
   ConditionVariable(Mutex* mutex) :
     cond_(_CONDVAR_DATA(cond_)), mutex_(mutex)
   { }
 
-  _always_inline bool wait() {
+  TURAG_ALWAYS_INLINE bool wait() {
     return chCondWait(&cond_) != 0;
   }
 
@@ -229,11 +233,11 @@ public:
 
 #endif
 
-  _always_inline void signal() {
+  TURAG_ALWAYS_INLINE void signal() {
     chCondSignal(&cond_);
   }
 
-  _always_inline void broadcast() {
+  TURAG_ALWAYS_INLINE void broadcast() {
     chCondBroadcast(&cond_);
   }
 
@@ -300,7 +304,8 @@ public:
 // Semaphore
 #if CH_CFG_USE_SEMAPHORES
 class Semaphore {
-  NOT_COPYABLE(Semaphore);
+  Semaphore(const Semaphore&) = delete;
+  Semaphore& operator=(const Semaphore&) = delete;
 
 private:
   semaphore_t sem_;
@@ -320,7 +325,8 @@ public:
 // BinarySemaphore
 #if CH_CFG_USE_SEMAPHORES
 class BinarySemaphore {
-  NOT_COPYABLE(BinarySemaphore);
+  BinarySemaphore(const BinarySemaphore&) = delete;
+  BinarySemaphore& operator=(const BinarySemaphore&) = delete;
 
 private:
   binary_semaphore_t sem_;
@@ -338,4 +344,4 @@ public:
 
 } // namespace TURAG
 
-#endif // TINAPP_CHIBIOS_THREAD_H
+#endif // PLATFORM_CHIBIOS3_PUBLIC_TINAPP_THREAD_H

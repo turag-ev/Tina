@@ -1,5 +1,5 @@
-#ifndef ROS_LIB_TURAG_H_
-#define ROS_LIB_TURAG_H_
+#ifndef PLATFORM_CHIBIOS3_PUBLIC_TURAG_ROS_H
+#define PLATFORM_CHIBIOS3_PUBLIC_TURAG_ROS_H
 #include <ros.h>
 #include <tina++/container/thread_fifo.h>
 
@@ -78,4 +78,4 @@ public:
 
 } // namespace TURAG
 
-#endif // ROS_LIB_TURAG_H_
+#endif // PLATFORM_CHIBIOS3_PUBLIC_TURAG_ROS_H

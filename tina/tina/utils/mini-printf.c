@@ -105,7 +105,7 @@ mini_vsnprintf(char *buffer, unsigned int buffer_len, const char *fmt, va_list v
 	char ch;
 
     // (formerly nested function)
-#define _putc(c) \
+#define turag_mini_putc(c) \
 	do { \
 		if ((unsigned int)((pbuffer - buffer) + 1) >= buffer_len) \
 			break; \
@@ -115,7 +115,7 @@ mini_vsnprintf(char *buffer, unsigned int buffer_len, const char *fmt, va_list v
 	} while (0)
 
     // (formerly nested function)
-#define _puts(s, len) \
+#define turag_mini_puts(s, len) \
 	do { \
 		unsigned int i; \
         unsigned int len_ = (len); \
@@ -135,7 +135,7 @@ mini_vsnprintf(char *buffer, unsigned int buffer_len, const char *fmt, va_list v
 		if ((unsigned int)((pbuffer - buffer) + 1) >= buffer_len)
 			break;
 		if (ch!='%')
-			_putc(ch);
+			turag_mini_putc(ch);
 		else {
 			char zero_pad = 0;
 			char *ptr;
@@ -160,26 +160,26 @@ mini_vsnprintf(char *buffer, unsigned int buffer_len, const char *fmt, va_list v
 				case 'u':
 				case 'd':
 					len = mini_itoa(va_arg(va, unsigned int), 10, 0, (ch=='u'), bf, zero_pad);
-					_puts(bf, len);
+					turag_mini_puts(bf, len);
 					break;
 
 				case 'x':
 				case 'X':
 					len = mini_itoa(va_arg(va, unsigned int), 16, (ch=='X'), 1, bf, zero_pad);
-					_puts(bf, len);
+					turag_mini_puts(bf, len);
 					break;
 
 				case 'c' :
-					_putc((char)(va_arg(va, int)));
+					turag_mini_putc((char)(va_arg(va, int)));
 					break;
 
 				case 's' :
 					ptr = va_arg(va, char*);
-					_puts(ptr, mini_strlen(ptr));
+					turag_mini_puts(ptr, mini_strlen(ptr));
 					break;
 
 				default:
-					_putc(ch);
+					turag_mini_putc(ch);
 					break;
 			}
 		}

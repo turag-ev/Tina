@@ -1,5 +1,5 @@
-#ifndef CIRCULAR_BUFFER_H
-#define CIRCULAR_BUFFER_H
+#ifndef TINAPP_CONTAINER_CIRCULAR_BUFFER_H
+#define TINAPP_CONTAINER_CIRCULAR_BUFFER_H
 
 #include <cstddef>
 #include <iterator>
@@ -72,7 +72,7 @@ public:
       return *this;
   }
 
-  _always_inline
+  TURAG_ALWAYS_INLINE
   element_ref operator*() {
 	return (queue_.get())[pos_];
   }
@@ -98,7 +98,7 @@ public:
   }
 
   // function below are using only function above
-  _always_inline
+  TURAG_ALWAYS_INLINE
   element_pointer operator->()  {
     return &(operator*());
   }
@@ -348,7 +348,7 @@ public:
 
   // modifiers
   void pop_front() {
-	  if (unlikely(empty())) {
+	  if (TURAG_UNLIKELY(empty())) {
 		  turag_internal_error("CircularBuffer underflow!");
 		  return ;
 	  }
@@ -359,7 +359,7 @@ public:
   }
 
   void pop_back() {
-	if (unlikely(empty())) {
+	if (TURAG_UNLIKELY(empty())) {
 		turag_internal_error("CircularBuffer underflow!");
 		return ;
 	}
@@ -369,7 +369,7 @@ public:
   }
 
   void push_back(const T& x) {
-	if (unlikely(length_ >= capacity())) {
+	if (TURAG_UNLIKELY(length_ >= capacity())) {
 	  turag_internal_error("CircularBuffer overflow!");
       return ;
     }
@@ -380,7 +380,7 @@ public:
 
   template< class... Args >
   void emplace_back(Args&&... args) {
-	if (unlikely(length_ >= capacity())) {
+	if (TURAG_UNLIKELY(length_ >= capacity())) {
 	  turag_internal_error("CircularBuffer overflow!");
       return ;
     }
@@ -390,7 +390,7 @@ public:
   }
 
   void push_front(const T& x) {
-	  if (unlikely(length_ >= capacity())) {
+	  if (TURAG_UNLIKELY(length_ >= capacity())) {
 		  turag_internal_error("CircularBuffer overflow!");
 		  return ;
 	  }
@@ -402,7 +402,7 @@ public:
 
   template< class... Args >
   void emplace_front(Args&&... args) {
-	  if (unlikely(length_ >= capacity())) {
+	  if (TURAG_UNLIKELY(length_ >= capacity())) {
 		  turag_internal_error("CircularBuffer overflow!");
 		  return ;
 	  }
@@ -486,11 +486,11 @@ private:
 
   template<typename U, std::size_t M>
   void copy(const CircularBuffer<U, M>& other) {
-	  if (unlikely(this == &other)) return;
+	  if (TURAG_UNLIKELY(this == &other)) return;
 
 	  std::size_t new_size = other.size();
 	  if (M > N) {
-		  if (unlikely(new_size > capacity())) {
+		  if (TURAG_UNLIKELY(new_size > capacity())) {
 			  turag_internal_error("CircularBuffer overflow!");
 			  new_size = capacity();
 		  }
@@ -510,11 +510,11 @@ private:
 
   template<typename U, std::size_t M>
   void move(CircularBuffer<U, M>&& other) {
-	  if (unlikely(this == &other)) return;
+	  if (TURAG_UNLIKELY(this == &other)) return;
 
 	  std::size_t new_size = other.size();
 	  if (M > N) {
-		  if (unlikely(new_size > capacity())) {
+		  if (TURAG_UNLIKELY(new_size > capacity())) {
 			  turag_internal_error("CircularBuffer overflow!");
 			  new_size = capacity();
 		  }
@@ -544,4 +544,4 @@ using CircularBuffer = detail::CircularBuffer<T, next_power_of_two(N)>;
 
 } // namespace TURAG
 
-#endif // CIRCULAR_BUFFER_H
+#endif // TINAPP_CONTAINER_CIRCULAR_BUFFER_H

@@ -1,5 +1,5 @@
-#ifndef ROLLING_BUFFER_H
-#define ROLLING_BUFFER_H
+#ifndef TINAPP_CONTAINER_ROLLING_BUFFER_H
+#define TINAPP_CONTAINER_ROLLING_BUFFER_H
 
 #include "circular_buffer.h"
 
@@ -169,4 +169,4 @@ public:
 
 } // namespace TURAG
 
-#endif // ROLLING_BUFFER_H
+#endif // TINAPP_CONTAINER_ROLLING_BUFFER_H

@@ -1,5 +1,5 @@
-#ifndef TINA_H
-#define TINA_H
+#ifndef TINA_TINA_H
+#define TINA_TINA_H
 
 /**
  * \mainpage ReadMe
@@ -65,10 +65,6 @@
  * 
  */
 
-#ifdef TURAG_STD_CONFIG
-# warning TURAG_STD_CONFIG is deprecated. Use TURAG_NO_PROJECT_CONFIG and TURAG_NO_PLATFORM_CONFIG instead.
-#endif
-
 // include custom project configuration unless
 // this is deactivated
 #ifndef TURAG_NO_PROJECT_CONFIG
@@ -90,4 +86,4 @@
 #include "helper/types.h"
 #include "helper/macros.h"
 
-#endif // TINA_H
+#endif // TINA_TINA_H

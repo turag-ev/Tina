@@ -1,9 +1,8 @@
-#ifndef TINAPP_H
-#define TINAPP_H
+#ifndef TINAPP_TINA_H
+#define TINAPP_TINA_H
 
 #include <tina/tina.h>
 
 #include "helper/normalize.h"
-#include "helper/macros.h"
 
-#endif // TINAPP_H
+#endif // TINAPP_TINA_H

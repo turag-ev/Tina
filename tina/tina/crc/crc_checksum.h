@@ -3,8 +3,8 @@
  * Functions and types for CRC checks.
  */
 
-#ifndef __TINA_CRC_CRC_CHECKSUMS_H__
-#define __TINA_CRC_CRC_CHECKSUMS_H__
+#ifndef TINA_CRC_CRC_CHECKSUM_H
+#define TINA_CRC_CRC_CHECKSUM_H
 
 #include <tina/tina.h>
 
@@ -324,4 +324,4 @@ TURAG_INLINE bool turag_crc16_check(const void* data, size_t length, uint16_t ch
 
 #endif // __DOXYGEN__
 
-#endif      /* __TINA_CRC_CRC_CHECKSUMS_H__ */
+#endif // TINA_CRC_CRC_CHECKSUM_H

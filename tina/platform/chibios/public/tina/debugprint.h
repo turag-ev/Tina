@@ -1,5 +1,5 @@
-#ifndef TINA_CHIBIOS_DEBUGPRINT_H
-#define TINA_CHIBIOS_DEBUGPRINT_H
+#ifndef PLATFORM_CHIBIOS3_PUBLIC_TINA_DEBUGPRINT_H
+#define PLATFORM_CHIBIOS3_PUBLIC_TINA_DEBUGPRINT_H
 
 #include <stdarg.h>
 #include <tina/helper/macros.h>
@@ -11,4 +11,4 @@ void turag_debug_vprintf(const char* fmt, va_list vargs);
 
 TURAG_C_API_END
 
-#endif // TINA_CHIBIOS_DEBUGPRINT_H
+#endif // PLATFORM_CHIBIOS3_PUBLIC_TINA_DEBUGPRINT_H

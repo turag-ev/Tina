@@ -1,5 +1,5 @@
-#ifndef TINA_DEBUG_INTERNALDEBUG_H
-#define TINA_DEBUG_INTERNALDEBUG_H
+#ifndef TINA_DEBUG_INTERNAL_DEBUG_H
+#define TINA_DEBUG_INTERNAL_DEBUG_H
 
 #include <tina/debugprint.h>
 #include "print-impl.h"
@@ -26,9 +26,6 @@
 # define turag_internal_warning(msg) TURAG_MACRO_NOOP
 #endif
 
-#define _turag_print_error(msg) \
-	turag_debug_puts_impl(msg)
-
 #endif // __DOXYGEN__
 
-#endif // TINA_DEBUG_INTERNALDEBUG_H
+#endif // TINA_DEBUG_INTERNAL_DEBUG_H

@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef TURAG_FELDBUS_FUER_ASEB_H_
-#define TURAG_FELDBUS_FUER_ASEB_H_
+#ifndef TINA_FELDBUS_PROTOCOL_TURAG_FELDBUS_FUER_ASEB_H
+#define TINA_FELDBUS_PROTOCOL_TURAG_FELDBUS_FUER_ASEB_H
 
 
 #include "turag_feldbus_bus_protokoll.h"
@@ -59,4 +59,4 @@
 ///@}
 
 
-#endif
+#endif // TINA_FELDBUS_PROTOCOL_TURAG_FELDBUS_FUER_ASEB_H

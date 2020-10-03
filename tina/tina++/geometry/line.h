@@ -1,5 +1,5 @@
-#ifndef LINE_H
-#define LINE_H
+#ifndef TINAPP_GEOMETRY_LINE_H
+#define TINAPP_GEOMETRY_LINE_H
 
 #include "circle.h"
 #include "geometry.h"
@@ -42,7 +42,7 @@ struct Line
     /// \brief Länge der Linie ermitteln
     /// \return Länge der Linie
     ///
-    math_constexpr
+    TURAG_MATH_CONSTEXPR
     Length getLength() const {
         return distance(p, q);
     }
@@ -192,4 +192,4 @@ bool in_range(const Line& line, const Rect& rect, const Length r) {
 
 } // namespace TURAG
 
-#endif // LINE_H
+#endif // TINAPP_GEOMETRY_LINE_H

@@ -1,5 +1,5 @@
-#ifndef CONVERT_H
-#define CONVERT_H
+#ifndef TINAPP_ROS_CONVERT_H
+#define TINAPP_ROS_CONVERT_H
 
 #include "pose.h"
 #pragma GCC diagnostic push
@@ -26,4 +26,4 @@ Out convert(const In& in) {
 
 } // TURAG
 
-#endif // CONVERT_H
+#endif // TINAPP_ROS_CONVERT_H

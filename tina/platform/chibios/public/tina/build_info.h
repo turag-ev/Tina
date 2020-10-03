@@ -1,5 +1,5 @@
-#ifndef _BUILD_INFO_H
-#define _BUILD_INFO_H
+#ifndef PLATFORM_CHIBIOS3_PUBLIC_TINA_BUILD_INFO_H
+#define PLATFORM_CHIBIOS3_PUBLIC_TINA_BUILD_INFO_H
 
 #include <tina/helper/macros.h>
 
@@ -10,4 +10,4 @@ void turag_build_info(void);
 
 #endif // TURAG_USE_BUILDINFO
 
-#endif // _BUILD_INFO_H
+#endif // PLATFORM_CHIBIOS3_PUBLIC_TINA_BUILD_INFO_H

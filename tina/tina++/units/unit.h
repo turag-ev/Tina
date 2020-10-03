@@ -141,16 +141,12 @@ constexpr struct unsafe_t { } unsafe = { };
 // roundToInt
 #ifndef __DOXYGEN__
 namespace detail {
-  template<typename T, REQUIRES(std::is_floating_point<T>)> math_constexpr _always_inline
+  template<typename T, typename std::enable_if<std::is_floating_point<T>::value, bool>::type = false> TURAG_MATH_CONSTEXPR TURAG_ALWAYS_INLINE
   int roundToInt(T value) {
-#if GCC_VERSION < 40700 && !defined(ECOS)
-	return (value < 0.0f) ? ceil(value - 0.5f) : floor(value + 0.5f);
-#else
 	return ::lround(value);
-#endif
   }
 
-  template<typename T, REQUIRES(!std::is_floating_point<T>)> constexpr
+  template<typename T, typename std::enable_if<!std::is_floating_point<T>::value, bool>::type = false> constexpr
   int roundToInt(T value) {
 	return value;
   }
@@ -158,20 +154,16 @@ namespace detail {
 
 // toValue
 namespace detail {
-  template<typename T, REQUIRES2(!std::is_floating_point<T>::value || std::is_floating_point<Value>::value)>
+  template<typename T, typename std::enable_if<(!std::is_floating_point<T>::value || std::is_floating_point<Value>::value), bool>::type = false>
   constexpr
   Value toValue(T value) {
 	return value;
   }
 
-  template<typename T, REQUIRES2(std::is_floating_point<T>::value && !std::is_floating_point<Value>::value)>
+  template<typename T, typename std::enable_if<(std::is_floating_point<T>::value && !std::is_floating_point<Value>::value), bool>::type = false>
   constexpr
   Value toValue(T value) {
-#if GCC_VERSION < 40700 && !defined(ECOS)
-	return (value < 0.0) ? ceil(value - 0.5) : floor(value + 0.5);
-#else
 	return ::lroundf(value);
-#endif
   }
 }
 #endif

@@ -1,5 +1,5 @@
-#ifndef DYNAMIXELDEVICE_H
-#define DYNAMIXELDEVICE_H
+#ifndef TINAPP_FELDBUS_DYNAMIXEL_DYNAMIXELDEVICE_H
+#define TINAPP_FELDBUS_DYNAMIXEL_DYNAMIXELDEVICE_H
 
 #include <tina++/feldbus/dynamixel/dynamixel.h>
 #include <tina++/feldbus/host/device.h>
@@ -163,4 +163,4 @@ protected:
 } // namespace TURAG
 } // namespace Feldbus
 
-#endif // DYNAMIXELDEVICE_H
+#endif // TINAPP_FELDBUS_DYNAMIXEL_DYNAMIXELDEVICE_H

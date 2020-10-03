@@ -22,8 +22,8 @@
  * \see http://en.wikipedia.org/wiki/Base64
  */
 
-#ifndef TINA_UTILS_BASE64_H_
-#define TINA_UTILS_BASE64_H_
+#ifndef TINA_UTILS_BASE64_H
+#define TINA_UTILS_BASE64_H
 
 #include <tina/tina.h>
 
@@ -81,4 +81,4 @@ int turag_base64_decode(const uint8_t *encoded, size_t len, uint8_t *data);
 #endif
 
 
-#endif /* TINA_UTILS_BASE64_H_ */
+#endif // TINA_UTILS_BASE64_H

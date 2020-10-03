@@ -34,7 +34,7 @@ constexpr Angle angle_pi = M_PI * rad;
 /// sqr(4.f * Units::mm) // entspricht 8 mm
 /// \endcode
 template<typename Dim>
-constexpr _always_inline
+constexpr TURAG_ALWAYS_INLINE
 Units::Quantity<Units::dim_pow<Dim, std::ratio<2> > >
 sqr(Units::Quantity<Dim> arg) {
     return Units::Quantity< Units::dim_pow<Dim, std::ratio<2> > >
@@ -48,7 +48,7 @@ sqr(Units::Quantity<Dim> arg) {
 /// \code
 /// sqrt(4.f * Units::mm * Units::mm) // entspricht 2 mm
 /// \endcode
-template<typename Dim> math_constexpr _always_inline
+template<typename Dim> TURAG_MATH_CONSTEXPR TURAG_ALWAYS_INLINE
 Units::Quantity<Units::dim_root<Dim, std::ratio<2> >>
 sqrt(Units::Quantity<Dim> arg) {
     return Units::Quantity<Units::dim_root<Dim, std::ratio<2> >>
@@ -60,63 +60,63 @@ sqrt(Units::Quantity<Dim> arg) {
 namespace detail {
 
 // allgemeine Implementation über std::pow
-template<typename Pow, REQUIRES2(
+template<typename Pow, typename std::enable_if<(
          !(Pow::den == 1 && (Pow::num <= 4 && Pow::num >= 0)) && // Spezialversionen vorhanden
          !(Pow::num == 1 && (Pow::num <= 3 && Pow::num >= 0))    // Spezialversionen vorhanden
-         ), typename Dim>
-constexpr _always_inline
+         ), bool>::type = false, typename Dim>
+constexpr TURAG_ALWAYS_INLINE
 Units::Quantity<Units::dim_pow<Dim, Pow>>
 power_helper(Units::Quantity<Dim> arg) {
     return Units::Quantity<Units::dim_pow<Dim, Pow> >
             (std::pow(arg.value, Value(Pow::num) / Value(Pow::den)));
 }
 
-template<typename Pow, REQUIRES2(Pow::den == 1 && Pow::num == 0), typename Dim>
-constexpr _always_inline
+template<typename Pow, typename std::enable_if<(Pow::den == 1 && Pow::num == 0), bool>::type = false, typename Dim>
+constexpr TURAG_ALWAYS_INLINE
 Units::Quantity<Units::dim_pow<Dim, Pow>>
 power_helper(Units::Quantity<Dim> arg) {
   return Units::Quantity<Units::dim_pow<Dim, Pow>>(
               arg != 0. ? 1. : std::pow(arg, arg));
 }
 
-template<typename Pow, REQUIRES2(Pow::den == 1 && Pow::num == 1), typename Dim>
-constexpr _always_inline
+template<typename Pow, typename std::enable_if<(Pow::den == 1 && Pow::num == 1), bool>::type = false, typename Dim>
+constexpr TURAG_ALWAYS_INLINE
 Units::Quantity<Units::dim_pow<Dim, Pow> >
 power_helper(Units::Quantity<Dim> arg) {
   return arg;
 }
 
-template<typename Pow, REQUIRES2(Pow::den == 1 && Pow::num == 2), typename Dim>
-constexpr _always_inline
+template<typename Pow, typename std::enable_if<(Pow::den == 1 && Pow::num == 2), bool>::type = false, typename Dim>
+constexpr TURAG_ALWAYS_INLINE
 Units::Quantity<Units::dim_pow<Dim, Pow>>
 power_helper(Units::Quantity<Dim> arg) {
   return sqr(arg);
 }
 
-template<typename Pow, REQUIRES2(Pow::den == 1 && Pow::num == 3), typename Dim>
-constexpr _always_inline
+template<typename Pow, typename std::enable_if<(Pow::den == 1 && Pow::num == 3), bool>::type = false, typename Dim>
+constexpr TURAG_ALWAYS_INLINE
 Units::Quantity<Units::dim_pow<Dim, Pow>>
 power_helper(Units::Quantity<Dim> arg) {
   return Units::Quantity<Units::dim_pow<Dim, Pow>>
       (arg.value * arg.value * arg.value);
 }
 
-template<typename Pow, REQUIRES2(Pow::den == 1 && Pow::num == 4), typename Dim>
-constexpr _always_inline
+template<typename Pow, typename std::enable_if<(Pow::den == 1 && Pow::num == 4), bool>::type = false, typename Dim>
+constexpr TURAG_ALWAYS_INLINE
 Units::Quantity<Units::dim_pow<Dim, Pow>>
 power_helper(Units::Quantity<Dim> arg) {
   return sqr(sqr(arg));
 }
 
-template<typename Pow, REQUIRES2(Pow::den == 2 && Pow::num == 1), typename Dim>
-constexpr _always_inline
+template<typename Pow, typename std::enable_if<(Pow::den == 2 && Pow::num == 1), bool>::type = false, typename Dim>
+constexpr TURAG_ALWAYS_INLINE
 Units::Quantity<Units::dim_pow<Dim, Pow>>
 power_helper(Units::Quantity<Dim> arg) {
   return sqrt(arg);
 }
 
-template<typename Pow, REQUIRES2(Pow::den == 3 && Pow::num == 1), typename Dim>
-constexpr _always_inline
+template<typename Pow, typename std::enable_if<(Pow::den == 3 && Pow::num == 1), bool>::type = false, typename Dim>
+constexpr TURAG_ALWAYS_INLINE
 Units::Quantity<Units::dim_pow<Dim, Pow>>
 power_helper(Units::Quantity<Dim> arg) {
   return Units::Quantity< Units::dim_pow<Dim, Pow> >
@@ -137,7 +137,7 @@ power_helper(Units::Quantity<Dim> arg) {
 /// power<1,3>(27.f * Units::mm*Units::mm*Units::mm) // entspricht 3 mm
 /// \endcode
 template<std::intmax_t Num, std::intmax_t Denom = 1, typename Dim>
-constexpr _always_inline
+constexpr TURAG_ALWAYS_INLINE
 Units::Quantity<Units::dim_pow<Dim, std::ratio<Num, Denom> >>
 power(Units::Quantity<Dim> arg) {
     return detail::power_helper<std::ratio<Num, Denom> >(arg);
@@ -153,7 +153,7 @@ power(Units::Quantity<Dim> arg) {
 /// root<1,3>(3.f * Units::mm) // entspricht 27 mm^3
 /// \endcode
 template<std::intmax_t Num, std::intmax_t Denom = 1, typename Dim>
-constexpr _always_inline
+constexpr TURAG_ALWAYS_INLINE
 Units::Quantity< Units::dim_root<Dim, std::ratio<Num, Denom> >>
 root(Units::Quantity<Dim> arg) {
     return detail::power_helper<std::ratio<Denom, Num> >(arg);
@@ -167,7 +167,7 @@ root(Units::Quantity<Dim> arg) {
 /// abs(-4.f * Units::mm) // entspricht 4 mm
 /// \endcode
 template<typename Dim>
-constexpr _always_inline
+constexpr TURAG_ALWAYS_INLINE
 Units::Quantity<Dim>
 abs(Units::Quantity<Dim> arg) {
     return Units::Quantity<Dim>(std::abs(arg.value));
@@ -182,7 +182,7 @@ abs(Units::Quantity<Dim> arg) {
 /// max(-4.f * Units::mm, 6.f * Units::mm) // entspricht 6 mm
 /// \endcode
 template<typename Dim>
-constexpr _always_inline
+constexpr TURAG_ALWAYS_INLINE
 Units::Quantity<Dim>
 max(Units::Quantity<Dim> a, Units::Quantity<Dim> b) {
 	return Units::Quantity<Dim>((a.value > b.value) ? a.value : b.value);
@@ -197,7 +197,7 @@ max(Units::Quantity<Dim> a, Units::Quantity<Dim> b) {
 /// min(-4.f * Units::mm, 6.f * Units::mm) // entspricht -4 mm
 /// \endcode
 template<typename Dim>
-constexpr _always_inline
+constexpr TURAG_ALWAYS_INLINE
 Units::Quantity<Dim>
 min(Units::Quantity<Dim> a, Units::Quantity<Dim> b) {
 	return Units::Quantity<Dim>((a.value < b.value) ? a.value : b.value);
@@ -213,7 +213,7 @@ min(Units::Quantity<Dim> a, Units::Quantity<Dim> b) {
 /// saturate(-4.f * Units::mm, -1.f * Units::mm, 6.f * Units::mm) // entspricht -1 mm
 /// \endcode
 template<typename Dim>
-constexpr _always_inline
+constexpr TURAG_ALWAYS_INLINE
 Units::Quantity<Dim>
 saturate(Units::Quantity<Dim> val, Units::Quantity<Dim> min_val, Units::Quantity<Dim> max_val) {
 	return min(max(val, min_val), max_val);
@@ -229,7 +229,7 @@ saturate(Units::Quantity<Dim> val, Units::Quantity<Dim> min_val, Units::Quantity
 /// sgn(-4.f * Units::mm) // entspricht -1
 /// \endcode
 template<typename Dim>
-constexpr _always_inline
+constexpr TURAG_ALWAYS_INLINE
 int
 sgn(Units::Quantity<Dim> x) {
 	using namespace Units;
@@ -239,7 +239,7 @@ sgn(Units::Quantity<Dim> x) {
 /// Sinus berechnen
 /// \param arg Variable mit Einheit
 /// \returns \f$ \sin(arg) \f$
-math_constexpr _always_inline
+TURAG_MATH_CONSTEXPR TURAG_ALWAYS_INLINE
 Units::Real sin(Units::Angle arg) {
     return std::sin(arg.to(Units::rad));
 }
@@ -247,7 +247,7 @@ Units::Real sin(Units::Angle arg) {
 /// Kosinus berechnen
 /// \param arg Variable mit Einheit
 /// \returns \f$ \cos(arg) \f$
-math_constexpr _always_inline
+TURAG_MATH_CONSTEXPR TURAG_ALWAYS_INLINE
 Units::Real cos(Units::Angle arg) {
     return std::cos(arg.to(Units::rad));
 }
@@ -256,7 +256,7 @@ Units::Real cos(Units::Angle arg) {
 /// \param y,x Variable mit Einheit
 /// \returns \f$ \arctan( \frac{y}{x} ) \f$
 /// \post Ergebnis liegt im Bereich \f$ [\pi, -\pi) \f$.
-math_constexpr _always_inline
+TURAG_MATH_CONSTEXPR TURAG_ALWAYS_INLINE
 Units::Angle atan2(Units::Length y, Units::Length x) {
     return std::atan2(y.value, x.value) * Units::rad;
 }
@@ -266,20 +266,20 @@ Units::Angle atan2(Units::Length y, Units::Length x) {
 /// \return \f$ \sqrt{x^2 + y^2} \f$
 ///
 /// Ist sicher gegen Variablenüberlauf im Gegensatz zur manuellen Berechnung
-math_constexpr _always_inline
+TURAG_MATH_CONSTEXPR TURAG_ALWAYS_INLINE
 Units::Length hypot(Units::Length x, Units::Length y) {
     return Units::Length(::hypot(x.value, y.value));
 }
 
 /// Is value not a Number (NaN)
 template<typename Dim>
-constexpr _always_inline
+constexpr TURAG_ALWAYS_INLINE
 bool isnan(Units::Quantity<Dim> arg) {
 	return std::isnan(arg.value);
 }
 
 template<typename Dim>
-math_constexpr _always_inline
+TURAG_MATH_CONSTEXPR TURAG_ALWAYS_INLINE
 bool isfinite(Units::Quantity<Dim> arg) {
     return std::isfinite(arg.value);
 }

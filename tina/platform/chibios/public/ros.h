@@ -1,5 +1,5 @@
-#ifndef ROS_H
-#define ROS_H
+#ifndef PLATFORM_CHIBIOS3_PUBLIC_ROS_H
+#define PLATFORM_CHIBIOS3_PUBLIC_ROS_H
 
 #include <type_traits>
 
@@ -43,4 +43,4 @@ using NodeHandle = NodeHandle_<ChibiOSHardware, 50, 50, 1024, 1024>;
 
 } // namespace ros
 
-#endif /* ROS_H */
+#endif // PLATFORM_CHIBIOS3_PUBLIC_ROS_H

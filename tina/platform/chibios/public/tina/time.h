@@ -1,5 +1,5 @@
-#ifndef TINA_CHIBIOS_TIME_H
-#define TINA_CHIBIOS_TIME_H
+#ifndef PLATFORM_CHIBIOS3_PUBLIC_TINA_TIME_H
+#define PLATFORM_CHIBIOS3_PUBLIC_TINA_TIME_H
 
 #include <ch.h>
 
@@ -11,10 +11,10 @@ extern "C" {
 #endif
 
 #define TURAG_TIME_IMMEDIATE_TICKS   TIME_IMMEDIATE
-#define TURAG_TIME_IMMEDIATE         _turag_ticks_to_time(TIME_IMMEDIATE)
+#define TURAG_TIME_IMMEDIATE         turag_ticks_to_time(TIME_IMMEDIATE)
 
 #define TURAG_TIME_INFINITE_TICKS   TIME_INFINITE
-#define TURAG_TIME_INFINITE         _turag_ticks_to_time(TIME_INFINITE)
+#define TURAG_TIME_INFINITE         turag_ticks_to_time(TIME_INFINITE)
 /* Wrapper defines for ChibiOS 19 */
 #ifndef S2ST
 #define S2ST TIME_S2I
@@ -31,8 +31,8 @@ typedef struct {
 } TuragSystemTime;
 
 // only for intern use!!!
-static _always_inline _constexpr_func
-TuragSystemTime _turag_ticks_to_time(TuragSystemTicks ticks) {
+static TURAG_ALWAYS_INLINE TURAG_CONSTEXPR_FUNC
+TuragSystemTime turag_ticks_to_time(TuragSystemTicks ticks) {
 #ifndef __cplusplus
   TuragSystemTime result = {ticks};
   return result;
@@ -42,50 +42,50 @@ TuragSystemTime _turag_ticks_to_time(TuragSystemTicks ticks) {
 }
 
 /// Frequenz der plattformabhängigen Ticks
-static _always_inline _constexpr_func
+static TURAG_ALWAYS_INLINE TURAG_CONSTEXPR_FUNC
 unsigned turag_get_systick_frequency(void) {
     return CH_CFG_ST_FREQUENCY;
 }
 
-static _always_inline _constexpr_func
+static TURAG_ALWAYS_INLINE TURAG_CONSTEXPR_FUNC
 TuragSystemTime turag_s_to_ticks(int s) {
-  return _turag_ticks_to_time(S2ST(s));
+  return turag_ticks_to_time(S2ST(s));
 }
 
-static _always_inline _constexpr_func
+static TURAG_ALWAYS_INLINE TURAG_CONSTEXPR_FUNC
 TuragSystemTime turag_ms_to_ticks(int ms) {
-	return ms == 0 ? _turag_ticks_to_time(0) : _turag_ticks_to_time(MS2ST(ms));
+	return ms == 0 ? turag_ticks_to_time(0) : turag_ticks_to_time(MS2ST(ms));
 }
 
-static _always_inline _constexpr_func
+static TURAG_ALWAYS_INLINE TURAG_CONSTEXPR_FUNC
 TuragSystemTime turag_us_to_ticks(int us) {
-	return us == 0 ? _turag_ticks_to_time(0) : _turag_ticks_to_time(US2ST(us));
+	return us == 0 ? turag_ticks_to_time(0) : turag_ticks_to_time(US2ST(us));
 }
 
-static _always_inline _constexpr_func
+static TURAG_ALWAYS_INLINE TURAG_CONSTEXPR_FUNC
 unsigned turag_ticks_to_s(TuragSystemTime time) {
     return (time.value / turag_get_systick_frequency());
 }
 
-static _always_inline _constexpr_func
+static TURAG_ALWAYS_INLINE TURAG_CONSTEXPR_FUNC
 unsigned turag_ticks_to_ms(TuragSystemTime time) {
 	return time.value == 0 ? 0 : (((time.value - 1L) * 1000L) / turag_get_systick_frequency() + 1L);
 }
 
-static _always_inline _constexpr_func
+static TURAG_ALWAYS_INLINE TURAG_CONSTEXPR_FUNC
 unsigned turag_ticks_to_us(TuragSystemTime time) {
 	return time.value == 0 ? 0 : (((time.value - 1L) * 1000000L) / turag_get_systick_frequency() + 1L);
 }
 
 /// Get number of sys ticks since system start
-static _always_inline
+static TURAG_ALWAYS_INLINE
 TuragSystemTime turag_get_current_tick(void) { // [tick]
-  return _turag_ticks_to_time(chVTGetSystemTime());
+  return turag_ticks_to_time(chVTGetSystemTime());
 }
 
 #ifdef __cplusplus
 } // extern "C"
 #endif
 
-#endif // TINA_CHIBIOS_TIME_H
+#endif // PLATFORM_CHIBIOS3_PUBLIC_TINA_TIME_H
 

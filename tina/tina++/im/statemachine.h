@@ -191,8 +191,8 @@
  */
 
 
-#ifndef IM_STATEMACHINE_H
-#define IM_STATEMACHINE_H
+#ifndef TINAPP_IM_STATEMACHINE_H
+#define TINAPP_IM_STATEMACHINE_H
 
 #include <tina++/time.h>
 #include <tina++/statemachine.h>
@@ -312,7 +312,7 @@ protected:
      * \param event_class Event class of the event to add.
 	 * \param param Parameter object.
      */
-    template<typename T, REQUIRES(!std::is_integral<T>)> _always_inline
+    template<typename T, typename std::enable_if<!std::is_integral<T>::value, bool>::type = false> TURAG_ALWAYS_INLINE
     void emitEvent(const EventClass* event_class, T param) const {
       emitEvent(event_class, pack<EventArg>(param));
     }
@@ -711,7 +711,7 @@ private:
     void emitEvent(const EventClass* event_class, EventArg params = 0) const {
         if (eventqueue_ && event_class && event_class->id != EventQueue::event_null) eventqueue_->push(event_class, params, resultCallback_);
     }
-    template<typename T, REQUIRES(!std::is_integral<T>)> _always_inline
+    template<typename T, typename std::enable_if<!std::is_integral<T>::value, bool>::type = false> TURAG_ALWAYS_INLINE
     void push(const EventClass* event_class, T param) const {
       emitEvent(event_class, pack<EventArg>(param));
     }
@@ -765,4 +765,4 @@ private:
 } // namespace IM
 } // namespace TURAG
 
-#endif //IM_STATEMACHINE_H
+#endif // TINAPP_IM_STATEMACHINE_H

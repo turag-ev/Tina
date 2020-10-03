@@ -1,5 +1,5 @@
-#ifndef ERROROBSERVER_H
-#define ERROROBSERVER_H
+#ifndef TINAPP_DEBUG_ERROROBSERVER_H
+#define TINAPP_DEBUG_ERROROBSERVER_H
 
 #include <tina++/time.h>
 
@@ -224,4 +224,4 @@ private:
 } // namespace Debug
 } // namespace TURAG
 
-#endif // ERROROBSERVER_H
+#endif // TINAPP_DEBUG_ERROROBSERVER_H

@@ -38,7 +38,7 @@ EventQueue::EventQueue() :
 
 constexpr SystemTime EventQueue::max_tick_time;
 
-static _hot
+static TURAG_HOT_FUNC
 void print_debug_info(const Event& e) {
 #if TURAG_DEBUG_LEVEL > 3
   EventId id = e.event_class->id;
@@ -64,11 +64,11 @@ void print_debug_info(const Event& e) {
                 e.method ? "yes":"no");
   }
 #else
-  UNUSED(e);
+  TURAG_USE(e);
 #endif
 }
 
-_hot
+TURAG_HOT_FUNC
 bool EventQueue::loadEvent(Event* event) {
   if (!timequeue_.empty()) {
     SystemTime t = SystemTime::now();

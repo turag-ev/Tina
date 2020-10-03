@@ -150,7 +150,7 @@ namespace _detail
 {
   // Länge von Array
   template<class T, size_t N>
-  constexpr std::size_t length(T (&a)[N] _unused) noexcept
+  constexpr std::size_t length(T (&)[N]) noexcept
   {
 	return N;
   }

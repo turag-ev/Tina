@@ -14,7 +14,7 @@
 using namespace TURAG;
 
 extern "C"
-void _turag_binary_send(char source, char object_id, const void* object, size_t size) {
+void turag_binary_send_impl(char source, char object_id, const void* object, size_t size) {
 	constexpr std::size_t newline_size = length(TURAG_DEBUG_NEWLINE) - 1;
 	static_assert(newline_size == 0 || newline_size == 1 || newline_size == 2, "");
 

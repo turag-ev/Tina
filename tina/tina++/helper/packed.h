@@ -1,6 +1,9 @@
 #ifndef TINAPP_HELPER_PACKED_H
 #define TINAPP_HELPER_PACKED_H
 
+#include <cstring>
+#include <type_traits>
+
 namespace TURAG {
 
 /// \addtogroup Utils
@@ -55,6 +58,9 @@ namespace TURAG {
 ///
 /// \pre Bedingung ist das der Ausgangstyp \a Unpacked weniger oder gleich viel
 /// Speicherplatz benötigt als der Zieltyp \a Packed: `sizeof(Unpacked) <= sizeof(Packed)`
+/// Auserdem müssen sowohl \a Packed als auch \a Unpacked trivial kopierbar sein, d.h. dürfen keine
+/// Kopier-Konstruktoren oder Kopier-Zuweisungsoperatoren überladen oder keine Member enthalten, die
+/// nicht trivial kopierbar sind.
 ///
 /// \tparam Packed Typ in den Variable gepackt werden soll.
 /// \tparam Unpacked Typ von Variable in Grundzustand (muss nicht angegeben werden)
@@ -63,10 +69,11 @@ namespace TURAG {
 template<typename Packed, typename Unpacked>
 inline Packed pack(Unpacked src) {
   static_assert(sizeof(Unpacked) <= sizeof(Packed), "type cast fatal because of bit loose");
-
-  union { Unpacked src; Packed dest; } helper;
-  helper.src = src;
-  return helper.dest;
+  static_assert(std::is_trivially_copyable<Packed>::value, "Packed must be trivially copyable!");
+  static_assert(std::is_trivially_copyable<Unpacked>::value, "Unpacked must be trivially copyable!");
+  Packed dest;
+  std::memcpy(&dest, &src, sizeof(Unpacked));
+  return dest;
 }
 
 /// \brief Entpackt eine beliebige Variable in anderen Typ
@@ -80,9 +87,12 @@ inline Packed pack(Unpacked src) {
 /// \sa TURAG::unpack, TURAG::reinterpret_reference
 template<typename Unpacked, typename Packed>
 inline Unpacked unpack(Packed src) {
-  union { Unpacked dest; Packed src; } helper;
-  helper.src = src;
-  return helper.dest;
+  static_assert(sizeof(Unpacked) <= sizeof(Packed), "type cast fatal because of bit loose");
+  static_assert(std::is_trivially_copyable<Packed>::value, "Packed must be trivially copyable!");
+  static_assert(std::is_trivially_copyable<Unpacked>::value, "Unpacked must be trivially copyable!");
+  Unpacked dest;
+  std::memcpy(&dest, &src, sizeof(Unpacked));
+  return dest;
 }
 
 } // namespace TURAG

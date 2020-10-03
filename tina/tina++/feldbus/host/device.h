@@ -7,8 +7,8 @@
  */
 
 
-#ifndef TURAGFELDBUSDEVICE_H_
-#define TURAGFELDBUSDEVICE_H_
+#ifndef TINAPP_FELDBUS_HOST_DEVICE_H
+#define TINAPP_FELDBUS_HOST_DEVICE_H
 
 #include <tina++/tina.h>
 #include <tina++/thread.h>
@@ -157,7 +157,8 @@ namespace Feldbus {
  * 
  */
 class Device {
-	NOT_COPYABLE(Device);
+	Device(const Device&) = delete;
+	Device& operator=(const Device&) = delete;
 public:
 	/**
 	 * \brief Verfügbare Adresslängen.
@@ -182,7 +183,7 @@ public:
         uint8_t id;
         T data;
         uint8_t checksum;
-    } _packed;
+    } TURAG_PACKED;
 
 	/**
 	 * \brief Struktur-Template zur Verwendung mit transceive().
@@ -194,7 +195,7 @@ public:
 		uint8_t address[2];
         T data;
         uint8_t checksum;
-    } _packed;
+    } TURAG_PACKED;
 
 	/**
 	 * \brief Struktur-Template zur Verwendung mit transceive().
@@ -206,7 +207,7 @@ public:
 		uint8_t address[2];
         T data;
         uint8_t checksum;
-    } _packed;
+    } TURAG_PACKED;
 
     /*!
      * \brief Speichert das Device-Info-Paket eines Slave-Gerätes.
@@ -533,7 +534,7 @@ public:
 	 * Diese Funktion benutzt intern die plattformabhängige Funktion turag_rs485_transceive(),
 	 * deren Implementierung bestimmt, wie die Übertragung im Detail stattfindet.
 	 */
-	template<typename T, typename U> _always_inline
+	template<typename T, typename U> TURAG_ALWAYS_INLINE
 	bool transceive(Request<T>& transmit, Response<U>* receive, bool ignoreDysfunctional = false) {
 	return transceive(reinterpret_cast<uint8_t*>(&(transmit)) + sizeof(Request<T>::address) - myAddressLength,
 					  sizeof(Request<T>) + myAddressLength - sizeof(Request<T>::address),
@@ -552,7 +553,7 @@ public:
 	 * Sendet einen %Broadcast an die in transmit eingestellte Gerätegruppe und
 	 * kehrt zurück, sobald alle Daten geschrieben wurden.
 	 */
-    template<typename T> _always_inline
+    template<typename T> TURAG_ALWAYS_INLINE
 	bool transceive(Broadcast<T>& transmit, bool ignoreDysfunctional = false) {
 		return transceive(reinterpret_cast<uint8_t*>(&(transmit)) + sizeof(Broadcast<T>::address) - myAddressLength,
 						  sizeof(Broadcast<T>) + myAddressLength - sizeof(Broadcast<T>::address),
@@ -693,7 +694,7 @@ struct Device::Broadcast<void> {
 	uint8_t address[2];
     uint8_t id;
     uint8_t checksum;
-} _packed;
+} TURAG_PACKED;
 
 /**
 * \brief Struktur-Template zur Verwendung mit transceive().
@@ -704,7 +705,7 @@ template<>
 struct Device::Request<void> {
 	uint8_t address[2];
     uint8_t checksum;
-} _packed;
+} TURAG_PACKED;
 
 /**
 * \brief Struktur-Template zur Verwendung mit transceive().
@@ -715,11 +716,11 @@ template<>
 struct Device::Response<void> {
 	uint8_t address[2];
     uint8_t checksum;
-} _packed;
+} TURAG_PACKED;
 
 
 
 } // namespace Feldbus
 } // namespace TURAG
 
-#endif /* TURAGFELDBUSDEVICE_H_ */
+#endif // TINAPP_FELDBUS_HOST_DEVICE_H

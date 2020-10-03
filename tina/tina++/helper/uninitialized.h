@@ -1,10 +1,9 @@
-#ifndef UNINITIALIZED_H
-#define UNINITIALIZED_H
+#ifndef TINAPP_HELPER_UNINITIALIZED_H
+#define TINAPP_HELPER_UNINITIALIZED_H
 
 #include <utility>
 #include <new>
 
-#include "macros.h"
 #include "construct.h"
 #include "../container/array_storage.h"
 
@@ -66,4 +65,4 @@ private:
 
 } // namespace TURAG
 
-#endif // UNINITIALIZED_H
+#endif // TINAPP_HELPER_UNINITIALIZED_H

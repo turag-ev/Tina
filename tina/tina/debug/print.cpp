@@ -75,7 +75,7 @@ GameTime game_time;
 
 }
 
-void _turag_print_system_gametime()
+void turag_print_system_gametime()
 {
 	game_time.print();
 }
@@ -136,9 +136,9 @@ TuragSystemTime turag_debug_system_gametime_get()
 	return TURAG::SystemTime::now();
 }
 
-void turag_log_puts(const char* s) { UNUSED(s); };
-void turag_log_printf(const char* fmt, ...) { UNUSED(fmt); }
-void turag_debug_printf(const char* fmt, ...) { UNUSED(fmt); }
+void turag_log_puts(const char* s) { TURAG_USE(s); };
+void turag_log_printf(const char* fmt, ...) { TURAG_USE(fmt); }
+void turag_debug_printf(const char* fmt, ...) { TURAG_USE(fmt); }
 
 #endif
 

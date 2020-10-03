@@ -3,7 +3,6 @@
 
 #include <memory>
 
-#include "macros.h"
 #include "normalize.h"
 
 namespace TURAG {
@@ -20,13 +19,13 @@ namespace TURAG {
 class initializer {
 public:
   template<typename T>
-  _always_inline initializer(T& var, T value) {
+  TURAG_ALWAYS_INLINE initializer(T& var, T value) {
     var = value;
   }
 };
 
 /// macro for easier use for initializer class
-#define INIT_VAR(v,x) static initializer TURAG_CONCAT(_turag_initializer_,__COUNTER__) ((v), (x))
+#define TURAG_INIT_VAR(v,x) static initializer TURAG_CONCAT(turag_initializer_,__COUNTER__) ((v), (x))
 
 /// Call function at initialization
 /// outside of function or method blocks the function is called before main function is called (called when all ctors of static classes are called).
@@ -35,13 +34,13 @@ public:
 class initializer_call {
 public:
   template<typename F, typename... Args>
-  _always_inline initializer_call(F func, Args&&... args) {
+  TURAG_ALWAYS_INLINE initializer_call(F func, Args&&... args) {
       func(std::forward<Args>(args)...);
   }
 };
 
 /// macro for call a function initialization
-#define INIT_CALL(v, ...) static initializer_call TURAG_CONCAT(_turag_initializer_,__COUNTER__) (v, ## __VA_ARGS__)
+#define TURAG_INIT_CALL(v, ...) static initializer_call TURAG_CONCAT(turag_initializer_,__COUNTER__) (v, ## __VA_ARGS__)
 
 /// \}
 

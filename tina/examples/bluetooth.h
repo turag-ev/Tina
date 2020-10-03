@@ -1,5 +1,5 @@
-#ifndef SYSTEMCONTROL_COMMON_BLUETOOTH_H
-#define SYSTEMCONTROL_COMMON_BLUETOOTH_H
+#ifndef EXAMPLES_BLUETOOTH_H
+#define EXAMPLES_BLUETOOTH_H
 
 //! [Includes]
 #include <tina++/tina.h>
@@ -38,4 +38,4 @@ private:
 
 
 
-#endif // SYSTEMCONTROL_COMMON_BLUETOOTH_H
+#endif // EXAMPLES_BLUETOOTH_H

@@ -28,8 +28,8 @@
  */
 
 
-#ifndef __MINI_PRINTF__
-#define __MINI_PRINTF__
+#ifndef TINA_UTILS_MINI_PRINTF_H
+#define TINA_UTILS_MINI_PRINTF_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -91,4 +91,4 @@ int mini_snprintf(char* buffer, unsigned int buffer_len, const char *fmt, ...);
 #define vsnprintf mini_vsnprintf
 #define snprintf mini_snprintf
 
-#endif
+#endif // TINA_UTILS_MINI_PRINTF_H

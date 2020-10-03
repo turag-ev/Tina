@@ -44,7 +44,7 @@ uint16_t Bootloader::getMcuId(void) {
 	if (myMcuId == TURAG_FELDBUS_BOOTLOADER_MCU_ID_INVALID) {
 		struct McuId {
 			uint16_t id;
-		} _packed;
+		} TURAG_PACKED;
 
 		Device::Request<uint8_t> request;
 		request.data = TURAG_FELDBUS_BOOTLOADER_COMMAND_GET_MCUID;
@@ -71,7 +71,7 @@ bool Bootloader::unlockBootloader(void) {
 		uint8_t key;
 		uint16_t mcuId;
 		uint16_t unlockCode;
-	} _packed;
+	} TURAG_PACKED;
 
 	Device::Request<UnlockBootloader> request;
 	request.data.key = TURAG_FELDBUS_BOOTLOADER_COMMAND_UNLOCK_BOOTLOADER;
@@ -98,7 +98,7 @@ uint16_t BootloaderAvrBase::getPageSize(void) {
 	if (myPageSize == 0) {
 		struct PageSize {
 			uint16_t size;
-		} _packed;
+		} TURAG_PACKED;
 
 		Device::Request<uint8_t> request;
 		request.data = TURAG_FELDBUS_BOOTLOADER_AVR_GET_PAGE_SIZE;
@@ -122,7 +122,7 @@ uint32_t BootloaderAvrBase::getFlashSize(bool writable) {
 		if (myWritableFlashSize == 0) {
 			struct FlashSize {
 				uint32_t size;
-			} _packed;
+			} TURAG_PACKED;
 
 			Device::Request<GetFlashSize> request;
 			request.data.key = TURAG_FELDBUS_BOOTLOADER_AVR_GET_FLASH_SIZE;
@@ -139,7 +139,7 @@ uint32_t BootloaderAvrBase::getFlashSize(bool writable) {
 		if (myFlashSize == 0) {
 			struct FlashSize {
 				uint32_t size;
-			} _packed;
+			} TURAG_PACKED;
 
 			Device::Request<GetFlashSize> request;
 			request.data.key = TURAG_FELDBUS_BOOTLOADER_AVR_GET_FLASH_SIZE;
@@ -193,7 +193,7 @@ BootloaderAvrBase::ErrorCode BootloaderAvrBase::writeFlash(uint32_t byteAddress,
 	
 	struct uint32_t_packed {
 		uint32_t value;
-	} _packed;
+	} TURAG_PACKED;
 	
 	for (unsigned i = 0; i < pages; ++i) {
 		reinterpret_cast<uint32_t_packed*>(request + addressLength() + 1)->value = targetAddress;
@@ -263,7 +263,7 @@ BootloaderAvrBase::ErrorCode BootloaderAvrBase::readFlash(uint32_t byteAddress, 
 	struct header_packed {
 		uint32_t targetAddress;
 		uint16_t currentPacketSize;
-	} _packed;
+	} TURAG_PACKED;
 
 	for (unsigned i = 0; i < packets; ++i) {
 		uint16_t currentPacketSize = std::min(packetSize, byteAddress + length - targetAddress);
@@ -347,7 +347,7 @@ bool BootloaderXmega::readFuses(Fuses* fuseBuffer) {
 		uint8_t fuse4;
 		uint8_t fuse5;
 		uint8_t fuse6;
-	} _packed;
+	} TURAG_PACKED;
 
 	Device::Response<FusesRaw> response;
 

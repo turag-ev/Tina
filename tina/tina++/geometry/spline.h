@@ -1,5 +1,5 @@
-#ifndef SPLINE_H
-#define SPLINE_H
+#ifndef TINAPP_GEOMETRY_SPLINE_H
+#define TINAPP_GEOMETRY_SPLINE_H
 
 #include "geometry.h"
 #include <cmath>
@@ -174,4 +174,4 @@ using Spline3 = SplineOrder<3>;
 
 } // namespace TURAG
 
-#endif // SPLINE_H
+#endif // TINAPP_GEOMETRY_SPLINE_H

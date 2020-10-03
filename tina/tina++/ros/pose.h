@@ -1,5 +1,5 @@
-#ifndef TINA_ROS_POSE_H
-#define TINA_ROS_POSE_H
+#ifndef TINAPP_ROS_POSE_H
+#define TINAPP_ROS_POSE_H
 
 #include <tina++/geometry.h>
 #include <geometry_msgs/Pose.h>
@@ -79,4 +79,4 @@ void convert(const geometry_msgs::Accel& in, PoseAcceleration& out) {
 
 } // TURAG
 
-#endif // TINA_ROS_POSE_H
+#endif // TINAPP_ROS_POSE_H

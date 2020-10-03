@@ -18,8 +18,8 @@
  * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
  */
 
-#ifndef TINA_CONFIG_TINA_DEFAULT_H
-#define TINA_CONFIG_TINA_DEFAULT_H
+#ifndef TINA_HELPER_CONFIG_TINA_DEFAULT_H
+#define TINA_HELPER_CONFIG_TINA_DEFAULT_H
 
 /** @name Allgemein
  *  
@@ -57,6 +57,11 @@
 /// Speicherbereich anzulegen. Plattformabhängig.
 #if !defined(TURAG_ATTR_SECTION_CCMDATA) || defined(__DOXYGEN__)
 # define TURAG_ATTR_SECTION_CCMDATA
+#endif
+
+/// Wortbreite der Prozessorarchitektur. Plattformabhängig.
+#if !defined(TURAG_WORDSIZE) || defined(__DOXYGEN__)
+# define TURAG_WORDSIZE __WORDSIZE
 #endif
 
 
@@ -159,4 +164,4 @@
 # error TURAG_CRC_CRC16_ALGORITHM must be between 0 and 2
 #endif
 
-#endif // TINA_CONFIG_TINA_DEFAULT_H
+#endif // TINA_HELPER_CONFIG_TINA_DEFAULT_H

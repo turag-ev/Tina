@@ -20,9 +20,7 @@ HEADERS  += \
     $$PWD/tina++/helper/init.h \
     $$PWD/tina++/helper/integer.h \
     $$PWD/tina++/helper/locked.h \
-    $$PWD/tina++/helper/macros.h \
     $$PWD/tina++/helper/normalize.h \
-    $$PWD/tina++/helper/normalize_type_traits.h \
     $$PWD/tina++/helper/packed.h \
     $$PWD/tina++/helper/scoped_lock.h \
     $$PWD/tina++/helper/static_const.h \

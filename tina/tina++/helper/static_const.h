@@ -1,5 +1,5 @@
-#ifndef STATIC_CONST_H
-#define STATIC_CONST_H
+#ifndef TINAPP_HELPER_STATIC_CONST_H
+#define TINAPP_HELPER_STATIC_CONST_H
 
 namespace TURAG {
 namespace _detail {
@@ -17,4 +17,4 @@ constexpr T static_const<T>::value;
 } // namespace _detail
 } // namespace TURAG
 
-#endif // STATIC_CONST_H
+#endif // TINAPP_HELPER_STATIC_CONST_H

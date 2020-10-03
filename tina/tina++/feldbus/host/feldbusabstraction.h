@@ -1,5 +1,5 @@
-#ifndef FELDBUSABSTRACTION_H
-#define FELDBUSABSTRACTION_H
+#ifndef TINAPP_FELDBUS_HOST_FELDBUSABSTRACTION_H
+#define TINAPP_FELDBUS_HOST_FELDBUSABSTRACTION_H
 
 
 #include <tina++/tina.h>
@@ -48,7 +48,8 @@ enum class ChecksumType : uint8_t {
  */
 class FeldbusAbstraction
 {
-	NOT_COPYABLE(FeldbusAbstraction);
+	FeldbusAbstraction(const FeldbusAbstraction&) = delete;
+	FeldbusAbstraction& operator=(const FeldbusAbstraction&) = delete;
 
 public:
 	/**
@@ -172,4 +173,4 @@ private:
 } // namespace Feldbus
 } // namespace TURAG
 
-#endif // FELDBUSABSTRACTION_H
+#endif // TINAPP_FELDBUS_HOST_FELDBUSABSTRACTION_H

@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef TINAPP_SIM_THREAD_H
-#define TINAPP_SIM_THREAD_H
+#ifndef PLATFORM_DESKTOP_PUBLIC_TINAPP_THREAD_H
+#define PLATFORM_DESKTOP_PUBLIC_TINAPP_THREAD_H
 
 #include <mutex>
 #include <thread>
@@ -26,7 +26,8 @@ namespace TURAG {
 
 class ThreadImpl
 {
-	NOT_COPYABLE(ThreadImpl);
+	ThreadImpl(const ThreadImpl&) = delete;
+	ThreadImpl& operator=(const ThreadImpl&) = delete;
     
 protected:
     // should only be created through Thread
@@ -95,20 +96,23 @@ public:
 // ConditionVariable
 
 class ConditionVariable {
-	NOT_COPYABLE(ConditionVariable);
+	ConditionVariable(const ConditionVariable&) = delete;
+	ConditionVariable& operator=(const ConditionVariable&) = delete;
 
 	class Unlocker {
-		NOT_COPYABLE(Unlocker);
-		NOT_MOVABLE(Unlocker);
+		Unlocker(const Unlocker&) = delete;
+		Unlocker& operator=(const Unlocker&) = delete;
+		Unlocker(Unlocker&&) = delete;
+		Unlocker& operator=(Unlocker&&) = delete;
 
 	public:
-		_always_inline explicit Unlocker(Mutex& m) :
+		TURAG_ALWAYS_INLINE explicit Unlocker(Mutex& m) :
 			m_(m), locked_(false)
 		{
 			m_.unlock();
 		}
 
-		_always_inline ~Unlocker() {
+		TURAG_ALWAYS_INLINE ~Unlocker() {
 			if (!locked_) {
 				m_.lock();
 			}
@@ -127,11 +131,11 @@ public:
 			condvar_(condvar)
 		{ }
 
-		_always_inline bool wait() {
+		TURAG_ALWAYS_INLINE bool wait() {
 			return condvar_.wait(*this);
 		}
 
-		_always_inline bool waitFor(SystemTime timeout) {
+		TURAG_ALWAYS_INLINE bool waitFor(SystemTime timeout) {
 			return condvar_.waitFor(*this, timeout);
 		}
 
@@ -140,18 +144,18 @@ public:
 	};
 
 public:
-	_always_inline ConditionVariable(Mutex* mut) :
+	TURAG_ALWAYS_INLINE ConditionVariable(Mutex* mut) :
 		cond_(), workaround_mut_(), mut_(mut)
 	{ }
 
-	_always_inline bool wait() {
+	TURAG_ALWAYS_INLINE bool wait() {
 		std::unique_lock<std::mutex> lock(workaround_mut_);
 		Unlocker unlock(*mut_);
 		cond_.wait(lock);
 		return true;
 	}
 
-	_always_inline bool wait(std::unique_lock<std::mutex>& lock) {
+	TURAG_ALWAYS_INLINE bool wait(std::unique_lock<std::mutex>& lock) {
 		cond_.wait(lock);
 		return true;
 	}
@@ -170,11 +174,11 @@ public:
 				== std::cv_status::no_timeout;
 	}
 
-	_always_inline void signal() {
+	TURAG_ALWAYS_INLINE void signal() {
 		cond_.notify_one();
 	}
 
-	_always_inline void broadcast() {
+	TURAG_ALWAYS_INLINE void broadcast() {
 		cond_.notify_all();
 	}
 
@@ -193,7 +197,8 @@ private:
 // Semaphore
 
 class Semaphore {
-    NOT_COPYABLE(Semaphore);
+    Semaphore(const Semaphore&) = delete;
+    Semaphore& operator=(const Semaphore&) = delete;
 
 private:
     std::mutex mutex_;
@@ -234,4 +239,4 @@ public:
 
 } // namespace TURAG
 
-#endif // TINAPP_SIM_THREAD_H
+#endif // PLATFORM_DESKTOP_PUBLIC_TINAPP_THREAD_H

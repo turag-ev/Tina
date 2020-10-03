@@ -29,7 +29,7 @@ namespace Base64 {
  * @param[in] len Length of data that is to be encoded
  * @return length of base64 encoded data
  */
-_always_inline
+TURAG_ALWAYS_INLINE
 constexpr size_t encodeLength(size_t len) {
     return (len * 4 + 2) / 3;
 }
@@ -39,7 +39,7 @@ constexpr size_t encodeLength(size_t len) {
  * @param[in] data data that is to be encoded
  * @return length of base64 encoded data
  */
-template<typename T> _always_inline
+template<typename T> TURAG_ALWAYS_INLINE
 constexpr size_t encodeLength(const T& data) {
     return (sizeof(data) * 4 + 2) / 3;
 }
@@ -49,7 +49,7 @@ constexpr size_t encodeLength(const T& data) {
  * @tparam T data type that is to be encoded
  * @return length of base64 encoded data
  */
-template<typename T> _always_inline
+template<typename T> TURAG_ALWAYS_INLINE
 constexpr size_t encodeLength() {
 	return (sizeof(T) * 4 + 2) / 3;
 }
@@ -61,7 +61,7 @@ constexpr size_t encodeLength() {
  * @param[out] encoded buffer holding base64 encoded data
  * @return length of base64 encoded data
  */
-_always_inline
+TURAG_ALWAYS_INLINE
 int encode(const uint8_t *data, size_t len, uint8_t *encoded) {
     return turag_base64_encode(data, len, encoded);
 }
@@ -72,7 +72,7 @@ int encode(const uint8_t *data, size_t len, uint8_t *encoded) {
  * @param[out] encoded buffer holding base64 encoded data
  * @return length of base64 encoded data
  */
-template<typename T> _always_inline
+template<typename T> TURAG_ALWAYS_INLINE
 int encode(const T& data, uint8_t *encoded) {
     return turag_base64_encode(reinterpret_cast<const uint8_t*>(&data), sizeof(data), encoded);
 }
@@ -83,7 +83,7 @@ int encode(const T& data, uint8_t *encoded) {
  * @param[in] len length of base64 encoded data
  * @return length of decoded data
  */
-_always_inline
+TURAG_ALWAYS_INLINE
 constexpr size_t decodeLength(size_t len) {
     return len * 3 / 4;
 }
@@ -96,7 +96,7 @@ constexpr size_t decodeLength(size_t len) {
  * @param[out] data buffer holding decoded data
  * @return Length of decoded data
  */
-_always_inline
+TURAG_ALWAYS_INLINE
 int decode(const uint8_t *encoded, size_t len, uint8_t *data) {
     return turag_base64_decode(encoded, len, data);
 }

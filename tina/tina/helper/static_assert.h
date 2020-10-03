@@ -19,8 +19,8 @@
  * @ingroup Utils
  */
 
-#ifndef _GL_VERIFY_H
-#define _GL_VERIFY_H
+#ifndef TINA_HELPER_STATIC_ASSERT_H
+#define TINA_HELPER_STATIC_ASSERT_H
 
 #if defined __DOXYGEN__
 
@@ -302,4 +302,4 @@ template <int w>
 
 #endif // DOXYGEN
 
-#endif
+#endif // TINA_HELPER_STATIC_ASSERT_H

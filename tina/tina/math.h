@@ -101,21 +101,6 @@ extern "C" {
 #include <tina/float.h>
 #endif
 
-// extra math functions
-#define mRadToRad(x)        ((x) * 0.001f)
-#define radTomRad(x)        ((x) * 1000.0f)
-#define mmTom(x)            ((x) * 0.001f)
-#define mTomm(x)            ((x) * 1000.0f)
-
-#define degToRad(x)  	((x) * M_PIf / 180.0f)
-#define radToDeg(x)     ((x) * 180.0f / M_PIf)
-
-#define square(x)     	((x) * (x))
-#define cubic(x)		((x)*(x)*(x))
-
-
-
-
 TURAG_INLINE float sqrf(float x) {
   return x * x;
 }

@@ -1,5 +1,5 @@
-#ifndef TINA_DEBUG_LOGSOURCE_H
-#define TINA_DEBUG_LOGSOURCE_H
+#ifndef TINA_DEBUG_LOG_SOURCE_H
+#define TINA_DEBUG_LOG_SOURCE_H
 
 #include "defines.h"
 
@@ -26,4 +26,4 @@
 //# warning Makro TURAG_DEBUG_LOG_SOURCE nicht definiert!
 #endif
 
-#endif // TINA_DEBUG_LOGSOURCE_H
+#endif // TINA_DEBUG_LOG_SOURCE_H

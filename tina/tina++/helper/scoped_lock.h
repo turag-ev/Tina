@@ -1,7 +1,6 @@
 #ifndef TINAPP_HELPER_SCOPED_LOCK_H
 #define TINAPP_HELPER_SCOPED_LOCK_H
 
-#include "macros.h"
 #include "normalize.h"
 
 namespace TURAG {
@@ -15,18 +14,19 @@ namespace TURAG {
 /// \brief Lock für Mutexes
 template<class Mutex>
 class ScopedLock {
-  NOT_COPYABLE(ScopedLock);
+  ScopedLock(const ScopedLock&) = delete;
+  ScopedLock& operator=(const ScopedLock&) = delete;
 
 public:
   /// ScopedLock erstellen und Lock holen.
-  _always_inline explicit ScopedLock(Mutex& m) :
+  TURAG_ALWAYS_INLINE explicit ScopedLock(Mutex& m) :
     m_(m), locked_(true)
   {
     m_.lock();
   }
 
   /// Lock verschieben
-  _always_inline explicit ScopedLock(ScopedLock&& other) :
+  TURAG_ALWAYS_INLINE explicit ScopedLock(ScopedLock&& other) :
 	m_(other.m_), locked_(other.locked_)
   {
 	other.locked_ = false;
@@ -42,12 +42,12 @@ public:
   }
 
   /// Lock u.U. freigeben und zerstören.
-  _always_inline ~ScopedLock() {
+  TURAG_ALWAYS_INLINE ~ScopedLock() {
     unlock();
   }
 
   /// Lock freigeben, wenn Instanz Lock besitzt.
-  _always_inline void unlock() {
+  TURAG_ALWAYS_INLINE void unlock() {
     if (locked_) {
       locked_ = false;
       m_.unlock();
@@ -55,7 +55,7 @@ public:
   }
 
   /// Lock holen, falls Instanz ihn noch nicht besitzt.
-  _always_inline void lock() {
+  TURAG_ALWAYS_INLINE void lock() {
     if (!locked_) {
       locked_ = true;
       m_.lock();

@@ -25,7 +25,7 @@ BOOST_AUTO_TEST_CASE( test_size ) {
     uint16_t b;
     uint8_t c;
     uint16_t d;
-  } _packed;
+  } TURAG_PACKED;
   Feldbus::Request<R> request3;
   BOOST_CHECK_EQUAL(sizeof(request3), sizeof(uint8_t) * (2 + 6));
 }

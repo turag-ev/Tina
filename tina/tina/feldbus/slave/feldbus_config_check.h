@@ -1,5 +1,5 @@
-#ifndef FELDBUS_CONFIG_CHECK_H_
-#define FELDBUS_CONFIG_CHECK_H_
+#ifndef TINA_FELDBUS_SLAVE_FELDBUS_CONFIG_CHECK_H
+#define TINA_FELDBUS_SLAVE_FELDBUS_CONFIG_CHECK_H
 
 #include <feldbus_config.h>
 
@@ -80,5 +80,4 @@
 # include "avr_feldbus_config_check.h"
 #endif
 
-
-#endif // FELDBUS_CONFIG_CHECK_H_
+#endif // TINA_FELDBUS_SLAVE_FELDBUS_CONFIG_CHECK_H

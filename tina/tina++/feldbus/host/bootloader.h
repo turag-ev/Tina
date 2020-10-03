@@ -7,8 +7,8 @@
  */
 
 
-#ifndef TURAGFELDBUSBOOTLOADER_H_
-#define TURAGFELDBUSBOOTLOADER_H_
+#ifndef TINAPP_FELDBUS_HOST_BOOTLOADER_H
+#define TINAPP_FELDBUS_HOST_BOOTLOADER_H
 
 #include "device.h"
 #include <tina++/tina.h>
@@ -204,4 +204,4 @@ private:
 } // namespace Feldbus
 } // namespace TURAG
 
-#endif /* TURAGFELDBUSBOOTLOADER_H_ */
+#endif // TINAPP_FELDBUS_HOST_BOOTLOADER_H

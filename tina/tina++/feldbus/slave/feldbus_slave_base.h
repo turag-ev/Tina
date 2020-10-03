@@ -5,8 +5,8 @@
  *      Author: martin
  */
 
-#ifndef SLAVE_FELDBUS_SLAVE_BASE_H_
-#define SLAVE_FELDBUS_SLAVE_BASE_H_
+#ifndef TINAPP_FELDBUS_SLAVE_FELDBUS_SLAVE_BASE_H
+#define TINAPP_FELDBUS_SLAVE_FELDBUS_SLAVE_BASE_H
 
 /**
  * @defgroup feldbus-slave-base Basis-Implementierung
@@ -223,4 +223,4 @@ private:
 
 
 
-#endif /* SLAVE_FELDBUS_SLAVE_BASE_H_ */
+#endif // TINAPP_FELDBUS_SLAVE_FELDBUS_SLAVE_BASE_H

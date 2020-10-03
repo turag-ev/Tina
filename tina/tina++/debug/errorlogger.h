@@ -1,5 +1,5 @@
-#ifndef ERRORLOGGER_H
-#define ERRORLOGGER_H
+#ifndef TINAPP_DEBUG_ERRORLOGGER_H
+#define TINAPP_DEBUG_ERRORLOGGER_H
 
 #include "errorobserver.h"
 #include <tina/debug/internal-debug.h>
@@ -17,7 +17,7 @@ namespace Debug {
 ///
 /// \todo Ausgabemeldung ist derzeit noch nicht konfigurierbar.
 ///
-/// Das \ref ErrorLogger Objekt kann über das Makro \ref ERROR_LOGGER erstellt
+/// Das \ref ErrorLogger Objekt kann über das Makro \ref TURAG_ERROR_LOGGER erstellt
 /// werden. Damit entfällt die Angabe der Logquelle (\ref TURAG_DEBUG_LOG_SOURCE),
 /// die über das Makro eingelesen und dem Konstruktur übergeben wird.
 ///
@@ -31,7 +31,7 @@ namespace Debug {
 /// \code
 /// // Definition
 /// static ErrorLogger error_logger
-///     = ERROR_LOGGER("Konnte keine GPS-Position lesen.", SystemTime::fromSec(25), 5);
+///     = TURAG_ERROR_LOGGER("Konnte keine GPS-Position lesen.", SystemTime::fromSec(25), 5);
 /// void getGpsPos() {
 ///   Point point;
 ///   if (error_logger.logResult(GPS::getPosition(&point))) {
@@ -49,7 +49,7 @@ public:
 	///
 	/// \brief	Fehlerzähler erstellen
 	///
-	/// Es wird empfohlen, das Hilfsmakro \ref ERROR_LOGGER zu benutzen.
+	/// Es wird empfohlen, das Hilfsmakro \ref TURAG_ERROR_LOGGER zu benutzen.
 	/// \p min_interval und \p min_errors werden intern an den Konstruktor von \ref ErrorObserver
 	/// übergeben.
 	///
@@ -61,7 +61,7 @@ public:
 	///
 	/// \bug Prozentzeichen in \p message müssen gedoppelt werden (wie in printf).
 	///
-	/// \sa ERROR_LOGGER, ErrorObserver::ErrorObserver
+	/// \sa TURAG_ERROR_LOGGER, ErrorObserver::ErrorObserver
     ErrorLogger(char log_level, char log_source, const char* message, SystemTime min_interval, uint16_t min_errors = 5);
 
 	///
@@ -113,7 +113,7 @@ private:
 /// konfigurierbare Meldung, erweitert um die Anzahl der seit der letzten
 /// Ausgabe aufgetretenen Fehler aus.
 ///
-/// Das \ref CheapErrorLogger Objekt kann über das Makro \ref CHEAP_ERROR_LOGGER erstellt
+/// Das \ref CheapErrorLogger Objekt kann über das Makro \ref TURAG_CHEAP_ERROR_LOGGER erstellt
 /// werden. Damit entfällt die Angabe der Logquelle (\ref TURAG_DEBUG_LOG_SOURCE),
 /// die über das Makro eingelesen und dem Konstruktur übergeben wird.
 ///
@@ -130,7 +130,7 @@ private:
 /// \code
 /// // Definition
 /// static CheapErrorLogger error_logger
-///     = CHEAP_ERROR_LOGGER("Konnte keine GPS-Position lesen.", SystemTime::fromSec(25));
+///     = TURAG_CHEAP_ERROR_LOGGER("Konnte keine GPS-Position lesen.", SystemTime::fromSec(25));
 /// void getGpsPos() {
 ///   Point point;
 ///   if (error_logger.logResult(GPS::getPosition(&point))) {
@@ -146,7 +146,7 @@ public:
 	///
 	/// \brief Einfachen Meldungslogger erstellen
 	///
-	/// Es wird empfohlen, das Hilfsmakro \ref CHEAP_ERROR_LOGGER zu benutzen.
+	/// Es wird empfohlen, das Hilfsmakro \ref TURAG_CHEAP_ERROR_LOGGER zu benutzen.
 	///
 	/// \param log_level Loglevel (z.B. `TURAG_DEBUG_ERROR_PREFIX[0]`)
 	/// \param log_source Logquelle: `TURAG_DEBUG_LOG_SOURCE[0]`
@@ -156,7 +156,7 @@ public:
 	///
 	/// \bug Prozentzeichen in \p message müssen gedoppelt werden (wie in printf).
 	///
-	/// \sa CHEAP_ERROR_LOGGER
+	/// \sa TURAG_CHEAP_ERROR_LOGGER
 	CheapErrorLogger(char log_level, char log_source, const char* message, SystemTime min_interval);
 
 	///
@@ -228,11 +228,11 @@ private:
 /// Beispielcode:
 /// \code
 /// static ErrorLogger error_logger
-///     = ERROR_LOGGER("meine schöne Fehlermeldung", SystemTime::fromSec(25), 5);
+///     = TURAG_ERROR_LOGGER("meine schöne Fehlermeldung", SystemTime::fromSec(25), 5);
 /// \endcode
 ///
 /// \sa TURAG_DEBUG_LOG_SOURCE, TURAG::Debug::ErrorLogger::ErrorLogger
-#define ERROR_LOGGER(message, min_interval, min_errors) \
+#define TURAG_ERROR_LOGGER(message, min_interval, min_errors) \
 	TURAG::Debug::ErrorLogger(TURAG_DEBUG_LOG_SOURCE[0], message, min_interval, min_errors)
 
 
@@ -247,15 +247,15 @@ private:
 /// Beispielcode:
 /// \code
 /// static CheapErrorLogger error_logger
-///     = CHEAP_ERROR_LOGGER("meine schöne Fehlermeldung", SystemTime::fromSec(25));
+///     = TURAG_CHEAP_ERROR_LOGGER("meine schöne Fehlermeldung", SystemTime::fromSec(25));
 /// \endcode
 ///
 /// \sa TURAG_DEBUG_LOG_SOURCE, TURAG::Debug::CheapErrorLogger::CheapErrorLogger
-#define CHEAP_ERROR_LOGGER(message, min_interval) \
+#define TURAG_CHEAP_ERROR_LOGGER(message, min_interval) \
 	TURAG::Debug::CheapErrorLogger(TURAG_DEBUG_LOG_SOURCE[0], message, min_interval)
 
 
 } // namespace Debug
 } // namespace TURAG
 
-#endif // ERRORLOGGER_H
+#endif // TINAPP_DEBUG_ERRORLOGGER_H

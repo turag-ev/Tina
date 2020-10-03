@@ -1,5 +1,5 @@
-#ifndef ARRAY_STORAGE_H
-#define ARRAY_STORAGE_H
+#ifndef TINAPP_CONTAINER_ARRAY_STORAGE_H
+#define TINAPP_CONTAINER_ARRAY_STORAGE_H
 
 #include <type_traits>
 #include <iterator>
@@ -7,16 +7,6 @@
 #include "../tina.h"
 #include "../helper/construct.h"
 #include "../helper/traits_algorithms.h"
-
-#if GCC_VERSION < 50000 && !defined(__clang__)
-namespace std {
-template<std::size_t Len, typename... Types>
-struct aligned_union {
-	using type =
-		typename std::aligned_storage<Len, TURAG::max_integral_constant<std::alignment_of<Types>...>::value>::type;
-};
-}
-#endif
 
 namespace TURAG {
 
@@ -45,8 +35,10 @@ using UnionStorage = typename std::aligned_union<max_value(sizeof(Types)...), Ty
 template<typename T, size_t N>
 struct ArrayStorage {
 public:
-  COPYABLE(ArrayStorage);
-  MOVABLE(ArrayStorage);
+  ArrayStorage(const ArrayStorage&) = default;
+  ArrayStorage& operator=(const ArrayStorage&) = default;
+  ArrayStorage(ArrayStorage&&) = default;
+  ArrayStorage& operator=(ArrayStorage&&) = default;
 
   // types
   typedef T value_type;
@@ -65,7 +57,7 @@ public:
 
   typedef TypeStorage<T> element_type;
 
-  constexpr _always_inline
+  constexpr TURAG_ALWAYS_INLINE
   ArrayStorage() :
     data_()
 #ifdef TURAG_HEAVY_DEBUG
@@ -74,34 +66,34 @@ public:
   {}
 
   // Create an object in aligned storage
-  template<typename ...Args> _always_inline
+  template<typename ...Args> TURAG_ALWAYS_INLINE
   void construct(std::size_t index, Args&&... args) {
 	TURAG::construct(reinterpret_cast<T*>(data_ + index), std::forward<Args>(args)...);
   }
 
-  template<typename ...Args> _always_inline
+  template<typename ...Args> TURAG_ALWAYS_INLINE
   static void construct(iterator pos, Args&&... args) {
 	TURAG::construct(pos, std::forward<Args>(args)...);
   }
 
-  template<typename ...Args> _always_inline
+  template<typename ...Args> TURAG_ALWAYS_INLINE
   void assign(std::size_t index, T&& arg) {
 	*reinterpret_cast<T*>(data_ + index) = std::move(arg);
   }
 
-  template<typename ...Args> _always_inline
+  template<typename ...Args> TURAG_ALWAYS_INLINE
   static void assign(iterator pos, T&& arg) {
 	*(pos) = std::move(arg);
   }
 
   // Access an object in aligned storage
-  constexpr _always_inline
+  constexpr TURAG_ALWAYS_INLINE
   const T& operator[](std::size_t pos) const {
     return reinterpret_cast<const T&>(data_[pos]);
   }
 
   // Access an object in aligned storage
-  _always_inline
+  TURAG_ALWAYS_INLINE
   T& operator[](std::size_t pos) {
     return reinterpret_cast<T&>(data_[pos]);
   }
@@ -143,4 +135,4 @@ private:
 
 } // namespace TURAG
 
-#endif // ARRAY_STORAGE_H
+#endif // TINAPP_CONTAINER_ARRAY_STORAGE_H

@@ -14,7 +14,7 @@
 
 namespace TURAG {
 
-_hot
+TURAG_HOT_FUNC
 void CurrentThread::delay(SystemTime d /* [ticks] */) {
   if (d.toMsec()*1000 < UINT_MAX) {
     usleep(d.toMsec()*1000);

@@ -1,5 +1,5 @@
-#ifndef RECT_H
-#define RECT_H
+#ifndef TINAPP_GEOMETRY_RECT_H
+#define TINAPP_GEOMETRY_RECT_H
 
 #include "geometry.h"
 
@@ -106,4 +106,4 @@ inline bool in_range(const Pose& pos, const Rect& rect, Length r) {
 
 } // namespace TURAG
 
-#endif // RECT_H
+#endif // TINAPP_GEOMETRY_RECT_H

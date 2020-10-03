@@ -1,5 +1,5 @@
-#ifndef TINA_CHIBIOS_THREAD_H
-#define TINA_CHIBIOS_THREAD_H
+#ifndef PLATFORM_CHIBIOS3_PUBLIC_TINA_THREAD_H
+#define PLATFORM_CHIBIOS3_PUBLIC_TINA_THREAD_H
 
 #include <ch.h>
 #include <stddef.h>
@@ -22,13 +22,13 @@ typedef struct {
   static THD_WORKING_AREA(TURAG_CONCAT(name, _stack_), stack_size); \
   TuragThread name = {0, &TURAG_CONCAT(name, _stack_), sizeof(TURAG_CONCAT(name, _stack_))}
 
-extern void _turag_thread_entry(void* data);
+extern void turag_thread_entry(void* data);
 
-static _always_inline
+static TURAG_ALWAYS_INLINE
 void turag_thread_start(TuragThread* thread, tprio_t priority, void (*entry) (void)) {
   thread->thread = chThdCreateStatic(thread->stack, thread->stack_size,
                                      NORMALPRIO + priority,
-                                     (tfunc_t)_turag_thread_entry,
+                                     (tfunc_t)turag_thread_entry,
                                      (void*)entry);
 }
 
@@ -181,4 +181,4 @@ static inline void turag_condition_variable_broadcast(TuragConditionVariable* co
 } // extern "C"
 #endif
 
-#endif // TINA_CHIBIOS_THREAD_H
+#endif // PLATFORM_CHIBIOS3_PUBLIC_TINA_THREAD_H

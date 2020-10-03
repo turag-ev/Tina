@@ -1,5 +1,5 @@
-#ifndef ARRAYREF_H
-#define ARRAYREF_H
+#ifndef TINAPP_CONTAINER_ARRAY_REF_H
+#define TINAPP_CONTAINER_ARRAY_REF_H
 
 #include <tina++/tina.h>
 #include <type_traits>
@@ -75,4 +75,4 @@ private:
 
 } // namespace TURAG
 
-#endif // ARRAYREF_H
+#endif // TINAPP_CONTAINER_ARRAY_REF_H

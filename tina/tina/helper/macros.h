@@ -13,17 +13,17 @@
 
 // Interna
 
-#define __NARG__(...)  __NARG_I_(,##__VA_ARGS__,__RSEQ_N())
-#define __NARG_I_(...) __ARG_N(__VA_ARGS__)
-#define __ARG_N( \
-      _0, _1, _2, _3, _4, _5, _6, _7, _8, _9,_10, \
-         _11,_12,_13,_14,_15,_16,_17,_18,_19,_20, \
-         _21,_22,_23,_24,_25,_26,_27,_28,_29,_30, \
-         _31,_32,_33,_34,_35,_36,_37,_38,_39,_40, \
-         _41,_42,_43,_44,_45,_46,_47,_48,_49,_50, \
-         _51,_52,_53,_54,_55,_56,_57,_58,_59,_60, \
-         _61,_62,_63,N,...) N
-#define __RSEQ_N() \
+#define TURAG_INTERNAL_NARG_(...)  TURAG_INTERNAL_NARG_I_(,##__VA_ARGS__,TURAG_INTERNAL_RSEQ_N())
+#define TURAG_INTERNAL_NARG_I_(...) TURAG_INTERNAL_ARG_N(__VA_ARGS__)
+#define TURAG_INTERNAL_ARG_N( \
+      TURAG_INTERNAL_0, TURAG_INTERNAL_1, TURAG_INTERNAL_2, TURAG_INTERNAL_3, TURAG_INTERNAL_4, TURAG_INTERNAL_5, TURAG_INTERNAL_6, TURAG_INTERNAL_7, TURAG_INTERNAL_8, TURAG_INTERNAL_9,TURAG_INTERNAL_10, \
+         TURAG_INTERNAL_11,TURAG_INTERNAL_12,TURAG_INTERNAL_13,TURAG_INTERNAL_14,TURAG_INTERNAL_15,TURAG_INTERNAL_16,TURAG_INTERNAL_17,TURAG_INTERNAL_18,TURAG_INTERNAL_19,TURAG_INTERNAL_20, \
+         TURAG_INTERNAL_21,TURAG_INTERNAL_22,TURAG_INTERNAL_23,TURAG_INTERNAL_24,TURAG_INTERNAL_25,TURAG_INTERNAL_26,TURAG_INTERNAL_27,TURAG_INTERNAL_28,TURAG_INTERNAL_29,TURAG_INTERNAL_30, \
+         TURAG_INTERNAL_31,TURAG_INTERNAL_32,TURAG_INTERNAL_33,TURAG_INTERNAL_34,TURAG_INTERNAL_35,TURAG_INTERNAL_36,TURAG_INTERNAL_37,TURAG_INTERNAL_38,TURAG_INTERNAL_39,TURAG_INTERNAL_40, \
+         TURAG_INTERNAL_41,TURAG_INTERNAL_42,TURAG_INTERNAL_43,TURAG_INTERNAL_44,TURAG_INTERNAL_45,TURAG_INTERNAL_46,TURAG_INTERNAL_47,TURAG_INTERNAL_48,TURAG_INTERNAL_49,TURAG_INTERNAL_50, \
+         TURAG_INTERNAL_51,TURAG_INTERNAL_52,TURAG_INTERNAL_53,TURAG_INTERNAL_54,TURAG_INTERNAL_55,TURAG_INTERNAL_56,TURAG_INTERNAL_57,TURAG_INTERNAL_58,TURAG_INTERNAL_59,TURAG_INTERNAL_60, \
+         TURAG_INTERNAL_61,TURAG_INTERNAL_62,TURAG_INTERNAL_63,N,...) N
+#define TURAG_INTERNAL_RSEQ_N() \
          63,62,61,60,                   \
          59,58,57,56,55,54,53,52,51,50, \
          49,48,47,46,45,44,43,42,41,40, \
@@ -32,31 +32,31 @@
          19,18,17,16,15,14,13,12,11,10, \
          9,8,7,6,5,4,3,2,1,0
 
-#define _TURAG_VFUNC_(name, n) name##n
-#define _TURAG_VFUNC(name, n) _TURAG_VFUNC_(name, n)
+#define TURAG_INTERNAL_VFUNC_(name, n) name##n
+#define TURAG_INTERNAL_VFUNC(name, n) TURAG_INTERNAL_VFUNC_(name, n)
 
-#define _TURAG_CONCAT1_(a) a
-#define _TURAG_CONCAT1(a) _TURAG_CONCAT1_(a)
+#define TURAG_INTERNAL_CONCAT1_(a) a
+#define TURAG_INTERNAL_CONCAT1(a) TURAG_INTERNAL_CONCAT1_(a)
 
-#define _TURAG_CONCAT2_(a,b) a##b
-#define _TURAG_CONCAT2(a,b) _TURAG_CONCAT2_(a,b)
+#define TURAG_INTERNAL_CONCAT2_(a,b) a##b
+#define TURAG_INTERNAL_CONCAT2(a,b) TURAG_INTERNAL_CONCAT2_(a,b)
 
-#define _TURAG_CONCAT3_(a,b,c) a##b##c
-#define _TURAG_CONCAT3(a,b,c) _TURAG_CONCAT3_(a,b,c)
+#define TURAG_INTERNAL_CONCAT3_(a,b,c) a##b##c
+#define TURAG_INTERNAL_CONCAT3(a,b,c) TURAG_INTERNAL_CONCAT3_(a,b,c)
 
-#define _TURAG_CONCAT4_(a,b,c,d) a##b##c##d
-#define _TURAG_CONCAT4(a,b,c,d) _TURAG_CONCAT4_(a,b,c,d)
+#define TURAG_INTERNAL_CONCAT4_(a,b,c,d) a##b##c##d
+#define TURAG_INTERNAL_CONCAT4(a,b,c,d) TURAG_INTERNAL_CONCAT4_(a,b,c,d)
 
-#define _TURAG_CONCAT5_(a,b,c,d,e) a##b##c##d##e
-#define _TURAG_CONCAT5(a,b,c,d,e) _TURAG_CONCAT5_(a,b,c,d,e)
+#define TURAG_INTERNAL_CONCAT5_(a,b,c,d,e) a##b##c##d##e
+#define TURAG_INTERNAL_CONCAT5(a,b,c,d,e) TURAG_INTERNAL_CONCAT5_(a,b,c,d,e)
 
-#define _TURAG_CONCAT6_(a,b,c,d,e,f) a##b##c##d##e##f
-#define _TURAG_CONCAT6(a,b,c,d,e,f) _TURAG_CONCAT6_(a,b,c,d,e,f)
+#define TURAG_INTERNAL_CONCAT6_(a,b,c,d,e,f) a##b##c##d##e##f
+#define TURAG_INTERNAL_CONCAT6(a,b,c,d,e,f) TURAG_INTERNAL_CONCAT6_(a,b,c,d,e,f)
 
-#define _TURAG_CONCAT_FUNC(n) _TURAG_CONCAT_FUNC_(n)
-#define _TURAG_CONCAT_FUNC_(n) _TURAG_CONCAT ## n
+#define TURAG_INTERNAL_CONCAT_FUNC(n) TURAG_INTERNAL_CONCAT_FUNC_(n)
+#define TURAG_INTERNAL_CONCAT_FUNC_(n) TURAG_INTERNAL_CONCAT ## n
 
-#define _TURAG_STRINGIFY(x) #x
+#define TURAG_INTERNAL_STRINGIFY(x) #x
          
 #else // __DOXYGEN__
 
@@ -75,14 +75,14 @@
 /// #define SUM1(x) (x)
 /// #define SUM2(x,y) ((x) + (y))
 /// #define SUM3(x,y,z) ((x) + (y) + (z))
-/// #define SUM(...) TURAG_CONCAT(SUM, __NARG__(__VA_ARGS__)) (__VA_ARGS__)
+/// #define SUM(...) TURAG_CONCAT(SUM, TURAG_INTERNAL_NARG_(__VA_ARGS__)) (__VA_ARGS__)
 ///
 /// int sum = SUM(x, 5, 42); // benutzt SUM3
 /// \endcode
 ///
 /// \pre Maximal 64 Argumente können angegeben werden.
 /// \bug Aufruf ohne Argumente compiliert nicht
-#define __NARG__(...)
+#define TURAG_INTERNAL_NARG_(...)
 
 #endif // __DOXYGEN__
 
@@ -120,7 +120,7 @@
 ///
 /// \pre Maximal 64 Argumente können angegeben werden.
 /// \bug Aufruf ohne Argumente (nur mit Funktionsgrundname) compiliert nicht
-#define TURAG_VFUNC(name, ...) _TURAG_VFUNC(name, __NARG__(__VA_ARGS__)) (__VA_ARGS__)
+#define TURAG_VFUNC(name, ...) TURAG_INTERNAL_VFUNC(name, TURAG_INTERNAL_NARG_(__VA_ARGS__)) (__VA_ARGS__)
 
 /// \brief die zwei Argumente zusammenführen
 ///
@@ -133,33 +133,33 @@
 /// \endcode
 ///
 /// \pre Maximal 6 Argumente können angegeben werden.
-#define TURAG_CONCAT(...) TURAG_VFUNC(_TURAG_CONCAT, __VA_ARGS__)
+#define TURAG_CONCAT(...) TURAG_VFUNC(TURAG_INTERNAL_CONCAT, __VA_ARGS__)
 
 /// \brief die zwei Argumente zusammenführen
 ///
 /// `TURAG_CONCAT2(A, BC)` wird zu `ABC`
 ///
 /// \deprecated TURAG_CONCAT benutzen
-#define TURAG_CONCAT2(a,b) _TURAG_CONCAT2_(a,b)
+#define TURAG_CONCAT2(a,b) TURAG_INTERNAL_CONCAT2_(a,b)
 
 /// \brief die drei Argumente zusammenführen
 ///
 /// `TURAG_CONCAT3(A, B, C)` wird zu `ABC`
 ///
 /// \deprecated TURAG_CONCAT benutzen
-#define TURAG_CONCAT3(a,b,c) _TURAG_CONCAT3_(a,b,c)
+#define TURAG_CONCAT3(a,b,c) TURAG_INTERNAL_CONCAT3_(a,b,c)
 
 /// \brief die vier Argumente zusammenführen
 ///
 /// `TURAG_CONCAT4(A, B, C, D)` wird zu `ABCD`
 ///
 /// \deprecated TURAG_CONCAT benutzen
-#define TURAG_CONCAT4(a,b,c,d) _TURAG_CONCAT4_(a,b,c,d)
+#define TURAG_CONCAT4(a,b,c,d) TURAG_INTERNAL_CONCAT4_(a,b,c,d)
 
 /// \brief Argument in Zeichenkette umwandeln
 ///
 /// `TURAG_STRINGIFY(123)` wird zu `"123"`
-#define TURAG_STRINGIFY(x) _TURAG_STRINGIFY(x)
+#define TURAG_STRINGIFY(x) TURAG_INTERNAL_STRINGIFY(x)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Macro utils
@@ -198,9 +198,7 @@
 // Compiler utils
 
 /// use it to shut the compiler up talking about unused variables
-#ifndef UNUSED
-#  define UNUSED(x) (void)x
-#endif
+#define TURAG_USE(x) (void)x
 
 #ifdef __DOXYGEN__
 /// \brief Start von Definition von C-API
@@ -239,7 +237,7 @@
 /// static int global_vector[32];
 /// static int global_int;
 ///
-/// INITIALIZATION {
+/// TURAG_INITIALIZATION {
 ///   // Quadratzahlen speichern
 ///   for (size_t i = 0; i < 32; i++) {
 ///     global_vector[i] = i*i;
@@ -252,10 +250,8 @@
 ///   }
 /// }
 /// \endcode
-///
-/// \todo In `TURAG_INITIALIZATION` umbenennen
-#define INITIALIZATION \
-  static _constructor void TURAG_CONCAT(_turag_initialization_code_, __COUNTER__)()
+#define TURAG_INITIALIZATION \
+  static TURAG_CONSTRUCTOR void TURAG_CONCAT(turag_initialization_code_, __COUNTER__)()
 
 
 /// \brief Definiert Funktion, welche bei Terminierung des Programms aufgerufen wird.
@@ -268,15 +264,13 @@
 /// Der Sinn dieser Funktion ist es abschließende Aktionen in einem <em>Desktop-Programm</em>
 /// zu machen. Im Roboter wird dieser Code nie aufgerufen.
 /// \code
-/// FINALIZATION {
+/// TURAG_FINALIZATION {
 ///   // abschließende Aktion durchführen
 ///   saveSettings();
 /// }
 /// \endcode
-///
-/// \todo In `TURAG_FINALIZATION` umbenennen
-#define FINALIZATION \
-  static _destructor void TURAG_CONCAT(_finalization_code, __COUNTER__)()
+#define TURAG_FINALIZATION \
+  static TURAG_DESTRUCTOR void TURAG_CONCAT(turag_finalization_code_, __COUNTER__)()
   
 /// \}
 

@@ -1,5 +1,5 @@
-#ifndef DEBUG_TIME_H
-#define DEBUG_TIME_H
+#ifndef TINA_DEBUG_GAME_TIME_H
+#define TINA_DEBUG_GAME_TIME_H
 
 #include "defines.h"
 #include "print.h"
@@ -61,7 +61,7 @@ void turag_print_system_gametime();
 #else // __DOXYGEN__
 
 #if TURAG_DEBUG_LEVEL > 0
-# define turag_print_system_gametime _turag_print_system_gametime
+# define turag_print_system_gametime turag_print_system_gametime
 #else
 # define turag_print_system_gametime() TURAG_MACRO_NOOP
 #endif
@@ -96,4 +96,4 @@ TuragSystemTime turag_debug_system_gametime_get(void);
 
 TURAG_C_API_END
 
-#endif // DEBUG_TIME_H
+#endif // TINA_DEBUG_GAME_TIME_H

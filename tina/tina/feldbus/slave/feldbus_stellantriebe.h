@@ -56,8 +56,8 @@
  *
  *
  */
-#ifndef TINA_FELDBUS_SLAVE_FELDBUS_STELLANTRIEBE_H_
-#define TINA_FELDBUS_SLAVE_FELDBUS_STELLANTRIEBE_H_
+#ifndef TINA_FELDBUS_SLAVE_FELDBUS_STELLANTRIEBE_H
+#define TINA_FELDBUS_SLAVE_FELDBUS_STELLANTRIEBE_H
 
 #include <tina/tina.h>
 #include <tina/feldbus/slave/feldbus_config_check.h>
@@ -74,7 +74,7 @@ extern "C" {
 
 // do not change this structure!!! Otherwise the device will send 
 // corrupted command info packages.
-typedef struct _packed {
+typedef struct TURAG_PACKED {
 	/// pointer to the actual value
     void* value;  
 	/// is the value allowed to be altered by the host?
@@ -146,4 +146,4 @@ FeldbusSize_t turag_feldbus_slave_process_package(const uint8_t* message, Feldbu
 }
 #endif
 
-#endif /* TINA_FELDBUS_SLAVE_FELDBUS_STELLANTRIEBE_H_ */
+#endif // TINA_FELDBUS_SLAVE_FELDBUS_STELLANTRIEBE_H

@@ -5,8 +5,8 @@
  *      Author: richard
  */
 
-#ifndef TINAPP_SIM_CAN_H
-#define TINAPP_SIM_CAN_H
+#ifndef PLATFORM_DESKTOP_PUBLIC_TINAPP_CAN_H
+#define PLATFORM_DESKTOP_PUBLIC_TINAPP_CAN_H
 
 #include <tina++/tina.h>
 #include <tina++/helper/init.h>
@@ -39,13 +39,13 @@ uint64_t call(Id remote_id, FuncId func_id, uint64_t param, ErrorCode* error_res
 
 // CASA_RPC_BIND C++ replacement
 extern RpcHandler sc_can_rpc_table[];
-#define CAN_RPC_BIND(function, id) INIT_VAR(TURAG::CAN::sc_can_rpc_table[id], function);
+#define CAN_RPC_BIND(function, id) TURAG_INIT_VAR(TURAG::CAN::sc_can_rpc_table[id], function);
 
 extern RpcHandler mc_can_rpc_table[];
-#define CAN_MC_RPC_BIND(function, id) INIT_VAR(TURAG::CAN::mc_can_rpc_table[id], function);
+#define CAN_MC_RPC_BIND(function, id) TURAG_INIT_VAR(TURAG::CAN::mc_can_rpc_table[id], function);
 
 extern RpcHandler ui_can_rpc_table[];
-#define CAN_UI_RPC_BIND(function, id) INIT_VAR(TURAG::CAN::ui_can_rpc_table[id], function);
+#define CAN_UI_RPC_BIND(function, id) TURAG_INIT_VAR(TURAG::CAN::ui_can_rpc_table[id], function);
 
 #define CAN_RPC_HANDLER_DEF(id) uint64_t Casa_RpcHandler_##id (uint64_t)
 
@@ -89,4 +89,4 @@ bool set_blackboard_notify_callback(const Blackboard* object,
 
 } // namespace TURAG
 
-#endif // TINAPP_SIM_CAN_H
+#endif // PLATFORM_DESKTOP_PUBLIC_TINAPP_CAN_H

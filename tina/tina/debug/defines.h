@@ -82,7 +82,7 @@
 /// \code{.cpp}
 /// const char* log_source_table[127] = {0};
 ///
-/// INITIALIZATION {
+/// TURAG_INITIALIZATION {
 ///   log_source_table['*'] = "AStar";
 ///   // ...
 ///
@@ -215,7 +215,7 @@
 #define TURAG_DEBUG_GRAPH_MAX_CHANNELS  (64)
 #endif
 
-# if __WORDSIZE == 64
+# if TURAG_WORDSIZE == 64
 #  define TURAG_32_PREFIX
 #  define TURAG_64_PREFIX	"l"
 #  define TURAG_PTR_PREFIX	"l"

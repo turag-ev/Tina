@@ -1,5 +1,5 @@
-#ifndef TURAG_QUAD_ENCODER_H
-#define TURAG_QUAD_ENCODER_H
+#ifndef PLATFORM_CHIBIOS3_PUBLIC_TINAPP_QUAD_ENCODER_H
+#define PLATFORM_CHIBIOS3_PUBLIC_TINAPP_QUAD_ENCODER_H
 
 #include <hal.h>
 #include <tina++/time.h>
@@ -113,4 +113,4 @@ private:
 
 }  // namespace TURAG
 
-#endif // TURAG_QUAD_ENCODER_H
+#endif // PLATFORM_CHIBIOS3_PUBLIC_TINAPP_QUAD_ENCODER_H

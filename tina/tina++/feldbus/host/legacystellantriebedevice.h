@@ -7,8 +7,8 @@
  */
 
 
-#ifndef TURAGFELDBUSAKTOR_H_
-#define TURAGFELDBUSAKTOR_H_
+#ifndef TINAPP_FELDBUS_HOST_LEGACYSTELLANTRIEBEDEVICE_H
+#define TINAPP_FELDBUS_HOST_LEGACYSTELLANTRIEBEDEVICE_H
 
 #include "device.h"
 #include <tina++/tina.h>
@@ -254,4 +254,4 @@ protected:
 } // namespace Feldbus
 } // namespace TURAG
 
-#endif /* TURAGFELDBUSAKTOR_H_ */
+#endif // TINAPP_FELDBUS_HOST_LEGACYSTELLANTRIEBEDEVICE_H

@@ -63,8 +63,6 @@ constexpr Frequency::UnitType MHz(UnitFactor(1000) * kHz.factor);
 
 } // namespace Units
 
-#if __cplusplus >= 201103L
-
 inline namespace Literals {
 inline namespace UnitsLiterals {
 
@@ -104,8 +102,6 @@ constexpr Units::Frequency operator""_MHz(long long unsigned x) { return x * Uni
 namespace Units {
     using namespace Literals::UnitsLiterals;
 } // namespace Units
-
-#endif
 
 } // namespace TURAG
 

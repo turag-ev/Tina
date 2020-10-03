@@ -1,5 +1,5 @@
-#ifndef SLAVE_FELDBUS_SLAVE_STELLANTRIEBE_H_
-#define SLAVE_FELDBUS_SLAVE_STELLANTRIEBE_H_
+#ifndef TINAPP_FELDBUS_SLAVE_FELDBUS_SLAVE_STELLANTRIEBE_H
+#define TINAPP_FELDBUS_SLAVE_FELDBUS_SLAVE_STELLANTRIEBE_H
 
 /**
  * @defgroup feldbus-slave-stellantriebe Stellantriebe-Implementierung
@@ -68,7 +68,7 @@ public:
         Access access;
         CommandType type;
         float factor;
-    } _packed;
+    } TURAG_PACKED;
 
     static constexpr
     size_t get_command_length(CommandType t)
@@ -212,4 +212,4 @@ private:
 } // namespace TURAG
 
 #endif /* (TURAG_FELDBUS_DEVICE_PROTOCOL==TURAG_FELDBUS_DEVICE_PROTOCOL_STELLANTRIEBE) */
-#endif /* SLAVE_FELDBUS_SLAVE_STELLANTRIEBE_H_ */
+#endif // TINAPP_FELDBUS_SLAVE_FELDBUS_SLAVE_STELLANTRIEBE_H

@@ -1,5 +1,5 @@
-#ifndef CONTAINER_H
-#define CONTAINER_H
+#ifndef TINAPP_CONTAINER_CONTAINER_H
+#define TINAPP_CONTAINER_CONTAINER_H
 
 /**
  * \defgroup Container Container [C++]
@@ -17,4 +17,4 @@
 #include "circular_buffer.h"
 #include "thread_fifo.h"
 
-#endif // CONTAINER_H
+#endif // TINAPP_CONTAINER_CONTAINER_H

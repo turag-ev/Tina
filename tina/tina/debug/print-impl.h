@@ -1,5 +1,5 @@
-#ifndef PRINTIMPL_H
-#define PRINTIMPL_H
+#ifndef TINA_DEBUG_PRINT_IMPL_H
+#define TINA_DEBUG_PRINT_IMPL_H
 
 #include "defines.h"
 
@@ -33,5 +33,5 @@ void turag_debug_printf(const char* fmt, ...) __attribute__ ((format(printf, 1, 
 
 TURAG_C_API_END
 
-#endif // PRINTIMPL_H
+#endif // TINA_DEBUG_PRINT_IMPL_H
 

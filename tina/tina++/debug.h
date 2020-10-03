@@ -37,5 +37,5 @@ inline const char* bool_str_de(bool boolean) {
 
 } // namespace TURAG
 
-#endif // UTILS_DEBUG_H
+#endif // TINAPP_DEBUG_H
 

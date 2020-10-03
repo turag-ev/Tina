@@ -1,5 +1,5 @@
-#ifndef TINA_CONTAINER_TEST
-#define TINA_CONTAINER_TEST
+#ifndef TESTS_CONTAINER_TEST_H
+#define TESTS_CONTAINER_TEST_H
 
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
@@ -112,4 +112,4 @@ check_container_content(const Container& a, std::initializer_list<Dummy> b) {
 
 } // namespace TURAG
 
-#endif // TINA_CONTAINER_TEST
+#endif // TESTS_CONTAINER_TEST_H

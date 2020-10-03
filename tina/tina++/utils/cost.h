@@ -1,5 +1,5 @@
-#ifndef COST_H
-#define COST_H
+#ifndef TINAPP_UTILS_COST_H
+#define TINAPP_UTILS_COST_H
 
 #include <limits>
 #include <tina++/tina.h>
@@ -156,4 +156,4 @@ constexpr Cost COST_MAX = Cost(Cost::MAX_);
 
 } // namespace TURAG
 
-#endif // COST_H
+#endif // TINAPP_UTILS_COST_H

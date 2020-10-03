@@ -1,5 +1,5 @@
-#ifndef PIN_CONFIG_H_
-#define PIN_CONFIG_H_
+#ifndef PLATFORM_CHIBIOS3_PUBLIC_TINAPP_PIN_CONFIG_H
+#define PLATFORM_CHIBIOS3_PUBLIC_TINAPP_PIN_CONFIG_H
 
 #include <cstddef>
 #include <utility>
@@ -274,4 +274,4 @@ static constexpr PinConfig default_pin_cfg(Pin pin) {
 
 } // namespace TURAG
 
-#endif // PIN_CONFIG_H_
+#endif // PLATFORM_CHIBIOS3_PUBLIC_TINAPP_PIN_CONFIG_H

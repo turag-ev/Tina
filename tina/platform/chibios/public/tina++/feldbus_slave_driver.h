@@ -12,8 +12,8 @@
  *      in platform code and start() in generic code.
  */
 
-#ifndef FELDBUS_SLAVE_DRIVER_H_
-#define FELDBUS_SLAVE_DRIVER_H_
+#ifndef PLATFORM_CHIBIOS3_PUBLIC_TINAPP_FELDBUS_SLAVE_DRIVER_H
+#define PLATFORM_CHIBIOS3_PUBLIC_TINAPP_FELDBUS_SLAVE_DRIVER_H
 
 
 #include <tina++/tina.h>
@@ -190,4 +190,4 @@ private:
 }
 
 
-#endif /* FELDBUS_SLAVE_DRIVER_H_ */
+#endif // PLATFORM_CHIBIOS3_PUBLIC_TINAPP_FELDBUS_SLAVE_DRIVER_H

@@ -1,5 +1,5 @@
-#ifndef TINAPP_CHIBIOS_HIGHRESDELAYTIMER_H
-#define TINAPP_CHIBIOS_HIGHRESDELAYTIMER_H
+#ifndef TINAPP_UTILS_HIGHRESDELAYTIMER_H
+#define TINAPP_UTILS_HIGHRESDELAYTIMER_H
 
 #include <tina++/private/highresdelaytimer_private.h>
 
@@ -94,4 +94,4 @@ private:
 
 } // namespace TURAG
 
-#endif // TINAPP_CHIBIOS_HIGHRESDELAYTIMER_H
+#endif // TINAPP_UTILS_HIGHRESDELAYTIMER_H

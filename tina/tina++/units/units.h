@@ -1,5 +1,5 @@
-#ifndef TINAPP_GEOMETRY_UNITS_UNITS_H
-#define TINAPP_GEOMETRY_UNITS_UNITS_H
+#ifndef TINAPP_UNITS_UNITS_H
+#define TINAPP_UNITS_UNITS_H
 
 #include "config.h"
 #include "unit.h"
@@ -65,29 +65,27 @@ constexpr Current::UnitType mA(FROM_SI_CONVERT_FACTOR_CURRENT / UnitFactor(1000)
 
 } // namespace Units
 
-#if __cplusplus >= 201103L
-
 inline namespace Literals {
 inline namespace UnitsLiterals {
 
 /// \ingroup UnitsDefs
 /// \{
 
-constexpr Units::Length operator"" _mm(long double x) { return x * Units::mm; }
-constexpr Units::Length operator"" _mm(long long unsigned x) { return x * Units::mm; }
-constexpr Units::Length operator"" _cm(long double x) { return x * Units::cm; }
-constexpr Units::Length operator"" _cm(long long unsigned x) { return x * Units::cm; }
-constexpr Units::Length operator"" _dm(long double x) { return x * Units::dm; }
-constexpr Units::Length operator"" _dm(long long unsigned x) { return x * Units::dm; }
-constexpr Units::Length operator"" _m(long double x) { return x * Units::m; }
-constexpr Units::Length operator"" _m(long long unsigned x) { return x * Units::m; }
+constexpr Units::Length operator""_mm(long double x) { return x * Units::mm; }
+constexpr Units::Length operator""_mm(long long unsigned x) { return x * Units::mm; }
+constexpr Units::Length operator""_cm(long double x) { return x * Units::cm; }
+constexpr Units::Length operator""_cm(long long unsigned x) { return x * Units::cm; }
+constexpr Units::Length operator""_dm(long double x) { return x * Units::dm; }
+constexpr Units::Length operator""_dm(long long unsigned x) { return x * Units::dm; }
+constexpr Units::Length operator""_m(long double x) { return x * Units::m; }
+constexpr Units::Length operator""_m(long long unsigned x) { return x * Units::m; }
 
-constexpr Units::Angle operator"" _mrad(long double x) { return x * Units::mrad; }
-constexpr Units::Angle operator"" _mrad(long long unsigned x) { return x * Units::mrad; }
-constexpr Units::Angle operator"" _rad(long double x) { return x * Units::rad; }
-constexpr Units::Angle operator"" _rad(long long unsigned x) { return x * Units::rad; }
-constexpr Units::Angle operator"" _deg(long double x) { return x * Units::deg; }
-constexpr Units::Angle operator"" _deg(long long unsigned x) { return x * Units::deg; }
+constexpr Units::Angle operator""_mrad(long double x) { return x * Units::mrad; }
+constexpr Units::Angle operator""_mrad(long long unsigned x) { return x * Units::mrad; }
+constexpr Units::Angle operator""_rad(long double x) { return x * Units::rad; }
+constexpr Units::Angle operator""_rad(long long unsigned x) { return x * Units::rad; }
+constexpr Units::Angle operator""_deg(long double x) { return x * Units::deg; }
+constexpr Units::Angle operator""_deg(long long unsigned x) { return x * Units::deg; }
 
 /// \}
 
@@ -98,8 +96,6 @@ namespace Units {
 using namespace Literals::UnitsLiterals;
 } // namespace Units
 
-#endif
-
 } // namespace TURAG
 
-#endif // TINAPP_GEOMETRY_UNITS_UNITS_H
+#endif // TINAPP_UNITS_UNITS_H

@@ -1,5 +1,5 @@
-#ifndef CIRCLE_H
-#define CIRCLE_H
+#ifndef TINAPP_GEOMETRY_CIRCLE_H
+#define TINAPP_GEOMETRY_CIRCLE_H
 
 #include <array>
 
@@ -52,29 +52,29 @@ bool intersect(const Circle& one, const Circle& two, std::array<Point, 2>& resul
 /// \retval false es existiert kein Schnittpunkt zwischen den Kreisen oder zwei Kreise sind gleich (unendlich viele Schnittpunkte)
 bool intersect(const Circle& zero, const Circle& one, const Circle& two, std::array<Point, 3>& results);
 
-_always_inline
+TURAG_ALWAYS_INLINE
 bool in_range(const Circle& one, const Circle& two, Length radius) {
 	return in_range(one.m, two.m, one.r + two.r + radius);
 }
 
-_always_inline
+TURAG_ALWAYS_INLINE
 bool in_range(const Pose& one, const Circle& two, Length radius) {
 	return in_range(one, two.m, two.r + radius);
 }
-_always_inline
+TURAG_ALWAYS_INLINE
 bool in_range(const Circle& one, const Pose& two, Length radius) {
 	return in_range(two, one, radius);
 }
 
-_always_inline
+TURAG_ALWAYS_INLINE
 bool in_range(const Point& one, const Circle& two, Length radius) {
 	return in_range(one, two.m, two.r + radius);
 }
-_always_inline
+TURAG_ALWAYS_INLINE
 bool in_range(const Circle& one, const Point& two, Length radius) {
 	return in_range(two, one, radius);
 }
 
 } // namespace TURAG
 
-#endif // CIRCLE_H
+#endif // TINAPP_GEOMETRY_CIRCLE_H

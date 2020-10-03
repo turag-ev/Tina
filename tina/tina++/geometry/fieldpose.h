@@ -1,5 +1,5 @@
-#ifndef POSES_H
-#define POSES_H
+#ifndef TINAPP_GEOMETRY_FIELDPOSE_H
+#define TINAPP_GEOMETRY_FIELDPOSE_H
 
 #include "tina++/tina.h"
 #include "geometry.h"
@@ -17,7 +17,7 @@ namespace TURAG {
 
 /// abhängig von Teamfarbe \p right oder \p left übergeben
 template<typename T>
-_always_inline
+TURAG_ALWAYS_INLINE
 T for_teamcolor(T right, T left);
 
 /// \}
@@ -87,7 +87,7 @@ public:
   static void switchSide(Pose& pose);
 
   /// Pose für andere Teamfarbe
-  static _always_inline Pose otherSide(Pose pose) {
+  static TURAG_ALWAYS_INLINE Pose otherSide(Pose pose) {
       switchSide(pose);
       return pose;
   }
@@ -125,11 +125,11 @@ private:
 };
 
 template<typename T>
-_always_inline
+TURAG_ALWAYS_INLINE
 T for_teamcolor(T right, T left) {
     return FieldPose::isRightTeamcolor() ? right : left;
 }
 
 } // namespace TURAG
 
-#endif // POSES_H
+#endif // TINAPP_GEOMETRY_FIELDPOSE_H

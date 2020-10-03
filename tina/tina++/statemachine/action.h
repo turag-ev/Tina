@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef TINAPP_STATEMACHINE_STATE_H
-#define TINAPP_STATEMACHINE_STATE_H
+#ifndef TINAPP_STATEMACHINE_ACTION_H
+#define TINAPP_STATEMACHINE_ACTION_H
 
 #include <tina++/tina.h>
 #include <type_traits>
@@ -38,7 +38,7 @@ public:
 
     bool func(EventId id, EventArg arg);
 
-    _always_inline
+    TURAG_ALWAYS_INLINE
     bool isActive() const {
         return active_;
     }
@@ -50,17 +50,17 @@ public:
         child->start(this, arg);
     }
 
-    _always_inline
+    TURAG_ALWAYS_INLINE
     const Action* getChildAction() const {
         return child_;
     }
 
-    _always_inline
+    TURAG_ALWAYS_INLINE
     bool hasChildAction() const {
         return child_ != nullptr;
     }
 
-    _always_inline
+    TURAG_ALWAYS_INLINE
     const Action* getParentAction() const {
         return parent_;
     }
@@ -69,7 +69,7 @@ public:
     }
 
 protected:
-    _always_inline Action* getChildAction() {
+    TURAG_ALWAYS_INLINE Action* getChildAction() {
         return child_;
     }
 
@@ -119,7 +119,7 @@ public:
         return &instance;
     }
 private:
-    _always_inline bool state(EventId id, EventArg arg) {
+    TURAG_ALWAYS_INLINE bool state(EventId id, EventArg arg) {
         static_assert(std::is_base_of<StateAction<A>, A>::value, "");
         return (static_cast<A*>(this)->*currentstate_)(id, arg);
     }
@@ -232,7 +232,7 @@ A StateAction<A>::instance;
 
 #define ACTION_STATES(name, s1, ...) \
     private: \
-    ACTION_I_DECL(__NARG__(s1, ## __VA_ARGS__)) (s1, ## __VA_ARGS__); \
+    ACTION_I_DECL(TURAG_INTERNAL_NARG_(s1, ## __VA_ARGS__)) (s1, ## __VA_ARGS__); \
     public: \
     name() : \
     StateAction<name>(&name::s1, #name) \
@@ -421,4 +421,4 @@ A StateAction<A>::instance;
 
 } // namespace TURAG
 
-#endif // TINAPP_STATEMACHINE_STATE_H
+#endif // TINAPP_STATEMACHINE_ACTION_H

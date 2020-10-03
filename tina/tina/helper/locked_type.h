@@ -11,8 +11,8 @@
  */
 
 
-#ifndef __TINA_HELPERS_LOCKED_STRUCT__
-#define __TINA_HELPERS_LOCKED_STRUCT__
+#ifndef TINA_HELPER_LOCKED_TYPE_H
+#define TINA_HELPER_LOCKED_TYPE_H
 
 #include <tina/tina.h>
 #include <tina/thread.h>
@@ -98,4 +98,4 @@ extern "C" {
 #endif
 
 		
-#endif // __TINA_HELPERS_LOCKED_STRUCT__
+#endif // TINA_HELPER_LOCKED_TYPE_H
