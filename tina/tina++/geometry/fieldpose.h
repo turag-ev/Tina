@@ -1,9 +1,9 @@
 #ifndef TINAPP_GEOMETRY_FIELDPOSE_H
 #define TINAPP_GEOMETRY_FIELDPOSE_H
 
+#include "tina/teamcolor.h"
 #include "tina++/tina.h"
 #include "geometry.h"
-#include <global/global.h>
 #include <cmath>
 
 namespace TURAG {
