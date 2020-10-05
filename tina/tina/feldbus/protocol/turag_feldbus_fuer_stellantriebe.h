@@ -131,11 +131,11 @@
  * @name Command Keys für Servo
  * @{
  */
-#define RS485_STELLANTRIEBE_SERVO_KEY_CTRL_POS_GAIN_P (0x11)    // P-Gain for Position control
-#define RS485_STELLANTRIEBE_SERVO_KEY_CTRL_POS_GAIN_I (0x12)    // I-Gain Position control
-#define RS485_STELLANTRIEBE_SERVO_KEY_CTRL_CUR_GAIN_P (0x13)    // P-Gain Current control
-#define RS485_STELLANTRIEBE_SERVO_KEY_CTRL_CUR_GAIN_I (0x14)    // I-Gain Current control
-#define RS485_STELLANTRIEBE_SERVO_KEY_CTRL_CUR_STATIC_FF (0x15) // current static feed forward
+#define RS485_STELLANTRIEBE_SERVO_KEY_CTRL_POS_GAIN_P (0x11)     // P-Gain for Position control
+#define RS485_STELLANTRIEBE_SERVO_KEY_CTRL_POS_GAIN_I (0x12)     // I-Gain Position control
+#define RS485_STELLANTRIEBE_SERVO_KEY_CTRL_CUR_GAIN_P (0x13)     // P-Gain Current control
+#define RS485_STELLANTRIEBE_SERVO_KEY_CTRL_CUR_GAIN_I (0x14)     // I-Gain Current control
+#define RS485_STELLANTRIEBE_SERVO_KEY_CTRL_CUR_STATIC_FF (0x15)  // current static feed forward
 
 ///@}
 
@@ -144,7 +144,7 @@
  * @{
  */
 #define RS485_STELLANTRIEBE_DC_KEY_SWITCH_STATUS (0x11)
-#define RS485_STELLANTRIEBE_DC_KEY_RETURN_TO_HOME (0x12) // requests the slave to return to some defined position where it adjusts its current angle appropriately, takes velocity as argument
+#define RS485_STELLANTRIEBE_DC_KEY_RETURN_TO_HOME (0x12)  // requests the slave to return to some defined position where it adjusts its current angle appropriately, takes velocity as argument
 ///@}
 
 /**
@@ -211,6 +211,8 @@
 #define TURAG_FELDBUS_STELLANTRIEBE_SERVO_ENABLE "enable"
 #define TURAG_FLEDBUS_STELLANTRIEBE_SERVO_INVERT "inversionFactor"
 #define TURAG_FELDBUS_STELLANTRIEBE_SERVO_HAS_POSITION_REACHED "hasReached"
+#define TURAG_FELDBUS_STELLANTRIEBE_SERVO_CTR_TYPE "ctrlType"
+
 ///@}
 
 /**
@@ -218,6 +220,14 @@
  * @{
  */
 #define TURAG_FELDBUS_STELLANTRIEBE_SERVO_STATUS_ANGLE_REACHED (0x01)
+///@}
+
+/**
+ * @name Werte für Servo control type 
+ * @{
+ */
+#define TURAG_FELDBUS_STELLANTRIEBE_SERVO_CTR_TYPE_PID (0x00)
+#define TURAG_FELDBUS_STELLANTRIEBE_SERVO_CTR_TYPE_HYS (0x01)
 ///@}
 
 /**
