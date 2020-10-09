@@ -55,6 +55,19 @@
 #define CMD_GEGI_MEASURE		(0x40)
 
 #define CMD_GEGI_ACK			(0)		//0 for ack, other for nack
+
+#define GEGI_BEACON_ROBO_A              (0)
+#define GEGI_BEACON_ROBO_B              (1)
+#define GEGI_BEACON_OPPO_A              (2)
+#define GEGI_BEACON_OPPO_B              (3)
+
+#define GEGI_FLAG_ROBO_ACTIVE_BEACON    (0)
+#define GEGI_FLAG_BEACON_0              (1)
+#define GEGI_FLAG_BEACON_1              (2)
+#define GEGI_FLAG_BEACON_2              (3)
+#define GEGI_FLAG_ROBO_PASSIVE_BEACON   (4)
+#define GEGI_FLAG_OPPO_A                (5)
+#define GEGI_FLAG_OPPO_B                (6)
 ///@}
 
 #endif // TINA_FELDBUS_PROTOCOL_TURAG_FELDBUS_FUER_LOKALISIERUNGSSENSOREN_H
