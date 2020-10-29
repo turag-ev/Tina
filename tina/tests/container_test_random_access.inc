@@ -5,7 +5,7 @@ BOOST_AUTO_TEST_CASE( TURAG_CONTAINER_TEST(rai_copy) ) {
 	  test.push_front(1);
 	  
     CONTAINER::iterator test1 = test.begin();
-    CONTAINER::iterator test2(test1);
+    TURAG_UNUSED CONTAINER::iterator test2(test1);
     CONTAINER::iterator test3 = test1;
     test1 = test3;    
   }
