@@ -195,7 +195,7 @@ bool TestMainAction::end(EventId id, EventArg data) {
 
 BOOST_AUTO_TEST_SUITE(StateTests)
 
-BOOST_AUTO_TEST_CASE( action ) {
+BOOST_AUTO_TEST_CASE(ActionTestCase) {
   TestMainAction* action = TestMainAction::getPointer();
   bool retval = false;
 

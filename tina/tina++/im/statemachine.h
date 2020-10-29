@@ -562,7 +562,7 @@ public:
      * \param reset If running, set state to initial state, start machine otherwise
      * \remark This function is thread-safe.
      */
-    void start(uintptr_t argument = 0, bool supressStatechangeDebugMessages = false,
+    void start(uintptr_t argument = 0, bool supressStatechangeDebugMessages_ = false,
                EventMethod resultCallback = nullptr, bool reset = false);
 
     /*!
@@ -575,7 +575,7 @@ public:
      * \param reset If running, set state to initial state, start machine otherwise
      * \remark This function is thread-safe.
      */
-    void start(EventQueue* eventqueue, uintptr_t argument = 0, bool supressStatechangeDebugMessages = false,
+    void start(EventQueue* eventqueue, uintptr_t argument = 0, bool supressStatechangeDebugMessages_ = false,
                EventMethod resultCallback = nullptr, bool reset = false);
 
     /*!
@@ -607,7 +607,7 @@ public:
      * \param resultCallback Callback function to handle emitted events (not including events emitted from states)
      * \remark This function is thread-safe.
      */
-    void reset(uintptr_t argument = 0, bool supressStatechangeDebugMessages = false,
+    void reset(uintptr_t argument = 0, bool supressStatechangeDebugMessages_ = false,
                EventMethod resultCallback = nullptr);
 
     /*!
@@ -619,7 +619,7 @@ public:
      * \param resultCallback Callback function to handle emitted events (not including events emitted from states)
      * \remark This function is thread-safe.
      */
-    void reset(EventQueue* eventqueue, uintptr_t argument = 0, bool supressStatechangeDebugMessages = false,
+    void reset(EventQueue* eventqueue, uintptr_t argument = 0, bool supressStatechangeDebugMessages_ = false,
                EventMethod resultCallback = nullptr);
 
     /*!
@@ -750,7 +750,7 @@ private:
     EventQueue* eventqueue_;
 
 	Status status_;
-	bool supressStatechangeDebugMessages;
+	bool supressStatechangeDebugMessages_;
 	bool sendSignal_;
 	bool clearSignal_;
 	uintptr_t signal_;

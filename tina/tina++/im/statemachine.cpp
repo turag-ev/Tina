@@ -69,7 +69,7 @@ Statemachine::Statemachine(const char* const name_,
     myEventOnErrorShutdown(eventOnErrorShutdown),
 	eventqueue_(nullptr),
 	status_(Status::none),
-	supressStatechangeDebugMessages(false),
+	supressStatechangeDebugMessages_(false),
 	sendSignal_(false),
 	clearSignal_(false),
 	signal_(0),
@@ -81,7 +81,7 @@ void Statemachine::start(uintptr_t argument, bool supressStatechangeDebugMessage
     start(defaultEventqueue_, argument, supressStatechangeDebugMessages, resultCallback, reset);
 }
 
-void Statemachine::start(EventQueue* eventqueue, uintptr_t argument, bool supressStatechangeDebugMessages_,
+void Statemachine::start(EventQueue* eventqueue, uintptr_t argument, bool supressStatechangeDebugMessages,
                          EventMethod resultCallback, bool reset) {
     Mutex::Lock lock(interface_mutex);
     
@@ -122,7 +122,7 @@ void Statemachine::start(EventQueue* eventqueue, uintptr_t argument, bool supres
     argument_ = argument;
     eventqueue_ = eventqueue;
     resultCallback_ = resultCallback;
-    supressStatechangeDebugMessages = supressStatechangeDebugMessages_;
+    supressStatechangeDebugMessages_ = supressStatechangeDebugMessages;
     status_ = new_status;
     sendSignal_ = false;
     clearSignal_ = false;
@@ -158,8 +158,8 @@ void Statemachine::reset(uintptr_t argument, bool supressStatechangeDebugMessage
     start(argument,supressStatechangeDebugMessages, resultCallback, true);
 }
 
-void Statemachine::reset(EventQueue *eventqueue, uintptr_t argument, bool supressStatechangeDebugMessages_, EventMethod resultCallback) {
-    start(eventqueue, argument, supressStatechangeDebugMessages_, resultCallback, true);
+void Statemachine::reset(EventQueue *eventqueue, uintptr_t argument, bool supressStatechangeDebugMessages, EventMethod resultCallback) {
+    start(eventqueue, argument, supressStatechangeDebugMessages, resultCallback, true);
 }
 
 bool Statemachine::sendSignal(uintptr_t signal) {
@@ -225,7 +225,7 @@ void Statemachine::doStatemachineProcessing(void) {
     Statemachine* sm = Statemachine::first_to_be_activated_statemachine;
     while (sm != nullptr) {
 		if (sm->entrystate) {
-			if (!sm->supressStatechangeDebugMessages) {
+			if (!sm->supressStatechangeDebugMessages_) {
 				turag_infof("%s activated", sm->name);
 			} else {
 				turag_infof("%s activated; output of state change debug messages supressed", sm->name);
@@ -343,7 +343,7 @@ void Statemachine::change_state(State* next_state) {
 		next_state->setSignal(current_state);
 	}
 
-	if (!supressStatechangeDebugMessages) {
+	if (!supressStatechangeDebugMessages_) {
 		if (current_state) {
 			turag_infof("%s: %s --> %s", name, current_state->name, next_state->name);
 		} else {

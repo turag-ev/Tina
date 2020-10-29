@@ -73,8 +73,8 @@ struct EventClass {
 	/// \param name Beschreibung von Ereignis
 	/// \param id Id von Ereignis
 	constexpr
-	EventClass(const char* name, EventId id) :
-		name(name), id(id)
+	EventClass(const char* name_, EventId id_) :
+		name(name_), id(id_)
 	{ }
 
 	/// \brief Beschreibung von Events dieser Eventklasse (nur als Debuginformation benutzbar)
@@ -133,8 +133,8 @@ struct Event {
   /// \brief Ereignis aus Ereignisklasse erstellen
   /// \note Ereignis sollte nie selber erstellt werden, sondern die Funktionen der
   /// \ref TURAG::EventQueue "EventQueue" benutzt werden.
-  Event(const EventClass* event_class, EventArg param, EventMethod method) :
-	event_class(event_class), param(param), method(method)
+  Event(const EventClass* event_class_, EventArg param_, EventMethod method_) :
+	event_class(event_class_), param(param_), method(method_)
   { }
 };
 
@@ -149,15 +149,15 @@ struct TimeEvent {
   /// zeitverzögertes Ereignis erstellen
   /// \note Ereignis sollte nie selber erstellt werden, sondern die Funktionen der
   /// \ref TURAG::EventQueue "EventQueue" benutzt werden.
-  TimeEvent(const Event& event, SystemTime time) :
-	event(event), time(time)
+  TimeEvent(const Event& event_, SystemTime time_) :
+	event(event_), time(time_)
   { }
 
   /// zeitverzögertes Ereignis erstellen
   /// \note Ereignis sollte nie selber erstellt werden, sondern die Funktionen der
   /// \ref TURAG::EventQueue "EventQueue" benutzt werden.
-  TimeEvent(const EventClass* event_class, EventArg param, EventMethod method, SystemTime time) :
-	event(event_class, param, method), time(time)
+  TimeEvent(const EventClass* event_class_, EventArg param_, EventMethod method_, SystemTime time_) :
+	event(event_class_, param_, method_), time(time_)
   { }
 };
 
