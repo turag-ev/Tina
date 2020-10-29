@@ -78,6 +78,10 @@ protected:
                 list_end->next_ = this;
             }
         }
+
+#if TURAG_USE_LIBSUPCPP_RUNTIME_SUPPORT
+        virtual ~CommandBase() = default;
+#endif
         //name used to identify command in the command set
         const char* name() const { return name_; }
         //properties of command (have to match the information returned by the device)

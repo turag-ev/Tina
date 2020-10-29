@@ -32,6 +32,10 @@ public:
 
     Action(const char* name);
 
+#if TURAG_USE_LIBSUPCPP_RUNTIME_SUPPORT
+    virtual ~Action() = default;
+#endif
+
     const char* getName() const {
         return name_;
     }
