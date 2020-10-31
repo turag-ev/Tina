@@ -54,13 +54,13 @@ void print_debug_info(const Event& e) {
                   static_cast<char>(id >> 16),
                   static_cast<char>(id >> 8),
                   static_cast<unsigned>(id & 0xFF),
-                  (int)e.param,
+                  static_cast<int>(e.param),
                   e.method ? "yes":"no");
   } else {
     turag_infof("Event: %s (id: %u param: %" TURAG_d32 " has method: %s",
                 name,
                 static_cast<unsigned>(id),
-                (int)e.param,
+                static_cast<int>(e.param),
                 e.method ? "yes":"no");
   }
 #else
