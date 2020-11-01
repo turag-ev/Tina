@@ -17,6 +17,7 @@
 
 #include <algorithm>
 #include <cstring>
+#include <vector>
 
 
 
@@ -183,7 +184,7 @@ BootloaderAvrBase::ErrorCode BootloaderAvrBase::writeFlash(uint32_t byteAddress,
 		++pages;
 	}
 	
-	uint8_t request[addressLength() + 1 + 4 + myPageSize + 1];
+    std::vector<uint8_t> request(addressLength() + 1 + 4 + myPageSize + 1);
 	request[addressLength()] = TURAG_FELDBUS_BOOTLOADER_AVR_PAGE_WRITE;
 	
     const int response_len = addressLength() + 1 + 1;
@@ -196,14 +197,14 @@ BootloaderAvrBase::ErrorCode BootloaderAvrBase::writeFlash(uint32_t byteAddress,
 	} TURAG_PACKED;
 	
 	for (unsigned i = 0; i < pages; ++i) {
-		reinterpret_cast<uint32_t_packed*>(request + addressLength() + 1)->value = targetAddress;
+		reinterpret_cast<uint32_t_packed*>(request.data() + addressLength() + 1)->value = targetAddress;
 
 		uint16_t currentPageSize = std::min(myPageSize, static_cast<uint16_t>(byteAddress + length - targetAddress));
-		memcpy(request + addressLength() + 5, data, currentPageSize);
+		memcpy(request.data() + addressLength() + 5, data, currentPageSize);
 		
 		unsigned k = 0;
 		for (k = 0; k < maxTriesForWriting; ++k) {
-			if (!transceive(request, sizeof(request), response, response_len)) {
+			if (!transceive(request.data(), request.size(), response, response_len)) {
 				return ErrorCode::transceive_error;
 			}
 			if (response[addressLength()] == TURAG_FELDBUS_BOOTLOADER_AVR_RESPONSE_SUCCESS) {
@@ -272,9 +273,9 @@ BootloaderAvrBase::ErrorCode BootloaderAvrBase::readFlash(uint32_t byteAddress, 
 		reinterpret_cast<header_packed*>(request + addressLength() + 1)->targetAddress = targetAddress;
 		reinterpret_cast<header_packed*>(request + addressLength() + 1)->currentPacketSize = currentPacketSize;
 
-		uint8_t response[addressLength() + 1 + currentPacketSize + 1];
+		std::vector<uint8_t> response(addressLength() + 1 + currentPacketSize + 1);
 		
-		if (!transceive(request, request_len, response, sizeof(response))) {
+		if (!transceive(request, request_len, response.data(), response.size())) {
 			return ErrorCode::transceive_error;
 		}
 		// this shouldn't happen
@@ -282,7 +283,7 @@ BootloaderAvrBase::ErrorCode BootloaderAvrBase::readFlash(uint32_t byteAddress, 
 			return ErrorCode::invalid_address;
 		}
 		
-		memcpy(buffer, response + addressLength() + 1, currentPacketSize);
+		memcpy(buffer, response.data() + addressLength() + 1, currentPacketSize);
 		
 		targetAddress += currentPacketSize;
 		buffer += currentPacketSize;

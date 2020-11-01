@@ -395,40 +395,50 @@ public:
   /// \endcode
   /// \param position Iterator auf Element in Array an das Element eingefügt werden soll
   /// \param val einzufügendes Element
+  template<typename U = T, typename std::enable_if<!std::is_trivially_copyable<U>::value, int>::type = 0>
   void insert(iterator position, const value_type& val)
   {
-	if (TURAG_UNLIKELY(is_full()))
-	{
-	  turag_internal_error("ArrayBuffer overflow!");
-	  return;
-	}
+    if (TURAG_UNLIKELY(is_full()))
+    {
+      turag_internal_error("ArrayBuffer overflow!");
+      return;
+    }
 
-	const iterator last = end();
+    const iterator last = end();
 
-	length_++;
+    length_++;
 
-	if (std::is_trivially_copyable<T>::value)
-	{
-		value_type tmp(val);
-		const ptrdiff_t n = last - position;
-		if (n)
-		  memmove(position + 1, position, sizeof(T) * n);
-		bytes_.construct(position, tmp);
-	}
-	else
-	{
-		value_type tmp(val);
-		if (position != last)
-		{
-			construct(last, std::move(*(last - 1)));
-			TURAG::move_backward(position, last - 1, last);
-			*position = tmp;
-		}
-		else
-		{
-			bytes_.construct(position, val);
-		}
-	}
+    value_type tmp(val);
+    if (position != last)
+    {
+      construct(last, std::move(*(last - 1)));
+      TURAG::move_backward(position, last - 1, last);
+      *position = tmp;
+    }
+    else
+    {
+      bytes_.construct(position, val);
+    }
+  }
+
+  template<typename U = T, typename std::enable_if<std::is_trivially_copyable<U>::value, int>::type = 0>
+  void insert(iterator position, const value_type& val)
+  {
+    if (TURAG_UNLIKELY(is_full()))
+    {
+      turag_internal_error("ArrayBuffer overflow!");
+      return;
+    }
+
+    const iterator last = end();
+
+    length_++;
+
+    value_type tmp(val);
+    const ptrdiff_t n = last - position;
+    if (n)
+      memmove(position + 1, position, sizeof(T) * n);
+    bytes_.construct(position, tmp);
   }
 
   /// Element an beliebiger Position einfügen
@@ -454,39 +464,47 @@ public:
   /// \endcode
   /// \param position Iterator auf Element in Array an das Element eingefügt werden soll
   /// \param args Argumente für einen Konstruktor von Typ \a T um Element zu erstellen
-  template<class... Args> TURAG_ALWAYS_INLINE
-  void emplace(iterator position, Args&&... args) {
-	  if (TURAG_UNLIKELY(is_full()))
-	  {
-		turag_internal_error("ArrayBuffer overflow!");
-		return;
-	  }
+  template<class... Args, typename U = T, typename std::enable_if<!std::is_trivially_copyable<U>::value, int>::type = 0>
+  TURAG_ALWAYS_INLINE void emplace(iterator position, Args&&... args) {
+    if (TURAG_UNLIKELY(is_full()))
+    {
+      turag_internal_error("ArrayBuffer overflow!");
+      return;
+    }
 
-	  const iterator last = end();
+    const iterator last = end();
 
-	  length_++;
+    length_++;
 
-	  if (std::is_trivially_copyable<T>::value)
-	  {
-		  const ptrdiff_t n = last - position;
-		  if (n)
-			memmove(position + 1, position, sizeof(T) * n);
-		  bytes_.construct(position, std::forward<Args>(args)...);
-	  }
-	  else
-	  {
-		  if (position != last)
-		  {
-			  construct(last, std::move(*(last - 1)));
-			  TURAG::move_backward(position, last - 1, last);
-			  *position = T(std::forward<Args>(args)...);
-		  }
-		  else
-		  {
-			  // es muss nichts verschoben werden, wir sind am Ende
-			  bytes_.construct(position, std::forward<Args>(args)...);
-		  }
-	  }
+    if (position != last)
+    {
+      construct(last, std::move(*(last - 1)));
+      TURAG::move_backward(position, last - 1, last);
+      *position = T(std::forward<Args>(args)...);
+    }
+    else
+    {
+      // es muss nichts verschoben werden, wir sind am Ende
+      bytes_.construct(position, std::forward<Args>(args)...);
+    }
+  }
+
+  template<class... Args, typename U = T, typename std::enable_if<std::is_trivially_copyable<U>::value, int>::type = 0>
+  TURAG_ALWAYS_INLINE void emplace(iterator position, Args&&... args) {
+    if (TURAG_UNLIKELY(is_full()))
+    {
+      turag_internal_error("ArrayBuffer overflow!");
+      return;
+    }
+
+    const iterator last = end();
+
+    length_++;
+
+    const ptrdiff_t n = last - position;
+    if (n)
+      memmove(position + 1, position, sizeof(T) * n);
+    bytes_.construct(position, std::forward<Args>(args)...);
   }
 
   /// Element entfernen

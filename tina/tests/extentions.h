@@ -6,7 +6,7 @@
 template<class C, class T>
 std::basic_ostream<C, T>& operator<<(std::basic_ostream<C, T>& os, std::nullptr_t)
 {
-  return os << (void*) nullptr;
+  return os << static_cast<void>(nullptr);
 }
 
 #endif // TESTS_EXTENTIONS_H

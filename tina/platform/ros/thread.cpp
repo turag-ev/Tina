@@ -72,7 +72,7 @@ ThreadPrivate& getPrivate()
 void CurrentThread::setName(const char *name)
 {
 #ifndef _WIN32
-	prctl(PR_SET_NAME, (unsigned long)name, 0, 0, 0);
+	prctl(PR_SET_NAME, reinterpret_cast<unsigned long>(name), 0, 0, 0);
 #endif
 }
 
