@@ -10,16 +10,16 @@
 #ifndef TINAPP_FELDBUS_HOST_DEVICE_H
 #define TINAPP_FELDBUS_HOST_DEVICE_H
 
-#include <tina++/tina.h>
+#include <tina++/debug/errorobserver.h>
+#include <tina++/feldbus/host/feldbusabstraction.h>
 #include <tina++/thread.h>
 #include <tina++/time.h>
-#include <tina++/debug/errorobserver.h>
+#include <tina++/tina.h>
 #include <tina/feldbus/protocol/turag_feldbus_bus_protokoll.h>
-#include <tina++/feldbus/host/feldbusabstraction.h>
 
 
 #if !TURAG_USE_TURAG_FELDBUS_HOST
-# warning TURAG_USE_TURAG_FELDBUS_HOST must be defined to 1
+#warning TURAG_USE_TURAG_FELDBUS_HOST must be defined to 1
 #endif
 
 
@@ -88,31 +88,30 @@
 /// Definiert, wie oft eine Übertragung wiederholt wird, bis mit einem Fehler
 /// abgebrochen wird, falls im Konstruktor kein anderer Wert übergeben wird.
 #if !defined(TURAG_FELDBUS_DEVICE_CONFIG_MAX_TRANSMISSION_ATTEMPTS) || defined(__DOXYGEN__)
-# define TURAG_FELDBUS_DEVICE_CONFIG_MAX_TRANSMISSION_ATTEMPTS		5
+#define TURAG_FELDBUS_DEVICE_CONFIG_MAX_TRANSMISSION_ATTEMPTS 5
 #endif
 
 /// Definiert, wieviele Übetragungen hintereinander fehlschlagen müssen,
 /// damit das Gerät als dysfunktional deklariert wird, falls im Konstruktor
 /// kein anderer Wert angegeben wird.
 #if !defined(TURAG_FELDBUS_DEVICE_CONFIG_MAX_TRANSMISSION_ERRORS) || defined(__DOXYGEN__)
-# define TURAG_FELDBUS_DEVICE_CONFIG_MAX_TRANSMISSION_ERRORS			35
+#define TURAG_FELDBUS_DEVICE_CONFIG_MAX_TRANSMISSION_ERRORS 35
 #endif
 
 /// Checksummen-Algorithmus der beim Instanziieren von Feldbusklassen
 /// standardmäßig benutzt wird.
 #if !defined(TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_CHECKSUM_TYPE) || defined(__DOXYGEN__)
-# define TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_CHECKSUM_TYPE			TURAG::Feldbus::ChecksumType::crc8_icode
+#define TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_CHECKSUM_TYPE TURAG::Feldbus::ChecksumType::crc8_icode
 #endif
 
 /// Standardmäßige Adresslänge.
 #if !defined(TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_ADDRESS_LENGTH) || defined(__DOXYGEN__)
-# define TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_ADDRESS_LENGTH		TURAG::Feldbus::Device::AddressLength::byte_
+#define TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_ADDRESS_LENGTH TURAG::Feldbus::Device::AddressLength::byte_
 #endif
 
 /*!
  * @}
  */
-
 
 
 namespace TURAG {
@@ -126,7 +125,7 @@ namespace TURAG {
  * Slave-Implementierungen sind im Namspace \ref Feldbus::Slave zu finden.
  *
  * @ingroup feldbus-host
- */	
+ */
 namespace Feldbus {
 
 
@@ -157,54 +156,58 @@ namespace Feldbus {
  * 
  */
 class Device {
-	Device(const Device&) = delete;
-	Device& operator=(const Device&) = delete;
+    Device(const Device&) = delete;
+    Device& operator=(const Device&) = delete;
+
 public:
-	/**
+    /**
 	 * \brief Verfügbare Adresslängen.
 	 */
-	enum class AddressLength : uint8_t {
-		// do not change the values! They are casted to
-		// int and used for pointer arithmetics.
-		// Also the size of the address fields in the following templates
-		// equal the largest element.
-		byte_ = 1, 	///< Adresse umfasst 1 Byte.
-		short_ = 2	///< Adresse umfasst 2 Byte.
-	};
+
+    Device(Device&&) = default;
+    Device& operator=(Device&&) = default;
+    enum class AddressLength : uint8_t {
+        // do not change the values! They are casted to
+        // int and used for pointer arithmetics.
+        // Also the size of the address fields in the following templates
+        // equal the largest element.
+        byte_ = 1, ///< Adresse umfasst 1 Byte.
+        short_ = 2 ///< Adresse umfasst 2 Byte.
+    };
 
     /*!
      * \brief Struktur-Template zur Verwendung mit transceive().
 	 * 
 	 * address und checksum werden dann automatisch befüllt.
      */
-    template<typename T = void>
+    template <typename T = void>
     struct Broadcast {
-		uint8_t address[2];
+        uint8_t address[2];
         uint8_t id;
         T data;
         uint8_t checksum;
     } TURAG_PACKED;
 
-	/**
+    /**
 	 * \brief Struktur-Template zur Verwendung mit transceive().
 	 * 
 	 * address und checksum werden dann automatisch befüllt.
 	 */
-    template<typename T = void>
-	struct Request {
-		uint8_t address[2];
+    template <typename T = void>
+    struct Request {
+        uint8_t address[2];
         T data;
         uint8_t checksum;
     } TURAG_PACKED;
 
-	/**
+    /**
 	 * \brief Struktur-Template zur Verwendung mit transceive().
 	 * 
 	 * address und checksum werden dann automatisch befüllt.
 	 */
-    template<typename T = void>
+    template <typename T = void>
     struct Response {
-		uint8_t address[2];
+        uint8_t address[2];
         T data;
         uint8_t checksum;
     } TURAG_PACKED;
@@ -215,42 +218,42 @@ public:
      * Diese Struktur entspricht vom Speicherlayout nicht dem, was der
      * Slave über den Bus sendet.
      */
-	class DeviceInfo {
-		friend class Device;
-	public:
-		DeviceInfo() :
-			uptimeFrequency_(0),
-			bufferSize_(0),
-			deviceProtocolId_(0),
-			deviceTypeId_(0),
-			crcType_(0),
-			nameLength_(0),
-			versioninfoLength_(0)
-		{}
+    class DeviceInfo {
+        friend class Device;
 
-		bool isValid(void) { return bufferSize_ != 0; }
+    public:
+        DeviceInfo()
+            : uptimeFrequency_(0),
+              bufferSize_(0),
+              deviceProtocolId_(0),
+              deviceTypeId_(0),
+              crcType_(0),
+              nameLength_(0),
+              versioninfoLength_(0) {}
 
-		uint8_t deviceProtocolId(void) const { return deviceProtocolId_; }
-		uint8_t deviceTypeId(void) const { return deviceTypeId_; }
-		ChecksumType crcType(void) const { return static_cast<ChecksumType>(crcType_ & 0x07); }
-		bool packageStatisticsAvailable(void) const { return crcType_ & 0x80 ? true : false; }
-		uint16_t bufferSize(void) const { return bufferSize_; }
-		uint8_t nameLength(void) const { return nameLength_; }
-		uint8_t versionInfoLength(void) const { return versioninfoLength_; }
-		uint16_t uptimeFrequency(void) const { return uptimeFrequency_; }
+        bool isValid(void) { return bufferSize_ != 0; }
 
-	private:
-		uint16_t uptimeFrequency_;
-		uint16_t bufferSize_;
-		uint8_t deviceProtocolId_;
-		uint8_t deviceTypeId_;
-		uint8_t crcType_;
-		uint8_t nameLength_;
-		uint8_t versioninfoLength_;
+        uint8_t deviceProtocolId(void) const { return deviceProtocolId_; }
+        uint8_t deviceTypeId(void) const { return deviceTypeId_; }
+        ChecksumType crcType(void) const { return static_cast<ChecksumType>(crcType_ & 0x07); }
+        bool packageStatisticsAvailable(void) const { return crcType_ & 0x80 ? true : false; }
+        uint16_t bufferSize(void) const { return bufferSize_; }
+        uint8_t nameLength(void) const { return nameLength_; }
+        uint8_t versionInfoLength(void) const { return versioninfoLength_; }
+        uint16_t uptimeFrequency(void) const { return uptimeFrequency_; }
+
+    private:
+        uint16_t uptimeFrequency_;
+        uint16_t bufferSize_;
+        uint8_t deviceProtocolId_;
+        uint8_t deviceTypeId_;
+        uint8_t crcType_;
+        uint8_t nameLength_;
+        uint8_t versioninfoLength_;
     };
 
 
-	/**
+    /**
 	 * \brief Konstruktor.
 	 * \param[in] name_ Interner Name des Gerätes, der von name() zurückgeliefert wird.
 	 * \param[in] address Busadresse des Gerätes.
@@ -261,17 +264,17 @@ public:
 	 * \param[in] max_transmission_errors Anzahl hintereinander auftretender Fehler, ab dem das Gerät als dysfunktional deklariert wird.
 	 * \param[in] addressLength Auf dem Bus verwendete Adresslänge.
 	 */
-	Device(const char* name_, unsigned address, FeldbusAbstraction& feldbus,
+    Device(const char* name_, unsigned address, FeldbusAbstraction& feldbus,
            ChecksumType type = TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_CHECKSUM_TYPE,
            const AddressLength addressLength = TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_ADDRESS_LENGTH,
-		   unsigned int max_transmission_attempts = TURAG_FELDBUS_DEVICE_CONFIG_MAX_TRANSMISSION_ATTEMPTS,
-		   unsigned int max_transmission_errors = TURAG_FELDBUS_DEVICE_CONFIG_MAX_TRANSMISSION_ERRORS);
+           unsigned int max_transmission_attempts = TURAG_FELDBUS_DEVICE_CONFIG_MAX_TRANSMISSION_ATTEMPTS,
+           unsigned int max_transmission_errors = TURAG_FELDBUS_DEVICE_CONFIG_MAX_TRANSMISSION_ERRORS);
 
 #if TURAG_USE_LIBSUPCPP_RUNTIME_SUPPORT
-	virtual ~Device() { }
+    virtual ~Device() {}
 #endif
 
-	/**
+    /**
 	 * \brief Gibt zurück, ob das Gerät verfügbar ist.
 	 * \param[in] forceUpdate Gibt an, ob in jedem Fall ein 
 	 * Ping-Paket versendet werden soll, um eine möglichst aktuelle
@@ -306,7 +309,7 @@ public:
 	 */
     bool isAvailable(bool forceUpdate = false);
 
-	/**
+    /**
 	 * @brief Gibt den Namen des Gerätes zurück.
 	 * @return Name des Gerätes.
 	 *
@@ -316,21 +319,21 @@ public:
 	 *
 	 * \see receiveDeviceRealName
 	 */
-	const char* name(void) const { return name_; }
+    const char* name(void) const { return name_; }
 
-	/*!
+    /*!
 	 * \brief Gibt die Adresse des Gerätes zurück.
 	 * \return Adresse des Gerätes.
 	 */
-	unsigned address(void) const { return myAddress; }
+    unsigned address(void) const { return myAddress; }
 
-	/**
+    /**
 	 * @brief Gibt die Adresslänge des Gerätes zurück.
 	 * @return Adresslänge in Byte.
 	 */
-	unsigned addressLength(void) const { return myAddressLength; }
-	
-	/*!
+    unsigned addressLength(void) const { return myAddressLength; }
+
+    /*!
 	 * \brief Gibt die Geräte-Info zurück.
 	 * \param[out] device_info Pointer auf DeviceInfo, was nach dem Aufruf die Daten
 	 * enthält.
@@ -346,9 +349,9 @@ public:
 	 * zu einem früheren Zeitpunkt geschehen ist) und können von dort
 	 * ausgelesen werden.
 	 */
-	bool getDeviceInfo(DeviceInfo* device_info);
-   
-	/*!
+    bool getDeviceInfo(DeviceInfo* device_info);
+
+    /*!
 	 * \brief Empfängt die im Gerät hinterlegte Bezeichnung des Slaves.
 	 * \param[out] out_real_name Char-Array, das den String aufnimmt.
 	 * \return True bei erfolgreichem Empfang der Gerätebezeichnung.
@@ -362,8 +365,8 @@ public:
 	 * werden!
 	 */
     bool receiveDeviceRealName(char* out_real_name);
-	
-	/*!
+
+    /*!
 	 * \brief Empfängt die Versionsinfo des Gerätes.
 	 * \param[out] out_version_info Char-Array, das den String aufnimmt.
 	 * \return True bei erfolgreichem Empfang der Versionsinfo.
@@ -376,9 +379,9 @@ public:
 	 * String zurückgibt. Daher muss out_version_info ein Byte größer reserviert
 	 * werden!
 	 */
-	bool receiveVersionInfo(char* out_version_info);
-	
-	/**
+    bool receiveVersionInfo(char* out_version_info);
+
+    /**
 	 * \brief Fragt die Uptime des Gerätes ab.
 	 * \param[out] uptime Puffer in dem die Uptime gespeichert wird.
 	 * \return True bei Erfolg, ansonsten false.
@@ -388,41 +391,41 @@ public:
 	 * Wenn das Gerät die eigene Uptime nicht zählt, so wird 
 	 * NaN in uptime geschrieben.
 	 */
-	bool receiveUptime(float* uptime);
-	
-	/**
+    bool receiveUptime(float* uptime);
+
+    /**
 	 * \brief Fragt die Anzahl korrekt empfangener Pakete vom Slave ab.
 	 * \param[out] packageCount Puffer in dem der Wert gespeichert wird.
 	 * \return True bei Erfolg, ansonsten false.
 	 * \see https://intern.turag.de/wiki/doku.php/id,04_programmierung;protokolle_busse;turag-simplebus/#fehlerzustaende
 	 */
-	bool receiveNumberOfAcceptedPackages(uint32_t* packageCount);
-	
-	/**
+    bool receiveNumberOfAcceptedPackages(uint32_t* packageCount);
+
+    /**
 	 * \brief Fragt die Anzahl aufgetretener Pufferüberlaufe vom Slave ab.
 	 * \param[out] overflowCount Puffer in dem der Wert gespeichert wird.
 	 * \return True bei Erfolg, ansonsten false.
 	 * \see https://intern.turag.de/wiki/doku.php/id,04_programmierung;protokolle_busse;turag-simplebus/#fehlerzustaende
 	 */
-	bool receiveNumberOfOverflows(uint32_t* overflowCount);
-	
-	/**
+    bool receiveNumberOfOverflows(uint32_t* overflowCount);
+
+    /**
 	 * \brief Fragt die Anzahl verlorener Pakete vom Slave ab.
 	 * \param[out] lostPackagesCount Puffer in dem der Wert gespeichert wird.
 	 * \return True bei Erfolg, ansonsten false.
 	 * \see https://intern.turag.de/wiki/doku.php/id,04_programmierung;protokolle_busse;turag-simplebus/#fehlerzustaende
 	 */
-	bool receiveNumberOfLostPackages(uint32_t* lostPackagesCount);
-	
-	/**
+    bool receiveNumberOfLostPackages(uint32_t* lostPackagesCount);
+
+    /**
 	 * \brief Fragt die Anzahl aufgetretener Checksummenfehler vom Slave ab.
 	 * \param[out] checksumErrorCount Puffer in dem der Wert gespeichert wird.
 	 * \return True bei Erfolg, ansonsten false.
 	 * \see https://intern.turag.de/wiki/doku.php/id,04_programmierung;protokolle_busse;turag-simplebus/#fehlerzustaende
 	 */
-	bool receiveNumberOfChecksumErrors(uint32_t* checksumErrorCount);
-	
-	/**
+    bool receiveNumberOfChecksumErrors(uint32_t* checksumErrorCount);
+
+    /**
 	 * \brief Fragt die Anzahl korrekt empfangener Pakete, aufgetretener Pufferüberlaufe, verlorener Pakete und 
 	 * aufgetretener Checksummenfehler vom Slave ab.
 	 * \param[out] counts Puffer in dem der Wert gespeichert wird.
@@ -432,15 +435,15 @@ public:
 	 * Es werden mit einem Mal alle 4 Werte abgefragt, der Puffer muss also eine
 	 * entsprechende Größe aufweisen.
 	 */
-	bool receiveAllSlaveErrorCount(uint32_t* counts);
-	
-	/**
+    bool receiveAllSlaveErrorCount(uint32_t* counts);
+
+    /**
 	 * \brief Weist das Gerät an, seine internen Paketstatistiken zurückzusetzen.
 	 * \return True bei Erfolg, anonsten false.
 	 */
-	bool resetSlaveErrors(void);
-	
-	/**
+    bool resetSlaveErrors(void);
+
+    /**
 	 * \brief Sendet ein Ping-Paket.
 	 * \return True, wenn des Gerät erwartungsgemäß geantwortet hat, false
 	 * im Fehlerfall.
@@ -452,50 +455,50 @@ public:
 	 * \note Diese Funktion sollte verwendet werden, um für dysfunktionale Geräte
 	 * zu prüfen, ob diese eventuell wieder verfügbar sind.
 	 */
-	bool sendPing(void);
+    bool sendPing(void);
 
-	/**
+    /**
 	 * \brief Gibt die Anzahl der im Master aufgetretenen Checksummenfehler zurück.
 	 * \return Anzahl der Checksummenfehler.
 	 * \see https://intern.turag.de/wiki/doku.php/id,04_programmierung;protokolle_busse;turag-simplebus/#fehlerzustaende
 	 */
-	unsigned int getChecksumErrors(void) const { return myTotalChecksumErrors; }
-	
-	/**
+    unsigned int getChecksumErrors(void) const { return myTotalChecksumErrors; }
+
+    /**
 	 * \brief Gibt die Anzahl der im Master aufgetretenen Antwortfehler zurück.
 	 * \return Anzahl der Antwortfehler.
 	 * \see https://intern.turag.de/wiki/doku.php/id,04_programmierung;protokolle_busse;turag-simplebus/#fehlerzustaende
 	 */
-	unsigned int getNoAnswerErrors(void) const { return myTotalNoAnswerErrors; }
-	
-	/**
+    unsigned int getNoAnswerErrors(void) const { return myTotalNoAnswerErrors; }
+
+    /**
 	 * \brief Gibt die Anzahl der im Master aufgetretenen Datenfehler zurück.
 	 * \return Anzahl der Datenfehler.
 	 * \see https://intern.turag.de/wiki/doku.php/id,04_programmierung;protokolle_busse;turag-simplebus/#fehlerzustaende
 	 */
-	unsigned int getMissingDataErrors(void) const { return myTotalMissingDataErrors; }
+    unsigned int getMissingDataErrors(void) const { return myTotalMissingDataErrors; }
 
-	/**
+    /**
 	 * \brief Gibt die Anzahl der im Master aufgetretenen Sendefehler zurück.
 	 * \return Anzahl der Sendefehler.
 	 * \see https://intern.turag.de/wiki/doku.php/id,04_programmierung;protokolle_busse;turag-simplebus/#fehlerzustaende
 	 */
-	unsigned int getTransmitErrors(void) const { return myTotalTransmitErrors; }
+    unsigned int getTransmitErrors(void) const { return myTotalTransmitErrors; }
 
-	/**
+    /**
 	 * \brief Gibt die Anzahl aller aufgetretenen Fehler zurück.
 	 * \return Gesamtzahl der Fehler.
 	 */
-	unsigned int getAllErrors(void) const { return myTotalChecksumErrors + myTotalNoAnswerErrors + myTotalMissingDataErrors + myTotalTransmitErrors; }
-	
-	/**
+    unsigned int getAllErrors(void) const { return myTotalChecksumErrors + myTotalNoAnswerErrors + myTotalMissingDataErrors + myTotalTransmitErrors; }
+
+    /**
 	 * \brief Gibt die Anzahl der durchgeführten Datenübertragungen zurück.
 	 * \return Anzahl der durchgeführten Datenübertragungen.
 	 * 
 	 * Dieser Wert repräsentiert die Gesamtanzahl an Übertragungsversuchen, schließt also 
 	 * die Fehlerfälle mit ein.
 	 */
-	unsigned int getTotalTransmissions(void) const { return myTotalTransmissions; }
+    unsigned int getTotalTransmissions(void) const { return myTotalTransmissions; }
 
     /**
 	 * \brief Setzt die Error-Counter und den Übertragungs-Counter auf null zurück.
@@ -507,16 +510,16 @@ public:
 	 * statt dieser Funktion sendPing() benutzt werden. Ein Aufruf dieser Funktion
 	 * ist dann nur nötig um die bisherigen Übertragungsstatistiken zurückzusetzen.
 	 */
-    void clearTransmissionCounters(void) { 
-		myTotalChecksumErrors = 0;
-		myTotalNoAnswerErrors = 0;
-		myTotalMissingDataErrors = 0;
-		myTotalTransmitErrors = 0;
-		myTotalTransmissions = 0;
-		myCurrentErrorCounter = 0; 
-		hasCheckedAvailabilityYet = false;
-		dysFunctionalLog_.resetAll();
-	}
+    void clearTransmissionCounters(void) {
+        myTotalChecksumErrors = 0;
+        myTotalNoAnswerErrors = 0;
+        myTotalMissingDataErrors = 0;
+        myTotalTransmitErrors = 0;
+        myTotalTransmissions = 0;
+        myCurrentErrorCounter = 0;
+        hasCheckedAvailabilityYet = false;
+        dysFunctionalLog_.resetAll();
+    }
 
 
     /*!
@@ -534,16 +537,16 @@ public:
 	 * Diese Funktion benutzt intern die plattformabhängige Funktion turag_rs485_transceive(),
 	 * deren Implementierung bestimmt, wie die Übertragung im Detail stattfindet.
 	 */
-	template<typename T, typename U> TURAG_ALWAYS_INLINE
-	bool transceive(Request<T>& transmit, Response<U>* receive, bool ignoreDysfunctional = false) {
-	return transceive(reinterpret_cast<uint8_t*>(&(transmit)) + sizeof(Request<T>::address) - myAddressLength,
-					  sizeof(Request<T>) + myAddressLength - sizeof(Request<T>::address),
-					  reinterpret_cast<uint8_t*>(receive) + sizeof(Response<T>::address) - myAddressLength,
-					  sizeof(Response<U>) + myAddressLength - sizeof(Response<T>::address),
-					  ignoreDysfunctional);
-	}
+    template <typename T, typename U>
+    TURAG_ALWAYS_INLINE bool transceive(Request<T>& transmit, Response<U>* receive, bool ignoreDysfunctional = false) {
+        return transceive(reinterpret_cast<uint8_t*>(&(transmit)) + sizeof(Request<T>::address) - myAddressLength,
+                          sizeof(Request<T>) + myAddressLength - sizeof(Request<T>::address),
+                          reinterpret_cast<uint8_t*>(receive) + sizeof(Response<T>::address) - myAddressLength,
+                          sizeof(Response<U>) + myAddressLength - sizeof(Response<T>::address),
+                          ignoreDysfunctional);
+    }
 
-	/*!
+    /*!
 	 * \brief Versendet einen Broadcast.
 	 * \param[out] transmit Zu sendende Daten, verpackt in eine Broadcast-Struktur.
 	 * \param[in] ignoreDysfunctional Sendet das Paket auch, wenn das Gerät dysfunktional
@@ -553,16 +556,16 @@ public:
 	 * Sendet einen %Broadcast an die in transmit eingestellte Gerätegruppe und
 	 * kehrt zurück, sobald alle Daten geschrieben wurden.
 	 */
-    template<typename T> TURAG_ALWAYS_INLINE
-	bool transceive(Broadcast<T>& transmit, bool ignoreDysfunctional = false) {
-		return transceive(reinterpret_cast<uint8_t*>(&(transmit)) + sizeof(Broadcast<T>::address) - myAddressLength,
-						  sizeof(Broadcast<T>) + myAddressLength - sizeof(Broadcast<T>::address),
-						  nullptr,
-						  0,
-						  ignoreDysfunctional);
-	}
+    template <typename T>
+    TURAG_ALWAYS_INLINE bool transceive(Broadcast<T>& transmit, bool ignoreDysfunctional = false) {
+        return transceive(reinterpret_cast<uint8_t*>(&(transmit)) + sizeof(Broadcast<T>::address) - myAddressLength,
+                          sizeof(Broadcast<T>) + myAddressLength - sizeof(Broadcast<T>::address),
+                          nullptr,
+                          0,
+                          ignoreDysfunctional);
+    }
 
-	/**
+    /**
 	 * @brief Gibt das erste Feldbus-Device zurück.
 	 * @return Zeiger auf das erste Feldbus-Device im System.
 	 *
@@ -571,25 +574,25 @@ public:
 	 *
 	 * \see getNextDevice()
 	 */
-	static Device* getFirstDevice(void) {
-		return firstDevice;
-	}
+    static Device* getFirstDevice(void) {
+        return firstDevice;
+    }
 
-	/**
+    /**
 	 * @brief Gibt das nächste Feldbus-Device zurück.
 	 * @return Zeiger auf das nächste Feldbus-Device im System.
 	 *
 	 * \see getFirstDevice()
 	 */
-	Device* getNextDevice(void) const {
-		return myNextDevice;
-	}
+    Device* getNextDevice(void) const {
+        return myNextDevice;
+    }
 
-	/**
+    /**
 	 * @brief Zugriff auf den mit dem Gerät assoziierten Bus.
 	 * @return Referenz auf eine FeldbusAbstraction-Instanz.
 	 */
-	FeldbusAbstraction& bus(void) const { return bus_; }
+    FeldbusAbstraction& bus(void) const { return bus_; }
 
 protected:
     /*!
@@ -614,9 +617,9 @@ protected:
 	 * Wenn receive oder receive_length 0 ist, so wird angenommen dass eine 
 	 * Broadcastübertragung gewünscht wird und statt der Geräteadresse 0 benutzt.
      */
-	bool transceive(uint8_t *transmit, int transmit_length, uint8_t *receive, int receive_length, bool ignoreDysfunctional = false);
+    bool transceive(uint8_t* transmit, int transmit_length, uint8_t* receive, int receive_length, bool ignoreDysfunctional = false);
 
-	/**
+    /**
 	 * \brief Gibt zurück, ob das Gerät als dysfunktional betrachtet wird.
 	 * \return Wenn das Gerät dysfunktional ist true, ansonsten false.
 	 * 
@@ -634,52 +637,50 @@ protected:
 	 * braucht).
 	 */
     bool isDysfunctional(void) const { return myCurrentErrorCounter >= maxTransmissionErrors; }
-    
+
 
 private:
-	bool receiveString(uint8_t command, uint8_t stringLength, char* out_string);
-	bool receiveErrorCount(uint8_t command, uint32_t* buffer);
+    bool receiveString(uint8_t command, uint8_t stringLength, char* out_string);
+    bool receiveErrorCount(uint8_t command, uint32_t* buffer);
 
 
-// data is ordered to prevent the insertion
-// of padding bytes!
+    // data is ordered to prevent the insertion
+    // of padding bytes!
 public:
-
 protected:
-	/**
+    /**
 	 * \brief Puffert die DeviceInfo-Struktur des Gerätes.
 	 */
-	DeviceInfo myDeviceInfo;
+    DeviceInfo myDeviceInfo;
 
 
 private:
-	Debug::CheapErrorObserver dysFunctionalLog_;
+    Debug::CheapErrorObserver dysFunctionalLog_;
 
-	FeldbusAbstraction& bus_;
+    FeldbusAbstraction& bus_;
 
-	Device* myNextDevice;
-	static Device* firstDevice;
-	static Mutex listMutex;
+    Device* myNextDevice;
+    static Device* firstDevice;
+    static Mutex listMutex;
 
-	const char* name_;
-	const unsigned myAddress;
+    const char* name_;
+    const unsigned myAddress;
 
-	const unsigned int maxTransmissionAttempts;
-	const unsigned int maxTransmissionErrors;
+    const unsigned int maxTransmissionAttempts;
+    const unsigned int maxTransmissionErrors;
 
-	unsigned int myCurrentErrorCounter;
-	unsigned int myTotalTransmissions;
-	unsigned int myTotalChecksumErrors;
-	unsigned int myTotalNoAnswerErrors;
-	unsigned int myTotalMissingDataErrors;
-	unsigned int myTotalTransmitErrors;
+    unsigned int myCurrentErrorCounter;
+    unsigned int myTotalTransmissions;
+    unsigned int myTotalChecksumErrors;
+    unsigned int myTotalNoAnswerErrors;
+    unsigned int myTotalMissingDataErrors;
+    unsigned int myTotalTransmitErrors;
 
-	ChecksumType myChecksumType;
-	const uint8_t myAddressLength;
+    ChecksumType myChecksumType;
+    const uint8_t myAddressLength;
 
-	bool hasCheckedAvailabilityYet;
+    bool hasCheckedAvailabilityYet;
 };
-
 
 
 // specializations of the container templates
@@ -689,9 +690,9 @@ private:
 * 
 * Für Übertragungen, die nur aus Adresse, Broadcast-ID und Checksumme bestehen.
 */
-template<>
+template <>
 struct Device::Broadcast<void> {
-	uint8_t address[2];
+    uint8_t address[2];
     uint8_t id;
     uint8_t checksum;
 } TURAG_PACKED;
@@ -701,9 +702,9 @@ struct Device::Broadcast<void> {
 * 
 * Für Übertragungen, die nur aus Adresse und Checksumme bestehen.
 */
-template<>
+template <>
 struct Device::Request<void> {
-	uint8_t address[2];
+    uint8_t address[2];
     uint8_t checksum;
 } TURAG_PACKED;
 
@@ -712,12 +713,11 @@ struct Device::Request<void> {
 * 
 * Für Übertragungen, die nur aus Adresse und Checksumme bestehen.
 */
-template<>
+template <>
 struct Device::Response<void> {
-	uint8_t address[2];
+    uint8_t address[2];
     uint8_t checksum;
 } TURAG_PACKED;
-
 
 
 } // namespace Feldbus
