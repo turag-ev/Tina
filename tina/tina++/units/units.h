@@ -87,6 +87,10 @@ constexpr Units::Angle operator""_rad(long long unsigned x) { return x * Units::
 constexpr Units::Angle operator""_deg(long double x) { return x * Units::deg; }
 constexpr Units::Angle operator""_deg(long long unsigned x) { return x * Units::deg; }
 
+constexpr Units::Angle operator""_g(long double x) { return x * Units::g; }
+constexpr Units::Angle operator""_kg(long long unsigned x) { return x * Units::kg; }
+constexpr Units::Angle operator""_A(long double x) { return x * Units::A; }
+constexpr Units::Angle operator""_mA(long long unsigned x) { return x * Units::mA; }
 /// \}
 
 } // inline namespace UnitsLiterals
