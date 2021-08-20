@@ -127,7 +127,7 @@ class Mutex {
 public:
   typedef ScopedLock<Mutex> Lock;
 
-  constexpr TURAG_ALWAYS_INLINE
+  TURAG_ALWAYS_INLINE
   Mutex() :
     mut_(_MUTEX_DATA(mut_))
   { }
@@ -204,7 +204,7 @@ public:
 	};
 
 public:
-  constexpr TURAG_ALWAYS_INLINE
+  TURAG_ALWAYS_INLINE
   ConditionVariable(Mutex* mutex) :
     cond_(_CONDVAR_DATA(cond_)), mutex_(mutex)
   { }
@@ -267,7 +267,7 @@ public:
         mailbox_(_MAILBOX_DATA(mailbox_, pointer_buffer_, size)) { }
 
     bool post(void* msg, SystemTime time) {
-        if (chMBPostTimeout(&mailbox_, static_cast<msg_t>(msg), time.value) == MSG_OK) {
+        if (chMBPostTimeout(&mailbox_, reinterpret_cast<msg_t>(msg), time.value) == MSG_OK) {
             return true;
         } else {
             return false;
@@ -276,7 +276,7 @@ public:
     bool post(void* msg) { return post(msg, TIME_INFINITE); }
 
     bool postAhead(void* msg, SystemTime time) {
-        if (chMBPostAheadTimeout(&mailbox_, static_cast<msg_t>(msg), time.value) == MSG_OK) {
+        if (chMBPostAheadTimeout(&mailbox_, reinterpret_cast<msg_t>(msg), time.value) == MSG_OK) {
             return true;
         } else {
             return false;
@@ -288,7 +288,7 @@ public:
         msg_t msg;
 
         if (chMBFetchTimeout(&mailbox_, &msg, time.value) == MSG_OK) {
-            return static_cast<void*>(msg);
+            return reinterpret_cast<void*>(msg);
         } else {
             return nullptr;
         }
