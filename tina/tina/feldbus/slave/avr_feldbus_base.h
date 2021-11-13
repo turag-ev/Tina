@@ -982,6 +982,7 @@ TURAG_INLINE void turag_feldbus_do_processing(void) {
 				case TURAG_FELDBUS_SLAVE_COMMAND_PACKAGE_COUNT_CHKSUM_MISMATCH: {
 					_Static_assert(sizeof(uint32_t) + TURAG_FELDBUS_SLAVE_CONFIG_ADDRESS_LENGTH <= TURAG_FELDBUS_SLAVE_CONFIG_BUFFER_SIZE, "Buffer overflow");
 					turag_feldbus_slave_uart.transmitLength = sizeof(uint32_t) + TURAG_FELDBUS_SLAVE_CONFIG_ADDRESS_LENGTH;
+					break;
 				}
 #endif
 				case TURAG_FELDBUS_SLAVE_COMMAND_PACKAGE_COUNT_ALL: {

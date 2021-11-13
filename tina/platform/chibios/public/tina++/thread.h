@@ -127,9 +127,9 @@ class Mutex {
 public:
   typedef ScopedLock<Mutex> Lock;
 
-  constexpr TURAG_ALWAYS_INLINE
+  TURAG_ALWAYS_INLINE
   Mutex() :
-    mut_(_MUTEX_DATA(mut_))
+    mut_(__MUTEX_DATA(mut_))
   { }
 
   typedef mutex_t* NativeHandle;
@@ -204,9 +204,9 @@ public:
 	};
 
 public:
-  constexpr TURAG_ALWAYS_INLINE
+  TURAG_ALWAYS_INLINE
   ConditionVariable(Mutex* mutex) :
-    cond_(_CONDVAR_DATA(cond_)), mutex_(mutex)
+    cond_(__CONDVAR_DATA(cond_)), mutex_(mutex)
   { }
 
   TURAG_ALWAYS_INLINE bool wait() {
@@ -264,10 +264,10 @@ private:
 
 public:
     explicit Mailbox() :
-        mailbox_(_MAILBOX_DATA(mailbox_, pointer_buffer_, size)) { }
+        mailbox_(__MAILBOX_DATA(mailbox_, pointer_buffer_, size)) { }
 
     bool post(void* msg, SystemTime time) {
-        if (chMBPostTimeout(&mailbox_, static_cast<msg_t>(msg), time.value) == MSG_OK) {
+        if (chMBPostTimeout(&mailbox_, reinterpret_cast<msg_t>(msg), time.value) == MSG_OK) {
             return true;
         } else {
             return false;
@@ -276,7 +276,7 @@ public:
     bool post(void* msg) { return post(msg, TIME_INFINITE); }
 
     bool postAhead(void* msg, SystemTime time) {
-        if (chMBPostAheadTimeout(&mailbox_, static_cast<msg_t>(msg), time.value) == MSG_OK) {
+        if (chMBPostAheadTimeout(&mailbox_, reinterpret_cast<msg_t>(msg), time.value) == MSG_OK) {
             return true;
         } else {
             return false;
@@ -288,7 +288,7 @@ public:
         msg_t msg;
 
         if (chMBFetchTimeout(&mailbox_, &msg, time.value) == MSG_OK) {
-            return static_cast<void*>(msg);
+            return reinterpret_cast<void*>(msg);
         } else {
             return nullptr;
         }
@@ -312,7 +312,7 @@ private:
 
 public:
   explicit Semaphore(int count = 0) :
-      sem_(_SEMAPHORE_DATA(sem_, count)) { }
+      sem_(__SEMAPHORE_DATA(sem_, count)) { }
 
   void wait(void) { while (chSemWait(&sem_) == MSG_RESET); }
   bool wait(SystemTime time);
@@ -333,7 +333,7 @@ private:
 
 public:
   explicit BinarySemaphore(bool taken = true) :
-      sem_(_BSEMAPHORE_DATA(sem_, taken)) { }
+      sem_(__BSEMAPHORE_DATA(sem_, taken)) { }
 
   void wait(void) { while (chBSemWait(&sem_) == MSG_RESET); }
   bool wait(SystemTime time);

@@ -110,7 +110,7 @@ void Driver::transmitDebugData(const void* data, size_t length) {
 #endif
 
 
-void blinkCallback (void *t) {
+void blinkCallback (virtual_timer_t*, void *t) {
     Base::doLedPattern(50);
     chSysLockFromISR();
     chVTSetI(reinterpret_cast<virtual_timer_t*>(t), MS2ST(20), blinkCallback, t);
