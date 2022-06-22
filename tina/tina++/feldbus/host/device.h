@@ -517,32 +517,68 @@ public:
 		dysFunctionalLog_.resetAll();
 	}
 
+    bool executeUuidBroadcastPing(uint32_t *uuid);
+
+    bool pingUuid(uint32_t uuid);
+    bool receiveBusAddress(uint32_t uuid, unsigned* busAddress);
+    bool setBusAddress(uint32_t uuid, unsigned busAddress);
+    bool resetBusAddress(uint32_t uuid);
+    bool enableBusNeighbors(void);
+    bool disableBusNeighbors(void);
+
+    bool resetAllBusAddresses(void);
+
+
 
     /*!
-	 * \brief Blockierende Standard-Datenüberträgung.
-	 * \param[in] transmit Zu sendende Daten, verpackt in einer Request-Struktur.
-	 * \param[out] receive Pointer auf eine Response-Struktur, die nach dem Aufruf die
-	 * Antwortdaten enthält.
-	 * \param[in] ignoreDysfunctional Sendet das Paket auch, wenn das Gerät dysfunktional
-	 * ist.
-	 * \return True bei erfolgreicher Übertragung.
-	 * 
-	 * Sendet ein Datenpaket an das Slavegerät und blockiert solange, bis entweder 
-	 * die erwartete Anzahl an Daten eingetroffen ist oder ein timeout erreicht wurde.
-	 * 
-	 * Diese Funktion benutzt intern die plattformabhängige Funktion turag_rs485_transceive(),
-	 * deren Implementierung bestimmt, wie die Übertragung im Detail stattfindet.
-	 */
-	template<typename T, typename U> _always_inline
-	bool transceive(Request<T>& transmit, Response<U>* receive, bool ignoreDysfunctional = false) {
-	return transceive(reinterpret_cast<uint8_t*>(&(transmit)) + sizeof(Request<T>::address) - myAddressLength,
-					  sizeof(Request<T>) + myAddressLength - sizeof(Request<T>::address),
-					  reinterpret_cast<uint8_t*>(receive) + sizeof(Response<T>::address) - myAddressLength,
-					  sizeof(Response<U>) + myAddressLength - sizeof(Response<T>::address),
-					  ignoreDysfunctional);
-	}
+     * \brief Blockierende Standard-Datenüberträgung.
+     * \param[in] transmit Zu sendende Daten, verpackt in einer Request-Struktur.
+     * \param[out] receive Pointer auf eine Response-Struktur, die nach dem Aufruf die
+     * Antwortdaten enthält.
+     * \param[in] ignoreDysfunctional Sendet das Paket auch, wenn das Gerät dysfunktional
+     * ist.
+     * \return True bei erfolgreicher Übertragung.
+     *
+     * Sendet ein Datenpaket an das Slavegerät und blockiert solange, bis entweder
+     * die erwartete Anzahl an Daten eingetroffen ist oder ein timeout erreicht wurde.
+     *
+     * Diese Funktion benutzt intern die plattformabhängige Funktion turag_rs485_transceive(),
+     * deren Implementierung bestimmt, wie die Übertragung im Detail stattfindet.
+     */
+    template<typename T, typename U> _always_inline
+    bool transceive(Request<T>& transmit, Response<U>* receive, bool ignoreDysfunctional = false) {
+    return transceive(reinterpret_cast<uint8_t*>(&(transmit)) + sizeof(Request<T>::address) - myAddressLength,
+                      sizeof(Request<T>) + myAddressLength - sizeof(Request<T>::address),
+                      reinterpret_cast<uint8_t*>(receive) + sizeof(Response<T>::address) - myAddressLength,
+                      sizeof(Response<U>) + myAddressLength - sizeof(Response<T>::address),
+                      ignoreDysfunctional);
+    }
 
-	/*!
+    /*!
+     * \brief Versendet einen Broadcast mit Antwort.
+     * \param[in] transmit Zu sendende Daten, verpackt in einer Broadcast-Struktur.
+     * \param[out] receive Pointer auf eine Response-Struktur, die nach dem Aufruf die
+     * Antwortdaten enthält.
+     * \param[in] ignoreDysfunctional Sendet das Paket auch, wenn das Gerät dysfunktional
+     * ist.
+     * \return True bei erfolgreicher Übertragung.
+     *
+     * Sendet ein Datenpaket an das Slavegerät und blockiert solange, bis entweder
+     * die erwartete Anzahl an Daten eingetroffen ist oder ein timeout erreicht wurde.
+     *
+     * Diese Funktion benutzt intern die plattformabhängige Funktion turag_rs485_transceive(),
+     * deren Implementierung bestimmt, wie die Übertragung im Detail stattfindet.
+     */
+    template<typename T, typename U> _always_inline
+    bool transceive(Broadcast<T>& transmit, Response<U>* receive, bool ignoreDysfunctional = false) {
+    return transceive(reinterpret_cast<uint8_t*>(&(transmit)) + sizeof(Broadcast<T>::address) - myAddressLength,
+                      sizeof(Broadcast<T>) + myAddressLength - sizeof(Broadcast<T>::address),
+                      reinterpret_cast<uint8_t*>(receive) + sizeof(Response<T>::address) - myAddressLength,
+                      sizeof(Response<U>) + myAddressLength - sizeof(Response<T>::address),
+                      ignoreDysfunctional, true);
+    }
+
+    /*!
 	 * \brief Versendet einen Broadcast.
 	 * \param[out] transmit Zu sendende Daten, verpackt in eine Broadcast-Struktur.
 	 * \param[in] ignoreDysfunctional Sendet das Paket auch, wenn das Gerät dysfunktional
@@ -558,7 +594,7 @@ public:
 						  sizeof(Broadcast<T>) + myAddressLength - sizeof(Broadcast<T>::address),
 						  nullptr,
 						  0,
-						  ignoreDysfunctional);
+                          ignoreDysfunctional, true);
 	}
 
 	/**
@@ -613,7 +649,7 @@ protected:
 	 * Wenn receive oder receive_length 0 ist, so wird angenommen dass eine 
 	 * Broadcastübertragung gewünscht wird und statt der Geräteadresse 0 benutzt.
      */
-	bool transceive(uint8_t *transmit, int transmit_length, uint8_t *receive, int receive_length, bool ignoreDysfunctional = false);
+    bool transceive(uint8_t *transmit, int transmit_length, uint8_t *receive, int receive_length, bool ignoreDysfunctional = false, bool transmitBroadcast = false);
 
 	/**
 	 * \brief Gibt zurück, ob das Gerät als dysfunktional betrachtet wird.
@@ -636,8 +672,8 @@ protected:
     
 
 private:
-	bool receiveString(uint8_t command, uint8_t stringLength, char* out_string);
-	bool receiveErrorCount(uint8_t command, uint32_t* buffer);
+    bool receiveString(uint8_t command, uint8_t stringLength, char* out_string);
+    bool receiveErrorCount(uint8_t command, uint32_t* buffer);
 
 
 // data is ordered to prevent the insertion

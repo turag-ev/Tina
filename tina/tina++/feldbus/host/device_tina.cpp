@@ -81,7 +81,7 @@ Device::Device(const char* name, unsigned address, FeldbusAbstraction& feldbus, 
 }
 
  
-bool Device::transceive(uint8_t *transmit, int transmit_length, uint8_t *receive, int receive_length, bool ignoreDysfunctional)
+bool Device::transceive(uint8_t *transmit, int transmit_length, uint8_t *receive, int receive_length, bool ignoreDysfunctional, bool transmitBroadcast)
 {
 	bool bailOutBecauseDysfunctional = isDysfunctional() && !ignoreDysfunctional;
 
@@ -96,7 +96,7 @@ bool Device::transceive(uint8_t *transmit, int transmit_length, uint8_t *receive
 	// Generate target address.
 	// We assume the caller wants to transmit a broadcast, if he does not supply any means to store an answer.
 	// Thus we use zero rather than the device's address.
-	unsigned useAddress = !receive || !receive_length ? TURAG_FELDBUS_BROADCAST_ADDR : myAddress;
+    unsigned useAddress = !receive || !receive_length || transmitBroadcast ? TURAG_FELDBUS_BROADCAST_ADDR : myAddress;
 
 	switch (myAddressLength) {
 	case 1:
@@ -449,6 +449,159 @@ bool Device::resetSlaveErrors(void) {
 	
 	return transceive(request, &response);
 }
+
+bool Device::executeUuidBroadcastPing(uint32_t* uuid) {
+    Broadcast<uint8_t> request;
+    request.id = 0x00;
+    request.data = 0x00;
+
+    // this seems to be required for proper alignment
+    struct Value {
+        uint32_t uuid;
+    } _packed;
+
+    Response<Value> response;
+
+    if (!transceive(request, &response)) {
+        return false;
+    }
+
+    *uuid = response.data.uuid;
+    return true;
+}
+
+bool Device::pingUuid(uint32_t uuid) {
+    struct Value {
+        uint8_t key;
+        uint32_t uuid;
+    } _packed;
+
+    Broadcast<Value> request;
+
+    request.id = 0x00;
+    request.data.key = 0x00;
+    request.data.uuid = uuid;
+
+    Response<> response;
+
+    return transceive(request, &response);
+}
+
+bool Device::receiveBusAddress(uint32_t uuid, unsigned* busAddress) {
+    struct Value {
+        uint8_t key;
+        uint32_t uuid;
+        uint8_t key2;
+    } _packed;
+
+    Broadcast<Value> request;
+
+    request.id = 0x00;
+    request.data.key = 0x00;
+    request.data.uuid = uuid;
+    request.data.key2 = 0x00;
+
+    Response<uint8_t> response;
+
+    if (!transceive(request, &response)) {
+        return false;
+    }
+
+    *busAddress = response.data;
+    return true;
+}
+
+bool Device::setBusAddress(uint32_t uuid, unsigned busAddress) {
+    struct Value {
+        uint8_t key;
+        uint32_t uuid;
+        uint8_t key2;
+        uint8_t busAddress;
+    } _packed;
+
+    struct Value2 {
+        uint8_t key;
+        uint32_t uuid;
+        uint8_t key2;
+        uint16_t busAddress;
+    } _packed;
+
+    if (myAddressLength == 1) {
+        Broadcast<Value> request;
+
+        request.id = 0x00;
+        request.data.key = 0x00;
+        request.data.uuid = uuid;
+        request.data.key2 = 0x00;
+        request.data.busAddress = busAddress & 0xFF;
+
+        Response<uint8_t> response;
+
+        if (!transceive(request, &response)) {
+            return false;
+        }
+
+        return response.data == 1;
+    } else {
+        Broadcast<Value2> request;
+
+        request.id = 0x00;
+        request.data.key = 0x00;
+        request.data.uuid = uuid;
+        request.data.key2 = 0x00;
+        request.data.busAddress = busAddress & 0xFFFF;
+
+        Response<uint8_t> response;
+
+        if (!transceive(request, &response)) {
+            return false;
+        }
+        return response.data == 1;
+    }
+}
+
+bool Device::resetBusAddress(uint32_t uuid) {
+    struct Value {
+        uint8_t key;
+        uint32_t uuid;
+        uint8_t key2;
+    } _packed;
+
+    Broadcast<Value> request;
+
+    request.id = 0x00;
+    request.data.key = 0x00;
+    request.data.uuid = uuid;
+    request.data.key2 = 0x01;
+
+    Response<> response;
+
+    return transceive(request, &response);
+}
+
+bool Device::enableBusNeighbors(void) {
+    Broadcast<uint8_t> request;
+    request.id = 0x00;
+    request.data = 0x01;
+
+    return transceive(request);
+}
+bool Device::disableBusNeighbors(void) {
+    Broadcast<uint8_t> request;
+    request.id = 0x00;
+    request.data = 0x02;
+
+    return transceive(request);
+}
+
+bool Device::resetAllBusAddresses(void) {
+    Broadcast<uint8_t> request;
+    request.id = 0x00;
+    request.data = 0x03;
+
+    return transceive(request);
+}
+
 
 
 

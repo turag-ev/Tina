@@ -38,11 +38,16 @@ public:
 	bool sendStartProgramBroadcast(void);
 
 	uint16_t getMcuId(void);
+    bool receiveMcuIdString(char* out_string);
+
 	bool unlockBootloader(void);
 	bool isUnlocked(void) const { return unlocked; }
 	
     static const char* getMcuName(uint16_t mcuId);
+
 private:
+    bool receiveString(uint8_t command, uint8_t stringLength, char* out_string);
+
 	uint16_t myMcuId;
 	bool unlocked;
 };
@@ -199,6 +204,37 @@ public:
 private:
 	char revisionId;
 };
+
+
+class BootloaderStm32v2 : public BootloaderAvrBase {
+public:
+    /**
+     * \brief Konstruktor.
+     * \param[in] name
+     * \param[in] address
+     * \param[in] feldbus
+     * \param[in] type
+     * \param[in] addressLength
+     */
+    BootloaderStm32v2(const char* name, unsigned address, FeldbusAbstraction& feldbus, ChecksumType type = TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_CHECKSUM_TYPE,
+        const AddressLength addressLength = TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_ADDRESS_LENGTH) :
+        BootloaderAvrBase(name, address, feldbus, type, addressLength), bootloaderInitialStackAddress(0xFFFFFFFF), bootloaderResethandlerAddress(0xFFFFFFFF)
+    {
+    }
+
+    uint32_t getBootloaderInitialStackAddress();
+    uint32_t getBootloaderResetHandlerAddress();
+
+    TURAG::Feldbus::BootloaderAvrBase::ErrorCode writeAppResetVectors(uint32_t stackAddress, uint32_t resetHandlerAddress);
+
+private:
+    bool readBootloaderAddresses();
+
+    uint32_t bootloaderInitialStackAddress;
+    uint32_t bootloaderResethandlerAddress;
+};
+
+
 
 
 } // namespace Feldbus

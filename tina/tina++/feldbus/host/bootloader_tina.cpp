@@ -93,6 +93,51 @@ bool Bootloader::unlockBootloader(void) {
 	}
 }
 
+bool Bootloader::receiveString(uint8_t command, uint8_t stringLength, char* out_string) {
+    if (!out_string) {
+        return false;
+    }
+
+    // because we receive a packet including address and checksum
+    // we need a slightly bigger array.
+    char recvBuffer[stringLength + addressLength() + 1];
+
+
+    uint8_t request[addressLength() + 1 + 1];
+    request[addressLength()] = command;
+
+    if (!transceive(request,
+                      sizeof(request),
+                      reinterpret_cast<uint8_t*>(recvBuffer),
+                      stringLength + addressLength() + 1)) {
+        return false;
+    }
+
+    for (int i = 0; i < stringLength; ++i) {
+        out_string[i] = recvBuffer[i + addressLength()];
+    }
+    out_string[stringLength] = 0;
+
+    return true;
+}
+
+bool Bootloader::receiveMcuIdString(char* out_string) {
+    Device::Request<uint8_t> request;
+    request.data = TURAG_FELDBUS_BOOTLOADER_COMMAND_RECEIVE_MCU_STRING_LENGTH;
+
+    Device::Response<uint8_t> response;
+
+    if (transceive(request, &response)) {
+        return receiveString(
+            TURAG_FELDBUS_BOOTLOADER_COMMAND_RECEIVE_MCU_STRING,
+            response.data,
+            out_string);
+    } else {
+        return false;
+    }
+}
+
+
 
 uint16_t BootloaderAvrBase::getPageSize(void) {
 	if (myPageSize == 0) {
@@ -417,6 +462,61 @@ char BootloaderXmega::getRevisionId(void) {
 		}
 	}
 	return revisionId;
+}
+
+bool BootloaderStm32v2::readBootloaderAddresses() {
+    struct BootloaderAddresses {
+        uint32_t stackAddress;
+        uint32_t resethandlerAddress;
+    } _packed;
+
+    Device::Request<uint8_t> request;
+    request.data = TURAG_FELDBUS_BOOTLOADER_STM32V2_GET_BOOTLOADER_RESET_VECTOR;
+
+    Device::Response<BootloaderAddresses> response;
+
+    if (transceive(request, &response)) {
+        bootloaderInitialStackAddress = response.data.stackAddress;
+        bootloaderResethandlerAddress = response.data.resethandlerAddress;
+        return true;
+    }
+
+    return false;
+}
+
+uint32_t BootloaderStm32v2::getBootloaderInitialStackAddress() {
+    if (bootloaderInitialStackAddress == 0xFFFFFFFF) {
+        readBootloaderAddresses();
+    }
+    return bootloaderInitialStackAddress;
+}
+
+uint32_t BootloaderStm32v2::getBootloaderResetHandlerAddress() {
+    if (bootloaderResethandlerAddress == 0xFFFFFFFF) {
+        readBootloaderAddresses();
+    }
+    return bootloaderResethandlerAddress;
+}
+
+TURAG::Feldbus::BootloaderAvrBase::ErrorCode BootloaderStm32v2::writeAppResetVectors(uint32_t stackAddress, uint32_t resetHandlerAddress) {
+    struct StoreBootloaderAddressesRequest {
+        uint8_t cmd;
+        uint32_t stackAddress;
+        uint32_t resethandlerAddress;
+    } _packed;
+
+    Device::Request<StoreBootloaderAddressesRequest> request;
+    request.data.cmd = TURAG_FELDBUS_BOOTLOADER_STM32V2_STORE_APP_RESET_VECTORS;
+    request.data.stackAddress = stackAddress;
+    request.data.resethandlerAddress = resetHandlerAddress;
+
+    Device::Response<uint8_t> response;
+
+    if (transceive(request, &response)) {
+        return (TURAG::Feldbus::BootloaderAvrBase::ErrorCode)response.data;
+    }
+
+    return TURAG::Feldbus::BootloaderAvrBase::ErrorCode::transceive_error;
 }
 
 const char* Bootloader::getMcuName(uint16_t mcuId) {
