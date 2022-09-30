@@ -4,6 +4,9 @@ INCLUDEPATH *= $$PWD
 DEPENDPATH  *= $$PWD
 
 HEADERS  += \
+    $$PWD/tina++/feldbus/host/feldbus_basedevice.h \
+    $$PWD/tina++/feldbus/host/feldbus_binaryaddresssearcher.h \
+    $$PWD/tina++/feldbus/host/feldbus_devicelocator.h \
     $$PWD/tina/tina.h \
     $$PWD/tina++/tina.h \
     $$PWD/tina++/container/array_buffer.h \
@@ -251,6 +254,9 @@ contains(TINA, ros) {
 }
 
 SOURCES += \
+    $$PWD/tina++/feldbus/host/feldbus_basedevice.cpp \
+    $$PWD/tina++/feldbus/host/feldbus_binaryaddresssearcher.cpp \
+    $$PWD/tina++/feldbus/host/feldbus_devicelocator.cpp \
     $$PWD/tina++/statemachine/action.cpp \
     $$PWD/tina++/geometry/riemanangle.cpp \
     $$PWD/tina++/feldbus/host/muxer_64_32.cpp

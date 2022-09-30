@@ -45,25 +45,16 @@ Device* Device::firstDevice(nullptr);
 
 
 Device::Device(const char* name, unsigned address, FeldbusAbstraction& feldbus, ChecksumType type,
-       const AddressLength addressLength,
        unsigned int max_transmission_attempts,
        unsigned int max_transmission_errors) :
+    BaseDevice(feldbus, type, max_transmission_attempts),
 	dysFunctionalLog_(SystemTime::fromSec(5)),
-	bus_(feldbus),
 	myNextDevice(nullptr),
 	name_(name),
-	myAddress(address),
-	maxTransmissionAttempts(max_transmission_attempts),
 	maxTransmissionErrors(max_transmission_errors),
-	myCurrentErrorCounter(0),
-	myTotalTransmissions(0),
-	myTotalChecksumErrors(0),
-	myTotalNoAnswerErrors(0),
-	myTotalMissingDataErrors(0),
-	myTotalTransmitErrors(0),
-	myChecksumType(type),
-	myAddressLength(static_cast<uint8_t>(addressLength)),
-	hasCheckedAvailabilityYet(false)
+    myCurrentErrorCounter(0),
+    myAddress(static_cast<uint8_t>(address)),
+    hasCheckedAvailabilityYet(false)
 {
 	{
 		Mutex::Lock lock(listMutex);
@@ -96,95 +87,20 @@ bool Device::transceive(uint8_t *transmit, int transmit_length, uint8_t *receive
 	// Generate target address.
 	// We assume the caller wants to transmit a broadcast, if he does not supply any means to store an answer.
 	// Thus we use zero rather than the device's address.
-    unsigned useAddress = !receive || !receive_length || transmitBroadcast ? TURAG_FELDBUS_BROADCAST_ADDR : myAddress;
-
-	switch (myAddressLength) {
-	case 1:
-		transmit[0] = static_cast<uint8_t>(useAddress);
-		break;
-
-	case 2:
-		transmit[0] = static_cast<uint8_t>(useAddress & 0xff);
-		transmit[1] = static_cast<uint8_t>(useAddress >> 8);
-		break;
-
-	default: return false;
-	}
-
-	// Generate checksum for transmission.
-	switch (myChecksumType) {
-	case ChecksumType::xor_based:
-		transmit[transmit_length - 1] = XOR::calculate(transmit, transmit_length - 1);
-		break;
-
-	case ChecksumType::crc8_icode:
-		transmit[transmit_length - 1] = CRC8::calculate(transmit, transmit_length - 1);
-		break;
-
-	case ChecksumType::none:
-		break;
-	}
+    uint8_t useAddress = !receive || !receive_length || transmitBroadcast ? TURAG_FELDBUS_BROADCAST_ADDR : myAddress;
 
 
-//            turag_infof("%s: transceive tx [", name);
-//            for (int i = 0; i < transmit_length; ++i) {
-//                turag_infof("%.2x", transmit[i]);
-//            }
-//            turag_info("]\n");
+    FeldbusAbstraction::ResultStatus status;
 
-
-	FeldbusAbstraction::ResultStatus status = FeldbusAbstraction::ResultStatus::TransmissionError;
-	unsigned int attempt = 0;
-
-	// If the device is dysfunctional, we can force transmissions with
-	// ignoreDysfunctional. But in this case it wouldn't make sense
-	// to try more than a single transmission as the reason for a failure
-	// is then most likely the device still being dysfunctional.
-	unsigned maxAttempts = isDysfunctional() ? 1 : maxTransmissionAttempts;
-
-
-	// we try to transmit until either
-	// - the transmission succeeds and the checksum is correct or
-	// - the number of transmission attempts is exceeded or
-	// - the first attempt failed when the device is already dysfunctional.
-	while (attempt < maxAttempts && status != FeldbusAbstraction::ResultStatus::Success) {
-		int transmit_length_copy = transmit_length;
-		int receive_length_copy = receive_length;
-
-		// clear buffer from any previous failed transmissions, then send
-		bus_.clearBuffer();
-		status = bus_.transceive(transmit, &transmit_length_copy, receive, &receive_length_copy, useAddress, myChecksumType);
-
-
-		switch (status) {
-		case FeldbusAbstraction::ResultStatus::TransmissionError:
-			if (transmit_length_copy < transmit_length) {
-				++myTotalTransmitErrors;
-			} else if (receive_length_copy == 0) {
-				++myTotalNoAnswerErrors;
-			} else {
-				++myTotalMissingDataErrors;
-			}
-			break;
-
-		case FeldbusAbstraction::ResultStatus::ChecksumError:
-			++myTotalChecksumErrors;
-			break;
-
-        case FeldbusAbstraction::ResultStatus::Success:
-            break;
-		}
-
-		++attempt;
-	}
-	myTotalTransmissions += attempt;
-
-
-//            turag_infof("%s: transceive rx success(%x|%x) [", name, success, checksum_correct);
-//            for (int j = 0; j < receive_length; ++j) {
-//                turag_infof("%.2x", receive[j]);
-//            }
-//            turag_info("]\n");
+    // If the device is dysfunctional, we can force transmissions with
+    // ignoreDysfunctional. But in this case it wouldn't make sense
+    // to try more than a single transmission as the reason for a failure
+    // is then most likely the device still being dysfunctional.
+    if (isDysfunctional()) {
+        status = BaseDevice::transceive(useAddress, transmit, transmit_length, receive, receive_length, 1);
+    } else {
+        status = BaseDevice::transceive(useAddress, transmit, transmit_length, receive, receive_length);
+    }
 
 
     switch (status)
@@ -206,15 +122,15 @@ bool Device::transceive(uint8_t *transmit, int transmit_length, uint8_t *receive
         return true;
     case FeldbusAbstraction::ResultStatus::TransmissionError:
         turag_warningf("%s: rs485 transceive failed: Transmission error", name_);
-        myCurrentErrorCounter += attempt;
+        myCurrentErrorCounter += 1;
         return false;
     case FeldbusAbstraction::ResultStatus::ChecksumError:
         turag_warningf("%s: rs485 transceive failed: Checksum error", name_);
-        myCurrentErrorCounter += attempt;
+        myCurrentErrorCounter += 1;
         return false;
     default:
         turag_warningf("%s: rs485 transceive failed: Unknown error", name_);
-        myCurrentErrorCounter += attempt;
+        myCurrentErrorCounter += 1;
         return false;
     }
 }
@@ -450,157 +366,7 @@ bool Device::resetSlaveErrors(void) {
 	return transceive(request, &response);
 }
 
-bool Device::executeUuidBroadcastPing(uint32_t* uuid) {
-    Broadcast<uint8_t> request;
-    request.id = 0x00;
-    request.data = 0x00;
 
-    // this seems to be required for proper alignment
-    struct Value {
-        uint32_t uuid;
-    } _packed;
-
-    Response<Value> response;
-
-    if (!transceive(request, &response)) {
-        return false;
-    }
-
-    *uuid = response.data.uuid;
-    return true;
-}
-
-bool Device::pingUuid(uint32_t uuid) {
-    struct Value {
-        uint8_t key;
-        uint32_t uuid;
-    } _packed;
-
-    Broadcast<Value> request;
-
-    request.id = 0x00;
-    request.data.key = 0x00;
-    request.data.uuid = uuid;
-
-    Response<> response;
-
-    return transceive(request, &response);
-}
-
-bool Device::receiveBusAddress(uint32_t uuid, unsigned* busAddress) {
-    struct Value {
-        uint8_t key;
-        uint32_t uuid;
-        uint8_t key2;
-    } _packed;
-
-    Broadcast<Value> request;
-
-    request.id = 0x00;
-    request.data.key = 0x00;
-    request.data.uuid = uuid;
-    request.data.key2 = 0x00;
-
-    Response<uint8_t> response;
-
-    if (!transceive(request, &response)) {
-        return false;
-    }
-
-    *busAddress = response.data;
-    return true;
-}
-
-bool Device::setBusAddress(uint32_t uuid, unsigned busAddress) {
-    struct Value {
-        uint8_t key;
-        uint32_t uuid;
-        uint8_t key2;
-        uint8_t busAddress;
-    } _packed;
-
-    struct Value2 {
-        uint8_t key;
-        uint32_t uuid;
-        uint8_t key2;
-        uint16_t busAddress;
-    } _packed;
-
-    if (myAddressLength == 1) {
-        Broadcast<Value> request;
-
-        request.id = 0x00;
-        request.data.key = 0x00;
-        request.data.uuid = uuid;
-        request.data.key2 = 0x00;
-        request.data.busAddress = busAddress & 0xFF;
-
-        Response<uint8_t> response;
-
-        if (!transceive(request, &response)) {
-            return false;
-        }
-
-        return response.data == 1;
-    } else {
-        Broadcast<Value2> request;
-
-        request.id = 0x00;
-        request.data.key = 0x00;
-        request.data.uuid = uuid;
-        request.data.key2 = 0x00;
-        request.data.busAddress = busAddress & 0xFFFF;
-
-        Response<uint8_t> response;
-
-        if (!transceive(request, &response)) {
-            return false;
-        }
-        return response.data == 1;
-    }
-}
-
-bool Device::resetBusAddress(uint32_t uuid) {
-    struct Value {
-        uint8_t key;
-        uint32_t uuid;
-        uint8_t key2;
-    } _packed;
-
-    Broadcast<Value> request;
-
-    request.id = 0x00;
-    request.data.key = 0x00;
-    request.data.uuid = uuid;
-    request.data.key2 = 0x01;
-
-    Response<> response;
-
-    return transceive(request, &response);
-}
-
-bool Device::enableBusNeighbors(void) {
-    Broadcast<uint8_t> request;
-    request.id = 0x00;
-    request.data = 0x01;
-
-    return transceive(request);
-}
-bool Device::disableBusNeighbors(void) {
-    Broadcast<uint8_t> request;
-    request.id = 0x00;
-    request.data = 0x02;
-
-    return transceive(request);
-}
-
-bool Device::resetAllBusAddresses(void) {
-    Broadcast<uint8_t> request;
-    request.id = 0x00;
-    request.data = 0x03;
-
-    return transceive(request);
-}
 
 
 
