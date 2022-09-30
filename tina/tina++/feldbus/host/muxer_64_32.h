@@ -22,9 +22,8 @@ public:
         Undefined
     };
 
-    Muxer_64_32(const char* name, unsigned int address, FeldbusAbstraction& feldbus, ChecksumType type = TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_CHECKSUM_TYPE,
-            const AddressLength addressLength = TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_ADDRESS_LENGTH) :
-            Device(name, address, feldbus, type, addressLength), cycleLength(-1), maxCycleLength(-1), triggerMode(TriggerMode::Undefined),
+    Muxer_64_32(const char* name, unsigned int address, FeldbusAbstraction& feldbus, ChecksumType type = TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_CHECKSUM_TYPE) :
+            Device(name, address, feldbus, type), cycleLength(-1), maxCycleLength(-1), triggerMode(TriggerMode::Undefined),
             outputEnabled(false)
     {
     }

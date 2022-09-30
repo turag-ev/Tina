@@ -20,9 +20,8 @@ namespace Feldbus {
  */
 class Sensor : public TURAG::Feldbus::Device {
 public:
-	Sensor(const char* name, unsigned int address, FeldbusAbstraction& feldbus, ChecksumType type = TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_CHECKSUM_TYPE,
-		const AddressLength addressLength = TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_ADDRESS_LENGTH) : 
-		Device(name, address, feldbus, type, addressLength) {}
+    Sensor(const char* name, unsigned int address, FeldbusAbstraction& feldbus, ChecksumType type = TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_CHECKSUM_TYPE) :
+        Device(name, address, feldbus, type) {}
 };
 
 } // namespace Feldbus

@@ -69,9 +69,8 @@ public:
 	 * \param[in] type
 	 * \param[in] addressLength
 	 */
-	Aseb(const char* name, unsigned int address, FeldbusAbstraction& feldbus, ChecksumType type = TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_CHECKSUM_TYPE,
-		const AddressLength addressLength = TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_ADDRESS_LENGTH) :
-				Device(name, address, feldbus, type, addressLength),
+    Aseb(const char* name, unsigned int address, FeldbusAbstraction& feldbus, ChecksumType type = TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_CHECKSUM_TYPE) :
+                Device(name, address, feldbus, type),
 				analogInputs_(nullptr), pwmOutputs_(nullptr), syncBuffer_(nullptr),
 				analogInputSize_(-1), pwmOutputSize_(-1), digitalInputSize_(-1),
 				digitalOutputSize_(-1), syncSize_(0),
@@ -359,11 +358,10 @@ private:
  * Hintergrund.
  * 
  */
-template<std::size_t AnalogInputSize, std::size_t PwmOutputSize, bool HasDigitalInputs,
-         Device::AddressLength AddressSize = TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_ADDRESS_LENGTH>
+template<std::size_t AnalogInputSize, std::size_t PwmOutputSize, bool HasDigitalInputs>
 class AsebTemplate : public Aseb {
 public:
-    static constexpr std::size_t SyncSize = static_cast<uint8_t>(AddressSize) + 2*AnalogInputSize + (HasDigitalInputs?2:0) + 1;
+    static constexpr std::size_t SyncSize = 1 + 2 * AnalogInputSize + (HasDigitalInputs ? 2 : 0) + 1;
 	/**
 	 * \brief Konstruktor
      * \param[in] name Interner Name des Gerätes, der von name() zurückgeliefert wird.
@@ -372,7 +370,7 @@ public:
      * \param[in] type Typ der verwendeten Checksumme.
 	 */
     AsebTemplate(const char* name, unsigned int address, FeldbusAbstraction& feldbus, ChecksumType type = TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_CHECKSUM_TYPE):
-        Aseb(name, address, feldbus, type, AddressSize)  { }
+        Aseb(name, address, feldbus, type)  { }
 	
 	/**
 	 * \brief Initialisiert das Gerät.

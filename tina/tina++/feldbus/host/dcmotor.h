@@ -21,9 +21,8 @@ namespace Feldbus {
 class DCMotorBase : public TURAG::Feldbus::ServoBase {
 public:
 
-	DCMotorBase(const char* name, unsigned address, FeldbusAbstraction& feldbus, ChecksumType type = TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_CHECKSUM_TYPE,
-		const AddressLength addressLength = TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_ADDRESS_LENGTH) :
-		ServoBase(name, address, feldbus, type, addressLength) {}
+    DCMotorBase(const char* name, unsigned address, FeldbusAbstraction& feldbus, ChecksumType type = TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_CHECKSUM_TYPE) :
+        ServoBase(name, address, feldbus, type) {}
 
     virtual bool driveHome(float velocity) { return setValue(RS485_STELLANTRIEBE_DC_KEY_RETURN_TO_HOME, velocity); }
 
@@ -32,9 +31,8 @@ public:
 
 class DCMotor : public DCMotorBase {
 public:
-	DCMotor(const char* name, unsigned address, FeldbusAbstraction& feldbus, ChecksumType type = TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_CHECKSUM_TYPE,
-		const AddressLength addressLength = TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_ADDRESS_LENGTH) :
-		DCMotorBase(name, address, feldbus, type, addressLength) {}
+    DCMotor(const char* name, unsigned address, FeldbusAbstraction& feldbus, ChecksumType type = TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_CHECKSUM_TYPE) :
+        DCMotorBase(name, address, feldbus, type) {}
 
     bool initialize(void) { return populateCommandSet(command_set, 19); }
 
