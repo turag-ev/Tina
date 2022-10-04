@@ -234,6 +234,7 @@ BootloaderAvrBase::ErrorCode BootloaderAvrBase::writeFlash(uint32_t byteAddress,
 	
     uint8_t response[myAddressLength + 1 + 1];
 	
+    byteAddress |= getFlashBaseAddress();
 	uint32_t targetAddress = byteAddress;
 	
 	struct uint32_t_packed {
@@ -299,7 +300,8 @@ BootloaderAvrBase::ErrorCode BootloaderAvrBase::readFlash(uint32_t byteAddress, 
     uint8_t request[myAddressLength + 1 + 4 + 2 + 1];
     request[myAddressLength] = TURAG_FELDBUS_BOOTLOADER_AVR_DATA_READ;
 	
-	uint32_t targetAddress = byteAddress;
+    byteAddress |= getFlashBaseAddress();
+    uint32_t targetAddress = byteAddress;
 	
 	struct header_packed {
 		uint32_t targetAddress;

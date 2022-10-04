@@ -79,6 +79,8 @@ public:
         Bootloader(name, address, feldbus, type), myPageSize(0), myFlashSize(0), myWritableFlashSize(0)
     {
     }
+
+    virtual uint32_t getFlashBaseAddress() const { return 0; }
 	
 	/**
 	 * \brief Liest die Größe einer Flashseite aus.
@@ -220,6 +222,9 @@ public:
     uint32_t getResetVectorStorageAddress();
     TURAG::Feldbus::BootloaderAvrBase::ErrorCode transmitAppResetVectors(uint32_t stackAddress, uint32_t resetHandlerAddress);
     TURAG::Feldbus::BootloaderAvrBase::ErrorCode commitAppResetVectors(uint32_t stackAddress, uint32_t resetHandlerAddress);
+
+    virtual uint32_t getFlashBaseAddress() const override { return 0x08000000; }
+
 
 
 private:
