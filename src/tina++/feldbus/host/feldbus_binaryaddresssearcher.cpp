@@ -12,58 +12,60 @@ bool BinaryAddressSearcher::TryFindNextDevice(bool* foundDevice, uint32_t* devic
         return false;
     }
 
-    while (addressesToSearch.size() > 0)
+    if (addressesToSearch.empty()) {
+        *foundDevice = false;
+        return false;
+    }
+
+    BinaryAddressSearcher::SearchAddress searchAddress(addressesToSearch.front());
+    addressesToSearch.pop_front();
+
+    SystemTime timeDiff = SystemTime::now() - lastTransmissionTime;
+
+    // Console.WriteLine("timediffSec: " + timeDiffSec);
+
+    if (timeDiff < delayTime)
     {
-        BinaryAddressSearcher::SearchAddress searchAddress(addressesToSearch.front());
-        addressesToSearch.pop_front();
+        Thread_delay(delayTime - timeDiff);
+    }
 
-        SystemTime timeDiff = SystemTime::now() - lastTransmissionTime;
+    lastTransmissionTime = SystemTime::now();
 
-        // Console.WriteLine("timediffSec: " + timeDiffSec);
+    bool detectedBusAssertion = false;
+    bool success = deviceLocator.requestBusAssertion(
+                searchAddress.level(), searchAddress.address(), &detectedBusAssertion, onlyDevicesWithoutAddress);
 
-        if (timeDiff < delayTime)
+
+    if (!success)
+    {
+        return false;
+    }
+    else
+    {
+        auto result = searchAddress.getNextAddresses(detectedBusAssertion);
+        SearchAddress nextLevelAddresses, sameLevelAddress, detectedDevice;
+        std::tie(detectedDevice, nextLevelAddresses, sameLevelAddress) = result;
+
+        if (nextLevelAddresses.valid())
         {
-            Thread_delay(delayTime - timeDiff);
+            addressesToSearch.push_front(nextLevelAddresses);
+        }
+        if (sameLevelAddress.valid())
+        {
+            addressesToSearch.push_back(sameLevelAddress);
         }
 
-        lastTransmissionTime = SystemTime::now();
-
-        bool detectedBusAssertion = false;
-        bool success = deviceLocator.requestBusAssertion(
-                    searchAddress.level(), searchAddress.address(), &detectedBusAssertion, onlyDevicesWithoutAddress);
-
-
-        if (!success)
+        if (detectedDevice.valid())
         {
-            return false;
+            *foundDevice = true;
+            *deviceAddress = detectedDevice.address();
+
+            // Console.WriteLine("found " + BaseDevice.FormatUuid(detectedDevice.Address));
+        } else {
+            *foundDevice = false;
         }
-        else
-        {
-            auto result = searchAddress.getNextAddresses(detectedBusAssertion);
-            SearchAddress nextLevelAddresses, sameLevelAddress, detectedDevice;
-            std::tie(detectedDevice, nextLevelAddresses, sameLevelAddress) = result;
 
-            if (nextLevelAddresses.valid())
-            {
-                addressesToSearch.push_front(nextLevelAddresses);
-            }
-            if (sameLevelAddress.valid())
-            {
-                addressesToSearch.push_back(sameLevelAddress);
-            }
-
-            if (detectedDevice.valid())
-            {
-                *foundDevice = true;
-                *deviceAddress = detectedDevice.address();
-
-                // Console.WriteLine("found " + BaseDevice.FormatUuid(detectedDevice.Address));
-            } else {
-                *foundDevice = false;
-            }
-
-            return true;
-        }
+        return true;
     }
 }
 
