@@ -125,10 +125,29 @@ bool LegacyStellantriebeDevice::populateCommandSet(Command_t* commandSet_, unsig
         if (!transceive(request, &response)) {
             return false;
         }
-        commandSet[i].writeAccess = static_cast<Command_t::WriteAccess>(response.data.writeAccess);
-        commandSet[i].length = static_cast<Command_t::CommandLength>(response.data.length);
-        commandSet[i].factor = response.data.factor;
 
+        // filter unknown values for the data type/length
+        Command_t::CommandLength data_type = static_cast<Command_t::CommandLength>(response.data.length);
+        if (data_type != Command_t::CommandLength::none &&
+                data_type != Command_t::CommandLength::text &&
+                data_type != Command_t::CommandLength::length_char &&
+                data_type != Command_t::CommandLength::length_short &&
+                data_type != Command_t::CommandLength::length_long &&
+                data_type != Command_t::CommandLength::length_float) {
+            data_type = Command_t::CommandLength::none;
+    }
+
+        // filter unkown values for access mode
+        Command_t::WriteAccess access_mode = static_cast<Command_t::WriteAccess>(response.data.writeAccess);
+        if (access_mode != Command_t::WriteAccess::read_only &&
+                access_mode != Command_t::WriteAccess::write_only &&
+                access_mode != Command_t::WriteAccess::read_write) {
+            access_mode = Command_t::WriteAccess::read_only;
+        }
+
+        commandSet[i].writeAccess = access_mode;
+        commandSet[i].length = data_type;
+        commandSet[i].factor = response.data.factor;
     }
     commandSetPopulated = true;
     return true;
@@ -146,11 +165,12 @@ bool LegacyStellantriebeDevice::getValue(uint8_t key, float* value) {
 
     Command_t* command = &commandSet[key-1];
     
-    if (command->length == Command_t::CommandLength::none) {
+    if (command->length == Command_t::CommandLength::none || command->length == Command_t::CommandLength::text) {
         turag_errorf("%s: key not supported", name());
         return false;
     }
-    if (command->factor == TURAG_FELDBUS_STELLANTRIEBE_COMMAND_FACTOR_CONTROL_VALUE) {
+    if (command->factor == TURAG_FELDBUS_STELLANTRIEBE_COMMAND_FACTOR_CONTROL_VALUE &&
+            command->length != Command_t::CommandLength::length_float) {
 		turag_errorf("%s: value with key %u is not floating point, which was requested", name(), key);
         return false;
     }
@@ -174,11 +194,8 @@ bool LegacyStellantriebeDevice::getValue(uint8_t key, float* value) {
             if (!transceive(request, &response)) {
                 return false;
             }
-            command->buffer.floatValue =
-                static_cast<float>(response.data.value) * command->factor;
-            break;
-        }
-        case Command_t::CommandLength::length_long: {
+            command->buffer.floatValue = static_cast<float>(response.data.value) * command->factor;
+        } else if (command->length == Command_t::CommandLength::length_long) {
             Response<AktorGetLong> response;
             if (!transceive(request, &response)) {
                 return false;
@@ -186,22 +203,20 @@ bool LegacyStellantriebeDevice::getValue(uint8_t key, float* value) {
             command->buffer.floatValue =
                 static_cast<float>(response.data.value) * command->factor;
             break;
-        }
-        case Command_t::CommandLength::length_float: {
+        } else {
             Response<AktorGetFloat> response;
             if (!transceive(request, &response)) {
                 return false;
-            }
-            command->buffer.floatValue =
-                static_cast<float>(response.data.value) * command->factor;
-            break;
         }
-        default:
-            break;
+            if (command->factor != TURAG_FELDBUS_STELLANTRIEBE_COMMAND_FACTOR_CONTROL_VALUE) {
+                command->buffer.floatValue = response.data.value * command->factor;
+            } else {
+                command->buffer.floatValue = response.data.value;
+            }
         }
 
-        // protocol definition: writable values are bufferable
-        if (command->writeAccess == Command_t::WriteAccess::write) {
+        // protocol definition: write-only values are bufferable
+        if (command->writeAccess == Command_t::WriteAccess::write_only) {
             command->bufferValid = true;
         }
 
@@ -222,11 +237,12 @@ bool LegacyStellantriebeDevice::getValue(uint8_t key, int32_t* value) {
 
     Command_t* command = &commandSet[key-1];
 
-    if (command->length == Command_t::CommandLength::none) {
+    if (command->length == Command_t::CommandLength::none || command->length == Command_t::CommandLength::text) {
         turag_errorf("%s: key not supported", name());
         return false;
     }
-    if (command->factor != TURAG_FELDBUS_STELLANTRIEBE_COMMAND_FACTOR_CONTROL_VALUE) {
+    if (command->factor != TURAG_FELDBUS_STELLANTRIEBE_COMMAND_FACTOR_CONTROL_VALUE ||
+            command->length == Command_t::CommandLength::length_float) {
         turag_errorf("%s: value is floating point", name());
         return false;
     }
@@ -272,8 +288,8 @@ bool LegacyStellantriebeDevice::getValue(uint8_t key, int32_t* value) {
             break;
         }
 
-        // protocol definition: writable values are bufferable
-        if (command->writeAccess == Command_t::WriteAccess::write) {
+        // protocol definition: write-only values are bufferable
+        if (command->writeAccess == Command_t::WriteAccess::write_only) {
             command->bufferValid = true;
         }
 
@@ -295,15 +311,16 @@ bool LegacyStellantriebeDevice::setValue(uint8_t key, float value) {
 
     Command_t* command = &commandSet[key-1];
 
-    if (command->length == Command_t::CommandLength::none) {
+    if (command->length == Command_t::CommandLength::none || command->length == Command_t::CommandLength::text) {
         turag_errorf("%s: key not supported", name());
         return false;
     }
-    if (command->writeAccess != Command_t::WriteAccess::write) {
+    if (command->writeAccess == Command_t::WriteAccess::read_only) {
         turag_errorf("%s: key not writable", name());
         return false;
     }
-    if (command->factor == TURAG_FELDBUS_STELLANTRIEBE_COMMAND_FACTOR_CONTROL_VALUE) {
+    if (command->factor == TURAG_FELDBUS_STELLANTRIEBE_COMMAND_FACTOR_CONTROL_VALUE &&
+            command->length != Command_t::CommandLength::length_float) {
 		turag_errorf("%s: value with key %u is not floating point, but float shall be set", name(), key);
         return false;
     }
@@ -330,9 +347,7 @@ bool LegacyStellantriebeDevice::setValue(uint8_t key, float value) {
         if (!transceive(request, &response)) {
             return false;
         }
-        break;
-    }
-    case Command_t::CommandLength::length_long: {
+    } else if (command->length == Command_t::CommandLength::length_long) {
         Request<AktorSetLong> request;
         request.data.key = key;
         request.data.value = static_cast<int32_t>(value / command->factor);
@@ -340,20 +355,19 @@ bool LegacyStellantriebeDevice::setValue(uint8_t key, float value) {
         if (!transceive(request, &response)) {
             return false;
         }
-        break;
-    }
-    case Command_t::CommandLength::length_float: {
+    } else {
         Request<AktorSetFloat> request;
         request.data.key = key;
-        request.data.value = (value / command->factor);
+
+        if (command->factor != TURAG_FELDBUS_STELLANTRIEBE_COMMAND_FACTOR_CONTROL_VALUE) {
+            request.data.value = value / command->factor;
+        } else {
+            request.data.value = value;
+    }
 
         if (!transceive(request, &response)) {
             return false;
         }
-        break;
-    }
-    default:
-        break;
     }
     return true;
 }
@@ -370,15 +384,16 @@ bool LegacyStellantriebeDevice::setValue(uint8_t key, int32_t value) {
 
     Command_t* command = &commandSet[key-1];
 
-    if (command->length == Command_t::CommandLength::none) {
+    if (command->length == Command_t::CommandLength::none || command->length == Command_t::CommandLength::text) {
         turag_errorf("%s: key not supported", name());
         return false;
     }
-    if (command->writeAccess != Command_t::WriteAccess::write) {
+    if (command->writeAccess == Command_t::WriteAccess::read_only) {
         turag_errorf("%s: key not writable", name());
         return false;
     }
-    if (command->factor != TURAG_FELDBUS_STELLANTRIEBE_COMMAND_FACTOR_CONTROL_VALUE) {
+    if (command->factor != TURAG_FELDBUS_STELLANTRIEBE_COMMAND_FACTOR_CONTROL_VALUE ||
+            command->length == Command_t::CommandLength::length_float) {
         turag_errorf("%s: value is floating point", name());
         return false;
     }
@@ -476,23 +491,21 @@ bool LegacyStellantriebeDevice::getCommandName(uint8_t key, char* out_name) {
         return false;
     }
     
-    // Do not use whole buffer for one byte address
-    const int request_len = addressLength() + 4 + 1;
-	uint8_t request[2 + 4 + 1];
-	request[addressLength()] = key;
-	request[addressLength() + 1] = TURAG_FELDBUS_STELLANTRIEBE_COMMAND_INFO_GET_NAME;
-	request[addressLength() + 2] = TURAG_FELDBUS_STELLANTRIEBE_COMMAND_INFO_GET_NAME;
-	request[addressLength() + 3] = TURAG_FELDBUS_STELLANTRIEBE_COMMAND_INFO_GET_NAME;
+    uint8_t request[myAddressLength + 4 + 1];
+    request[myAddressLength] = key;
+    request[myAddressLength + 1] = TURAG_FELDBUS_STELLANTRIEBE_COMMAND_INFO_GET_NAME;
+    request[myAddressLength + 2] = TURAG_FELDBUS_STELLANTRIEBE_COMMAND_INFO_GET_NAME;
+    request[myAddressLength + 3] = TURAG_FELDBUS_STELLANTRIEBE_COMMAND_INFO_GET_NAME;
     
     if (!transceive(request,
                     request_len,
                     reinterpret_cast<uint8_t*>(out_name),
-					name_length + addressLength() + 1)) {
+                    name_length + myAddressLength + 1)) {
         return false;
     }
 
 	for (unsigned i = 0; i < name_length; ++i) {
-		out_name[i] = out_name[i + addressLength()];
+        out_name[i] = out_name[i + myAddressLength];
     }
     out_name[name_length] = 0;
 
@@ -538,20 +551,20 @@ bool LegacyStellantriebeDevice::setStructuredOutputTable(const std::vector<uint8
         }
     }
     
-	uint8_t request[keys.size() + addressLength() + 3];
+    uint8_t request[keys.size() + myAddressLength + 3];
 
-	request[addressLength() + 0] = TURAG_FELDBUS_STELLANTRIEBE_STRUCTURED_OUTPUT_CONTROL;
-	request[addressLength() + 1] = TURAG_FELDBUS_STELLANTRIEBE_STRUCTURED_OUTPUT_SET_STRUCTURE;
-	memcpy(request + addressLength() + 2, keys.data(), keys.size());
+    request[myAddressLength + 0] = TURAG_FELDBUS_STELLANTRIEBE_STRUCTURED_OUTPUT_CONTROL;
+    request[myAddressLength + 1] = TURAG_FELDBUS_STELLANTRIEBE_STRUCTURED_OUTPUT_SET_STRUCTURE;
+    memcpy(request + myAddressLength + 2, keys.data(), keys.size());
     
-	uint8_t response[addressLength() + 1 + 1];
+    uint8_t response[myAddressLength + 1 + 1];
     
     if (transceive(
 			request, 
 			sizeof(request),
             response,
 			sizeof(response))) {
-		if (response[addressLength()] == TURAG_FELDBUS_STELLANTRIEBE_STRUCTURED_OUTPUT_TABLE_OK) {
+        if (response[myAddressLength] == TURAG_FELDBUS_STELLANTRIEBE_STRUCTURED_OUTPUT_TABLE_OK) {
             structuredOutputTable = keys;
             return true;
         }
@@ -591,16 +604,16 @@ bool LegacyStellantriebeDevice::getStructuredOutput(std::vector<StructuredDataPa
         }
     }
 
-	uint8_t request[addressLength() + 1 + 1];
-	request[addressLength()] = TURAG_FELDBUS_STELLANTRIEBE_STRUCTURED_OUTPUT_GET;
+    uint8_t request[myAddressLength + 1 + 1];
+    request[myAddressLength] = TURAG_FELDBUS_STELLANTRIEBE_STRUCTURED_OUTPUT_GET;
 
-	uint8_t* response = new uint8_t[addressLength() + data_size + 1];
+    uint8_t* response = new uint8_t[myAddressLength + data_size + 1];
 
     if (transceive(request,
                    sizeof(request),
                    response,
-				   addressLength() + data_size + 1)) {
-		uint8_t* pValue = response + addressLength();
+                   myAddressLength + data_size + 1)) {
+        uint8_t* pValue = response + myAddressLength;
 
         for (unsigned int i = 0; i < structuredOutputTable.size(); ++i) {
             int32_t device_value;

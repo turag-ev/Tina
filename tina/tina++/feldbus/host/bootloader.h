@@ -28,9 +28,8 @@ public:
 	 * \param[in] type
 	 * \param[in] addressLength
 	 */
-	Bootloader(const char* name, unsigned address, FeldbusAbstraction& feldbus, ChecksumType type = TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_CHECKSUM_TYPE,
-		const AddressLength addressLength = TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_ADDRESS_LENGTH) :
-		Device(name, address, feldbus, type, addressLength), myMcuId(TURAG_FELDBUS_BOOTLOADER_MCU_ID_INVALID), unlocked(false)
+    Bootloader(const char* name, unsigned address, FeldbusAbstraction& feldbus, ChecksumType type = TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_CHECKSUM_TYPE) :
+        Device(name, address, feldbus, type), myMcuId(TURAG_FELDBUS_BOOTLOADER_MCU_ID_INVALID), unlocked(false)
     {
     }
     
@@ -38,11 +37,16 @@ public:
 	bool sendStartProgramBroadcast(void);
 
 	uint16_t getMcuId(void);
+    bool receiveMcuIdString(char* out_string);
+
 	bool unlockBootloader(void);
 	bool isUnlocked(void) const { return unlocked; }
 	
     static const char* getMcuName(uint16_t mcuId);
+
 private:
+    bool receiveString(uint8_t command, uint8_t stringLength, char* out_string);
+
 	uint16_t myMcuId;
 	bool unlocked;
 };
@@ -71,9 +75,8 @@ public:
 	 * \param[in] type
 	 * \param[in] addressLength
 	 */
-	BootloaderAvrBase(const char* name, unsigned address, FeldbusAbstraction& feldbus, ChecksumType type = TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_CHECKSUM_TYPE,
-		const AddressLength addressLength = TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_ADDRESS_LENGTH) :
-		Bootloader(name, address, feldbus, type, addressLength), myPageSize(0), myFlashSize(0), myWritableFlashSize(0)
+    BootloaderAvrBase(const char* name, unsigned address, FeldbusAbstraction& feldbus, ChecksumType type = TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_CHECKSUM_TYPE) :
+        Bootloader(name, address, feldbus, type), myPageSize(0), myFlashSize(0), myWritableFlashSize(0)
     {
     }
 	
@@ -135,9 +138,8 @@ public:
 	 * \param[in] type
 	 * \param[in] addressLength
 	 */
-	BootloaderAtmega(const char* name, unsigned address, FeldbusAbstraction& feldbus, ChecksumType type = TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_CHECKSUM_TYPE,
-		const AddressLength addressLength = TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_ADDRESS_LENGTH) :
-		BootloaderAvrBase(name, address, feldbus, type, addressLength)
+    BootloaderAtmega(const char* name, unsigned address, FeldbusAbstraction& feldbus, ChecksumType type = TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_CHECKSUM_TYPE) :
+        BootloaderAvrBase(name, address, feldbus, type)
 	{
 	}
 
@@ -176,9 +178,8 @@ public:
 	 * \param[in] type
 	 * \param[in] addressLength
 	 */
-	BootloaderXmega(const char* name, unsigned address, FeldbusAbstraction& feldbus, ChecksumType type = TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_CHECKSUM_TYPE,
-		const AddressLength addressLength = TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_ADDRESS_LENGTH) :
-		BootloaderAvrBase(name, address, feldbus, type, addressLength), revisionId(0)
+    BootloaderXmega(const char* name, unsigned address, FeldbusAbstraction& feldbus, ChecksumType type = TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_CHECKSUM_TYPE) :
+        BootloaderAvrBase(name, address, feldbus, type), revisionId(0)
 	{
 	}
 
@@ -199,6 +200,36 @@ public:
 private:
 	char revisionId;
 };
+
+
+class BootloaderStm32v2 : public BootloaderAvrBase {
+public:
+    /**
+     * \brief Konstruktor.
+     * \param[in] name
+     * \param[in] address
+     * \param[in] feldbus
+     * \param[in] type
+     * \param[in] addressLength
+     */
+    BootloaderStm32v2(const char* name, unsigned address, FeldbusAbstraction& feldbus, ChecksumType type = TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_CHECKSUM_TYPE) :
+        BootloaderAvrBase(name, address, feldbus, type), resetVectorStorageAddress(0xFFFFFFFF)
+    {
+    }
+
+    uint32_t getResetVectorStorageAddress();
+    TURAG::Feldbus::BootloaderAvrBase::ErrorCode transmitAppResetVectors(uint32_t stackAddress, uint32_t resetHandlerAddress);
+    TURAG::Feldbus::BootloaderAvrBase::ErrorCode commitAppResetVectors(uint32_t stackAddress, uint32_t resetHandlerAddress);
+
+
+private:
+    bool readResetVectorStorageAddress();
+    TURAG::Feldbus::BootloaderAvrBase::ErrorCode transmitOrCommitAppResetVectors(uint8_t command, uint32_t stackAddress, uint32_t resetHandlerAddress);
+
+    uint32_t resetVectorStorageAddress;
+};
+
+
 
 
 } // namespace Feldbus

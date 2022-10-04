@@ -21,17 +21,18 @@
 #define TURAG_FELDBUS_BOOTLOADER_ATMEGA					0x02
 #define TURAG_FELDBUS_BOOTLOADER_XMEGA  				0x03
 #define TURAG_FELDBUS_BOOTLOADER_STM32  				0x04
+#define TURAG_FELDBUS_BOOTLOADER_STM32V2				0x05
 
 ///@}
 
 
 /*
  * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
- * 
- * NEVER EVER CHANGE ANY 
+ *
+ * NEVER EVER CHANGE ANY
  * OF THOSE DEFINITIONS!!!!!!
  * (Adding new ones is ok.)
- * 
+ *
  * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
  */
 
@@ -42,6 +43,10 @@
  */
 #define TURAG_FELDBUS_BOOTLOADER_COMMAND_GET_MCUID				0x01
 #define TURAG_FELDBUS_BOOTLOADER_COMMAND_UNLOCK_BOOTLOADER		0x02
+
+// only supported if the device returns 0xFFFF as mcu id
+#define TURAG_FELDBUS_BOOTLOADER_COMMAND_RECEIVE_MCU_STRING		0x03
+#define TURAG_FELDBUS_BOOTLOADER_COMMAND_RECEIVE_MCU_STRING_LENGTH		0x04
 
 #define TURAG_FELDBUS_BOOTLOADER_COMMAND_ENTER_BOOTLOADER		0xA1
 #define TURAG_FELDBUS_BOOTLOADER_COMMAND_START_PROGRAMM			0xAF
@@ -86,12 +91,79 @@
 ///@}
 
 
+/**
+ * @name STM32v2 Commands
+ * @{
+ */
+#define TURAG_FELDBUS_BOOTLOADER_STM32V2_GET_PAGE_SIZE				0x11
+#define TURAG_FELDBUS_BOOTLOADER_STM32V2_GET_FLASH_SIZE				0x13
+
+#define TURAG_FELDBUS_BOOTLOADER_STM32V2_GET_APP_ADDRESS_MODE	 		0x15
+
+// In this mode the stack address and the address of the reset handler are stored
+// at a specific address in the flash in addition to the program itself by using a
+// special command. When the bootloader
+// needs to start the program it reads these addresses from this flash position.
+// This approach is easy to implement but requires an additional erasable flash segment which
+// may be wasteful on some F4 devices whose flash sectors are very large at the end of the flash.
+#define TURAG_FELDBUS_BOOTLOADER_STM32V2_APP_ADDRESS_MODE_DEDICATED_PAGE	0x00
+
+// This method makes use of reserved positions within the vector table itself. This is the
+// preferred option for any device which has suitable unused space within its vector table.
+#define TURAG_FELDBUS_BOOTLOADER_STM32V2_APP_ADDRESS_MODE_HIDDEN_IN_VECTOR_TABLE	0x01
+
+
+//#define TURAG_FELDBUS_BOOTLOADER_STM32V2_GET_BOOTLOADER_RESET_VECTOR			0x16
+//#define TURAG_FELDBUS_BOOTLOADER_STM32V2_STORE_APP_RESET_VECTORS 	0x17  // only defined in APP_ADDRESS_MODE_DEDICATED_PAGE
+//#define TURAG_FELDBUS_BOOTLOADER_STM32V2_GET_APP_RESET_VECTOR_STORAGE_ADDRESS	0x18	// only defined in APP_ADDRESS_MODE_HIDDEN_IN_VECTOR_TABLE
+
+// Transmits the content of the reset vector of the user application to the bootloader.
+// This command must be called before transmitting any of the user application code if the address mode
+// is hidden vector.
+// Returns an error code.
+#define TURAG_FELDBUS_BOOTLOADER_STM32V2_TRANSMIT_APP_RESET_VECTOR	0x16
+
+// This function schould be called after the whole user application has been
+// transmitted. Depending on the used address mode this function either
+// - writes the user application reset vector to the dedicated flash page
+// - checks whether the supplied reset vector can be found at the expected
+//   position in the vector table.
+//
+// Returns an error code.
+#define TURAG_FELDBUS_BOOTLOADER_STM32V2_COMMIT_APP_RESET_VECTOR  0x17
+
+// Returns the location of the user app reset vector. This can be used
+// by the host when verifying the flash contents by reading it and comparing it
+// with the written data. If the reset vector is stored in the vector table, the first
+// flash page will be modified at this position and the read data will be different than the written data.
+#define TURAG_FELDBUS_BOOTLOADER_STM32V2_GET_APP_RESET_VECTOR_STORAGE_ADDRESS	0x18
+
+// and APP_ADDRESS_MODE_AFTER_USERAPP
+#define TURAG_FELDBUS_BOOTLOADER_STM32V2_PAGE_WRITE				0xAA
+#define TURAG_FELDBUS_BOOTLOADER_STM32V2_DATA_READ				0xAB
+
+
+
+
+#define TURAG_FELDBUS_BOOTLOADER_STM32V2_RESPONSE_SUCCESS            0x00
+#define TURAG_FELDBUS_BOOTLOADER_STM32V2_RESPONSE_FAIL_SIZE          0xFA
+#define TURAG_FELDBUS_BOOTLOADER_STM32V2_RESPONSE_FAIL_ADDRESS       0xFB
+#define TURAG_FELDBUS_BOOTLOADER_STM32V2_RESPONSE_FAIL_NOT_SUPPORTED 0xFC
+#define TURAG_FELDBUS_BOOTLOADER_STM32V2_RESPONSE_FAIL_FLASH	       0xFD
+
+
+
+
+///@}
+
+
 
 /**
- * @name MCU-IDs 
+ * @name MCU-IDs
  * @{
  */
 #define TURAG_FELDBUS_BOOTLOADER_MCU_ID_INVALID				    0x0000
+#define TURAG_FELDBUS_BOOTLOADER_MCU_ID_STRING					0xFFFF
 
 #define TURAG_FELDBUS_BOOTLOADER_MCU_ID_ATMEGA8				    0x0793
 #define TURAG_FELDBUS_BOOTLOADER_MCU_ID_ATMEGA16			    0x0394
@@ -116,10 +188,6 @@
 #define TURAG_FELDBUS_BOOTLOADER_MCU_ID_STM32F030x4 0x1002
 #define TURAG_FELDBUS_BOOTLOADER_MCU_ID_STM32F031x6 0x1003
 
-//legacy ChibiOS based bootloaders
-#define TURAG_FELDBUS_BOOTLOADER_MCU_ID_CHIBIOS_STM32F411xE 0x1000
-#define TURAG_FELDBUS_BOOTLOADER_MCU_ID_CHIBIOS_STM32F051x8 0x9748 // auto-generated
-#define TURAG_FELDBUS_BOOTLOADER_MCU_ID_CHIBIOS_STM32F405xG 0x9749 // auto-generated
 
 
 ///@}

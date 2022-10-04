@@ -45,24 +45,15 @@ Device* Device::firstDevice(nullptr);
 
 
 Device::Device(const char* name, unsigned address, FeldbusAbstraction& feldbus, ChecksumType type,
-       const AddressLength addressLength,
        unsigned int max_transmission_attempts,
        unsigned int max_transmission_errors) :
+    BaseDevice(feldbus, type, max_transmission_attempts),
 	dysFunctionalLog_(SystemTime::fromSec(5)),
-	bus_(feldbus),
 	myNextDevice(nullptr),
 	name_(name),
-	myAddress(address),
-	maxTransmissionAttempts(max_transmission_attempts),
 	maxTransmissionErrors(max_transmission_errors),
 	myCurrentErrorCounter(0),
-	myTotalTransmissions(0),
-	myTotalChecksumErrors(0),
-	myTotalNoAnswerErrors(0),
-	myTotalMissingDataErrors(0),
-	myTotalTransmitErrors(0),
-	myChecksumType(type),
-	myAddressLength(static_cast<uint8_t>(addressLength)),
+    myAddress(static_cast<uint8_t>(address)),
 	hasCheckedAvailabilityYet(false)
 {
 	{
@@ -81,7 +72,7 @@ Device::Device(const char* name, unsigned address, FeldbusAbstraction& feldbus, 
 }
 
  
-bool Device::transceive(uint8_t *transmit, int transmit_length, uint8_t *receive, int receive_length, bool ignoreDysfunctional)
+bool Device::transceive(uint8_t *transmit, int transmit_length, uint8_t *receive, int receive_length, bool ignoreDysfunctional, bool transmitBroadcast)
 {
 	bool bailOutBecauseDysfunctional = isDysfunctional() && !ignoreDysfunctional;
 
@@ -96,81 +87,20 @@ bool Device::transceive(uint8_t *transmit, int transmit_length, uint8_t *receive
 	// Generate target address.
 	// We assume the caller wants to transmit a broadcast, if he does not supply any means to store an answer.
 	// Thus we use zero rather than the device's address.
-	unsigned useAddress = !receive || !receive_length ? TURAG_FELDBUS_BROADCAST_ADDR : myAddress;
-
-	switch (myAddressLength) {
-	case 1:
-		transmit[0] = static_cast<uint8_t>(useAddress);
-		break;
-
-	case 2:
-		transmit[0] = static_cast<uint8_t>(useAddress & 0xff);
-		transmit[1] = static_cast<uint8_t>(useAddress >> 8);
-		break;
-
-	default: return false;
-	}
-
-	// Generate checksum for transmission.
-	switch (myChecksumType) {
-	case ChecksumType::xor_based:
-		transmit[transmit_length - 1] = XOR::calculate(transmit, transmit_length - 1);
-		break;
-
-	case ChecksumType::crc8_icode:
-		transmit[transmit_length - 1] = CRC8::calculate(transmit, transmit_length - 1);
-		break;
-
-	case ChecksumType::none:
-		break;
-	}
+    uint8_t useAddress = !receive || !receive_length || transmitBroadcast ? TURAG_FELDBUS_BROADCAST_ADDR : myAddress;
 
 
-	FeldbusAbstraction::ResultStatus status = FeldbusAbstraction::ResultStatus::TransmissionError;
-	unsigned int attempt = 0;
+    FeldbusAbstraction::ResultStatus status;
 
 	// If the device is dysfunctional, we can force transmissions with
 	// ignoreDysfunctional. But in this case it wouldn't make sense
 	// to try more than a single transmission as the reason for a failure
 	// is then most likely the device still being dysfunctional.
-	unsigned maxAttempts = isDysfunctional() ? 1 : maxTransmissionAttempts;
-
-
-	// we try to transmit until either
-	// - the transmission succeeds and the checksum is correct or
-	// - the number of transmission attempts is exceeded or
-	// - the first attempt failed when the device is already dysfunctional.
-	while (attempt < maxAttempts && status != FeldbusAbstraction::ResultStatus::Success) {
-		int transmit_length_copy = transmit_length;
-		int receive_length_copy = receive_length;
-
-		// clear buffer from any previous failed transmissions, then send
-		bus_.clearBuffer();
-		status = bus_.transceive(transmit, &transmit_length_copy, receive, &receive_length_copy, useAddress, myChecksumType);
-
-
-		switch (status) {
-		case FeldbusAbstraction::ResultStatus::TransmissionError:
-			if (transmit_length_copy < transmit_length) {
-				++myTotalTransmitErrors;
-			} else if (receive_length_copy == 0) {
-				++myTotalNoAnswerErrors;
+    if (isDysfunctional()) {
+        status = BaseDevice::transceive(useAddress, transmit, transmit_length, receive, receive_length, 1);
 			} else {
-				++myTotalMissingDataErrors;
+        status = BaseDevice::transceive(useAddress, transmit, transmit_length, receive, receive_length);
 			}
-			break;
-
-		case FeldbusAbstraction::ResultStatus::ChecksumError:
-			++myTotalChecksumErrors;
-			break;
-
-        case FeldbusAbstraction::ResultStatus::Success:
-            break;
-		}
-
-		++attempt;
-	}
-	myTotalTransmissions += attempt;
 
 
     switch (status)
@@ -192,11 +122,11 @@ bool Device::transceive(uint8_t *transmit, int transmit_length, uint8_t *receive
         return true;
     case FeldbusAbstraction::ResultStatus::TransmissionError:
         turag_warningf("%s: rs485 transceive failed: Transmission error", name_);
-        myCurrentErrorCounter += attempt;
+        myCurrentErrorCounter += 1;
         return false;
     case FeldbusAbstraction::ResultStatus::ChecksumError:
         turag_warningf("%s: rs485 transceive failed: Checksum error", name_);
-        myCurrentErrorCounter += attempt;
+        myCurrentErrorCounter += 1;
         return false;
     default:
         // C++ specifies that the range of enums (and enum classes) is the same
@@ -204,7 +134,7 @@ bool Device::transceive(uint8_t *transmit, int transmit_length, uint8_t *receive
         // the compiler generates a warning.
         // Anyway, if this case occurs, something is really fucked up.
         turag_errorf("%s: rs485 transceive failed: Unknown error", name_);
-        myCurrentErrorCounter += attempt;
+        myCurrentErrorCounter += 1;
         return false;
     }
 }
@@ -440,6 +370,9 @@ bool Device::resetSlaveErrors(void) {
 	
 	return transceive(request, &response);
 }
+
+
+
 
 
 

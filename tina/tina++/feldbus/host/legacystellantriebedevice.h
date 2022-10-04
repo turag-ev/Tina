@@ -46,8 +46,9 @@ public:
 		 * 
 		 */
 		enum class WriteAccess : uint8_t {
-			no_write = TURAG_FELDBUS_STELLANTRIEBE_COMMAND_ACCESS_NO_WRITE_ACCESS,
-			write = TURAG_FELDBUS_STELLANTRIEBE_COMMAND_ACCESS_WRITE_ACCESS
+            read_only = TURAG_FELDBUS_STELLANTRIEBE_COMMAND_ACCESS_READ_ONLY_ACCESS,
+            write_only = TURAG_FELDBUS_STELLANTRIEBE_COMMAND_ACCESS_WRITE_ONLY_ACCESS,
+            read_write = TURAG_FELDBUS_STELLANTRIEBE_COMMAND_ACCESS_READ_AND_WRITE_ACCESS,
 		};
 			
 		/**
@@ -76,7 +77,7 @@ public:
 		Command_t() : 
 		factor(1.0f),
 		buffer(),
-		writeAccess(WriteAccess::no_write),
+        writeAccess(WriteAccess::read_only),
 		length(CommandLength::length_char),
 		bufferValid(false) {}
 	};
@@ -108,9 +109,8 @@ public:
 	 * \param[in] type
 	 * \param[in] addressLength
 	 */
-	LegacyStellantriebeDevice(const char* name, unsigned address, FeldbusAbstraction& feldbus, ChecksumType type = TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_CHECKSUM_TYPE,
-		const AddressLength addressLength = TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_ADDRESS_LENGTH) :
-				Device(name, address, feldbus, type, addressLength), commandSet(nullptr), commandSetLength(0), commandSetPopulated(false),
+    Aktor(const char* name, unsigned address, FeldbusAbstraction& feldbus, ChecksumType type = TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_CHECKSUM_TYPE) :
+                Device(name, address, feldbus, type), commandSet(nullptr), commandSetLength(0), commandSetPopulated(false),
                 structuredOutputTableLength(-1)  { }
 #else
 	LegacyStellantriebeDevice(const char* name, unsigned address, FeldbusAbstraction& feldbus, ChecksumType type = TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_CHECKSUM_TYPE,

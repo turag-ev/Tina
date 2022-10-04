@@ -94,6 +94,51 @@ bool Bootloader::unlockBootloader(void) {
 	}
 }
 
+bool Bootloader::receiveString(uint8_t command, uint8_t stringLength, char* out_string) {
+    if (!out_string) {
+        return false;
+    }
+
+    // because we receive a packet including address and checksum
+    // we need a slightly bigger array.
+    char recvBuffer[stringLength + myAddressLength + 1];
+
+
+    uint8_t request[myAddressLength + 1 + 1];
+    request[myAddressLength] = command;
+
+    if (!transceive(request,
+                      sizeof(request),
+                      reinterpret_cast<uint8_t*>(recvBuffer),
+                      stringLength + myAddressLength + 1)) {
+        return false;
+    }
+
+    for (int i = 0; i < stringLength; ++i) {
+        out_string[i] = recvBuffer[i + myAddressLength];
+    }
+    out_string[stringLength] = 0;
+
+    return true;
+}
+
+bool Bootloader::receiveMcuIdString(char* out_string) {
+    Device::Request<uint8_t> request;
+    request.data = TURAG_FELDBUS_BOOTLOADER_COMMAND_RECEIVE_MCU_STRING_LENGTH;
+
+    Device::Response<uint8_t> response;
+
+    if (transceive(request, &response)) {
+        return receiveString(
+            TURAG_FELDBUS_BOOTLOADER_COMMAND_RECEIVE_MCU_STRING,
+            response.data,
+            out_string);
+    } else {
+        return false;
+    }
+}
+
+
 
 uint16_t BootloaderAvrBase::getPageSize(void) {
 	if (myPageSize == 0) {
@@ -184,11 +229,10 @@ BootloaderAvrBase::ErrorCode BootloaderAvrBase::writeFlash(uint32_t byteAddress,
 		++pages;
 	}
 	
-    std::vector<uint8_t> request(addressLength() + 1 + 4 + myPageSize + 1);
-	request[addressLength()] = TURAG_FELDBUS_BOOTLOADER_AVR_PAGE_WRITE;
+    uint8_t request[myAddressLength + 1 + 4 + myPageSize + 1];
+    request[myAddressLength] = TURAG_FELDBUS_BOOTLOADER_AVR_PAGE_WRITE;
 	
-    const int response_len = addressLength() + 1 + 1;
-	uint8_t response[2 + 1 + 1];
+    uint8_t response[myAddressLength + 1 + 1];
 	
 	uint32_t targetAddress = byteAddress;
 	
@@ -197,22 +241,22 @@ BootloaderAvrBase::ErrorCode BootloaderAvrBase::writeFlash(uint32_t byteAddress,
 	} TURAG_PACKED;
 	
 	for (unsigned i = 0; i < pages; ++i) {
-		reinterpret_cast<uint32_t_packed*>(request.data() + addressLength() + 1)->value = targetAddress;
+        reinterpret_cast<uint32_t_packed*>(request + myAddressLength + 1)->value = targetAddress;
 
 		uint16_t currentPageSize = std::min(myPageSize, static_cast<uint16_t>(byteAddress + length - targetAddress));
-		memcpy(request.data() + addressLength() + 5, data, currentPageSize);
+        memcpy(request + myAddressLength + 5, data, currentPageSize);
 		
 		unsigned k = 0;
 		for (k = 0; k < maxTriesForWriting; ++k) {
 			if (!transceive(request.data(), request.size(), response, response_len)) {
 				return ErrorCode::transceive_error;
 			}
-			if (response[addressLength()] == TURAG_FELDBUS_BOOTLOADER_AVR_RESPONSE_SUCCESS) {
+            if (response[myAddressLength] == TURAG_FELDBUS_BOOTLOADER_AVR_RESPONSE_SUCCESS) {
 				break;
-			} else if (response[addressLength()] == TURAG_FELDBUS_BOOTLOADER_AVR_RESPONSE_FAIL_CONTENT) {
+            } else if (response[myAddressLength] == TURAG_FELDBUS_BOOTLOADER_AVR_RESPONSE_FAIL_CONTENT) {
 				continue;
 			} else {
-				return static_cast<ErrorCode>(response[addressLength()]);
+                return static_cast<ErrorCode>(response[myAddressLength]);
 			}
 		}
 		// we give up after a few tries.
@@ -245,19 +289,15 @@ BootloaderAvrBase::ErrorCode BootloaderAvrBase::readFlash(uint32_t byteAddress, 
 		return ErrorCode::invalid_args;
 	}
 	
-	uint32_t packetSize = myDeviceInfo.bufferSize() - addressLength() - 1 - 1;
-	
-	// We are conservative because the transmission is only secured with an 8 bit CRC.
-	packetSize = std::min(packetSize, static_cast<uint32_t>(64));
+    uint32_t packetSize = myDeviceInfo.bufferSize() - myAddressLength - 1 - 1;
 	
 	unsigned packets = length / packetSize;
 	if (length % packetSize) {
 		++packets;
 	}
 
-    const int request_len = addressLength() + 1 + 4 + 2 + 1;
-	uint8_t request[2 + 1 + 4 + 2 + 1];
-	request[addressLength()] = TURAG_FELDBUS_BOOTLOADER_AVR_DATA_READ;
+    uint8_t request[myAddressLength + 1 + 4 + 2 + 1];
+    request[myAddressLength] = TURAG_FELDBUS_BOOTLOADER_AVR_DATA_READ;
 	
 	uint32_t targetAddress = byteAddress;
 	
@@ -270,20 +310,20 @@ BootloaderAvrBase::ErrorCode BootloaderAvrBase::readFlash(uint32_t byteAddress, 
 		uint16_t currentPacketSize = std::min(packetSize, byteAddress + length - targetAddress);
 		
 
-		reinterpret_cast<header_packed*>(request + addressLength() + 1)->targetAddress = targetAddress;
-		reinterpret_cast<header_packed*>(request + addressLength() + 1)->currentPacketSize = currentPacketSize;
+        reinterpret_cast<header_packed*>(request + myAddressLength + 1)->targetAddress = targetAddress;
+        reinterpret_cast<header_packed*>(request + myAddressLength + 1)->currentPacketSize = currentPacketSize;
 
-		std::vector<uint8_t> response(addressLength() + 1 + currentPacketSize + 1);
+        uint8_t response[myAddressLength + 1 + currentPacketSize + 1];
 		
 		if (!transceive(request, request_len, response.data(), response.size())) {
 			return ErrorCode::transceive_error;
 		}
 		// this shouldn't happen
-		if (response[addressLength()] == TURAG_FELDBUS_BOOTLOADER_AVR_RESPONSE_FAIL_ADDRESS) {
+        if (response[myAddressLength] == TURAG_FELDBUS_BOOTLOADER_AVR_RESPONSE_FAIL_ADDRESS) {
 			return ErrorCode::invalid_address;
 		}
 		
-		memcpy(buffer, response.data() + addressLength() + 1, currentPacketSize);
+        memcpy(buffer, response + myAddressLength + 1, currentPacketSize);
 		
 		targetAddress += currentPacketSize;
 		buffer += currentPacketSize;
@@ -420,6 +460,61 @@ char BootloaderXmega::getRevisionId(void) {
 		}
 	}
 	return revisionId;
+}
+
+bool BootloaderStm32v2::readResetVectorStorageAddress() {
+    struct BootloaderAddresses {
+        uint32_t resetVectorStorageAddress;
+    } _packed;
+
+    Device::Request<uint8_t> request;
+    request.data = TURAG_FELDBUS_BOOTLOADER_STM32V2_GET_APP_RESET_VECTOR_STORAGE_ADDRESS;
+
+    Device::Response<BootloaderAddresses> response;
+
+    if (transceive(request, &response)) {
+        resetVectorStorageAddress = response.data.resetVectorStorageAddress;
+        return true;
+    }
+
+    return false;
+}
+
+uint32_t BootloaderStm32v2::getResetVectorStorageAddress() {
+    if (resetVectorStorageAddress == 0xFFFFFFFF) {
+        readResetVectorStorageAddress();
+    }
+    return resetVectorStorageAddress;
+}
+
+TURAG::Feldbus::BootloaderAvrBase::ErrorCode BootloaderStm32v2::transmitAppResetVectors(uint32_t stackAddress, uint32_t resetHandlerAddress) {
+    return transmitOrCommitAppResetVectors(TURAG_FELDBUS_BOOTLOADER_STM32V2_TRANSMIT_APP_RESET_VECTOR, stackAddress, resetHandlerAddress);
+}
+
+TURAG::Feldbus::BootloaderAvrBase::ErrorCode BootloaderStm32v2::commitAppResetVectors(uint32_t stackAddress, uint32_t resetHandlerAddress) {
+    return transmitOrCommitAppResetVectors(TURAG_FELDBUS_BOOTLOADER_STM32V2_COMMIT_APP_RESET_VECTOR, stackAddress, resetHandlerAddress);
+}
+
+
+TURAG::Feldbus::BootloaderAvrBase::ErrorCode BootloaderStm32v2::transmitOrCommitAppResetVectors(uint8_t command, uint32_t stackAddress, uint32_t resetHandlerAddress) {
+    struct StoreBootloaderAddressesRequest {
+        uint8_t cmd;
+        uint32_t stackAddress;
+        uint32_t resethandlerAddress;
+    } _packed;
+
+    Device::Request<StoreBootloaderAddressesRequest> request;
+    request.data.cmd = command;
+    request.data.stackAddress = stackAddress;
+    request.data.resethandlerAddress = resetHandlerAddress;
+
+    Device::Response<uint8_t> response;
+
+    if (transceive(request, &response)) {
+        return (TURAG::Feldbus::BootloaderAvrBase::ErrorCode)response.data;
+    }
+
+    return TURAG::Feldbus::BootloaderAvrBase::ErrorCode::transceive_error;
 }
 
 const char* Bootloader::getMcuName(uint16_t mcuId) {
