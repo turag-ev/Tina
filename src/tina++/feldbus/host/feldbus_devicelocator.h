@@ -15,7 +15,9 @@ namespace Feldbus {
 
 
 class DeviceLocator : public BaseDevice {
-    NOT_COPYABLE(DeviceLocator);
+    DeviceLocator(const DeviceLocator&) = delete;
+    DeviceLocator& operator=(const DeviceLocator&) = delete;
+
 public:
     DeviceLocator(FeldbusAbstraction& feldbus,
            ChecksumType type = TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_CHECKSUM_TYPE,

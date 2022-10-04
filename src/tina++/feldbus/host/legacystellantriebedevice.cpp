@@ -185,8 +185,7 @@ bool LegacyStellantriebeDevice::getValue(uint8_t key, float* value) {
             if (!transceive(request, &response)) {
                 return false;
             }
-            command->buffer.floatValue =
-                static_cast<float>(response.data) * command->factor;
+            command->buffer.floatValue = static_cast<float>(response.data) * command->factor;
             break;
         }
         case Command_t::CommandLength::length_short: {
@@ -195,24 +194,28 @@ bool LegacyStellantriebeDevice::getValue(uint8_t key, float* value) {
                 return false;
             }
             command->buffer.floatValue = static_cast<float>(response.data.value) * command->factor;
-        } else if (command->length == Command_t::CommandLength::length_long) {
+            break;
+        }
+        case Command_t::CommandLength::length_long: {
             Response<AktorGetLong> response;
             if (!transceive(request, &response)) {
                 return false;
             }
-            command->buffer.floatValue =
-                static_cast<float>(response.data.value) * command->factor;
+            command->buffer.floatValue = static_cast<float>(response.data.value) * command->factor;
             break;
-        } else {
+        }
+        default: {
             Response<AktorGetFloat> response;
             if (!transceive(request, &response)) {
                 return false;
-        }
+            }
             if (command->factor != TURAG_FELDBUS_STELLANTRIEBE_COMMAND_FACTOR_CONTROL_VALUE) {
                 command->buffer.floatValue = response.data.value * command->factor;
             } else {
                 command->buffer.floatValue = response.data.value;
             }
+            break;
+        }
         }
 
         // protocol definition: write-only values are bufferable
@@ -347,7 +350,9 @@ bool LegacyStellantriebeDevice::setValue(uint8_t key, float value) {
         if (!transceive(request, &response)) {
             return false;
         }
-    } else if (command->length == Command_t::CommandLength::length_long) {
+        break;
+    }
+    case Command_t::CommandLength::length_long: {
         Request<AktorSetLong> request;
         request.data.key = key;
         request.data.value = static_cast<int32_t>(value / command->factor);
@@ -355,7 +360,9 @@ bool LegacyStellantriebeDevice::setValue(uint8_t key, float value) {
         if (!transceive(request, &response)) {
             return false;
         }
-    } else {
+        break;
+    }
+    default: {
         Request<AktorSetFloat> request;
         request.data.key = key;
 
@@ -363,11 +370,13 @@ bool LegacyStellantriebeDevice::setValue(uint8_t key, float value) {
             request.data.value = value / command->factor;
         } else {
             request.data.value = value;
-    }
+        }
 
         if (!transceive(request, &response)) {
             return false;
         }
+        break;
+    }
     }
     return true;
 }
@@ -498,7 +507,7 @@ bool LegacyStellantriebeDevice::getCommandName(uint8_t key, char* out_name) {
     request[myAddressLength + 3] = TURAG_FELDBUS_STELLANTRIEBE_COMMAND_INFO_GET_NAME;
     
     if (!transceive(request,
-                    request_len,
+                    sizeof(request),
                     reinterpret_cast<uint8_t*>(out_name),
                     name_length + myAddressLength + 1)) {
         return false;

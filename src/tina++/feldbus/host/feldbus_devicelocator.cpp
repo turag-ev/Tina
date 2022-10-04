@@ -21,7 +21,7 @@ bool DeviceLocator::sendBroadcastPing(uint32_t* uuid) {
     // this seems to be required for proper alignment
     struct Value {
         uint32_t uuid;
-    } _packed;
+    } TURAG_PACKED;
 
     Response<Value> response;
 
@@ -37,7 +37,7 @@ bool DeviceLocator::sendUuidPing(uint32_t uuid) {
     struct Value {
         uint8_t key;
         uint32_t uuid;
-    } _packed;
+    } TURAG_PACKED;
 
     Broadcast<Value> request;
 
@@ -55,7 +55,7 @@ bool DeviceLocator::receiveBusAddress(uint32_t uuid, unsigned* busAddress) {
         uint8_t key;
         uint32_t uuid;
         uint8_t key2;
-    } _packed;
+    } TURAG_PACKED;
 
     Broadcast<Value> request;
 
@@ -80,14 +80,14 @@ bool DeviceLocator::setBusAddress(uint32_t uuid, unsigned busAddress) {
         uint32_t uuid;
         uint8_t key2;
         uint8_t busAddress;
-    } _packed;
+    } TURAG_PACKED;
 
     struct Value2 {
         uint8_t key;
         uint32_t uuid;
         uint8_t key2;
         uint16_t busAddress;
-    } _packed;
+    } TURAG_PACKED;
 
     Broadcast<Value> request;
 
@@ -111,7 +111,7 @@ bool DeviceLocator::resetBusAddress(uint32_t uuid) {
         uint8_t key;
         uint32_t uuid;
         uint8_t key2;
-    } _packed;
+    } TURAG_PACKED;
 
     Broadcast<Value> request;
 
@@ -163,7 +163,7 @@ bool DeviceLocator::requestBusAssertion(int searchmaskLength, uint32_t searchAdd
         uint8_t key;
         uint8_t searchMaskLength;
         uint32_t searchAddress;
-    } _packed;
+    } TURAG_PACKED;
 
 
     if (searchmaskLength < 0 || searchmaskLength > 32)

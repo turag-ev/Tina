@@ -47,7 +47,10 @@ namespace Feldbus {
  *
  */
 class BaseDevice {
-    NOT_COPYABLE(BaseDevice);
+    // not copyable
+    BaseDevice(const BaseDevice&) = delete;
+    BaseDevice& operator=(const BaseDevice&) = delete;
+
 public:
     /*!
      * \brief Struktur-Template zur Verwendung mit transceive().
@@ -60,7 +63,7 @@ public:
         uint8_t id;
         T data;
         uint8_t checksum;
-    } _packed;
+    } TURAG_PACKED;
 
     /**
      * \brief Struktur-Template zur Verwendung mit transceive().
@@ -72,7 +75,7 @@ public:
         uint8_t address;
         T data;
         uint8_t checksum;
-    } _packed;
+    } TURAG_PACKED;
 
     /**
      * \brief Struktur-Template zur Verwendung mit transceive().
@@ -84,7 +87,7 @@ public:
         uint8_t address;
         T data;
         uint8_t checksum;
-    } _packed;
+    } TURAG_PACKED;
 
 
 
@@ -156,7 +159,7 @@ protected:
      * Diese Funktion benutzt intern die plattformabhängige Funktion turag_rs485_transceive(),
      * deren Implementierung bestimmt, wie die Übertragung im Detail stattfindet.
      */
-    template<typename T, typename U> _always_inline
+    template<typename T, typename U> TURAG_INLINE
     FeldbusAbstraction::ResultStatus transceive(uint8_t address, Request<T>& transmit, Response<U>* receive) {
         return transceive(
                     address,
@@ -179,7 +182,7 @@ protected:
      * Diese Funktion benutzt intern die plattformabhängige Funktion turag_rs485_transceive(),
      * deren Implementierung bestimmt, wie die Übertragung im Detail stattfindet.
      */
-    template<typename T, typename U> _always_inline
+    template<typename T, typename U> TURAG_INLINE
     FeldbusAbstraction::ResultStatus transceive(uint8_t address, Broadcast<T>& transmit, Response<U>* receive) {
         return transceive(
                     address,
@@ -197,7 +200,7 @@ protected:
      * Sendet einen %Broadcast an die in transmit eingestellte Gerätegruppe und
      * kehrt zurück, sobald alle Daten geschrieben wurden.
      */
-    template<typename T> _always_inline
+    template<typename T> TURAG_INLINE
     FeldbusAbstraction::ResultStatus transceive(uint8_t address, Broadcast<T>& transmit) {
         return transceive(
                     address,
@@ -236,7 +239,7 @@ struct BaseDevice::Broadcast<void> {
     uint8_t address;
     uint8_t id;
     uint8_t checksum;
-} _packed;
+} TURAG_PACKED;
 
 /**
 * \brief Struktur-Template zur Verwendung mit transceive().
@@ -247,7 +250,7 @@ template<>
 struct BaseDevice::Request<void> {
     uint8_t address;
     uint8_t checksum;
-} _packed;
+} TURAG_PACKED;
 
 /**
 * \brief Struktur-Template zur Verwendung mit transceive().
@@ -258,7 +261,7 @@ template<>
 struct BaseDevice::Response<void> {
     uint8_t address;
     uint8_t checksum;
-} _packed;
+} TURAG_PACKED;
 
 
 

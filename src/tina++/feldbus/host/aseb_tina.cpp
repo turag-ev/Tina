@@ -244,7 +244,7 @@ bool ASEBBase::sync(void) {
         request[myAddressLength] = TURAG_FELDBUS_ASEB_SYNC;
 
         if (!transceive(request,
-                        request_len,
+                        sizeof(request),
 						syncBuffer_,
                         syncSize_)) {
             return false;
@@ -520,7 +520,7 @@ bool ASEBBase::getCommandName(unsigned key, char* out_name) {
     request[myAddressLength + 1] = key;
 
     if (!transceive(request,
-                    request_len,
+                    sizeof(request),
                     reinterpret_cast<uint8_t*>(out_name),
                     name_length + myAddressLength + 1)) {
         return false;

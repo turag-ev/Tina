@@ -486,7 +486,7 @@ public:
      * Diese Funktion benutzt intern die plattformabhängige Funktion turag_rs485_transceive(),
      * deren Implementierung bestimmt, wie die Übertragung im Detail stattfindet.
      */
-    template<typename T, typename U> _always_inline
+    template<typename T, typename U> TURAG_INLINE
     bool transceive(Broadcast<T>& transmit, Response<U>* receive, bool ignoreDysfunctional = false) {
         return transceive(
                     reinterpret_cast<uint8_t*>(&(transmit)), sizeof(Broadcast<T>),

@@ -9,50 +9,50 @@ namespace Feldbus {
 
 struct PackedUint16 {
     uint16_t value;
-} _packed;
+} TURAG_PACKED;
 
 struct PackedUint8 {
     uint8_t value;
-} _packed;
+} TURAG_PACKED;
 
 struct PackedUint8Uint8 {
     uint8_t value1;
     uint8_t value2;
-} _packed;
+} TURAG_PACKED;
 
 struct CmdPackedUint16 {
     uint8_t cmd;
     uint16_t value;
-} _packed;
+} TURAG_PACKED;
 
 struct CmdPackedUint16Uint8Uint8 {
     uint8_t cmd;
     uint16_t value1;
     uint8_t value2;
     uint8_t value3;
-} _packed;
+} TURAG_PACKED;
 
 struct CmdPackedUint8Uint8Uint8 {
     uint8_t cmd;
     uint8_t value1;
     uint8_t value2;
     uint8_t value3;
-} _packed;
+} TURAG_PACKED;
 
 struct Cmd {
     uint8_t cmd;
-} _packed;
+} TURAG_PACKED;
 
 struct CmdPackedUint8 {
     uint8_t cmd;
     uint8_t value;
-} _packed;
+} TURAG_PACKED;
 
 struct CmdPackedUint8Uint8 {
     uint8_t cmd;
     uint8_t value1;
     uint8_t value2;
-} _packed;
+} TURAG_PACKED;
 
 
 

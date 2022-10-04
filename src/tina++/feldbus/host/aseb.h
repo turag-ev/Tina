@@ -369,7 +369,6 @@ public:
      * \param[in] feldbus Referenz auf eine FeldbusAbstraction-Instanz, die den zu verwendenden Bus repräsentiert.
      * \param[in] type Typ der verwendeten Checksumme.
 	 */
-        Aseb(name, address, feldbus, type)  { }
     ASEB(const char* name, unsigned int address, FeldbusAbstraction& feldbus, ChecksumType type = TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_CHECKSUM_TYPE):
         ASEBBase(name, address, feldbus, type)  { }
 	

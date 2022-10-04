@@ -248,7 +248,7 @@ BootloaderAvrBase::ErrorCode BootloaderAvrBase::writeFlash(uint32_t byteAddress,
 		
 		unsigned k = 0;
 		for (k = 0; k < maxTriesForWriting; ++k) {
-			if (!transceive(request.data(), request.size(), response, response_len)) {
+            if (!transceive(request, sizeof(request), response, sizeof(response))) {
 				return ErrorCode::transceive_error;
 			}
             if (response[myAddressLength] == TURAG_FELDBUS_BOOTLOADER_AVR_RESPONSE_SUCCESS) {
@@ -315,7 +315,7 @@ BootloaderAvrBase::ErrorCode BootloaderAvrBase::readFlash(uint32_t byteAddress, 
 
         uint8_t response[myAddressLength + 1 + currentPacketSize + 1];
 		
-		if (!transceive(request, request_len, response.data(), response.size())) {
+        if (!transceive(request, sizeof(request), response, sizeof(response))) {
 			return ErrorCode::transceive_error;
 		}
 		// this shouldn't happen
@@ -465,7 +465,7 @@ char BootloaderXmega::getRevisionId(void) {
 bool BootloaderStm32v2::readResetVectorStorageAddress() {
     struct BootloaderAddresses {
         uint32_t resetVectorStorageAddress;
-    } _packed;
+    } TURAG_PACKED;
 
     Device::Request<uint8_t> request;
     request.data = TURAG_FELDBUS_BOOTLOADER_STM32V2_GET_APP_RESET_VECTOR_STORAGE_ADDRESS;
@@ -501,7 +501,7 @@ TURAG::Feldbus::BootloaderAvrBase::ErrorCode BootloaderStm32v2::transmitOrCommit
         uint8_t cmd;
         uint32_t stackAddress;
         uint32_t resethandlerAddress;
-    } _packed;
+    } TURAG_PACKED;
 
     Device::Request<StoreBootloaderAddressesRequest> request;
     request.data.cmd = command;
@@ -511,7 +511,7 @@ TURAG::Feldbus::BootloaderAvrBase::ErrorCode BootloaderStm32v2::transmitOrCommit
     Device::Response<uint8_t> response;
 
     if (transceive(request, &response)) {
-        return (TURAG::Feldbus::BootloaderAvrBase::ErrorCode)response.data;
+        return static_cast<TURAG::Feldbus::BootloaderAvrBase::ErrorCode>(response.data);
     }
 
     return TURAG::Feldbus::BootloaderAvrBase::ErrorCode::transceive_error;
