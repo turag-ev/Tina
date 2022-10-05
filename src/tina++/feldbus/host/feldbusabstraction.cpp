@@ -56,7 +56,7 @@ FeldbusAbstraction::ResultStatus FeldbusAbstraction::transceive(const uint8_t *t
 				checksum_correct = XOR::check(receive, *receive_length-1, receive[*receive_length-1]);
 				break;
 
-			case ChecksumType::crc8_icode:
+            case ChecksumType::crc8:
 				checksum_correct = CRC8::check(receive, *receive_length-1, receive[*receive_length-1]);
 				break;
 

@@ -19,7 +19,7 @@ FeldbusAbstraction::ResultStatus BaseDevice::transceive(uint8_t address, uint8_t
         transmit[transmit_length - 1] = XOR::calculate(transmit, transmit_length - 1);
         break;
 
-    case ChecksumType::crc8_icode:
+    case ChecksumType::crc8:
         transmit[transmit_length - 1] = CRC8::calculate(transmit, transmit_length - 1);
         break;
 

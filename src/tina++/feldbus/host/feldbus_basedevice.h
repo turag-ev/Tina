@@ -29,7 +29,7 @@
 /// Checksummen-Algorithmus der beim Instanziieren von Feldbusklassen
 /// standardmäßig benutzt wird.
 #if !defined(TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_CHECKSUM_TYPE) || defined(__DOXYGEN__)
-# define TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_CHECKSUM_TYPE			TURAG::Feldbus::ChecksumType::crc8_icode
+# define TURAG_FELDBUS_DEVICE_CONFIG_STANDARD_CHECKSUM_TYPE			TURAG::Feldbus::ChecksumType::crc8
 #endif
 
 
