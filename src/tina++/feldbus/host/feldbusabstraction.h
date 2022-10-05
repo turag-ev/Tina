@@ -23,7 +23,7 @@ namespace Feldbus {
  */
 enum class ChecksumType : uint8_t {
 	xor_based = TURAG_FELDBUS_CHECKSUM_XOR, ///< XOR-Checksumme.
-	crc8_icode = TURAG_FELDBUS_CHECKSUM_CRC8_ICODE, ///< CRC8-Checksumme.
+    crc8_icode = TURAG_FELDBUS_CHECKSUM_CRC8, ///< CRC8-Checksumme.
 	none = 0xFF ///< Keine Checksumme verwenden.
 };
 

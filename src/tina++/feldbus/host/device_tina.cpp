@@ -27,16 +27,44 @@ namespace Feldbus {
 
 namespace {
 
-struct DeviceInfoInternal {
+struct TURAG_PACKED DeviceInfoInternal {
     uint8_t deviceProtocolId;
     uint8_t deviceTypeId;
-    uint8_t crcType;
-	uint16_t bufferSize;
-	uint16_t reserved;
-    uint8_t nameLength;
-    uint8_t versioninfoLength;
+    union {
+        struct {
+            uint8_t crcType: 3;
+            uint8_t deviceInfoNewVariant: 1;
+            uint8_t reserved: 3;
+            uint8_t packaStatisticsAvailability: 1;
+        };
+        uint8_t crcDataField;
+    };
+    union {
+        struct TURAG_PACKED {
+            uint16_t bufferSize;
+            uint16_t reserved;
+            uint8_t nameLength;
+            uint8_t versioninfoLength;
+        } legacy;
+        struct TURAG_PACKED {
+            uint16_t extendedDeviceInfoSize;
+            uint32_t uuid;
+        } newType;
+    } variable;
     uint16_t uptimeFrequency;
-} TURAG_PACKED;
+};
+
+struct TURAG_PACKED BaseRequest {
+    BaseRequest() : zeroKey(0), key(0) { }
+
+    uint8_t zeroKey;
+    uint8_t key;
+};
+
+struct TURAG_PACKED PackedUint32 {
+    uint32_t value;
+};
+
 
 }
 
@@ -98,9 +126,9 @@ bool Device::transceive(uint8_t *transmit, int transmit_length, uint8_t *receive
 	// is then most likely the device still being dysfunctional.
     if (isDysfunctional()) {
         status = BaseDevice::transceive(useAddress, transmit, transmit_length, receive, receive_length, 1);
-			} else {
+    } else {
         status = BaseDevice::transceive(useAddress, transmit, transmit_length, receive, receive_length);
-			}
+    }
 
 
     switch (status)
@@ -169,15 +197,64 @@ bool Device::getDeviceInfo(DeviceInfo* device_info) {
         if (!transceive(request, &response)) {
             return false;
         }
-		myDeviceInfo.deviceProtocolId_ = response.data.deviceProtocolId;
+
+        if (response.data.deviceInfoNewVariant) {
+            myDeviceInfo.uuid_ = response.data.variable.newType.uuid;
+            myDeviceInfo.extendedDeviceInfoPacketSize_ = response.data.variable.newType.extendedDeviceInfoSize;
+        } else {
+            Request<BaseRequest> uuidRequest;
+            uuidRequest.data.key = TURAG_FELDBUS_DEVICE_COMMAND_GET_UUID;
+
+            Response<PackedUint32> uuidResponse;
+
+            if (!transceive(uuidRequest, &uuidResponse)) {
+                return false;
+            }
+            myDeviceInfo.uuid_ = uuidResponse.data.value;
+            myDeviceInfo.extendedDeviceInfoPacketSize_ = 0;
+
+            myExtendedDeviceInfo.bufferSize_ = response.data.variable.legacy.bufferSize;
+            myExtendedDeviceInfo.nameLength_ = response.data.variable.legacy.nameLength;
+            myExtendedDeviceInfo.versioninfoLength_ = response.data.variable.legacy.versioninfoLength;
+        }
+
+        myDeviceInfo.deviceProtocolId_ = response.data.deviceProtocolId;
 		myDeviceInfo.deviceTypeId_ = response.data.deviceTypeId;
-		myDeviceInfo.crcType_ = response.data.crcType;
-		myDeviceInfo.bufferSize_ = response.data.bufferSize;
-		myDeviceInfo.nameLength_ = response.data.nameLength;
-		myDeviceInfo.versioninfoLength_ = response.data.versioninfoLength;
-		myDeviceInfo.uptimeFrequency_ = response.data.uptimeFrequency;
+        myDeviceInfo.crcDataField_ = response.data.crcDataField;
+        myDeviceInfo.uptimeFrequency_ = response.data.uptimeFrequency;
+
     }
     if (device_info) *device_info = myDeviceInfo;
+    return true;
+}
+
+bool Device::getExtendedDeviceInfo(ExtendedDeviceInfo *extended_device_info) {
+    if (!getDeviceInfo(nullptr)) {
+        return false;
+    }
+
+    if (!myExtendedDeviceInfo.isValid()) {
+        Request<BaseRequest> request;
+        request.data.key = TURAG_FELDBUS_DEVICE_COMMAND_GET_EXTENDED_INFO;
+
+        // because we receive a packet including address and checksum
+        // we need a slightly bigger array.
+        const int receive_length = myDeviceInfo.extendedDeviceInfoPacketSize() + myAddressLength + 1;
+        uint8_t recvBuffer[receive_length];
+
+        if (!transceive(reinterpret_cast<uint8_t*>(&request),
+                          sizeof(request),
+                          recvBuffer,
+                          receive_length)) {
+            return false;
+        }
+
+        myExtendedDeviceInfo.nameLength_ = recvBuffer[myAddressLength + 1];
+        myExtendedDeviceInfo.versioninfoLength_ = recvBuffer[myAddressLength + 2];
+        memcpy(&myExtendedDeviceInfo.bufferSize_, recvBuffer + myAddressLength + 3, 2);
+    }
+
+    if (extended_device_info) *extended_device_info = myExtendedDeviceInfo;
     return true;
 }
 
@@ -186,15 +263,13 @@ bool Device::receiveDeviceRealName(char* out_string) {
     // so our device info would be empty. Because the device
     // info contains the length of the string we are about 
 	// to receive, we make sure getDeviceInfo() gets called.
-	if (!myDeviceInfo.isValid()) {
-		if (!getDeviceInfo(nullptr)) {
-			return false;
-		}
-	}
+    if (!getExtendedDeviceInfo(nullptr)) {
+        return false;
+    }
 
     return receiveString(
-		TURAG_FELDBUS_SLAVE_COMMAND_DEVICE_NAME, 
-		myDeviceInfo.nameLength(),
+        TURAG_FELDBUS_DEVICE_COMMAND_DEVICE_NAME,
+        myExtendedDeviceInfo.nameLength(),
 		out_string);
 }
 
@@ -203,15 +278,13 @@ bool Device::receiveVersionInfo(char* out_string) {
     // so our device info would be empty. Because the device
     // info contains the length of the string we are about 
 	// to receive, we make sure getDeviceInfo() gets called.
-	if (!myDeviceInfo.isValid()) {
-		if (!getDeviceInfo(nullptr)) {
-			return false;
-		}
-	}
+    if (!getExtendedDeviceInfo(nullptr)) {
+        return false;
+    }
 
     return receiveString(
-		TURAG_FELDBUS_SLAVE_COMMAND_VERSIONINFO, 
-		myDeviceInfo.versionInfoLength(),
+        TURAG_FELDBUS_DEVICE_COMMAND_VERSIONINFO,
+        myExtendedDeviceInfo.versionInfoLength(),
 		out_string);
 }
 
@@ -219,24 +292,17 @@ bool Device::receiveString(uint8_t command, uint8_t stringLength, char* out_stri
     if (!out_string) {
 		return false;
     }
-    
+
+    Request<BaseRequest> request;
+    request.data.key = command;
+
     // because we receive a packet including address and checksum
     // we need a slightly bigger array.
-	char recvBuffer[stringLength + myAddressLength + 1];
+    uint8_t recvBuffer[stringLength + myAddressLength + 1];
 
-    struct cmd {
-        uint8_t a;
-        uint8_t b;
-    };
-
-    const int request_len = myAddressLength + 2 + 1;
-	uint8_t request[2 + 2 + 1];
-	request[myAddressLength] = 0;
-	request[myAddressLength + 1] = command;
-	
-    if (!transceive(request,
-                      request_len,
-                      reinterpret_cast<uint8_t*>(recvBuffer),
+    if (!transceive(reinterpret_cast<uint8_t*>(&request),
+                      sizeof(request),
+                      recvBuffer,
                       stringLength + myAddressLength + 1)) {
         return false;
     }
@@ -267,7 +333,7 @@ bool Device::receiveUptime(float* uptime) {
 	
 	uint32_t count = 0;
 	
-	if (!receiveErrorCount(TURAG_FELDBUS_SLAVE_COMMAND_UPTIME_COUNTER, &count)) {
+    if (!receiveErrorCount(TURAG_FELDBUS_DEVICE_COMMAND_UPTIME_COUNTER, &count)) {
 		return false;
 	}
 
@@ -276,19 +342,19 @@ bool Device::receiveUptime(float* uptime) {
 }
 
 bool Device::receiveNumberOfAcceptedPackages(uint32_t* packageCount) {
-	return receiveErrorCount(TURAG_FELDBUS_SLAVE_COMMAND_PACKAGE_COUNT_CORRECT, packageCount);
+    return receiveErrorCount(TURAG_FELDBUS_DEVICE_COMMAND_PACKAGE_COUNT_CORRECT, packageCount);
 }
 
 bool Device::receiveNumberOfOverflows(uint32_t* overflowCount) {
-	return receiveErrorCount(TURAG_FELDBUS_SLAVE_COMMAND_PACKAGE_COUNT_BUFFEROVERFLOW, overflowCount);
+    return receiveErrorCount(TURAG_FELDBUS_DEVICE_COMMAND_PACKAGE_COUNT_BUFFEROVERFLOW, overflowCount);
 }
 
 bool Device::receiveNumberOfLostPackages(uint32_t* lostPackagesCount) {
-	return receiveErrorCount(TURAG_FELDBUS_SLAVE_COMMAND_PACKAGE_COUNT_LOST, lostPackagesCount);
+    return receiveErrorCount(TURAG_FELDBUS_DEVICE_COMMAND_PACKAGE_COUNT_LOST, lostPackagesCount);
 }
 
 bool Device::receiveNumberOfChecksumErrors(uint32_t* checksumErrorCount) {
-	return receiveErrorCount(TURAG_FELDBUS_SLAVE_COMMAND_PACKAGE_COUNT_CHKSUM_MISMATCH, checksumErrorCount);
+    return receiveErrorCount(TURAG_FELDBUS_DEVICE_COMMAND_PACKAGE_COUNT_CHKSUM_MISMATCH, checksumErrorCount);
 }
 
 bool Device::receiveErrorCount(uint8_t command, uint32_t* buffer) {
@@ -296,21 +362,10 @@ bool Device::receiveErrorCount(uint8_t command, uint32_t* buffer) {
 		return false;
 	}
 	
-	struct cmd {
-		uint8_t a;
-		uint8_t b;
-	};
-
-	Request<cmd> request;
-	request.data.a = 0;
-	request.data.b = command;
+    Request<BaseRequest> request;
+    request.data.key = command;
 	
-	// this seems to be required for proper alignment
-	struct Value {
-		uint32_t value;
-	} TURAG_PACKED;
-
-	Response<Value> response;
+    Response<PackedUint32> response;
 	
 	if (!transceive(request, &response)) {
 		return false;
@@ -326,14 +381,8 @@ bool Device::receiveAllSlaveErrorCount(uint32_t* counts) {
 		return false;
 	}
 	
-	struct cmd {
-		uint8_t a;
-		uint8_t b;
-	};
-
-	Request<cmd> request;
-	request.data.a = 0;
-	request.data.b = TURAG_FELDBUS_SLAVE_COMMAND_PACKAGE_COUNT_ALL;
+    Request<BaseRequest> request;
+    request.data.key = TURAG_FELDBUS_DEVICE_COMMAND_PACKAGE_COUNT_ALL;
 	
 	struct Value {
 		uint32_t packageCount;
@@ -357,14 +406,8 @@ bool Device::receiveAllSlaveErrorCount(uint32_t* counts) {
 }
 
 bool Device::resetSlaveErrors(void) {
-	struct cmd {
-		uint8_t a;
-		uint8_t b;
-	};
-
-	Request<cmd> request;
-	request.data.a = 0;
-	request.data.b = TURAG_FELDBUS_SLAVE_COMMAND_RESET_PACKAGE_COUNT;
+    Request<BaseRequest> request;
+    request.data.key = TURAG_FELDBUS_DEVICE_COMMAND_RESET_PACKAGE_COUNT;
 
 	Response<> response;
 	

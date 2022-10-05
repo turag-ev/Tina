@@ -281,7 +281,7 @@ BootloaderAvrBase::ErrorCode BootloaderAvrBase::readFlash(uint32_t byteAddress, 
 		turag_errorf("%s: tried to call BootloaderAtmega::readData, but couldn't read flash size", name());
 		return ErrorCode::preconditions_not_met;
 	}
-	if (!getDeviceInfo(nullptr)) {
+    if (!getExtendedDeviceInfo(nullptr)) {
 		turag_errorf("%s: tried to call BootloaderAtmega::readData, but couldn't read device info", name());
 		return ErrorCode::preconditions_not_met;
 	}
@@ -290,7 +290,7 @@ BootloaderAvrBase::ErrorCode BootloaderAvrBase::readFlash(uint32_t byteAddress, 
 		return ErrorCode::invalid_args;
 	}
 	
-    uint32_t packetSize = myDeviceInfo.bufferSize() - myAddressLength - 1 - 1;
+    uint32_t packetSize = myExtendedDeviceInfo.bufferSize() - myAddressLength - 1 - 1;
 	
 	unsigned packets = length / packetSize;
 	if (length % packetSize) {

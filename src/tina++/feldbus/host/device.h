@@ -156,33 +156,48 @@ public:
 
     public:
         DeviceInfo()
-            : uptimeFrequency_(0),
-              bufferSize_(0),
-              deviceProtocolId_(0),
+            : deviceProtocolId_(0),
               deviceTypeId_(0),
-              crcType_(0),
-              nameLength_(0),
-              versioninfoLength_(0) {}
+              crcDataField_(0xFF),
+              extendedDeviceInfoPacketSize_(0),
+              uuid_(0),
+              uptimeFrequency_(0) {}
 
-        bool isValid(void) { return bufferSize_ != 0; }
+        bool isValid(void) { return crcDataField_ != 0xFF; }
 
         uint8_t deviceProtocolId(void) const { return deviceProtocolId_; }
         uint8_t deviceTypeId(void) const { return deviceTypeId_; }
-        ChecksumType crcType(void) const { return static_cast<ChecksumType>(crcType_ & 0x07); }
-        bool packageStatisticsAvailable(void) const { return crcType_ & 0x80 ? true : false; }
-        uint16_t bufferSize(void) const { return bufferSize_; }
-        uint8_t nameLength(void) const { return nameLength_; }
-        uint8_t versionInfoLength(void) const { return versioninfoLength_; }
+        ChecksumType crcType(void) const { return static_cast<ChecksumType>(crcDataField_ & 0x07); }
+        bool packageStatisticsAvailable(void) const { return crcDataField_ & 0x80; }
+        bool legacyDeviceInfoPacket() const { return !(crcDataField_ & 0x08); }
         uint16_t uptimeFrequency(void) const { return uptimeFrequency_; }
+        uint16_t extendedDeviceInfoPacketSize(void) const { return extendedDeviceInfoPacketSize_; }
+        uint32_t uuid(void) const { return uuid_; }
 
     private:
-        uint16_t uptimeFrequency_;
-        uint16_t bufferSize_;
         uint8_t deviceProtocolId_;
         uint8_t deviceTypeId_;
-        uint8_t crcType_;
+        uint8_t crcDataField_;
+        uint16_t extendedDeviceInfoPacketSize_;
+        uint32_t uuid_;
+        uint16_t uptimeFrequency_;
+    };
+
+    class ExtendedDeviceInfo {
+        friend class Device;
+
+    public:
+        ExtendedDeviceInfo() : nameLength_(0), versioninfoLength_(0), bufferSize_(0) {}
+
+        uint8_t nameLength(void) const { return nameLength_; }
+        uint8_t versionInfoLength(void) const { return versioninfoLength_; }
+        uint16_t bufferSize(void) const { return bufferSize_; }
+        bool isValid() const { return bufferSize_ > 0; }
+
+    private:
         uint8_t nameLength_;
         uint8_t versioninfoLength_;
+        uint16_t bufferSize_;
     };
 
 
@@ -276,6 +291,8 @@ public:
 	 * ausgelesen werden.
 	 */
     bool getDeviceInfo(DeviceInfo* device_info);
+
+    bool getExtendedDeviceInfo(ExtendedDeviceInfo* extended_device_info);
 
     /*!
 	 * \brief Empfängt die im Gerät hinterlegte Bezeichnung des Slaves.
@@ -596,6 +613,7 @@ protected:
 	 * \brief Puffert die DeviceInfo-Struktur des Gerätes.
 	 */
     DeviceInfo myDeviceInfo;
+    ExtendedDeviceInfo myExtendedDeviceInfo;
 
 
 private:
