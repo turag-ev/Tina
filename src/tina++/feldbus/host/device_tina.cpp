@@ -18,6 +18,7 @@
 #include <tina++/crc/crc.h>
 #include <tina/debug/print.h>
 #include <tina/math.h>
+#include <cstring>
 
 #include "device.h"
 
